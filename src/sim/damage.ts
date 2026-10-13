@@ -2,14 +2,16 @@
  * Gen 4 damage formula on computed stats (never base stats).
  *
  *   base = floor(floor(floor(2 * level / 5 + 2) * power * A / D) / 50) + 2
- *   then, flooring after each step: crit x2, random 85..100 / 100,
- *   STAB x1.5, type effectiveness per defending type.
+ *   (A and D include stat stages) then, flooring after each step: burn x0.5
+ *   on physical, crit x2, random 85..100 / 100, STAB x1.5, type
+ *   effectiveness per defending type.
  *
  * Minimum 1 damage unless the move has no effect.
  */
 import { typeEffectiveness } from '../data/pokedata';
 import type { MoveCategory } from '../data/pokedata';
 import type { Rng } from './rng';
+import { stageMultiplier } from './status';
 import type { Stats } from './stats';
 
 export interface DamageContext {
@@ -21,6 +23,14 @@ export interface DamageContext {
   attackerStats: Stats;
   defenderTypes: readonly number[];
   defenderStats: Stats;
+  /** Stat stage of the attacking stat (atk or spa), -6..+6. Default 0. */
+  attackStage?: number;
+  /** Stat stage of the defending stat (def or spd), -6..+6. Default 0. */
+  defenseStage?: number;
+  /** Attacker is burned: physical damage halved. */
+  attackerBurned?: boolean;
+  /** Burn multiplier, from config; default 0.5. */
+  burnMultiplier?: number;
 }
 
 export interface DamageResult {
@@ -46,12 +56,15 @@ export function typeMultiplier(moveType: number, defenderTypes: readonly number[
 /** Deterministic damage for a given crit flag and random roll. */
 export function computeDamage(ctx: DamageContext, crit: boolean, roll: number): DamageResult {
   if (!Number.isInteger(roll) || roll < 85 || roll > 100) throw new Error(`computeDamage: roll must be 85..100, got ${roll}`);
-  const attack = ctx.category === 'physical' ? ctx.attackerStats.atk : ctx.attackerStats.spa;
-  const defense = ctx.category === 'physical' ? ctx.defenderStats.def : ctx.defenderStats.spd;
+  const rawAttack = ctx.category === 'physical' ? ctx.attackerStats.atk : ctx.attackerStats.spa;
+  const rawDefense = ctx.category === 'physical' ? ctx.defenderStats.def : ctx.defenderStats.spd;
+  const attack = Math.max(1, Math.floor(rawAttack * stageMultiplier(ctx.attackStage ?? 0)));
+  const defense = Math.max(1, Math.floor(rawDefense * stageMultiplier(ctx.defenseStage ?? 0)));
   const stab = ctx.attackerTypes.includes(ctx.moveType);
   const effectiveness = typeMultiplier(ctx.moveType, ctx.defenderTypes);
 
   let damage = baseDamage(ctx.level, ctx.power, attack, defense);
+  if (ctx.attackerBurned && ctx.category === 'physical') damage = Math.floor(damage * (ctx.burnMultiplier ?? 0.5));
   if (crit) damage *= 2;
   damage = Math.floor((damage * roll) / 100);
   if (stab) damage = Math.floor(damage * 1.5);

@@ -8,7 +8,7 @@ import config from '../data/config.json';
 import { hits, rollDamage, type DamageResult } from './damage';
 import { gainExp, hitExp, koExp } from './exp';
 import { buildPath, isPlaceable, pointAlongPath, validateMap, type LevelPath, type MapDef, type Tile } from './map';
-import { createMonster, setMonsterLevel, type Monster } from './monster';
+import { activeMoveId, createMonster, setMonsterLevel, type Monster } from './monster';
 import { Rng } from './rng';
 import { attackCooldown, enemyTilesPerSec, type SpeedConfig } from './speed';
 import { generateWave, type LevelDef, type SpawnDef } from './waves';
@@ -260,7 +260,7 @@ function grantExp(state: LevelState, tower: Tower, amount: number, events: Level
 }
 
 function attack(state: LevelState, tower: Tower, enemy: Enemy, events: LevelEvent[]): void {
-  const moveId = tower.mon.moves[0];
+  const moveId = activeMoveId(tower.mon);
   if (moveId === undefined) return;
   const move = getMove(moveId);
   events.push({ type: 'attack', towerId: tower.id, enemyId: enemy.id });

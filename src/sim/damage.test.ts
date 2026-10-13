@@ -87,6 +87,21 @@ describe('computeDamage', () => {
     expect(computeDamage(special, false, 100).damage).toBe(7);
   });
 
+  it('applies attack and defense stages before the core formula', () => {
+    // atk 13 at +1 -> 19; 4*40*19/6 = 506.67 -> 506; /50 -> 10; +2 = 12
+    expect(computeDamage({ ...tackle, attackStage: 1 }, false, 100).damage).toBe(12);
+    // def 6 at +2 -> 12; 4*40*13/12 = 173.3 -> 173; /50 -> 3; +2 = 5
+    expect(computeDamage({ ...tackle, defenseStage: 2 }, false, 100).damage).toBe(5);
+    // atk at -6 -> floor(13 * 0.25) = 3; 4*40*3/6 = 80; /50 -> 1; +2 = 3
+    expect(computeDamage({ ...tackle, attackStage: -6 }, false, 100).damage).toBe(3);
+  });
+
+  it('halves physical damage from a burned attacker, not special', () => {
+    expect(computeDamage({ ...tackle, attackerBurned: true }, false, 100).damage).toBe(4);
+    expect(computeDamage({ ...tackle, category: 'special', attackerBurned: true }, false, 100).damage).toBe(7);
+    expect(computeDamage({ ...tackle, attackerBurned: true, burnMultiplier: 0.25 }, false, 100).damage).toBe(2);
+  });
+
   it('rejects rolls outside 85..100', () => {
     expect(() => computeDamage(tackle, false, 84)).toThrow();
     expect(() => computeDamage(tackle, false, 101)).toThrow();

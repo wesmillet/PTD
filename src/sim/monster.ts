@@ -3,7 +3,15 @@
  */
 import { getMove, getPokemon, type GrowthRate } from '../data/pokedata';
 import { expForLevel } from '../data/pokedata';
+import { startingMoves } from './moves';
 import { computeStats, type Stats } from './stats';
+import { createStatus, type StatusState } from './status';
+
+export interface MoveSlot {
+  id: number;
+  pp: number;
+  maxPp: number;
+}
 
 export interface Monster {
   species: number;
@@ -15,13 +23,27 @@ export interface Monster {
   types: number[];
   stats: Stats;
   hp: number;
-  /** Move ids; the first one is the active move for now. */
-  moves: number[];
+  /** Up to four known moves. */
+  moves: MoveSlot[];
+  /** Index into `moves` of the move used when attacking. */
+  activeMove: number;
+  status: StatusState;
+  shiny: boolean;
 }
 
-export function createMonster(species: number, level: number, moves: readonly number[] = []): Monster {
+export interface MonsterOptions {
+  shiny?: boolean;
+}
+
+export function makeMoveSlot(id: number): MoveSlot {
+  const pp = getMove(id).pp ?? 0;
+  return { id, pp, maxPp: pp };
+}
+
+/** Creates an instance; `moves` defaults to the level-up moves known at `level`. */
+export function createMonster(species: number, level: number, moves?: readonly number[], options: MonsterOptions = {}): Monster {
   const data = getPokemon(species);
-  for (const m of moves) getMove(m); // validate
+  const moveIds = moves ?? startingMoves(species, level);
   const stats = computeStats(data.base, level);
   return {
     species,
@@ -33,8 +55,16 @@ export function createMonster(species: number, level: number, moves: readonly nu
     types: [...data.types],
     stats,
     hp: stats.hp,
-    moves: [...moves],
+    moves: moveIds.slice(0, 4).map(makeMoveSlot),
+    activeMove: 0,
+    status: createStatus(),
+    shiny: options.shiny ?? false,
   };
+}
+
+/** Id of the move the Pokémon attacks with, or undefined if it knows none. */
+export function activeMoveId(mon: Monster): number | undefined {
+  return mon.moves[mon.activeMove]?.id ?? mon.moves[0]?.id;
 }
 
 /** Recomputes stats for a new level, keeping the current HP fraction. */
