@@ -17,8 +17,12 @@ import Phaser from 'phaser';
 import { DIRECTION_ROWS, parseAnimData, ticksToMs, type AnimData, type AnimEntry } from './animData';
 import { ALL_DIRECTIONS, type Direction } from './direction';
 
-/** Folder that `scripts/fetch-sprites.sh` fills, relative to the site root. */
-export const SPRITE_ROOT = 'assets/sprites';
+/**
+ * Folder that `scripts/fetch-sprites.sh` fills, resolved against Vite's
+ * `base` so requests work both in `vite dev` and under the GitHub Pages
+ * subpath (`/PTD/`).
+ */
+export const SPRITE_ROOT = `${import.meta.env.BASE_URL}assets/sprites`;
 
 /** Actions that loop forever. Everything else plays once and holds. */
 const LOOPING_ACTIONS: ReadonlySet<string> = new Set(['Idle', 'Walk', 'Sleep', 'EventSleep', 'Float']);
