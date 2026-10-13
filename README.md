@@ -14,6 +14,15 @@ npm run typecheck  # tsc --noEmit
 npm run build      # typecheck + production build into dist/
 ```
 
+## Deployment
+
+Every push to `main` runs `.github/workflows/deploy-pages.yml`, which installs
+dependencies, runs the tests, builds with Vite and publishes `dist/` to GitHub
+Pages. One-time repository setting: Settings -> Pages -> Source: "GitHub
+Actions" (the workflow also tries to enable this on its own). The site is
+served at `https://<owner>.github.io/PTD/`; the build uses relative paths so
+it works from that subpath.
+
 ## Sprites
 
 Sprites are from the [PMDCollab SpriteCollab](https://github.com/PMDCollab/SpriteCollab)
