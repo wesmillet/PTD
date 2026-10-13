@@ -35,3 +35,8 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
 - SpriteCollab credit ids are resolved to names with the repository's
   `credit_names.txt`, kept in `assets-src/spritecollab/` so the index can be
   rebuilt without a checkout.
+- Sprite sheets load per level (the party's evolution lines plus the area's
+  tables, both base and shiny) instead of every folder at boot; boot loads
+  only portraits. The all-at-once load was ~730 requests and failed on
+  GitHub Pages. Anything missing at runtime (a surprise evolution) loads on
+  demand, and a failed level load shows a Retry button.

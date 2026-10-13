@@ -1,17 +1,10 @@
 import Phaser from 'phaser';
-import spriteIndex from '../data/spriteIndex.json';
 import spriteFolders from '../data/spriteFolders.json';
-import { queuePokemon, registerAnims } from '../assets/pmdLoader';
 import { urlParam } from '../game/runtime';
 
-/** Actions loaded for every Pokémon in spriteIndex.json. */
-const ACTIONS = ['Idle', 'Walk', 'Attack', 'Hurt', 'Faint'] as const;
-/** Not every SpriteCollab folder has these; the scenes fall back when missing. */
-const OPTIONAL_ACTIONS = ['Attack', 'Hurt', 'Faint'] as const;
-
 /**
- * Loads every Pokémon listed in `src/data/spriteIndex.json`, registers their
- * animations and hands off to the requested scene.
+ * Loads the small shared assets (portraits, generated textures) and hands
+ * off. Pokémon sprite sheets load per level (see LevelScene.preload).
  */
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -21,7 +14,7 @@ export class BootScene extends Phaser.Scene {
   preload(): void {
     const { width, height } = this.scale;
     const label = this.add
-      .text(width / 2, height / 2 - 20, 'Loading sprites…', { fontFamily: '"Pixelify Sans", monospace', fontSize: '18px', color: '#f4ecd8' })
+      .text(width / 2, height / 2 - 20, 'Loading…', { fontFamily: '"Pixelify Sans", monospace', fontSize: '18px', color: '#f4ecd8' })
       .setOrigin(0.5);
     const bar = this.add.graphics();
     this.load.on('progress', (value: number) => {
@@ -32,23 +25,15 @@ export class BootScene extends Phaser.Scene {
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       label.setText(`Failed to load ${file.src}`).setColor('#ff6b6b');
     });
-
     const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
-    for (const dex of Object.values(spriteIndex)) {
-      queuePokemon(this, dex, ACTIONS, { optional: OPTIONAL_ACTIONS });
-      if (folders[dex]?.shiny) queuePokemon(this, `${dex}/shiny`, ACTIONS, { optional: OPTIONAL_ACTIONS });
-      if (folders[dex]?.portraits.includes('Normal')) {
+    for (const [dex, info] of Object.entries(folders)) {
+      if (info.portraits.includes('Normal')) {
         this.load.image(`portrait-${dex}`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/Normal.png`);
       }
     }
   }
 
   create(): void {
-    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
-    for (const dex of Object.values(spriteIndex)) {
-      registerAnims(this, dex);
-      if (folders[dex]?.shiny) registerAnims(this, `${dex}/shiny`);
-    }
     // A small star for shiny sparkles.
     const star = this.add.graphics();
     star.fillStyle(0xffffff, 1);

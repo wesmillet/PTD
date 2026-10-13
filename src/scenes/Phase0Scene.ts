@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import spriteIndex from '../data/spriteIndex.json';
 import { ALL_DIRECTIONS, DIRECTION_NAMES, Direction, directionFromVector } from '../assets/direction';
-import { createPmdSprite, playAnim, syncShadow } from '../assets/pmdLoader';
+import { createPmdSprite, playAnim, queuePokemon, registerAnims, syncShadow } from '../assets/pmdLoader';
 
 const PRIMARY = 'turtwig';
 const ROW_ACTIONS = ['Idle', 'Walk'] as const;
@@ -29,7 +29,12 @@ export class Phase0Scene extends Phaser.Scene {
     super('Phase0');
   }
 
+  preload(): void {
+    for (const dex of Object.values(spriteIndex)) queuePokemon(this, dex, ['Idle', 'Walk']);
+  }
+
   create(): void {
+    for (const dex of Object.values(spriteIndex)) registerAnims(this, dex);
     const { width } = this.scale;
     this.title = this.add.text(16, 12, '', TEXT_STYLE);
     this.add.text(

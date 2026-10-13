@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Direction, directionFromVector } from '../assets/direction';
-import { createPmdSprite, pickAction, playAnim, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
+import { createPmdSprite, ensureLoaded, isLoaded, pickAction, playAnim, queuePokemon, registerAnims, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
+import { ALL_ACTIONS, OPTIONAL_ACTIONS, levelSpriteFolders } from '../game/assets';
 import { getLevel } from '../data/levels';
 import { getMap } from '../data/maps';
 import { portraitUrl, runtime, runtimeConfig, spriteFolder, urlParam } from '../game/runtime';
@@ -35,6 +36,7 @@ import {
 } from '../sim/level';
 import { isPlaceable, pointAlongPath, tileKey } from '../sim/map';
 import { DebugPanel } from '../ui/debugPanel';
+import { Button } from '../ui/button';
 import { Hud } from '../ui/hud';
 import { LearnDialog } from '../ui/learnDialog';
 import { PokemonPanel } from '../ui/pokemonPanel';
@@ -139,15 +141,47 @@ export class LevelScene extends Phaser.Scene {
     this.hoverTile = null;
   }
 
+  private loadFailed = false;
+  private loadedFolders: string[] = [];
+
+  preload(): void {
+    loadDebugPartyIfRequested();
+    const game = getGame();
+    if (game.party.length === 0) return;
+    const def = getLevel(this.levelId);
+    const { width, height } = this.scale;
+    const label = this.add.text(width / 2, height / 2 - 20, `Loading ${def.name}…`, { ...TEXT, fontSize: '18px' }).setOrigin(0.5);
+    const bar = this.add.graphics();
+    this.load.on('progress', (value: number) => {
+      bar.clear();
+      bar.fillStyle(COLORS.borderOuter, 1).fillRoundedRect(width / 2 - 150, height / 2, 300, 12, 6);
+      bar.fillStyle(COLORS.exp, 1).fillRoundedRect(width / 2 - 150, height / 2, Math.max(12, 300 * value), 12, 6);
+    });
+    this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      this.loadFailed = true;
+      label.setText(`Could not load ${file.src}`).setColor('#ff7b7b');
+    });
+    this.loadedFolders = levelSpriteFolders(def, game);
+    for (const dex of this.loadedFolders) queuePokemon(this, dex, ALL_ACTIONS, { optional: OPTIONAL_ACTIONS });
+  }
+
   create(): void {
     const def = getLevel(this.levelId);
     const map = getMap(def.map);
-    loadDebugPartyIfRequested();
     const game = getGame();
     if (game.party.length === 0) {
       this.scene.start('LevelSelect');
       return;
     }
+    if (this.loadFailed) {
+      const { width, height } = this.scale;
+      this.add.text(width / 2, height / 2 + 40, 'Some sprites did not download. Check your connection and retry.', TEXT_DIM).setOrigin(0.5);
+      new Button(this, width / 2 - 80, height / 2 + 84, 'Retry', () => this.scene.restart({ levelId: this.levelId, seed: this.seed }), 140, 32);
+      new Button(this, width / 2 + 80, height / 2 + 84, 'Level select', () => this.scene.start('LevelSelect'), 140, 32);
+      return;
+    }
+    for (const dex of this.loadedFolders) registerAnims(this, dex);
+    this.children.removeAll(true);
     this.state = createLevel(def, map, { seed: this.seed, party: game.party, config: runtimeConfig, items: game.items });
     this.drawMap();
     this.overlay = this.add.graphics().setDepth(900);
@@ -735,6 +769,15 @@ export class LevelScene extends Phaser.Scene {
 
   private createTowerView(tower: Tower): void {
     const dex = spriteFolder(tower.mon.species, tower.mon.shiny);
+    if (!isLoaded(dex)) {
+      // Not preloaded (a surprise evolution or debug change): fetch it now.
+      ensureLoaded(this, dex, ALL_ACTIONS, { optional: OPTIONAL_ACTIONS })
+        .then(() => {
+          if (this.state.towers.includes(tower) && !this.towerViews.has(tower.id)) this.createTowerView(tower);
+        })
+        .catch((err: Error) => this.showToast(err.message));
+      return;
+    }
     const { px, py } = this.tilePixel(tower.tile[0], tower.tile[1]);
     const sprite = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Idle', Direction.Down);
     this.towerViews.set(tower.id, { sprite, busy: false });
@@ -744,6 +787,14 @@ export class LevelScene extends Phaser.Scene {
     const enemy = this.state.enemies.find((e) => e.id === enemyId);
     if (!enemy) return;
     const dex = spriteFolder(enemy.mon.species, shiny);
+    if (!isLoaded(dex)) {
+      ensureLoaded(this, dex, ALL_ACTIONS, { optional: OPTIONAL_ACTIONS })
+        .then(() => {
+          if (this.state.enemies.includes(enemy) && !this.enemyViews.has(enemyId)) this.createEnemyView(enemyId, shiny);
+        })
+        .catch((err: Error) => this.showToast(err.message));
+      return;
+    }
     const point = pointAlongPath(this.state.path, enemy.distance);
     const { px, py } = this.tilePixel(point.x, point.y);
     const dir = directionFromVector(point.dx, point.dy, Direction.Right);

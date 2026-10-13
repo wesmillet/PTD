@@ -15,6 +15,7 @@ function start(): void {
     height: Hud.HEIGHT + 14 * 32 + Hud.BOTTOM,
     backgroundColor: '#10121f',
     pixelArt: true,
+    loader: { maxRetries: 4 },
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,

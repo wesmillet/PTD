@@ -210,6 +210,44 @@ function queueSheets(
   }
 }
 
+/** Whether `dex` has finished loading (AnimData parsed and sheets queued). */
+export function isLoaded(dex: string): boolean {
+  return loadedSets.has(dex);
+}
+
+/**
+ * Loads a Pokémon at runtime (outside preload) if it is not loaded yet,
+ * then registers its animations. Resolves when ready; rejects on a load
+ * error. Safe to call while another runtime load is in progress.
+ */
+export function ensureLoaded(scene: Phaser.Scene, dex: string, actions: readonly string[], options: QueueOptions = {}): Promise<void> {
+  if (isLoaded(dex) && actions.every((a) => hasAction(dex, a) || options.optional?.includes(a))) {
+    registerAnims(scene, dex);
+    return Promise.resolve();
+  }
+  return new Promise((resolve, reject) => {
+    queuePokemon(scene, dex, actions, options);
+    const done = () => {
+      scene.load.off(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
+      try {
+        registerAnims(scene, dex);
+        resolve();
+      } catch (err) {
+        reject(err instanceof Error ? err : new Error(String(err)));
+      }
+    };
+    const failed = (file: Phaser.Loader.File) => {
+      if (file.key.includes(dex)) {
+        scene.load.off(Phaser.Loader.Events.COMPLETE, done);
+        reject(new Error(`failed to load ${file.src}`));
+      }
+    };
+    scene.load.once(Phaser.Loader.Events.COMPLETE, done);
+    scene.load.on(Phaser.Loader.Events.FILE_LOAD_ERROR, failed);
+    if (!scene.load.isLoading()) scene.load.start();
+  });
+}
+
 /** Whether a loaded Pokémon has an animation registered for `action`. */
 export function hasAction(dex: string, action: string): boolean {
   return loadedSets.get(dex)?.actions.has(action) ?? false;
