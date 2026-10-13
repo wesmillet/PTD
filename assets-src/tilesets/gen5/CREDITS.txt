@@ -1,0 +1,11 @@
+Gen 5 (Black/White) style tilesets
+
+kyle-dove-outside.png
+  Artist: Kyle-Dove
+  Source: compiled in "Tiles - Ready to use Tilesets" by Aki,
+          https://eeveeexpo.com/resources/15/
+  Format: RPG Maker XP tileset, 256 px wide (8 tiles x 32 px), 6720 px tall.
+  Credit requirement: credit Kyle-Dove (not the compiler).
+
+Still needed: the Gen 5 exterior tileset from the same page, saved as a
+full-size PNG (256 px wide), plus a cave tileset.
