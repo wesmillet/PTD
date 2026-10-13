@@ -34,13 +34,25 @@ describe('generated PokeAPI data', () => {
 
   it('has Tackle and the Platinum learnset for Turtwig', () => {
     expect(findMoveId('tackle')).toBe(33);
-    expect(getMove(33)).toEqual({ name: 'tackle', type: 1, power: 40, accuracy: 100, pp: 35, category: 'physical' });
+    expect(getMove(33)).toMatchObject({ name: 'tackle', type: 1, power: 40, accuracy: 100, pp: 35, category: 'physical', priority: 0, target: 'selected-pokemon' });
+    expect(getMove(33).effect).toMatchObject({ kind: 'damage', ailment: 'none', ailmentChance: 0, flinchChance: 0, stats: [] });
     const learnset = getLearnset(387);
     expect(learnset[0]).toEqual([1, 33]);
     expect(learnset).toContainEqual([5, 110]); // Withdraw at level 5
     for (let i = 1; i < learnset.length; i++) {
       expect(learnset[i]![0]).toBeGreaterThanOrEqual(learnset[i - 1]![0]);
     }
+  });
+
+  it('carries structured secondary effects from move_meta', () => {
+    expect(getMove(40).effect).toMatchObject({ kind: 'damage-ailment', ailment: 'poison', ailmentChance: 30 }); // Poison Sting
+    expect(getMove(86).effect).toMatchObject({ kind: 'ailment', ailment: 'paralysis', ailmentChance: 0 }); // Thunder Wave
+    expect(getMove(45)).toMatchObject({ target: 'all-opponents', effect: { kind: 'net-good-stats', stats: [{ stat: 'atk', change: -1 }] } }); // Growl
+    expect(getMove(110)).toMatchObject({ target: 'user', effect: { stats: [{ stat: 'def', change: 1 }] } }); // Withdraw
+    expect(getMove(71).effect).toMatchObject({ kind: 'damage-heal', drain: 50 }); // Absorb
+    expect(getMove(44).effect).toMatchObject({ flinchChance: 30 }); // Bite
+    expect(getMove(98)).toMatchObject({ priority: 1 }); // Quick Attack
+    expect(getMove(31).effect.hits).toEqual([2, 5]); // Fury Attack
   });
 
   it('uses the Gen 4 type chart', () => {

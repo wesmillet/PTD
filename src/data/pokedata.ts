@@ -36,6 +36,28 @@ export interface PokemonData {
   chain: number;
 }
 
+export type StageKey = StatKey | 'accuracy' | 'evasion';
+export type Ailment = 'none' | 'paralysis' | 'sleep' | 'freeze' | 'burn' | 'poison' | 'confusion' | string;
+
+/** Secondary effect data from PokeAPI's move_meta tables. */
+export interface MoveEffect {
+  /** PokeAPI meta category: damage, ailment, net-good-stats, heal, damage-ailment, damage-lower, damage-raise, damage-heal, ohko, unique, ... */
+  kind: string;
+  ailment: Ailment;
+  /** Percent chance of the ailment on hit; 0 on pure "ailment" moves means always. */
+  ailmentChance: number;
+  flinchChance: number;
+  /** Percent chance of the stat changes on hit; 0 on pure stat moves means always. */
+  statChance: number;
+  stats: { stat: StageKey; change: number }[];
+  /** Percent of damage dealt healed (positive) or taken as recoil (negative). */
+  drain: number;
+  /** Percent of max HP healed. */
+  healing: number;
+  critRate: number;
+  hits: [number, number] | null;
+}
+
 export interface MoveData {
   name: string;
   type: number;
@@ -43,6 +65,10 @@ export interface MoveData {
   accuracy: number | null;
   pp: number | null;
   category: MoveCategory;
+  priority: number;
+  /** PokeAPI target identifier: user, selected-pokemon, all-opponents, ... */
+  target: string;
+  effect: MoveEffect;
 }
 
 export interface EvolutionData {
@@ -77,7 +103,7 @@ export interface EncounterArea {
 
 const pokemon = pokemonJson as Record<string, PokemonData>;
 const learnsets = learnsetsJson as unknown as Record<string, [number, number][]>;
-const moves = movesJson as Record<string, MoveData>;
+const moves = movesJson as unknown as Record<string, MoveData>;
 const types = typesJson as { names: Record<string, string>; chart: Record<string, Record<string, number>> };
 const expCurves = expCurvesJson as Record<GrowthRate, number[]>;
 const evolutions = evolutionsJson as Record<string, EvolutionData[] | Record<string, number[]>>;

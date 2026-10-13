@@ -165,9 +165,23 @@ writeJson('learnsets.json', Object.fromEntries(Object.entries(learnsets).sort((a
 // ------------------------------------------------------------------- moves
 
 const categories: Record<string, string> = { '1': 'status', '2': 'physical', '3': 'special' };
+const targetNames = new Map(readCsv('move_targets.csv').map((r) => [r.id, r.identifier]));
+const metaCategories = new Map(readCsv('move_meta_categories.csv').map((r) => [r.id, r.identifier]));
+const ailmentNames = new Map(readCsv('move_meta_ailments.csv').map((r) => [r.id, r.identifier]));
+const meta = new Map(readCsv('move_meta.csv').map((r) => [r.move_id, r]));
+const stageStatKeys: Record<string, string> = { ...statKeys, '7': 'accuracy', '8': 'evasion' };
+const statChanges = new Map<string, { stat: string; change: number }[]>();
+for (const r of readCsv('move_meta_stat_changes.csv')) {
+  const stat = stageStatKeys[r.stat_id];
+  if (!stat) continue;
+  (statChanges.get(r.move_id) ?? statChanges.set(r.move_id, []).get(r.move_id)!).push({ stat, change: int(r.change) });
+}
 const moves: Record<string, unknown> = {};
 for (const r of readCsv('moves.csv')) {
   if (int(r.generation_id) > MAX_GENERATION || int(r.id) >= 10000 || int(r.type_id) > MAX_TYPE) continue;
+  const m = meta.get(r.id);
+  const minHits = m ? optInt(m.min_hits) : null;
+  const maxHits = m ? optInt(m.max_hits) : null;
   moves[r.id] = {
     name: r.identifier,
     type: int(r.type_id),
@@ -175,6 +189,20 @@ for (const r of readCsv('moves.csv')) {
     accuracy: optInt(r.accuracy),
     pp: optInt(r.pp),
     category: categories[r.damage_class_id] ?? 'status',
+    priority: optInt(r.priority) ?? 0,
+    target: targetNames.get(r.target_id) ?? 'selected-pokemon',
+    effect: {
+      kind: (m && metaCategories.get(m.meta_category_id)) ?? 'damage',
+      ailment: (m && ailmentNames.get(m.meta_ailment_id)) ?? 'none',
+      ailmentChance: m ? optInt(m.ailment_chance) ?? 0 : 0,
+      flinchChance: m ? optInt(m.flinch_chance) ?? 0 : 0,
+      statChance: m ? optInt(m.stat_chance) ?? 0 : 0,
+      stats: statChanges.get(r.id) ?? [],
+      drain: m ? optInt(m.drain) ?? 0 : 0,
+      healing: m ? optInt(m.healing) ?? 0 : 0,
+      critRate: m ? optInt(m.crit_rate) ?? 0 : 0,
+      hits: minHits !== null && maxHits !== null ? [minHits, maxHits] : null,
+    },
   };
 }
 writeJson('moves.json', moves);

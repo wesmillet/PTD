@@ -15,7 +15,8 @@
   },
   "combat": {
     "critRate": 0.0625,
-    "defaultRangeTiles": 2.5
+    "defaultRangeTiles": 2.5,
+    "maxMoves": 4
   },
   "exp": {
     "expPerHitFraction": 0.05
@@ -25,5 +26,32 @@
     "freeWaveGapSeconds": 4,
     "buildPhaseAutoStart": false
   },
-  "gameSpeeds": [1, 2]
+  "gameSpeeds": [
+    1,
+    2
+  ],
+  "status": {
+    "tickSeconds": 2,
+    "poisonFraction": 0.125,
+    "burnFraction": 0.0625,
+    "burnPhysicalMultiplier": 0.5,
+    "paralysisSpeedMultiplier": 0.5,
+    "paralysisAttackRateMultiplier": 0.5,
+    "paralysisSkipChance": 0.25,
+    "sleepSeconds": [
+      2,
+      5
+    ],
+    "freezeSeconds": [
+      3,
+      6
+    ],
+    "confusionSeconds": [
+      2,
+      5
+    ],
+    "confusionChance": 0.5,
+    "flinchSeconds": 0.5
+  },
+  "shinyRate": 0.000244140625
 }
