@@ -1,8 +1,12 @@
 /** One-time starter choice. DOM modal. */
 import { getPokemon, typeName } from '../data/pokedata';
-import { capitalize, ensureOverlayStyles, isolateFromGame } from './domOverlay';
+import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame } from './domOverlay';
 
-export function showStarterDialog(starters: readonly number[], portraitUrl: (species: number) => string | undefined, onPick: (species: number) => void): HTMLDivElement {
+export function showStarterDialog(
+  starters: readonly number[],
+  iconUrl: (species: number) => string | undefined,
+  onPick: (species: number) => void,
+): HTMLDivElement {
   ensureOverlayStyles();
   const root = document.createElement('div');
   root.className = 'ptd-panel ptd-modal';
@@ -21,13 +25,7 @@ export function showStarterDialog(starters: readonly number[], portraitUrl: (spe
     const li = document.createElement('li');
     li.className = 'ptd-move';
     li.style.gridTemplateColumns = 'auto 1fr auto';
-    const img = document.createElement('img');
-    img.className = 'ptd-portrait';
-    img.style.width = '40px';
-    img.style.height = '40px';
-    img.alt = '';
-    const url = portraitUrl(species);
-    if (url) img.src = url;
+    const img = iconImage(iconUrl(species)) ?? document.createElement('span');
     const name = document.createElement('span');
     name.className = 'ptd-name';
     name.textContent = capitalize(data.name);

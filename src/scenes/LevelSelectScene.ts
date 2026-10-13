@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { getLevel } from '../data/levels';
-import { portraitUrl } from '../game/runtime';
+import { iconUrl, portraitUrl } from '../game/runtime';
 import {
   currentSaveCode,
   getGame,
@@ -15,18 +15,16 @@ import {
 import { isLevelCompleted, isLevelUnlocked, orderedLevelIds } from '../sim/game';
 import { Button } from '../ui/button';
 import { PartyScreen } from '../ui/partyScreen';
-import { PokedexScreen } from '../ui/pokedexScreen';
 import { SavePanel } from '../ui/savePanel';
 import { ShopScreen } from '../ui/shopScreen';
 import { CreditsScreen } from '../ui/creditsScreen';
 import { showStarterDialog } from '../ui/starterDialog';
 import { TEXT_BIG, TEXT_DIM } from '../ui/styles';
 
-/** Level list with the unlock chain, plus the Party / PC, Shop, Pokédex and Save screens. */
+/** Level list with the unlock chain, plus the Party / PC, Shop and Save screens. */
 export class LevelSelectScene extends Phaser.Scene {
   private partyScreen?: PartyScreen;
   private shop?: ShopScreen;
-  private pokedex?: PokedexScreen;
   private savePanel?: SavePanel;
   private credits?: CreditsScreen;
   private starterRoot?: HTMLDivElement;
@@ -56,10 +54,9 @@ export class LevelSelectScene extends Phaser.Scene {
       y += 40;
     }
     const row = y + 16;
-    new Button(this, width / 2 - 255, row, 'Party / PC', () => this.guard(() => this.partyScreen?.show()), 150, 30);
-    new Button(this, width / 2 - 85, row, 'Shop', () => this.guard(() => this.shop?.show()), 150, 30);
-    new Button(this, width / 2 + 85, row, 'Pokédex', () => this.guard(() => this.pokedex?.show()), 150, 30);
-    new Button(this, width / 2 + 255, row, 'Save', () => this.savePanel?.show(), 150, 30);
+    new Button(this, width / 2 - 170, row, 'Party / PC', () => this.guard(() => this.partyScreen?.show()), 150, 30);
+    new Button(this, width / 2, row, 'Shop', () => this.guard(() => this.shop?.show()), 150, 30);
+    new Button(this, width / 2 + 170, row, 'Save', () => this.savePanel?.show(), 150, 30);
     new Button(this, width / 2 - 85, row + 38, 'Credits', () => this.credits?.show(), 150, 26);
     new Button(this, width / 2 + 85, row + 38, 'Sprite demo', () => this.scene.start('Phase0'), 150, 26);
     this.add.text(width / 2, this.scale.height - 16, 'Tip: ?level=<id> opens a level, ?party=debug loads the test party', TEXT_DIM).setOrigin(0.5);
@@ -68,9 +65,8 @@ export class LevelSelectScene extends Phaser.Scene {
       saveGame();
       this.scene.restart();
     };
-    this.partyScreen = new PartyScreen(game, { portraitUrl: (s) => portraitUrl(s), onChange: () => saveGame(), onClose: refresh });
+    this.partyScreen = new PartyScreen(game, { portraitUrl: (s) => portraitUrl(s), iconUrl: (s) => iconUrl(s), onChange: () => saveGame(), onClose: refresh });
     this.shop = new ShopScreen(game, { onChange: () => saveGame(), onClose: refresh });
-    this.pokedex = new PokedexScreen(game, (s) => portraitUrl(s), () => undefined);
     this.credits = new CreditsScreen(() => undefined);
     this.savePanel = new SavePanel({
       getCode: () => currentSaveCode(),
@@ -84,13 +80,11 @@ export class LevelSelectScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.partyScreen?.close();
       this.shop?.close();
-      this.pokedex?.close();
       this.savePanel?.close();
       this.credits?.close();
       this.starterRoot?.remove();
       this.partyScreen = undefined;
       this.shop = undefined;
-      this.pokedex = undefined;
       this.savePanel = undefined;
     });
     if (needsStarter()) this.askStarter();
@@ -103,7 +97,7 @@ export class LevelSelectScene extends Phaser.Scene {
 
   private askStarter(): void {
     this.starterRoot?.remove();
-    this.starterRoot = showStarterDialog(STARTERS, (s) => portraitUrl(s), (species) => {
+    this.starterRoot = showStarterDialog(STARTERS, (s) => iconUrl(s), (species) => {
       pickStarter(species);
       this.scene.restart();
     });

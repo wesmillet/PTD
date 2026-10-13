@@ -40,3 +40,10 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   only portraits. The all-at-once load was ~730 requests and failed on
   GitHub Pages. Anything missing at runtime (a surprise evolution) loads on
   demand, and a failed level load shows a Retry button.
+- The Pokédex page was removed on request; the seen/caught/shiny record
+  stays in the save for later features.
+- Box icons come from PokeAPI/sprites Gen 5 icons: the two-frame APNG is
+  used directly in DOM screens (browsers animate it) and split into two PNG
+  frames for the canvas party strip, which alternates them every 170 ms like
+  Black/White. Portraits stay for the large Pokémon panel and the evolution
+  prompt.

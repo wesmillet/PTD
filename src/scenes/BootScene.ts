@@ -25,10 +25,17 @@ export class BootScene extends Phaser.Scene {
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       label.setText(`Failed to load ${file.src}`).setColor('#ff6b6b');
     });
-    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
+    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[]; icon?: boolean; animatedIcon?: boolean }>;
     for (const [dex, info] of Object.entries(folders)) {
       if (info.portraits.includes('Normal')) {
         this.load.image(`portrait-${dex}`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/Normal.png`);
+      }
+      const id = Number(dex);
+      if (info.animatedIcon) {
+        this.load.image(`icon-${id}-0`, `${import.meta.env.BASE_URL}assets/icons/${id}-f0.png`);
+        this.load.image(`icon-${id}-1`, `${import.meta.env.BASE_URL}assets/icons/${id}-f1.png`);
+      } else if (info.icon) {
+        this.load.image(`icon-${id}`, `${import.meta.env.BASE_URL}assets/icons/${id}.png`);
       }
     }
   }

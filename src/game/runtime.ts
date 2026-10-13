@@ -37,6 +37,35 @@ export function spriteFolder(species: number, shiny: boolean): string {
   return shiny && info?.shiny ? `${dex}/shiny` : dex;
 }
 
+export interface IconInfo {
+  icon: boolean;
+  animatedIcon: boolean;
+}
+
+/** Whether a species has a box icon (and an animated one). */
+export function iconInfo(species: number): IconInfo {
+  const info = (spriteFolders as Record<string, { icon?: boolean; animatedIcon?: boolean }>)[dexFolder(species)];
+  return { icon: info?.icon ?? false, animatedIcon: info?.animatedIcon ?? false };
+}
+
+/**
+ * URL of the Gen 5 box icon. `animated` returns the two-frame APNG (browsers
+ * animate it in an <img>); otherwise the static icon. Undefined when the
+ * species ships no icon.
+ */
+export function iconUrl(species: number, animated = true): string | undefined {
+  const info = iconInfo(species);
+  if (!info.icon) return undefined;
+  const base = `${import.meta.env.BASE_URL}assets/icons/${species}`;
+  return animated && info.animatedIcon ? `${base}-anim.png` : `${base}.png`;
+}
+
+/** Phaser texture key of an icon frame (0 or 1), loaded by BootScene. */
+export function iconTextureKey(species: number, frame: 0 | 1): string {
+  const info = iconInfo(species);
+  return info.animatedIcon ? `icon-${species}-${frame}` : `icon-${species}`;
+}
+
 /** URL of a portrait emotion PNG, if the folder has it. */
 export function portraitUrl(species: number, emotion = 'Normal'): string | undefined {
   const dex = dexFolder(species);

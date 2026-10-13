@@ -40,7 +40,11 @@ for (const dex of [...present].sort()) {
   const shiny = existsSync(resolve(spriteRoot, dex, 'shiny', 'AnimData.xml'));
   const portraitDir = resolve(root, 'public/assets/portraits', dex);
   const portraits = existsSync(portraitDir) ? readdirSync(portraitDir).filter((f) => f.endsWith('.png')).map((f) => f.replace('.png', '')).sort() : [];
-  folders[dex] = { shiny, portraits };
+  const iconDir = resolve(root, 'public/assets/icons');
+  const id = String(Number(dex));
+  const icon = existsSync(resolve(iconDir, `${id}.png`));
+  const animatedIcon = existsSync(resolve(iconDir, `${id}-f0.png`)) && existsSync(resolve(iconDir, `${id}-f1.png`));
+  folders[dex] = { shiny, portraits, icon, animatedIcon };
 }
 writeFileSync(foldersPath, JSON.stringify(folders, null, 2) + '\n');
 console.log(`wrote ${foldersPath}`);
