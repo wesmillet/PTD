@@ -15,6 +15,7 @@ import {
   step,
   summarize,
   towerAt,
+  towerMove,
   type Enemy,
   type LevelEvent,
   type LevelState,
@@ -192,7 +193,7 @@ export class LevelScene extends Phaser.Scene {
         gfx.lineStyle(2, COLORS.selected, 1).strokeRect(tower.tile[0] * size + 2, Hud.HEIGHT + tower.tile[1] * size + 2, size - 4, size - 4);
       }
       if (tower === selected || this.state.phase === 'build') {
-        gfx.lineStyle(1, COLORS.range, 0.35).strokeCircle(px, py, tower.rangeTiles * size);
+        gfx.lineStyle(1, COLORS.range, 0.35).strokeCircle(px, py, (towerMove(tower)?.range ?? 0) * size);
       }
     }
   }
