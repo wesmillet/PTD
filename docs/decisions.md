@@ -26,3 +26,12 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   format and tilesets).
 - The starter is chosen once before Route 201; Pokémon Tower Defense gave
   the three Sinnoh starters at level 5 the same way.
+- The credits screen lists "RawAsset" verbatim as asked; I could not tell
+  what it refers to, so its line is just the name (edit
+  `GENERAL_CREDITS` in `src/ui/creditsScreen.ts`).
+- The Gen 5 tileset credit (Kyle-Dove, in `assets-src/tilesets/gen5/
+  CREDITS.txt`) is not on the credits screen yet because the tileset is not
+  shipped in the build; the maps branch should add it when tiles ship.
+- SpriteCollab credit ids are resolved to names with the repository's
+  `credit_names.txt`, kept in `assets-src/spritecollab/` so the index can be
+  rebuilt without a checkout.

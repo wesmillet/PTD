@@ -39,20 +39,24 @@ artists' `credits.txt`) and regenerates `src/data/spriteIndex.json`.
 Every `credits.txt` is kept verbatim and will be shown in the in-game credits
 screen. Please keep them when adding or updating sprites.
 
-## Playing the Phase 1 levels
+## Playing
 
-Open the dev server and pick a level, or jump straight in:
+Open the dev server at http://localhost:5173/PTD/. Pick a starter, then play
+the levels in order: Route 201 (free) → Lake Verity (free) → Route 202 (free)
+→ Route 203 (defend) → Oreburgh Gate (defend) → Oreburgh Mine 1F (defend).
+Free levels unlock the next one once you leave with at least one wave
+cleared; defend levels when you win.
 
-- Route 201 (free roam): http://localhost:5173/PTD/?level=route-201
-- Oreburgh Mine 1F (defend, 8 waves): http://localhost:5173/PTD/?level=oreburgh-mine-1f
-
-Add `&seed=<number>` to replay the same waves and `&shiny=1` to make every
-spawn shiny. Click a blue tile to place Turtwig. Click Turtwig (or its slot in
-the party strip) for its panel: click a move to make it active, or press Move
-and then a blue tile to re-place it, even mid-wave. Press the backtick key for
-the debug panel (speed and status constants, Turtwig level, enemy level
-override, shiny rate, time of day, seed reroll). Esc closes the panel, cancels
-a move, or returns to the level list.
+- Place a Pokémon by clicking its party slot and then a blue tile; drag a
+  placed Pokémon to move it (also mid-wave); tap it for its panel.
+- Click a ball in the ball bar, then a wild Pokémon, to throw it.
+- Between levels: Party / PC (swap, sort, Rare Candy), Shop, Pokédex, Save
+  (save code export and import, New Game) and Credits.
+- The game saves itself after every level and change. URL flags:
+  `?level=<id>` opens a level, `&seed=<n>` replays the same waves,
+  `&shiny=1` makes every spawn shiny, `?party=debug` loads the test party.
+- Backtick opens the debug panel (speed and status constants, party level,
+  enemy level override, shiny rate, time of day, seed reroll).
 
 ## Pokémon data
 
@@ -66,6 +70,9 @@ node scripts/build-pokedata.ts    # writes src/data/*.json
 ```
 
 The CSVs are never committed. Typed accessors live in `src/data/pokedata.ts`.
+`node scripts/level-species.mjs` lists every species the current levels need
+(with evolution lines); pass its output to `scripts/fetch-sprites.sh`, which
+also regenerates `spriteIndex.json`, `spriteFolders.json` and `credits.json`.
 
 ## Layout
 

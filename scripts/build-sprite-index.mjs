@@ -44,3 +44,40 @@ for (const dex of [...present].sort()) {
 }
 writeFileSync(foldersPath, JSON.stringify(folders, null, 2) + '\n');
 console.log(`wrote ${foldersPath}`);
+
+// Credits: every credits.txt shipped under public/assets, with SpriteCollab
+// credit ids resolved to names via credit_names.txt (kept in assets-src).
+const creditNamesPath = process.argv[4] ?? resolve(root, 'assets-src/spritecollab/credit_names.txt');
+const creditNames = new Map();
+if (existsSync(creditNamesPath)) {
+  for (const line of readFileSync(creditNamesPath, 'utf8').split('\n').slice(1)) {
+    const [name, discord] = line.split('\t');
+    if (name && discord) creditNames.set(discord.trim(), name.trim());
+  }
+}
+const resolveName = (id) => creditNames.get(id) ?? id.replace(/^<@!?(\d+)>$/, 'Discord user $1');
+const readCredits = (file) => {
+  if (!existsSync(file)) return [];
+  const names = [];
+  for (const line of readFileSync(file, 'utf8').split('\n')) {
+    const cols = line.split('\t');
+    if (cols.length < 2 || !cols[1]) continue;
+    const name = resolveName(cols[1].trim());
+    if (!names.includes(name)) names.push(name);
+  }
+  return names;
+};
+const credits = { source: 'PMDCollab SpriteCollab (https://github.com/PMDCollab/SpriteCollab)', pokemon: [] };
+for (const dex of [...present].sort()) {
+  const entry = tracker[dex];
+  credits.pokemon.push({
+    dex,
+    name: entry?.name ?? dex,
+    sprite: readCredits(resolve(spriteRoot, dex, 'credits.txt')),
+    shiny: readCredits(resolve(spriteRoot, dex, 'shiny', 'credits.txt')),
+    portrait: readCredits(resolve(root, 'public/assets/portraits', dex, 'credits.txt')),
+  });
+}
+const creditsPath = resolve(dirname(outPath), 'credits.json');
+writeFileSync(creditsPath, JSON.stringify(credits, null, 2) + '\n');
+console.log(`wrote ${creditsPath} for ${credits.pokemon.length} Pokémon`);

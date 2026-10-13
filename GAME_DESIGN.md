@@ -139,74 +139,136 @@ area's walk table, weighted by rarity, with levels rolled in each entry's
 range, from a seeded RNG so a level replays identically for the same seed.
 
 ### Catching
-- Any wild enemy can be targeted with a Poké Ball while alive. Catch chance uses
-  the Gen 4 catch formula (HP remaining, catch rate, ball modifier, status bonus).
-- Ball types: Poké, Great, Ultra, Dusk, Net, Quick, Master (story-gated).
-- Trainer-owned enemies cannot be caught.
-- A caught Pokémon is removed from the wave and added to the party at its current
-  level with its current moves.
+- Any wild enemy can be targeted with a Poké Ball while alive: click a ball
+  in the HUD ball bar, then click the enemy. Catch chance uses the Gen 4
+  formula in `src/sim/catch.ts`: `a = floor((3*maxHP - 2*HP) * catchRate *
+  ball / (3*maxHP)) * statusBonus`; `a >= 255` is a sure catch, otherwise
+  four shake checks against `b = floor(1048560 / sqrt(sqrt(16711680 / a)))`
+  with the seeded RNG. Status bonus: sleep and freeze 2x, paralysis, poison
+  and burn 1.5x (`config.json` `catch`).
+- Ball types (`config.json` `balls`): Poké 1x, Great 1.5x, Ultra 2x, Dusk 3.5x
+  in cave-themed maps or at night, Net 3x on Bug or Water types, Quick 4x on
+  a target that has taken no damage, Master 255x (defined, not obtainable).
+- Trainer-owned enemies cannot be caught (`trainer: true` on a level's wave
+  definition; no current level uses it).
+- A caught Pokémon leaves the wave and joins the party at its current level
+  with the moves it would know. The party holds 6; extras go to the PC box,
+  which has no cap. The Party / PC screen between levels swaps Pokémon,
+  sorts the box by level, type or name, and shows stats and moves.
+- Free-mode summaries list the Pokémon caught.
 
 ### Progression
-- Pokémon gain EXP per KO and per hit (small). Level-ups follow Gen 4 growth
-  curves. New moves prompt a replace dialog (4-move cap).
-- Evolution by level, stone, trade-equivalent item, and happiness (simplified:
-  a friendship counter that rises per level completed with that Pokémon placed).
-- Currency: Poké Dollars from clearing waves and selling items. Shop sells balls,
-  evolution stones, TMs, and vitamins.
-- Pokédex tracks seen, caught, and shiny caught.
+- EXP: a KO gives Gen 4 wild EXP, `floor(baseExp * enemyLevel / 7)`, split
+  evenly (floored) among every placed Pokémon that damaged the enemy
+  (poison and burn KOs credit whoever inflicted or last hit). Every hit also
+  gives a small EXP amount (`expPerHitFraction` of the KO value, at least 1).
+  Level-ups follow the Gen 4 growth curves in `exp_curves.json`, learn new
+  moves (replace dialog at four moves) and check for evolution.
+- Evolution by level comes from `evolutions.json` and shows an accept /
+  cancel prompt (the simulation pauses). Stone, trade, held-item, happiness,
+  time, location and move-based evolutions are stubbed as "not yet" with the
+  reason shown in the panel and the Party screen. Evolved forms keep level,
+  EXP, HP fraction, moves and status; their sprite folders are fetched by
+  `scripts/level-species.mjs`, which lists every evolution-line member of
+  every species in the current levels.
+- Level unlocks: Route 201 → Lake Verity (free) → Route 202 (free) → Route
+  203 (defend, 8 waves) → Oreburgh Gate (defend, 8 waves) → Oreburgh Mine 1F,
+  all with Platinum daytime tables (`requires` in `levels.json`). A defend
+  level is completed by winning; a free level counts once at least one wave
+  was cleared when leaving.
+- Starter choice: a one-time screen before Route 201 to pick Turtwig,
+  Chimchar or Piplup at level 5.
+- Placed Pokémon move by drag and drop (pointer or touch): the sprite follows
+  the pointer, free placeable tiles light up, a drop on one re-places it
+  (cooldown restarts) and a drop anywhere else snaps back. A tap without a
+  drag opens the Pokémon panel.
+- Currency: Poké Dollars per KO and per level cleared (`config.json`
+  `money`). The shop between levels sells all six balls, Potions (restore a
+  placed Pokémon to full HP between waves, from its panel) and Rare Candy
+  (one level, not past 100, from the Party screen; triggers move learning
+  and evolution). Evolution stones, TMs and vitamins come later.
+- Pokédex tracks seen (on spawn), caught, and shiny caught per species. The
+  Pokédex screen shows the portrait for caught species and a silhouette for
+  seen-only ones.
 
 ### Save data
-- Party and PC box (unlimited storage, searchable)
-- Level completion, star ratings, and challenge completions
-- Items, money, Pokédex, settings
-- Export/import save code
+- Saved to localStorage after every level and every party, PC, shop or
+  settings change; loaded on startup. Contents: starter, party and PC box
+  (species, level, EXP, HP, moves with PP, active move, shiny), level
+  progress, items, money, Pokédex, settings (game speed and the speed
+  constants).
+- Save code: a `PTD1.` prefixed base64url string with a checksum. Import
+  validates every field against the data tables and rejects corrupt codes
+  with the reason, never a crash.
+- New Game asks for confirmation and wipes the save.
 
-## Story mode: three acts
+## Story mode
 
-### Act 1: Sinnoh (based on Diamond / Pearl / Platinum)
-Follow the game's route order. Each level is a route, town event, cave, or gym.
-Gyms are boss levels where the leader's Pokémon come in scripted waves and the
-leader's ace is a boss with extra HP and a signature move.
-Required beats, in order:
-1. Twinleaf Town and Lake Verity: choose starter (Turtwig, Chimchar, Piplup),
-   Starly ambush tutorial level. Lake Verity is a free level.
-2. Route 201 to 203, Jubilife City, Oreburgh Mine, Roark (Rock). Route 201
-   and Route 202 are free levels.
-3. Floaroma Town, Valley Windworks (first Team Galactic encounter), Eterna
-   Forest, Gardenia (Grass), Galactic Eterna Building
-4. Cycling Road, Mt. Coronet, Hearthome, Fantina (Ghost)
-5. Solaceon, Veilstone, Maylene (Fighting), Galactic Warehouse
-6. Pastoria, Crasher Wake (Water), Great Marsh
-7. Celestic Town, Canalave, Byron (Steel), Iron Island with Riley
-8. Lake trio levels (Verity, Valor, Acuity), Snowpoint, Candice (Ice)
-9. Galactic HQ, Spear Pillar: Cyrus, then Dialga / Palkia boss
-10. Platinum branch: Distortion World, Giratina
-11. Sunyshore, Volkner (Electric), Victory Road, Elite Four and Cynthia
-Post-game: Stark Mountain, Heatran, Battle Frontier as endless mode.
+The game is organised by region. Each region is one story campaign of
+roughly 25 levels following the main games' route order, with the anime's
+characters and arcs woven into it rather than kept separate. Sinnoh is
+the first region; Unova is the second. Further regions may follow.
 
-### Act 2: Anime (Diamond and Pearl series)
-Levels that retell Ash's Sinnoh journey with anime-only content. Enemies and
-allies use anime teams, not game teams.
-- Ash and Dawn meet, Pikachu vs Paul's Elekid rivalry intro
-- Contest levels (Dawn): a scoring variant where style points come from move
-  variety instead of KOs
-- Hunter J levels: timed, protect a captured legendary from being frozen
-- Hunter J's airship as a multi-path level
-- Team Rocket (Jessie, James, Meowth) recurring comic-relief waves
-- Ash vs Paul Lake Acuity full battle, then Lily of the Valley Conference
-- Darkrai (Tobias) as a near-unwinnable showcase boss
-- Movie tie-in levels: Darkrai (Alamos Town), Shaymin, Arceus
+### Sinnoh (Platinum spine, Diamond & Pearl anime woven in)
+Free levels are training and catching; defend levels have stakes.
+1.  Lake Verity / Route 201 (free): starter choice, Starly tutorial
+2.  Route 202 (free): meet Dawn and Piplup (anime)
+3.  Jubilife City (defend): Team Rocket (Jessie, James, Meowth) steal from
+    the Poketch building; recurring comic-relief waves from here on
+4.  Route 203 and Oreburgh Gate (defend)
+5.  Oreburgh Mine (defend), then Roark gym boss
+6.  Route 204 and Ravaged Path (free)
+7.  Valley Windworks (defend): first Team Galactic encounter
+8.  Eterna Forest (free)
+9.  Gardenia gym boss
+10. Galactic Eterna Building (defend): Paul introduced as rival, his
+    Pokémon fight alongside Galactic's waves (anime rivalry)
+11. Route 207 and Mt. Coronet south pass (free)
+12. Hearthome Contest (contest objective: score from move variety, not
+    KOs), Dawn's arc
+13. Fantina gym boss
+14. Route 209 and Solaceon Ruins (free): Unown
+15. Veilstone: Maylene gym boss, then Galactic Warehouse (defend)
+16. Pastoria and the Great Marsh (free), then Crasher Wake gym boss
+17. Hunter J (timed defend): stop her airship freezing a captured
+    legendary; two paths (anime)
+18. Canalave: Byron gym boss, then Iron Island with Riley (defend)
+19. Lake trio ambush (defend): Mesprit, Azelf, Uxie as escorts to protect
+20. Snowpoint: Candice gym boss
+21. Galactic HQ (defend)
+22. Spear Pillar (defend): Cyrus, then Dialga and Palkia boss
+23. Distortion World (defend): Giratina boss
+24. Sunyshore: Volkner gym boss
+25. Victory Road and the League: Elite Four, Cynthia, then the Lily of
+    the Valley Conference with Paul and finally Tobias's Darkrai (anime)
+Post-game: Stark Mountain and Heatran; Battle Frontier as endless mode.
 
-### Act 3: Hisui and beyond (Legends: Arceus, Legends: Z-A)
-- Jubilife Village hub, survey missions as levels
-- Alpha Pokémon: oversized enemies with boosted stats, catchable
-- Frenzied Noble boss fights (Kleavor, Lilligant, Arcanine, Electrode,
-  Avalugg): phase-based, must throw balm items (reuse ball-throw mechanic)
-  during openings
-- Space-time distortions: random mid-level events that spawn rare spawns
-- Hisuian forms with their own sprites and typings
-- Z-A: Lumiose City urban maps with rooftops as air-only placement tiles,
-  Mega Evolution as a once-per-level temporary power-up
+### Hisui time rifts (bonus levels scattered through Sinnoh)
+As Team Galactic's experiments destabilise space-time, rifts open near
+the player. Each is a bonus level reachable from the region map once its
+trigger level is cleared, set in the Hisui area closest to that part of
+Sinnoh:
+- after Eterna Forest: Obsidian Fieldlands (free). Hisuian forms and
+  Alpha Pokémon (oversized enemies with boosted stats) introduced
+- after the Great Marsh: Crimson Mirelands (free)
+- after Canalave / Iron Island: Cobalt Coastlands (free), then the Noble
+  Kleavor boss (defend): phased fight where balm items reuse the
+  ball-throw mechanic during openings
+- after Snowpoint: Alabaster Icelands (free), then Noble Hisuian Avalugg
+  boss (defend)
+- after Spear Pillar: a space-time distortion (defend) with rare spawns,
+  then Hisuian Arcanine as the final Noble
+Hisuian forms are only catchable in rifts and usable everywhere.
+
+### Unova (Black 2 / White 2 spine, Best Wishes anime woven in)
+Outline to be written when Sinnoh is playable. Known pieces: Team
+Plasma and N as the antagonists, the eight Unova gyms, Ash, Iris and
+Cilan from the anime. Unova encounter tables come from the same PokeAPI
+pipeline (Black 2 and White 2 version ids), and Gen 5 sprites exist in
+SpriteCollab.
+
+### Challenge levels and shiny hunting
+Unchanged from the sections below.
 
 ## Challenge levels
 Unlocked after each gym. Each has a fixed rule set and gives a reward:
@@ -248,21 +310,28 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Settings: volume, sprite scale, colorblind-friendly type colors
 
 ## Build plan (work one phase at a time, commit at the end of each)
-Phase 0: Scaffold project, sprite loader, render one Pokémon playing Idle and
-         Walk in all 8 directions. Vitest configured.
-Phase 1: Two levels (Route 201 free, Oreburgh Mine 1F defend), one path each,
-         one placeable Pokémon, waves generated from Platinum encounter
-         tables, lives, win/lose/leave, PokeAPI stats pipeline, Gen 4 stats
-         and damage with tests, speed from stats, debug tuning panel.
-Phase 2: Moves from learnsets with learn/replace flow, move effects from
-         PokeAPI data, status conditions and stat stages, targeting rules,
-         mid-wave movement, in-level Pokémon panel, early shiny visual.
-Phase 3: Catching, party, PC box, EXP, level-up, move learning, evolution.
-Phase 4: Save/load with export code. Shop and items.
-Phase 5: Story Act 1, levels 1 through 11, with dialogue and gym bosses.
-Phase 6: Challenge levels and shiny system.
-Phase 7: Act 2 and Act 3.
-Phase 8: Polish: audio, settings, credits screen, performance pass.
+Phase 0 (done): Scaffold project, sprite loader, render one Pokémon playing
+         Idle and Walk in all 8 directions. Vitest configured.
+Phase 1 (done): Two levels (Route 201 free, Oreburgh Mine 1F defend), waves
+         from Platinum encounter tables, PokeAPI stats pipeline, Gen 4
+         stats and damage, speed from stats, debug tuning panel.
+Phase 2 (done): Moves from learnsets with learn/replace flow, move effects
+         from PokeAPI data, status conditions and stat stages, targeting
+         rules, mid-wave movement, in-level Pokémon panel, early shiny visual.
+Phase 3 (done): Catching with the Gen 4 formula and six ball types, party
+         and PC box, EXP split, evolution by level with stubs for the rest,
+         Lake Verity, Route 202, Route 203 and Oreburgh Gate with the unlock
+         chain, starter choice, drag-and-drop movement.
+Phase 4 (done): Save/load with export codes, money, shop, Potions and Rare
+         Candy, Pokédex, New Game.
+Cleanup (done): Credits screen, design doc update.
+UI pass (done): Pixel font, palette, consistent overlays, HUD bars, title
+         screen, docs/ui.md.
+Phase 5: Story Act 1 levels with dialogue and gym bosses, map editor and
+         PMD tilesets (maps branch), region map level select.
+Phase 6: Challenge levels and the full shiny system.
+Phase 7: Hisui rifts and Unova.
+Phase 8: Polish: audio, settings, performance pass; strip the debug panel.
 
 ## Working rules for Claude Code
 - Read this file at the start of every session.

@@ -1,0 +1,500 @@
+{
+  "source": "PMDCollab SpriteCollab (https://github.com/PMDCollab/SpriteCollab)",
+  "pokemon": [
+    {
+      "dex": "0041",
+      "name": "Zubat",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "fledermaus"
+      ]
+    },
+    {
+      "dex": "0042",
+      "name": "Golbat",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0054",
+      "name": "Psyduck",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Discord user 195280695009083392",
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Felis-Licht",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0055",
+      "name": "Golduck",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Caitemis"
+      ]
+    },
+    {
+      "dex": "0063",
+      "name": "Abra",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "3Monika4",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "cosmosully"
+      ]
+    },
+    {
+      "dex": "0064",
+      "name": "Kadabra",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "0palite",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0065",
+      "name": "Alakazam",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust"
+      ]
+    },
+    {
+      "dex": "0074",
+      "name": "Geodude",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JustAGunk"
+      ]
+    },
+    {
+      "dex": "0075",
+      "name": "Graveler",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Tainted#3886"
+      ]
+    },
+    {
+      "dex": "0076",
+      "name": "Golem",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0095",
+      "name": "Onix",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0169",
+      "name": "Crobat",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Chi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "<ElGian>",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0208",
+      "name": "Steelix",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0387",
+      "name": "Turtwig",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Chi"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0388",
+      "name": "Grotle",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Chi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emboarger"
+      ]
+    },
+    {
+      "dex": "0389",
+      "name": "Torterra",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0390",
+      "name": "Chimchar",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0391",
+      "name": "Monferno",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0392",
+      "name": "Infernape",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0393",
+      "name": "Piplup",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0394",
+      "name": "Prinplup",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emboarger",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0395",
+      "name": "Empoleon",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "0palite"
+      ]
+    },
+    {
+      "dex": "0396",
+      "name": "Starly",
+      "sprite": [
+        "CHUNSOFT",
+        "Emboarger",
+        "JFain"
+      ],
+      "shiny": [
+        "Lovi",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius"
+      ]
+    },
+    {
+      "dex": "0397",
+      "name": "Staravia",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius"
+      ]
+    },
+    {
+      "dex": "0398",
+      "name": "Staraptor",
+      "sprite": [
+        "CHUNSOFT",
+        "Audino"
+      ],
+      "shiny": [
+        "Lovi",
+        "Audino",
+        "Emmuffin",
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius",
+        "ShyStarryRain",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0399",
+      "name": "Bidoof",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Caitemis",
+        "Scizivire",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0400",
+      "name": "Bibarel",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire",
+        "G〜"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0401",
+      "name": "Kricketot",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0402",
+      "name": "Kricketune",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0403",
+      "name": "Shinx",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Reppamon"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0404",
+      "name": "Luxio",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Reppamon",
+        "Caitemis"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "C_Pariah"
+      ]
+    },
+    {
+      "dex": "0405",
+      "name": "Luxray",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Reppamon",
+        "G〜"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Soulja"
+      ]
+    },
+    {
+      "dex": "0491",
+      "name": "Darkrai",
+      "sprite": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "ShyStarryRain",
+        "Chi",
+        "baronessfaron"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Wyvernagon",
+        "baronessfaron"
+      ]
+    }
+  ]
+}

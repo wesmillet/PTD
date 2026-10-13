@@ -18,6 +18,7 @@ import { PartyScreen } from '../ui/partyScreen';
 import { PokedexScreen } from '../ui/pokedexScreen';
 import { SavePanel } from '../ui/savePanel';
 import { ShopScreen } from '../ui/shopScreen';
+import { CreditsScreen } from '../ui/creditsScreen';
 import { showStarterDialog } from '../ui/starterDialog';
 import { TEXT_BIG, TEXT_DIM } from '../ui/styles';
 
@@ -27,6 +28,7 @@ export class LevelSelectScene extends Phaser.Scene {
   private shop?: ShopScreen;
   private pokedex?: PokedexScreen;
   private savePanel?: SavePanel;
+  private credits?: CreditsScreen;
   private starterRoot?: HTMLDivElement;
 
   constructor() {
@@ -58,7 +60,8 @@ export class LevelSelectScene extends Phaser.Scene {
     new Button(this, width / 2 - 85, row, 'Shop', () => this.guard(() => this.shop?.show()), 150, 30);
     new Button(this, width / 2 + 85, row, 'Pokédex', () => this.guard(() => this.pokedex?.show()), 150, 30);
     new Button(this, width / 2 + 255, row, 'Save', () => this.savePanel?.show(), 150, 30);
-    new Button(this, width / 2, row + 38, 'Sprite demo', () => this.scene.start('Phase0'), 150, 26);
+    new Button(this, width / 2 - 85, row + 38, 'Credits', () => this.credits?.show(), 150, 26);
+    new Button(this, width / 2 + 85, row + 38, 'Sprite demo', () => this.scene.start('Phase0'), 150, 26);
     this.add.text(width / 2, this.scale.height - 16, 'Tip: ?level=<id> opens a level, ?party=debug loads the test party', TEXT_DIM).setOrigin(0.5);
 
     const refresh = () => {
@@ -68,6 +71,7 @@ export class LevelSelectScene extends Phaser.Scene {
     this.partyScreen = new PartyScreen(game, { portraitUrl: (s) => portraitUrl(s), onChange: () => saveGame(), onClose: refresh });
     this.shop = new ShopScreen(game, { onChange: () => saveGame(), onClose: refresh });
     this.pokedex = new PokedexScreen(game, (s) => portraitUrl(s), () => undefined);
+    this.credits = new CreditsScreen(() => undefined);
     this.savePanel = new SavePanel({
       getCode: () => currentSaveCode(),
       importCode: (code) => importSaveCode(code),
@@ -82,6 +86,7 @@ export class LevelSelectScene extends Phaser.Scene {
       this.shop?.close();
       this.pokedex?.close();
       this.savePanel?.close();
+      this.credits?.close();
       this.starterRoot?.remove();
       this.partyScreen = undefined;
       this.shop = undefined;

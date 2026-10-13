@@ -23,7 +23,7 @@ if [ ! -d "$WORK/.git" ]; then
 fi
 
 cd "$WORK"
-paths=(/tracker.json /sprite_config.json)
+paths=(/tracker.json /sprite_config.json /credit_names.txt)
 for dex in "$@"; do
   paths+=("/sprite/$dex/*" "/portrait/$dex/*")
 done
@@ -66,4 +66,5 @@ for dex in "$@"; do
   fi
 done
 
-node "$ROOT/scripts/build-sprite-index.mjs" "$WORK/tracker.json" "$ROOT/src/data/spriteIndex.json"
+cp -f "$WORK/credit_names.txt" "$ROOT/assets-src/spritecollab/credit_names.txt"
+node "$ROOT/scripts/build-sprite-index.mjs" "$WORK/tracker.json" "$ROOT/src/data/spriteIndex.json" "$ROOT/assets-src/spritecollab/credit_names.txt"
