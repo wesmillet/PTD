@@ -9,6 +9,8 @@ import {
   leaveLevel,
   moveTower,
   placeTower,
+  setPartyLevel,
+  setTimeOfDay,
   startWave,
   step,
   summarize,
@@ -19,6 +21,7 @@ import {
   type Tower,
 } from '../sim/level';
 import { isPlaceable, pointAlongPath, tileKey } from '../sim/map';
+import { DebugPanel } from '../ui/debugPanel';
 import { Hud } from '../ui/hud';
 import { COLORS, TEXT, TEXT_DIM } from '../ui/styles';
 import { showSummary } from '../ui/summary';
@@ -63,6 +66,7 @@ export class LevelScene extends Phaser.Scene {
   private overlay!: Phaser.GameObjects.Graphics;
   private hoverTile: [number, number] | null = null;
   private toast?: Phaser.GameObjects.Text;
+  private debugPanel?: DebugPanel;
 
   constructor() {
     super('Level');
@@ -103,9 +107,21 @@ export class LevelScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-ESC', () => this.scene.start('LevelSelect'));
     this.input.keyboard?.on('keydown-SPACE', () => this.tryStartWave());
 
-    // Debug hook for the panel and for automated checks.
-    (window as unknown as { __ptd?: unknown }).__ptd = { scene: this, state: this.state, runtime, runtimeConfig };
+    this.debugPanel = new DebugPanel({
+      getState: () => this.state,
+      setPartyLevel: (level) => {
+        setPartyLevel(this.state, 0, level);
+        runtime.partyLevelOverride = level;
+      },
+      setTimeOfDay: (time) => setTimeOfDay(this.state, time),
+      reroll: () => this.scene.restart({ levelId: this.levelId, seed: (Date.now() % 1_000_000) + 1 }),
+    });
+
+    // Debug hook for automated checks.
+    (window as unknown as { __ptd?: unknown }).__ptd = { scene: this, state: this.state, runtime, runtimeConfig, debugPanel: this.debugPanel };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.debugPanel?.destroy();
+      this.debugPanel = undefined;
       (window as unknown as { __ptd?: unknown }).__ptd = undefined;
     });
   }

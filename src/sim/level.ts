@@ -3,7 +3,7 @@
  * seed, party and sequence of calls produce the same result. The Phaser
  * scene renders this state and animates the events `step` returns.
  */
-import { encounterTable, getEncounterArea, getMove, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
+import { encounterTable, expForLevel, getEncounterArea, getMove, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
 import config from '../data/config.json';
 import { hits, rollDamage, type DamageResult } from './damage';
 import { gainExp, hitExp, koExp } from './exp';
@@ -134,6 +134,18 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
   if (state.table.length === 0) throw new Error(`createLevel: no walk table for ${def.area} at ${time}`);
   if (def.objective === 'defend' && (!def.waves || !def.lives)) throw new Error('createLevel: defend levels need waves and lives');
   return state;
+}
+
+/** Debug: sets a party member's level outright (stats, EXP and the summary baseline follow). */
+export function setPartyLevel(state: LevelState, partyIndex: number, level: number): void {
+  const entry = state.party[partyIndex];
+  if (!entry) throw new Error(`setPartyLevel: no party member ${partyIndex}`);
+  if (!Number.isInteger(level) || level < 1 || level > 100) throw new Error(`setPartyLevel: bad level ${level}`);
+  setMonsterLevel(entry.mon, level);
+  entry.mon.exp = expForLevel(entry.mon.growth, level);
+  entry.mon.hp = entry.mon.stats.hp;
+  entry.levelFrom = level;
+  entry.expGained = 0;
 }
 
 /** Changes the time of day; the next wave uses the matching table. */

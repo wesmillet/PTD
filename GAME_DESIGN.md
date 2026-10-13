@@ -79,8 +79,32 @@ runtime.
   random roll 0.85 to 1.0, and crits. Keep it in `src/sim/damage.ts` with tests.
 - Status conditions: poison, burn, paralysis, sleep, freeze, confusion, and
   flinch. Each has a defined effect on path movement and attack rate.
-- Enemies walk the path; reaching the end costs the player one "life" (or a
-  level-specific objective, like an item being stolen).
+- Enemies walk the path; what happens when one reaches the end depends on
+  the level's objective (see "Level objectives").
+- Every Pokémon instance (tower or enemy) has a level. Actual stats come from
+  base stats with the Gen 4 formula, IV 31, EV 0, neutral nature (the IV/EV
+  assumption lives in `src/data/config.json` and is tested in
+  `src/sim/stats.ts`). Damage always uses computed stats, never base stats.
+- Speed drives both movement and attack rate, with constants in
+  `src/data/config.json`:
+  enemy tiles/sec = clamp(speedBase + speedScale * Speed),
+  tower attacks/sec = moveRate * clamp(Speed / speedRef, clampMin, clampMax).
+
+### Level objectives
+Each level definition (`src/data/levels.json`) has an `objective`:
+- `defend`: a fixed wave count and a number of lives. Each enemy that reaches
+  the end costs one life. Win when all waves are cleared, lose at zero lives.
+- `free`: no lives. Enemies that reach the end despawn with no penalty. Waves
+  continue indefinitely from the area's encounter table, ramping only the
+  enemy count (never the level beyond the table's range). A "Leave route"
+  button ends the level at any time and shows a summary: EXP gained per
+  Pokémon, level-ups and (from Phase 3) Pokémon caught. Nothing is lost by
+  leaving. Free levels are the grinding and catching spots.
+
+Levels reference a Platinum location area and a time of day (morning, day,
+night) rather than a hand-written enemy list. Waves are generated from that
+area's walk table, weighted by rarity, with levels rolled in each entry's
+range, from a seeded RNG so a level replays identically for the same seed.
 
 ### Catching
 - Any wild enemy can be targeted with a Poké Ball while alive. Catch chance uses
@@ -113,8 +137,9 @@ Gyms are boss levels where the leader's Pokémon come in scripted waves and the
 leader's ace is a boss with extra HP and a signature move.
 Required beats, in order:
 1. Twinleaf Town and Lake Verity: choose starter (Turtwig, Chimchar, Piplup),
-   Starly ambush tutorial level
-2. Route 201 to 203, Jubilife City, Oreburgh Mine, Roark (Rock)
+   Starly ambush tutorial level. Lake Verity is a free level.
+2. Route 201 to 203, Jubilife City, Oreburgh Mine, Roark (Rock). Route 201
+   and Route 202 are free levels.
 3. Floaroma Town, Valley Windworks (first Team Galactic encounter), Eterna
    Forest, Gardenia (Grass), Galactic Eterna Building
 4. Cycling Road, Mt. Coronet, Hearthome, Fantina (Ghost)
@@ -184,8 +209,10 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 ## Build plan (work one phase at a time, commit at the end of each)
 Phase 0: Scaffold project, sprite loader, render one Pokémon playing Idle and
          Walk in all 8 directions. Vitest configured.
-Phase 1: One level, one path, one placeable Pokémon, one enemy type, waves,
-         lives, win/lose. Damage formula with tests.
+Phase 1: Two levels (Route 201 free, Oreburgh Mine 1F defend), one path each,
+         one placeable Pokémon, waves generated from Platinum encounter
+         tables, lives, win/lose/leave, PokeAPI stats pipeline, Gen 4 stats
+         and damage with tests, speed from stats, debug tuning panel.
 Phase 2: Moves, type chart, status effects, targeting rules, 4-move selection.
 Phase 3: Catching, party, PC box, EXP, level-up, move learning, evolution.
 Phase 4: Save/load with export code. Shop and items.

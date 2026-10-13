@@ -7,6 +7,8 @@ import {
   leaveLevel,
   moveTower,
   placeTower,
+  setPartyLevel,
+  setTimeOfDay,
   startWave,
   step,
   summarize,
@@ -167,6 +169,21 @@ describe('free objective', () => {
 });
 
 describe('debug overrides', () => {
+  it('sets the party level outright and switches the time-of-day table', () => {
+    const state = createLevel(route201, route201Map, { seed: 4, party: [turtwig(5)] });
+    setPartyLevel(state, 0, 40);
+    const mon = state.party[0]!.mon;
+    expect(mon.level).toBe(40);
+    expect(mon.hp).toBe(mon.stats.hp);
+    expect(state.party[0]!.levelFrom).toBe(40);
+    expect(() => setPartyLevel(state, 0, 0)).toThrow();
+    setTimeOfDay(state, 'night');
+    expect(state.table.some((e) => e.species === 401)).toBe(true); // Kricketot
+    setTimeOfDay(state, 'day');
+    expect(state.table.some((e) => e.species === 401)).toBe(false);
+  });
+
+
   it('forces enemy levels and reads speed constants live', () => {
     const config = defaultRuntimeConfig();
     config.enemyLevelOverride = 30;

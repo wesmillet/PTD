@@ -39,6 +39,18 @@ artists' `credits.txt`) and regenerates `src/data/spriteIndex.json`.
 Every `credits.txt` is kept verbatim and will be shown in the in-game credits
 screen. Please keep them when adding or updating sprites.
 
+## Playing the Phase 1 levels
+
+Open the dev server and pick a level, or jump straight in:
+
+- Route 201 (free roam): http://localhost:5173/PTD/?level=route-201
+- Oreburgh Mine 1F (defend, 8 waves): http://localhost:5173/PTD/?level=oreburgh-mine-1f
+
+Add `&seed=<number>` to replay the same waves. Click a blue tile to place
+Turtwig, click it again and another tile to move it between waves. Press the
+backtick key for the debug panel (speed constants, Turtwig level, enemy level
+override, time of day, seed reroll). Esc returns to the level list.
+
 ## Pokémon data
 
 Stats, moves, learnsets, the type chart, EXP curves, evolutions and Platinum
