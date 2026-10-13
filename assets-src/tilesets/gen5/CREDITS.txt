@@ -1,11 +1,18 @@
 Gen 5 (Black/White) style tilesets
+Both compiled in "Tiles - Ready to use Tilesets" by Aki,
+https://eeveeexpo.com/resources/15/
+Per that page, credit the original artists, not the compiler.
 
 kyle-dove-outside.png
   Artist: Kyle-Dove
-  Source: compiled in "Tiles - Ready to use Tilesets" by Aki,
-          https://eeveeexpo.com/resources/15/
   Format: RPG Maker XP tileset, 256 px wide (8 tiles x 32 px), 6720 px tall.
-  Credit requirement: credit Kyle-Dove (not the compiler).
+  Contents: terrain, grass, trees, cliffs, water edges.
 
-Still needed: the Gen 5 exterior tileset from the same page, saved as a
-full-size PNG (256 px wide), plus a cave tileset.
+gen5-exterior.png
+  Artist(s): see the Gen 5 exterior entry on the source page; the
+  compilation lists contributors per set and the exact names for this
+  sheet still need to be copied here before release.
+  Format: RPG Maker XP tileset, 256 px wide (8 tiles x 32 px), 41504 px tall.
+  Contents: buildings, roofs, fences, signs, town and route decoration.
+
+Still needed: a cave tileset.
