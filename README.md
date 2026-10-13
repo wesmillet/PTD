@@ -41,7 +41,8 @@ screen. Please keep them when adding or updating sprites.
 
 ## Playing
 
-Open the dev server at http://localhost:5173/PTD/. Pick a starter, then play
+Open the dev server at http://localhost:5173/PTD/. The title screen offers
+Continue, New Game and Credits. Pick a starter, then play
 the levels in order: Route 201 (free) → Lake Verity (free) → Route 202 (free)
 → Route 203 (defend) → Oreburgh Gate (defend) → Oreburgh Mine 1F (defend).
 Free levels unlock the next one once you leave with at least one wave

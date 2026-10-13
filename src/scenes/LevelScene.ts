@@ -544,7 +544,7 @@ export class LevelScene extends Phaser.Scene {
       const next = this.state.pendingLearns[0];
       if (next) this.promptLearn(next.towerId, next.moveId);
       else this.paused = false;
-    });
+    }, (s) => portraitUrl(s));
   }
 
   private handleEvents(events: LevelEvent[]): void {

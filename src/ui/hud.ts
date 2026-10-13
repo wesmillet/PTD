@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { BALL_IDS, BALLS } from '../sim/catch';
 import type { LevelState } from '../sim/level';
+import { getGame } from '../game/session';
+import config from '../data/config.json';
 import { Button } from './button';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 
@@ -37,14 +39,21 @@ export const BALL_COLORS: Record<string, number> = {
   master: 0xa040c0,
 };
 
-/** Top strip: level name, wave, lives, speed, start/leave. Bottom row: party slots and ball bar. */
+/**
+ * Top bar: level name, wave, lives, money, speed, Start / Leave.
+ * Bottom bar (below the map): party slots and the ball bar.
+ */
 export class Hud {
-  static readonly HEIGHT = 116;
-  private static readonly STRIP_Y = 92;
+  /** Height of the top bar; the map starts here. */
+  static readonly HEIGHT = 92;
+  /** Height of the bottom bar under the map. */
+  static readonly BOTTOM = 60;
+  private readonly bottomY: number;
   private readonly scene: Phaser.Scene;
   private readonly callbacks: HudCallbacks;
   private readonly wave: Phaser.GameObjects.Text;
   private readonly lives: Phaser.GameObjects.Text;
+  private readonly money: Phaser.GameObjects.Text;
   private readonly hint: Phaser.GameObjects.Text;
   private readonly startButton: Button;
   private readonly speedButton: Button;
@@ -57,35 +66,42 @@ export class Hud {
     this.scene = scene;
     this.callbacks = callbacks;
     const width = scene.scale.width;
-    scene.add.rectangle(0, 0, width, Hud.HEIGHT, COLORS.hudBg).setOrigin(0).setDepth(1000);
-    scene.add.text(16, 10, state.def.name, TEXT_BIG).setDepth(1001);
+    const height = scene.scale.height;
+    this.bottomY = height - Hud.BOTTOM;
+    const bar = scene.add.graphics().setDepth(1000);
+    bar.fillStyle(COLORS.hudBg, 1).fillRect(0, 0, width, Hud.HEIGHT);
+    bar.fillStyle(COLORS.borderOuter, 1).fillRect(0, Hud.HEIGHT - 3, width, 3);
+    bar.fillStyle(COLORS.hudBg, 1).fillRect(0, this.bottomY, width, Hud.BOTTOM);
+    bar.fillStyle(COLORS.borderOuter, 1).fillRect(0, this.bottomY, width, 3);
+    scene.add.text(16, 8, state.def.name, TEXT_BIG).setDepth(1001);
     this.wave = scene.add.text(16, 42, '', TEXT).setDepth(1001);
     this.lives = scene.add.text(16, 62, '', TEXT).setDepth(1001);
-    this.hint = scene.add.text(width / 2, 52, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
-    this.startButton = new Button(scene, width - 80, 24, 'Start wave', callbacks.onStartWave).setDepth(1001);
-    this.speedButton = new Button(scene, width - 180, 24, '1x', callbacks.onToggleSpeed, 60).setDepth(1001);
+    this.money = scene.add.text(250, 42, '', { ...TEXT, color: '#ffe066' }).setDepth(1001);
+    this.hint = scene.add.text(width / 2, 70, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
+    this.startButton = new Button(scene, width - 80, 22, 'Start wave', callbacks.onStartWave, 130, 30).setDepth(1001);
+    this.speedButton = new Button(scene, width - 185, 22, '1x', callbacks.onToggleSpeed, 60, 30).setDepth(1001);
     if (state.def.objective === 'free') {
-      this.leaveButton = new Button(scene, width - 290, 24, 'Leave route', callbacks.onLeave).setDepth(1001);
+      this.leaveButton = new Button(scene, width - 300, 22, 'Leave route', callbacks.onLeave, 130, 30).setDepth(1001);
     }
-    scene.add.text(150, Hud.STRIP_Y - 6, 'Party', { ...TEXT_DIM, fontSize: '10px' }).setOrigin(1, 0.5).setDepth(1001);
+    scene.add.text(16, this.bottomY + 24, 'Party', { ...TEXT_DIM, fontSize: '11px' }).setOrigin(0, 0.5).setDepth(1001);
     this.rebuildSlots(state);
 
-    // Ball bar, right side of the bottom row.
+    // Ball bar, right side of the bottom bar.
     const obtainable = BALL_IDS.filter((id) => BALLS[id]?.obtainable !== false);
     const startX = width - 16 - obtainable.length * 46 + 22;
-    scene.add.text(startX - 30, Hud.STRIP_Y - 6, 'Balls', { ...TEXT_DIM, fontSize: '10px' }).setOrigin(1, 0.5).setDepth(1001);
+    scene.add.text(startX - 30, this.bottomY + 30, 'Balls', { ...TEXT_DIM, fontSize: '11px' }).setOrigin(1, 0.5).setDepth(1001);
     obtainable.forEach((id, i) => {
       const x = startX + i * 46;
-      const y = Hud.STRIP_Y - 4;
-      const frame = scene.add.rectangle(x, y, 42, 40, 0x0d0d16).setStrokeStyle(1, COLORS.panelBorder).setDepth(1001).setInteractive({ useHandCursor: true });
+      const y = this.bottomY + 30;
+      const frame = scene.add.rectangle(x, y, 42, 46, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
       frame.on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
         event.stopPropagation();
         callbacks.onBall(id);
       });
-      scene.add.circle(x, y - 6, 9, BALL_COLORS[id] ?? 0xffffff).setStrokeStyle(2, 0x202020).setDepth(1002);
-      scene.add.rectangle(x, y - 6, 18, 2, 0x202020).setDepth(1003);
-      scene.add.circle(x, y - 6, 3, 0xffffff).setStrokeStyle(1, 0x202020).setDepth(1003);
-      const count = scene.add.text(x, y + 13, '', { ...TEXT_DIM, fontSize: '10px', color: '#ffffff' }).setOrigin(0.5).setDepth(1003);
+      scene.add.circle(x, y - 8, 9, BALL_COLORS[id] ?? 0xffffff).setStrokeStyle(2, 0x202020).setDepth(1002);
+      scene.add.rectangle(x, y - 8, 18, 2, 0x202020).setDepth(1003);
+      scene.add.circle(x, y - 8, 3, 0xffffff).setStrokeStyle(1, 0x202020).setDepth(1003);
+      const count = scene.add.text(x, y + 13, '', { ...TEXT_DIM, fontSize: '11px', color: '#f4ecd8' }).setOrigin(0.5).setDepth(1003);
       this.balls.push({ id, frame, count });
     });
     this.update(state, 1);
@@ -105,17 +121,17 @@ export class Hud {
     }
     this.slots = [];
     state.party.forEach((entry, i) => {
-      const x = 186 + i * 52;
-      const y = Hud.STRIP_Y - 10;
+      const x = 86 + i * 54;
+      const y = this.bottomY + 24;
       const dex = String(entry.mon.species).padStart(4, '0');
-      const frame = this.scene.add.rectangle(x, y + 6, 44, 44, 0x0d0d16).setStrokeStyle(1, COLORS.panelBorder).setDepth(1001).setInteractive({ useHandCursor: true });
+      const frame = this.scene.add.rectangle(x, y + 6, 46, 46, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
       frame.on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
         event.stopPropagation();
         this.callbacks.onPartySlot(i);
       });
       const image = this.scene.textures.exists(`portrait-${dex}`) ? this.scene.add.image(x, y + 6, `portrait-${dex}`).setDepth(1002) : undefined;
-      const level = this.scene.add.text(x + 22, y - 16, '', { ...TEXT_DIM, fontSize: '10px' }).setOrigin(1, 0).setDepth(1003);
-      const placed = this.scene.add.text(x - 22, y - 16, '', { ...TEXT_DIM, fontSize: '10px', color: '#9ad0ff' }).setOrigin(0, 0).setDepth(1003);
+      const level = this.scene.add.text(x + 22, y - 17, '', { ...TEXT_DIM, fontSize: '10px', color: '#f4ecd8' }).setOrigin(1, 0).setDepth(1003);
+      const placed = this.scene.add.text(x - 22, y - 17, '', { ...TEXT_DIM, fontSize: '10px', color: '#9ad0ff' }).setOrigin(0, 0).setDepth(1003);
       const hp = this.scene.add.graphics().setDepth(1003);
       const slot: Slot = { species: entry.mon.species, frame, level, hp, placed };
       if (image) slot.image = image;
@@ -133,6 +149,7 @@ export class Hud {
       this.lives.setText(`KOs ${state.kos}   Caught ${state.caught.length}`);
     }
     this.speedButton.setText(`${gameSpeed}x`);
+    this.money.setText(`$${getGame().money}${state.kos > 0 ? `  +$${state.kos * config.money.perKo}` : ''}`);
     const canStart = state.phase === 'build' && state.towers.length > 0;
     this.startButton.setEnabled(canStart);
     const nextIn = def.objective === 'free' && state.phase === 'build' && state.towers.length > 0 ? ` (auto in ${Math.ceil(state.buildTimer)}s)` : '';
@@ -158,7 +175,7 @@ export class Hud {
       if (!slot) return;
       slot.level.setText(`${entry.mon.shiny ? '★' : ''}L${entry.mon.level}`);
       const isPlaced = state.towers.some((t) => t.mon === entry.mon);
-      slot.frame.setStrokeStyle(i === selectedPartyIndex ? 2 : 1, i === selectedPartyIndex ? COLORS.selected : isPlaced ? COLORS.placeable : COLORS.panelBorder);
+      slot.frame.setStrokeStyle(2, i === selectedPartyIndex ? COLORS.selected : isPlaced ? COLORS.placeable : COLORS.borderOuter);
       slot.placed.setText(isPlaced ? '●' : '');
       const frac = entry.mon.stats.hp > 0 ? entry.mon.hp / entry.mon.stats.hp : 0;
       slot.hp.clear();
@@ -168,7 +185,7 @@ export class Hud {
     for (const b of this.balls) {
       const n = state.items.balls[b.id] ?? 0;
       b.count.setText(String(n));
-      b.frame.setStrokeStyle(b.id === selectedBall ? 2 : 1, b.id === selectedBall ? COLORS.selected : COLORS.panelBorder);
+      b.frame.setStrokeStyle(2, b.id === selectedBall ? COLORS.selected : COLORS.borderOuter);
       b.frame.setAlpha(n > 0 ? 1 : 0.4);
     }
   }

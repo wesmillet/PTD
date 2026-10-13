@@ -296,9 +296,16 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Pokédex shows shiny counts. A "shiny living dex" completion reward exists.
 
 ## UI
-- Level select map per act, styled after the Sinnoh region map
-- In-level HUD: wave counter, lives, money, speed toggle (1x, 2x, 4x),
-  pause, Poké Ball bar
+- Theme: dark navy panels with a light border in the style of the PMD
+  dialogue boxes, cream text, the 17 type colours as CSS variables, Pixelify
+  Sans (OFL, bundled) for headings, labels and the HUD, a system sans-serif
+  for long text. Variables and components are listed in `docs/ui.md`.
+- Title screen: game name, Continue, New Game, Credits.
+- Level select map per act, styled after the Sinnoh region map (a plain list
+  with the unlock chain for now)
+- In-level HUD: a top bar with wave counter, lives, money and the speed
+  toggle (1x, 2x; 4x and pause later), and a bottom bar with the party strip
+  and the Poké Ball bar; nothing overlaps the playfield
 - Pokémon panel: portrait, level, HP and EXP bars with numbers, status and
   stat stages, all four moves with type and power, the active move
   highlighted (click a move to make it active), a Move button, and later an

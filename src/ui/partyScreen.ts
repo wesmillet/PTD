@@ -7,7 +7,7 @@ import { evolutionOptions } from '../sim/evolution';
 import { moveToBox, moveToParty, sortMonsters, MAX_PARTY, type GameState, type SortKey } from '../sim/game';
 import type { Monster } from '../sim/monster';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, isolateFromGame, TYPE_COLORS } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame } from './domOverlay';
 import { replaceMove, useRareCandy } from '../sim/items';
 import { evolveMonster } from '../sim/evolution';
 import { learnableAt } from '../sim/moves';
@@ -130,7 +130,7 @@ export class PartyScreen {
       type.className = 'ptd-type';
       const t = typeName(mon.types[0] ?? 1);
       type.textContent = t;
-      type.style.background = TYPE_COLORS[t] ?? '#444';
+      type.style.background = `var(--type-${t}, #444)`;
       li.append(img, name, type);
       li.addEventListener('click', () => {
         this.selected = mon;
@@ -185,7 +185,7 @@ export class PartyScreen {
       const type = document.createElement('span');
       type.className = 'ptd-type';
       type.textContent = typeName(data.type);
-      type.style.background = TYPE_COLORS[typeName(data.type)] ?? '#444';
+      type.style.background = `var(--type-${typeName(data.type)}, #444)`;
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
       meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${data.category}  PP ${slot.pp}/${slot.maxPp}`;
@@ -240,7 +240,7 @@ export class PartyScreen {
           this.hooks.onChange();
           this.render();
           next();
-        });
+        }, this.hooks.portraitUrl);
         return;
       }
       if (result.evolution) {

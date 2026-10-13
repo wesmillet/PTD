@@ -9,7 +9,7 @@ import type { Monster } from '../sim/monster';
 import { resolveMove } from '../sim/moves';
 import { evolutionOptions } from '../sim/evolution';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, isolateFromGame, TYPE_COLORS } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame } from './domOverlay';
 
 export interface PokemonPanelHooks {
   portraitUrl: (species: number) => string | undefined;
@@ -196,7 +196,7 @@ export class PokemonPanel {
       const type = document.createElement('span');
       type.className = 'ptd-type';
       type.textContent = typeName(data.type);
-      type.style.background = TYPE_COLORS[typeName(data.type)] ?? '#444';
+      type.style.background = `var(--type-${typeName(data.type)}, #444)`;
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
       meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${data.category}  PP ${slot.pp}/${slot.maxPp}  range ${spec.range}  ${spec.targeting}`;

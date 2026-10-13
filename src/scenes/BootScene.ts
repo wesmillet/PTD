@@ -21,13 +21,13 @@ export class BootScene extends Phaser.Scene {
   preload(): void {
     const { width, height } = this.scale;
     const label = this.add
-      .text(width / 2, height / 2 - 20, 'Loading sprites…', { fontFamily: 'monospace', fontSize: '16px', color: '#ffffff' })
+      .text(width / 2, height / 2 - 20, 'Loading sprites…', { fontFamily: '"Pixelify Sans", monospace', fontSize: '18px', color: '#f4ecd8' })
       .setOrigin(0.5);
     const bar = this.add.graphics();
     this.load.on('progress', (value: number) => {
       bar.clear();
-      bar.fillStyle(0x444455, 1).fillRect(width / 2 - 150, height / 2, 300, 12);
-      bar.fillStyle(0x7fd37f, 1).fillRect(width / 2 - 150, height / 2, 300 * value, 12);
+      bar.fillStyle(0x2c335c, 1).fillRoundedRect(width / 2 - 150, height / 2, 300, 12, 6);
+      bar.fillStyle(0x6fa8dc, 1).fillRoundedRect(width / 2 - 150, height / 2, Math.max(12, 300 * value), 12, 6);
     });
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       label.setText(`Failed to load ${file.src}`).setColor('#ff6b6b');
@@ -59,7 +59,8 @@ export class BootScene extends Phaser.Scene {
     star.destroy();
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
+    else if (scene === 'select') this.scene.start('LevelSelect');
     else if (urlParam('level')) this.scene.start('Level');
-    else this.scene.start('LevelSelect');
+    else this.scene.start('Title');
   }
 }

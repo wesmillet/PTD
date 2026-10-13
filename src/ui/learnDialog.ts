@@ -4,7 +4,7 @@
  */
 import { getMove, typeName } from '../data/pokedata';
 import type { Monster } from '../sim/monster';
-import { capitalize, ensureOverlayStyles, isolateFromGame, TYPE_COLORS } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame, portraitImage } from './domOverlay';
 
 export class LearnDialog {
   private root: HTMLDivElement | null = null;
@@ -14,7 +14,7 @@ export class LearnDialog {
   }
 
   /** Shows the choice; `onChoice` receives the slot to replace or null to decline. */
-  show(mon: Monster, newMoveId: number, onChoice: (replaceIndex: number | null) => void): void {
+  show(mon: Monster, newMoveId: number, onChoice: (replaceIndex: number | null) => void, portraitUrl?: (species: number) => string | undefined): void {
     ensureOverlayStyles();
     this.close();
     const root = document.createElement('div');
@@ -25,7 +25,14 @@ export class LearnDialog {
     const hint = document.createElement('div');
     hint.className = 'ptd-dim';
     hint.textContent = 'It already knows four moves. Pick one to forget, or keep the current moves.';
-    root.append(title, hint);
+    const head = document.createElement('div');
+    head.className = 'ptd-head';
+    const img = portraitImage(portraitUrl?.(mon.species), false);
+    if (img) head.appendChild(img);
+    const titles = document.createElement('div');
+    titles.append(title, hint);
+    head.appendChild(titles);
+    root.append(head);
 
     const list = document.createElement('ul');
     list.className = 'ptd-moves';
@@ -39,7 +46,7 @@ export class LearnDialog {
       const type = document.createElement('span');
       type.className = 'ptd-type';
       type.textContent = typeName(data.type);
-      type.style.background = TYPE_COLORS[typeName(data.type)] ?? '#444';
+      type.style.background = `var(--type-${typeName(data.type)}, #444)`;
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
       meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${data.category}  PP ${data.pp ?? '—'}`;

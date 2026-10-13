@@ -1,0 +1,117 @@
+/*
+ * Sinnoh Tower Defense UI theme. Dark is the only theme.
+ * Variables and components are documented in docs/ui.md.
+ */
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/PTD/assets/fonts/PixelifySans.ttf') format('truetype');
+  font-weight: 400 700;
+  font-display: swap;
+}
+
+:root {
+  /* Surfaces, in the style of the PMD dialogue boxes */
+  --ptd-bg: #10121f;
+  --ptd-panel: #1b1f36;
+  --ptd-panel-2: #232849;
+  --ptd-border: #6f7fcf;
+  --ptd-border-outer: #2c335c;
+  --ptd-shadow: rgba(0, 0, 0, 0.55);
+  /* Text */
+  --ptd-text: #f4ecd8;
+  --ptd-text-dim: #b3b0c9;
+  --ptd-text-faint: #6d6b85;
+  --ptd-accent: #ffe066;
+  --ptd-good: #7ddc7d;
+  --ptd-bad: #ff7b7b;
+  --ptd-info: #8fc9ff;
+  /* Bars */
+  --ptd-hp: #5ad35a;
+  --ptd-hp-low: #d3b05a;
+  --ptd-hp-critical: #d35a5a;
+  --ptd-hp-back: #3a1d26;
+  --ptd-exp: #6fa8dc;
+  --ptd-bar-back: #2a2e4a;
+  /* Fonts */
+  --ptd-font-pixel: 'Pixelify Sans', 'Courier New', monospace;
+  --ptd-font-body: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Spacing and shape */
+  --ptd-radius: 10px;
+  --ptd-radius-sm: 6px;
+  --ptd-pad: 14px;
+  /* The 17 type colours (Gen 4) */
+  --type-normal: #a8a878;
+  --type-fighting: #c03028;
+  --type-flying: #a890f0;
+  --type-poison: #a040a0;
+  --type-ground: #e0c068;
+  --type-rock: #b8a038;
+  --type-bug: #a8b820;
+  --type-ghost: #705898;
+  --type-steel: #b8b8d0;
+  --type-fire: #f08030;
+  --type-water: #6890f0;
+  --type-grass: #78c850;
+  --type-electric: #f8d030;
+  --type-psychic: #f85888;
+  --type-ice: #98d8d8;
+  --type-dragon: #7038f8;
+  --type-dark: #705848;
+}
+
+html, body { background: var(--ptd-bg); color: var(--ptd-text); }
+
+/* ---------------------------------------------------------------- panels */
+.ptd-panel {
+  position: fixed; z-index: 20; box-sizing: border-box;
+  background: var(--ptd-panel); color: var(--ptd-text);
+  font: 15px/1.45 var(--ptd-font-body);
+  border: 2px solid var(--ptd-border); border-radius: var(--ptd-radius);
+  box-shadow: 0 0 0 3px var(--ptd-border-outer), 0 8px 28px var(--ptd-shadow);
+  padding: var(--ptd-pad);
+}
+.ptd-panel.ptd-side { right: 12px; top: 12px; width: 350px; max-height: calc(100vh - 24px); overflow: auto; }
+.ptd-panel.ptd-modal { left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(460px, calc(100vw - 24px)); }
+.ptd-panel h2 { margin: 0 0 6px; font: 700 22px/1.2 var(--ptd-font-pixel); color: var(--ptd-text); letter-spacing: 0.5px; }
+.ptd-panel h3, .ptd-panel .ptd-heading { margin: 12px 0 4px; font: 700 15px/1.3 var(--ptd-font-pixel); color: var(--ptd-accent); }
+.ptd-panel .ptd-head { display: flex; gap: 12px; align-items: center; }
+.ptd-panel .ptd-portrait { width: 80px; height: 80px; image-rendering: pixelated; border: 2px solid var(--ptd-border-outer); border-radius: var(--ptd-radius-sm); background: var(--ptd-bg); flex: none; }
+.ptd-panel .ptd-portrait.small { width: 40px; height: 40px; }
+.ptd-panel .ptd-dim { color: var(--ptd-text-dim); font-size: 13px; }
+.ptd-panel .ptd-label { font: 13px/1.3 var(--ptd-font-pixel); color: var(--ptd-text-dim); }
+.ptd-panel .ptd-bar { position: relative; height: 12px; background: var(--ptd-bar-back); border-radius: 6px; overflow: hidden; margin: 4px 0; border: 1px solid var(--ptd-border-outer); }
+.ptd-panel .ptd-bar > div { position: absolute; inset: 0 auto 0 0; border-radius: 6px; }
+.ptd-panel .ptd-bar.hp > div { background: var(--ptd-hp); }
+.ptd-panel .ptd-bar.hp.low > div { background: var(--ptd-hp-low); }
+.ptd-panel .ptd-bar.hp.critical > div { background: var(--ptd-hp-critical); }
+.ptd-panel .ptd-bar.exp > div { background: var(--ptd-exp); }
+.ptd-panel .ptd-moves { list-style: none; margin: 10px 0; padding: 0; }
+.ptd-panel .ptd-move { display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; align-items: center; padding: 8px 10px; margin: 6px 0;
+  border: 2px solid var(--ptd-border-outer); border-radius: var(--ptd-radius-sm); cursor: pointer; background: var(--ptd-panel-2); }
+.ptd-panel .ptd-move:hover { border-color: var(--ptd-border); }
+.ptd-panel .ptd-move.active { border-color: var(--ptd-accent); background: #2f2d1f; }
+.ptd-panel .ptd-move .ptd-name { font: 700 15px/1.3 var(--ptd-font-pixel); }
+.ptd-panel .ptd-move .ptd-meta { grid-column: 1 / -1; color: var(--ptd-text-dim); font-size: 12px; }
+.ptd-type { display: inline-block; font: 700 11px/1 var(--ptd-font-pixel); padding: 3px 7px; border-radius: 4px; background: #444; color: #fff;
+  text-transform: uppercase; letter-spacing: 0.5px; text-shadow: 0 1px 0 rgba(0,0,0,0.5); justify-self: end; }
+.ptd-panel .ptd-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }
+.ptd-panel button, .ptd-button {
+  font: 700 14px/1 var(--ptd-font-pixel); padding: 9px 14px; color: var(--ptd-text);
+  background: var(--ptd-panel-2); border: 2px solid var(--ptd-border); border-radius: var(--ptd-radius-sm); cursor: pointer;
+  box-shadow: 0 2px 0 var(--ptd-border-outer);
+}
+.ptd-panel button:hover { background: #2d3360; }
+.ptd-panel button:disabled { opacity: 0.45; cursor: default; }
+.ptd-panel button.ptd-close { position: absolute; top: 8px; right: 8px; padding: 3px 9px; }
+.ptd-panel .ptd-status { margin: 6px 0; font-size: 12px; }
+.ptd-panel .ptd-status span { display: inline-block; margin: 0 6px 4px 0; padding: 2px 7px; border-radius: 4px; background: var(--ptd-panel-2); border: 1px solid var(--ptd-border-outer); }
+.ptd-panel select, .ptd-panel input, .ptd-panel textarea { font: 13px var(--ptd-font-body); background: var(--ptd-bg); color: var(--ptd-text); border: 1px solid var(--ptd-border-outer); border-radius: 4px; padding: 3px 6px; }
+.ptd-panel .ptd-grid { display: grid; gap: 12px; }
+.ptd-panel .ptd-card { background: var(--ptd-panel-2); border: 2px solid var(--ptd-border-outer); border-radius: var(--ptd-radius-sm); padding: 6px; text-align: center; font-size: 11px; }
+.ptd-panel .ptd-card.unknown { opacity: 0.55; }
+
+@media (max-width: 600px) {
+  .ptd-panel.ptd-side { left: 0; right: 0; top: auto; bottom: 0; width: auto; max-height: 72vh; border-radius: var(--ptd-radius) var(--ptd-radius) 0 0; font-size: 16px; }
+  .ptd-panel .ptd-move { padding: 12px; }
+  .ptd-panel button { padding: 12px 18px; font-size: 16px; }
+}

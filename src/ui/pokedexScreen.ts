@@ -35,11 +35,12 @@ export class PokedexScreen {
     sub.textContent = `Seen ${counts.seen}   Caught ${counts.caught}   Shiny ${counts.shiny}   of 493`;
     root.append(title, sub);
     const grid = document.createElement('div');
-    grid.style.cssText = 'display:grid;grid-template-columns:repeat(auto-fill, minmax(84px, 1fr));gap:6px;margin-top:10px';
+    grid.className = 'ptd-grid';
+    grid.style.cssText = 'grid-template-columns:repeat(auto-fill, minmax(84px, 1fr));gap:6px;margin-top:10px';
     for (let id = 1; id <= 493; id++) {
       const e = this.game.pokedex[String(id)];
       const cell = document.createElement('div');
-      cell.style.cssText = 'text-align:center;font-size:11px;padding:4px;background:#202030;border:1px solid #3a3a5a;border-radius:4px';
+      cell.className = 'ptd-card';
       const img = document.createElement('img');
       img.alt = '';
       img.style.cssText = 'width:40px;height:40px;image-rendering:pixelated;display:block;margin:0 auto 2px;background:#0d0d16';
@@ -56,12 +57,12 @@ export class PokedexScreen {
           img.style.opacity = '0.8';
         } else img.style.display = 'none';
         label.textContent = `${id} ${capitalize(getPokemon(id).name)}`;
-        label.style.color = '#9a9ab0';
+        label.style.color = 'var(--ptd-text-dim)';
       } else {
         img.style.display = 'none';
         label.textContent = `${id} ???`;
-        label.style.color = '#55556a';
-        cell.style.opacity = '0.6';
+        label.style.color = 'var(--ptd-text-faint)';
+        cell.classList.add('unknown');
       }
       cell.append(img, label);
       grid.appendChild(cell);
