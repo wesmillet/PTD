@@ -64,6 +64,59 @@ export function shadowSheetKey(dex: string, sheet: string): string {
   return `pmd-${dex}-${sheet}-shadow`;
 }
 
+function rawShadowSheetKey(dex: string, sheet: string): string {
+  return `pmd-${dex}-${sheet}-shadow-raw`;
+}
+
+/** Alpha of the rendered shadow (0..255). */
+const SHADOW_ALPHA = 110;
+
+/**
+ * SpriteCollab shadow sheets encode three nested shadow sizes by color:
+ * red pixels form the small shadow, green adds the medium ring and blue the
+ * large ring (a white pixel marks the center). `ShadowSize` in AnimData.xml
+ * picks which rings apply. This converts the raw sheet into a translucent
+ * black spritesheet for that size.
+ */
+function buildShadowTexture(scene: Phaser.Scene, rawKey: string, outKey: string, shadowSize: number, entry: AnimEntry): void {
+  if (scene.textures.exists(outKey)) return;
+  const raw = scene.textures.get(rawKey);
+  const source = raw.getSourceImage() as HTMLImageElement | HTMLCanvasElement;
+  const width = source.width;
+  const height = source.height;
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) throw new Error('pmdLoader: no 2d canvas context for shadows');
+  ctx.drawImage(source, 0, 0);
+  const image = ctx.getImageData(0, 0, width, height);
+  const px = image.data;
+  for (let i = 0; i < px.length; i += 4) {
+    const r = px[i] as number;
+    const g = px[i + 1] as number;
+    const b = px[i + 2] as number;
+    const a = px[i + 3] as number;
+    const white = r > 200 && g > 200 && b > 200;
+    const keep = a > 0 && (white || r > 200 || (shadowSize >= 1 && g > 200) || (shadowSize >= 2 && b > 200));
+    px[i] = 0;
+    px[i + 1] = 0;
+    px[i + 2] = 0;
+    px[i + 3] = keep ? SHADOW_ALPHA : 0;
+  }
+  ctx.putImageData(image, 0, 0);
+  const texture = scene.textures.addCanvas(outKey, canvas);
+  if (!texture) throw new Error(`pmdLoader: could not create shadow texture ${outKey}`);
+  const columns = Math.floor(width / entry.frameWidth);
+  const rows = Math.floor(height / entry.frameHeight);
+  let index = 0;
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < columns; col++) {
+      texture.add(index++, 0, col * entry.frameWidth, row * entry.frameHeight, entry.frameWidth, entry.frameHeight);
+    }
+  }
+}
+
 export function shadowAnimKey(dex: string, action: string, direction: Direction): string {
   return `pmd-${dex}-${action}-${direction}-shadow`;
 }
@@ -147,9 +200,9 @@ function queueSheets(
         frameHeight: entry.frameHeight,
       });
     }
-    const shadowKey = shadowSheetKey(set.dex, entry.sheet);
-    if (shadows && !scene.textures.exists(shadowKey)) {
-      scene.load.spritesheet(shadowKey, `${SPRITE_ROOT}/${set.dex}/${entry.sheet}-Shadow.png`, {
+    const rawShadowKey = rawShadowSheetKey(set.dex, entry.sheet);
+    if (shadows && !scene.textures.exists(rawShadowKey) && !scene.textures.exists(shadowSheetKey(set.dex, entry.sheet))) {
+      scene.load.spritesheet(rawShadowKey, `${SPRITE_ROOT}/${set.dex}/${entry.sheet}-Shadow.png`, {
         frameWidth: entry.frameWidth,
         frameHeight: entry.frameHeight,
       });
@@ -187,6 +240,11 @@ export function registerAnims(scene: Phaser.Scene, dex: string): void {
       );
     }
     const shadowKey = shadowSheetKey(dex, entry.sheet);
+    const rawShadowKey = rawShadowSheetKey(dex, entry.sheet);
+    if (!scene.textures.exists(shadowKey) && scene.textures.exists(rawShadowKey)) {
+      buildShadowTexture(scene, rawShadowKey, shadowKey, set.animData.shadowSize, entry);
+      scene.textures.remove(rawShadowKey);
+    }
     const hasShadow = scene.textures.exists(shadowKey);
     for (const direction of ALL_DIRECTIONS) {
       const key = animKey(dex, action, direction);
