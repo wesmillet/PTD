@@ -18,7 +18,7 @@ const TEXT_STYLE = { fontFamily: 'monospace', fontSize: '13px', color: '#d8d8e8'
 export class Phase0Scene extends Phaser.Scene {
   private readonly names = Object.keys(spriteIndex) as (keyof typeof spriteIndex)[];
   private current: keyof typeof spriteIndex = PRIMARY;
-  private scaleIndex = 1;
+  private scaleIndex = 0; // 1x by default
   private rowsSwapped = false;
   private grid: Phaser.GameObjects.Sprite[][] = [];
   private walker!: Phaser.GameObjects.Sprite;
@@ -114,7 +114,7 @@ export class Phase0Scene extends Phaser.Scene {
   }
 
   private applyScale(): void {
-    const scale = SCALES[this.scaleIndex] ?? 2;
+    const scale = SCALES[this.scaleIndex] ?? 1;
     for (const row of this.grid) for (const sprite of row) sprite.setScale(scale);
     this.walker.setScale(scale);
     this.updateTitle();
@@ -130,7 +130,7 @@ export class Phase0Scene extends Phaser.Scene {
   }
 
   private updateTitle(): void {
-    const scale = SCALES[this.scaleIndex] ?? 2;
+    const scale = SCALES[this.scaleIndex] ?? 1;
     const rows = this.rowsSwapped ? 'Walk / Idle' : 'Idle / Walk';
     this.title.setText(`Phase 0 — ${this.current} (#${spriteIndex[this.current]})  rows: ${rows}  scale: ${scale}x`);
   }
