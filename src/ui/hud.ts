@@ -63,9 +63,9 @@ export class Hud {
     this.lives = scene.add.text(16, 62, '', TEXT).setDepth(1001);
     this.hint = scene.add.text(width / 2, 52, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
     this.startButton = new Button(scene, width - 80, 24, 'Start wave', callbacks.onStartWave).setDepth(1001);
-    this.speedButton = new Button(scene, width - 80, 60, '1x', callbacks.onToggleSpeed, 60).setDepth(1001);
+    this.speedButton = new Button(scene, width - 180, 24, '1x', callbacks.onToggleSpeed, 60).setDepth(1001);
     if (state.def.objective === 'free') {
-      this.leaveButton = new Button(scene, width - 220, 24, 'Leave route', callbacks.onLeave).setDepth(1001);
+      this.leaveButton = new Button(scene, width - 290, 24, 'Leave route', callbacks.onLeave).setDepth(1001);
     }
     scene.add.text(150, Hud.STRIP_Y - 6, 'Party', { ...TEXT_DIM, fontSize: '10px' }).setOrigin(1, 0.5).setDepth(1001);
     this.rebuildSlots(state);
