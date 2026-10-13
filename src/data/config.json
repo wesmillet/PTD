@@ -53,5 +53,68 @@
     "confusionChance": 0.5,
     "flinchSeconds": 0.5
   },
-  "shinyRate": 0.000244140625
+  "shinyRate": 0.000244140625,
+  "balls": {
+    "poke": {
+      "name": "Pok\u00e9 Ball",
+      "modifier": 1,
+      "price": 200
+    },
+    "great": {
+      "name": "Great Ball",
+      "modifier": 1.5,
+      "price": 600
+    },
+    "ultra": {
+      "name": "Ultra Ball",
+      "modifier": 2,
+      "price": 1200
+    },
+    "dusk": {
+      "name": "Dusk Ball",
+      "modifier": 3.5,
+      "condition": "cave-or-night",
+      "price": 1000
+    },
+    "net": {
+      "name": "Net Ball",
+      "modifier": 3,
+      "condition": "bug-or-water",
+      "price": 1000
+    },
+    "quick": {
+      "name": "Quick Ball",
+      "modifier": 4,
+      "condition": "undamaged",
+      "price": 1000
+    },
+    "master": {
+      "name": "Master Ball",
+      "modifier": 255,
+      "price": 0,
+      "obtainable": false
+    }
+  },
+  "catch": {
+    "statusBonus": {
+      "sleep": 2,
+      "freeze": 2,
+      "paralysis": 1.5,
+      "poison": 1.5,
+      "burn": 1.5
+    }
+  },
+  "startingItems": {
+    "balls": {
+      "poke": 10,
+      "great": 5,
+      "ultra": 2,
+      "dusk": 2,
+      "net": 2,
+      "quick": 2
+    }
+  },
+  "party": {
+    "maxParty": 6
+  }
 }

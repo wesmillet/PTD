@@ -8,7 +8,60 @@
     "enemiesFirstWave": 3,
     "enemiesPerWave": 1,
     "spawnInterval": 1.5,
-    "placements": 1
+    "placements": 6,
+    "requires": null
+  },
+  "lake-verity": {
+    "name": "Lake Verity",
+    "area": "lake-verity/before-galactic-intervention",
+    "time": "day",
+    "objective": "free",
+    "map": "lake-verity",
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "requires": "route-201"
+  },
+  "route-202": {
+    "name": "Route 202",
+    "area": "sinnoh-route-202",
+    "time": "day",
+    "objective": "free",
+    "map": "route-202",
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "requires": "lake-verity"
+  },
+  "route-203": {
+    "name": "Route 203",
+    "area": "sinnoh-route-203",
+    "time": "day",
+    "objective": "defend",
+    "map": "route-203",
+    "waves": 8,
+    "lives": 10,
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "requires": "route-202"
+  },
+  "oreburgh-gate": {
+    "name": "Oreburgh Gate",
+    "area": "oreburgh-gate/1f",
+    "time": "day",
+    "objective": "defend",
+    "map": "oreburgh-gate",
+    "waves": 8,
+    "lives": 10,
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "requires": "route-203"
   },
   "oreburgh-mine-1f": {
     "name": "Oreburgh Mine 1F",
@@ -21,6 +74,7 @@
     "enemiesFirstWave": 3,
     "enemiesPerWave": 1,
     "spawnInterval": 1.5,
-    "placements": 1
+    "placements": 6,
+    "requires": "oreburgh-gate"
   }
 }

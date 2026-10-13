@@ -1,0 +1,77 @@
+import { describe, expect, it } from 'vitest';
+import {
+  addPokemon,
+  chooseStarter,
+  createGameState,
+  isLevelCompleted,
+  isLevelUnlocked,
+  moveToBox,
+  moveToParty,
+  orderedLevelIds,
+  recordLevelResult,
+  sortMonsters,
+  swapPartyBox,
+  MAX_PARTY,
+} from './game';
+import { createMonster } from './monster';
+
+describe('party and box', () => {
+  it('fills the party to six then the box', () => {
+    const game = createGameState();
+    chooseStarter(game, 387, createMonster(387, 5));
+    expect(() => chooseStarter(game, 390, createMonster(390, 5))).toThrow();
+    for (let i = 0; i < 7; i++) addPokemon(game, createMonster(396, 2));
+    expect(game.party).toHaveLength(MAX_PARTY);
+    expect(game.box).toHaveLength(2);
+    expect(game.party[0]?.species).toBe(387);
+  });
+
+  it('moves and swaps between party and box with limits', () => {
+    const game = createGameState();
+    addPokemon(game, createMonster(387, 5));
+    addPokemon(game, createMonster(396, 2));
+    moveToBox(game, 1);
+    expect(game.party).toHaveLength(1);
+    expect(game.box[0]?.species).toBe(396);
+    expect(() => moveToBox(game, 0)).toThrow(/at least one/);
+    moveToParty(game, 0);
+    expect(game.party).toHaveLength(2);
+    expect(game.box).toHaveLength(0);
+    for (let i = 0; i < 5; i++) addPokemon(game, createMonster(399, 2));
+    expect(() => moveToParty(game, 0)).toThrow(/full/);
+    swapPartyBox(game, 0, 0);
+    expect(game.party[0]?.species).toBe(399);
+    expect(game.box[0]?.species).toBe(387);
+  });
+
+  it('sorts by level, type and name', () => {
+    const list = [createMonster(387, 5), createMonster(396, 10), createMonster(41, 7)];
+    expect(sortMonsters(list, 'level').map((m) => m.name)).toEqual(['starly', 'zubat', 'turtwig']);
+    expect(sortMonsters(list, 'type').map((m) => m.name)).toEqual(['turtwig', 'starly', 'zubat']); // grass, normal, poison
+    expect(sortMonsters(list, 'name').map((m) => m.name)).toEqual(['starly', 'turtwig', 'zubat']);
+    expect(list.map((m) => m.name)).toEqual(['turtwig', 'starly', 'zubat']); // input untouched
+  });
+});
+
+describe('level unlock chain', () => {
+  it('follows levels.json order and completion rules', () => {
+    const game = createGameState();
+    expect(orderedLevelIds()).toEqual(['route-201', 'lake-verity', 'route-202', 'route-203', 'oreburgh-gate', 'oreburgh-mine-1f']);
+    expect(isLevelUnlocked(game, 'route-201')).toBe(true);
+    expect(isLevelUnlocked(game, 'lake-verity')).toBe(false);
+    expect(recordLevelResult(game, 'route-201', 'left', 0)).toBe(false); // free: needs a cleared wave
+    expect(isLevelUnlocked(game, 'lake-verity')).toBe(false);
+    expect(recordLevelResult(game, 'route-201', 'left', 1)).toBe(true);
+    expect(isLevelUnlocked(game, 'lake-verity')).toBe(true);
+    expect(isLevelUnlocked(game, 'route-203')).toBe(false);
+    recordLevelResult(game, 'lake-verity', 'left', 2);
+    recordLevelResult(game, 'route-202', 'left', 1);
+    expect(isLevelUnlocked(game, 'route-203')).toBe(true);
+    expect(recordLevelResult(game, 'route-203', 'lost', 5)).toBe(false);
+    expect(isLevelUnlocked(game, 'oreburgh-gate')).toBe(false);
+    expect(recordLevelResult(game, 'route-203', 'won', 8)).toBe(true);
+    expect(isLevelCompleted(game, 'route-203')).toBe(true);
+    expect(game.progress['route-203']?.wavesCleared).toBe(8);
+    expect(isLevelUnlocked(game, 'oreburgh-gate')).toBe(true);
+  });
+});

@@ -8,8 +8,11 @@ import {
   moveTower,
   pickTarget,
   placeTower,
+  resolveEvolution,
   resolveLearn,
   setActiveMove,
+  throwBall,
+  canThrow,
   setPartyLevel,
   setTimeOfDay,
   startWave,
@@ -327,7 +330,7 @@ describe('move learning', () => {
       const needed = expForLevel(tower.mon.growth, before + 1) - tower.mon.exp;
       // Internal helper is private; drive through gainExp-equivalent path by awarding a KO of a strong enemy.
       // Path distance 12 is tile (10,5), one tile from the tower at (9,5).
-      state.enemies.push({ id: 9999 + tower.mon.level, mon: createMonster(95, 100), distance: 12, tilesPerSec: 0, lastHitBy: tower.id });
+      state.enemies.push({ id: 9999 + tower.mon.level, mon: createMonster(95, 100), distance: 12, tilesPerSec: 0, lastHitBy: tower.id, damagedBy: new Set(), trainer: false });
       state.enemies[state.enemies.length - 1]!.mon.hp = 1;
       state.enemies[state.enemies.length - 1]!.mon.baseExp = Math.ceil((needed * 7) / 100);
       tower.mon.moves = tower.mon.moves.length ? tower.mon.moves : [];
@@ -400,5 +403,106 @@ describe('shiny roll', () => {
     placeTower(s0, 0, 9, 5);
     startWave(s0);
     expect(run(s0, 3).filter((e) => e.type === 'spawn').every((e) => e.shiny === false)).toBe(true);
+  });
+});
+
+describe('catching', () => {
+  it('throws balls, consumes them, and caught Pokémon join the party', () => {
+    const state = createLevel(route201, route201Map, { seed: 12, party: [turtwig(5)], items: { balls: { poke: 2, great: 0, ultra: 1 } } });
+    const tower = placeTower(state, 0, 26, 3);
+    tower.mon.moves = [];
+    expect(canThrow(state, 'poke', 1)).toMatch(/no wave/);
+    startWave(state);
+    run(state, 3);
+    const target = state.enemies.find((e) => e.mon.species === 399) ?? state.enemies[0]!; // Bidoof: catch rate 255
+    expect(canThrow(state, 'great', target.id)).toMatch(/no Great Ball left/);
+    expect(() => throwBall(state, 'master', target.id)).toThrow(/no Master Ball left/);
+    throwBall(state, 'poke', target.id);
+    expect(state.items.balls['poke']).toBe(1);
+    if (state.enemies.includes(target)) {
+      target.mon.hp = 1; // Ultra Ball at 1 HP on a 255-rate species is a sure catch
+      const events = throwBall(state, 'ultra', target.id);
+      expect(state.items.balls['ultra']).toBe(0);
+      expect(events[0]).toMatchObject({ type: 'ballThrow', ball: 'ultra', enemyId: target.id });
+      expect(events[0]?.caught).toBe(true);
+      expect(events).toContainEqual({ type: 'caught', enemyId: target.id, species: 399, shiny: false });
+      expect(state.enemies.find((e) => e.id === target.id)).toBeUndefined();
+      expect(state.caught).toEqual([target.mon]);
+      expect(state.party.map((p) => p.mon)).toContain(target.mon);
+      expect(summarize(state).caught).toEqual([{ name: 'bidoof', species: 399, level: target.mon.level, shiny: false }]);
+      expect(summarize(state).party.map((p) => p.name)).toEqual(['turtwig']);
+    }
+  });
+
+  it("refuses trainers' Pokémon", () => {
+    const def = { ...route201, trainer: true };
+    const state = createLevel(def, route201Map, { seed: 1, party: [turtwig(5)] });
+    const tower = placeTower(state, 0, 26, 3);
+    tower.mon.moves = [];
+    startWave(state);
+    run(state, 3);
+    const enemy = state.enemies[0]!;
+    expect(enemy.trainer).toBe(true);
+    expect(canThrow(state, 'poke', enemy.id)).toMatch(/trainer/);
+    expect(() => throwBall(state, 'poke', enemy.id)).toThrow(/trainer/);
+  });
+
+  it('is deterministic for a seed and ends the wave when the last enemy is caught', () => {
+    const play = (seed: number) => {
+      const state = createLevel({ ...route201, enemiesFirstWave: 1 }, route201Map, { seed, party: [turtwig(5)], items: { balls: { poke: 50 } } });
+      const tower = placeTower(state, 0, 26, 3);
+      tower.mon.moves = [];
+      startWave(state);
+      run(state, 3);
+      const enemy = state.enemies[0]!;
+      const log: string[] = [];
+      while (state.enemies.length > 0 && state.items.balls['poke']! > 0) {
+        for (const e of throwBall(state, 'poke', enemy.id)) log.push(`${e.type}:${e.shakes ?? ''}:${e.caught ?? ''}:${e.phase ?? ''}`);
+      }
+      return { log, phase: state.phase, caught: state.caught.length };
+    };
+    expect(play(4)).toEqual(play(4));
+    const r = play(4);
+    expect(r.caught).toBe(1);
+    expect(r.phase).toBe('build');
+    expect(r.log.some((l) => l.startsWith('waveEnd'))).toBe(true);
+  });
+});
+
+describe('EXP split and evolution', () => {
+  it('splits KO EXP among every tower that damaged the enemy', () => {
+    const def = { ...route201, placements: 6 };
+    // A weak Chimchar chips enemies first; a strong Turtwig further down finishes them.
+    const state = createLevel(def, route201Map, { seed: 21, party: [createMonster(390, 5), turtwig(30)] });
+    placeTower(state, 0, 12, 8); // one tile from the (10,9)-(20,9) segment
+    placeTower(state, 1, 18, 10);
+    startWave(state);
+    const events = run(state, 40);
+    const kos = events.filter((e) => e.type === 'ko');
+    expect(kos.length).toBeGreaterThan(0);
+    const exp = state.party.map((p) => p.expGained);
+    expect(exp[0]).toBeGreaterThan(0);
+    expect(exp[1]).toBeGreaterThan(0);
+  });
+
+  it('prompts to evolve at the evolution level and applies or declines it', () => {
+    const state = createLevel(route201, route201Map, { seed: 1, party: [turtwig(17)] });
+    const tower = placeTower(state, 0, 9, 5);
+    tower.mon.exp = expForLevel('medium-slow', 18) - 1;
+    state.enemies.push({ id: 5000, mon: createMonster(399, 2), distance: 12, tilesPerSec: 0, lastHitBy: null, damagedBy: new Set(), trainer: false });
+    state.phase = 'wave';
+    tower.cooldown = 0;
+    const events = run(state, 0.1);
+    expect(events.some((e) => e.type === 'levelUp' && e.level === 18)).toBe(true);
+    expect(events).toContainEqual({ type: 'evolutionPrompt', towerId: tower.id, species: 388 });
+    expect(state.pendingEvolutions).toEqual([{ towerId: tower.id, to: 388 }]);
+    expect(resolveEvolution(state, tower.id, false)).toEqual([]);
+    expect(tower.mon.species).toBe(387);
+    state.pendingEvolutions.push({ towerId: tower.id, to: 388 });
+    const evolved = resolveEvolution(state, tower.id, true);
+    expect(evolved[0]).toEqual({ type: 'evolved', towerId: tower.id, species: 388 });
+    expect(tower.mon.name).toBe('grotle');
+    expect(tower.mon.level).toBe(18);
+    expect(() => resolveEvolution(state, tower.id, true)).toThrow();
   });
 });

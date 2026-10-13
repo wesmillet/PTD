@@ -3,7 +3,9 @@
  * seed, party and sequence of calls produce the same result. The Phaser
  * scene renders this state and animates the events `step` returns.
  */
-import { encounterTable, expForLevel, getEncounterArea, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
+import { encounterTable, expForLevel, getEncounterArea, getPokemon, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
+import { attemptCatch, ballModifier, BALLS } from './catch';
+import { evolutionOptions, evolveMonster } from './evolution';
 import config from '../data/config.json';
 import { hits, rollDamage, type DamageResult } from './damage';
 import { gainExp, hitExp, koExp } from './exp';
@@ -71,6 +73,15 @@ export interface Enemy {
   tilesPerSec: number;
   /** Tower that last damaged this enemy; receives EXP for status KOs. */
   lastHitBy: number | null;
+  /** Every tower that damaged this enemy; KO EXP is split among them. */
+  damagedBy: Set<number>;
+  /** Trainer-owned enemies cannot be caught. */
+  trainer: boolean;
+}
+
+export interface PendingEvolution {
+  towerId: number;
+  to: number;
 }
 
 export interface PartyEntry {
@@ -102,6 +113,10 @@ export type LevelEventType =
   | 'heal'
   | 'moveLearned'
   | 'moveLearnPrompt'
+  | 'ballThrow'
+  | 'caught'
+  | 'evolutionPrompt'
+  | 'evolved'
   | 'waveStart'
   | 'waveEnd'
   | 'phase';
@@ -121,6 +136,10 @@ export interface LevelEvent {
   block?: AttackBlock;
   changes?: StageChange[];
   shiny?: boolean;
+  ball?: string;
+  shakes?: number;
+  caught?: boolean;
+  species?: number;
 }
 
 export interface LevelState {
@@ -146,6 +165,13 @@ export interface LevelState {
   pending: SpawnDef[];
   /** Move-learn prompts waiting for the player (all four slots full). */
   pendingLearns: PendingLearn[];
+  /** Evolution prompts waiting for the player. */
+  pendingEvolutions: PendingEvolution[];
+  /** Ball inventory, shared with the game state object that was passed in. */
+  items: { balls: Record<string, number> };
+  /** Pokémon caught in this level, in order. */
+  caught: Monster[];
+  maxParty: number;
   kos: number;
   leaks: number;
   wavesCleared: number;
@@ -157,6 +183,9 @@ export interface CreateLevelOptions {
   party: Monster[];
   config?: RuntimeConfig;
   time?: TimeOfDay;
+  /** Ball inventory to draw from (mutated). Defaults to config.startingItems. */
+  items?: { balls: Record<string, number> };
+  maxParty?: number;
 }
 
 /** Moves that confuse their user after use (Gen 4). */
@@ -186,6 +215,10 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
     enemies: [],
     pending: [],
     pendingLearns: [],
+    pendingEvolutions: [],
+    items: options.items ?? { balls: { ...config.startingItems.balls } },
+    caught: [],
+    maxParty: options.maxParty ?? config.party.maxParty,
     kos: 0,
     leaks: 0,
     wavesCleared: 0,
@@ -310,6 +343,71 @@ export function leaveLevel(state: LevelState): LevelEvent[] {
   return [{ type: 'phase', phase: 'left' }];
 }
 
+// ------------------------------------------------------------------ catching
+
+export function enemyById(state: LevelState, enemyId: number): Enemy | undefined {
+  return state.enemies.find((e) => e.id === enemyId);
+}
+
+/** Whether a ball can be thrown at this enemy right now (reason if not). */
+export function canThrow(state: LevelState, ballId: string, enemyId: number): string | null {
+  if (state.phase !== 'wave') return 'no wave running';
+  if (!BALLS[ballId]) return `unknown ball ${ballId}`;
+  if ((state.items.balls[ballId] ?? 0) <= 0) return `no ${BALLS[ballId]?.name ?? ballId} left`;
+  const enemy = enemyById(state, enemyId);
+  if (!enemy) return 'no such enemy';
+  if (enemy.trainer) return "a trainer's Pokémon can't be caught";
+  if (enemy.distance < 0) return 'not on the path yet';
+  return null;
+}
+
+/** Throws a ball. Consumes one ball; on a catch the enemy leaves the wave and joins the party or the catch list. */
+export function throwBall(state: LevelState, ballId: string, enemyId: number): LevelEvent[] {
+  const reason = canThrow(state, ballId, enemyId);
+  if (reason) throw new Error(`throwBall: ${reason}`);
+  const enemy = enemyById(state, enemyId) as Enemy;
+  state.items.balls[ballId] = (state.items.balls[ballId] ?? 0) - 1;
+  const mod = ballModifier(ballId, {
+    types: enemy.mon.types,
+    undamaged: enemy.mon.hp >= enemy.mon.stats.hp,
+    caveOrNight: state.map.theme === 'cave' || state.time === 'night',
+  });
+  const result = attemptCatch(enemy.mon, getPokemon(enemy.mon.species).catchRate, mod, state.rng);
+  const events: LevelEvent[] = [{ type: 'ballThrow', enemyId, ball: ballId, shakes: result.shakes, caught: result.caught }];
+  if (!result.caught) return events;
+  removeEnemy(state, enemy);
+  state.caught.push(enemy.mon);
+  if (state.party.length < state.maxParty) {
+    state.party.push({ index: state.party.length, mon: enemy.mon, expGained: 0, levelFrom: enemy.mon.level });
+  }
+  events.push({ type: 'caught', enemyId, species: enemy.mon.species, shiny: enemy.mon.shiny });
+  if (state.pending.length === 0 && state.enemies.length === 0) endWave(state, events);
+  return events;
+}
+
+// ----------------------------------------------------------------- evolution
+
+/** Resolves an evolution prompt; accepting changes the species and may learn moves of the new form. */
+export function resolveEvolution(state: LevelState, towerId: number, accept: boolean): LevelEvent[] {
+  const idx = state.pendingEvolutions.findIndex((p) => p.towerId === towerId);
+  if (idx < 0) throw new Error(`resolveEvolution: no pending evolution for tower ${towerId}`);
+  const [pending] = state.pendingEvolutions.splice(idx, 1);
+  if (!accept || !pending) return [];
+  const tower = towerById(state, towerId);
+  evolveMonster(tower.mon, pending.to);
+  const events: LevelEvent[] = [{ type: 'evolved', towerId, species: pending.to }];
+  learnAtLevel(state, tower, tower.mon.level, events);
+  return events;
+}
+
+function queueEvolution(state: LevelState, tower: Tower, events: LevelEvent[]): void {
+  const ready = evolutionOptions(tower.mon).ready[0];
+  if (!ready) return;
+  if (state.pendingEvolutions.some((p) => p.towerId === tower.id)) return;
+  state.pendingEvolutions.push({ towerId: tower.id, to: ready.to });
+  events.push({ type: 'evolutionPrompt', towerId: tower.id, species: ready.to });
+}
+
 // ------------------------------------------------------------- move learning
 
 /**
@@ -351,6 +449,7 @@ function grantExp(state: LevelState, tower: Tower, amount: number, events: Level
     events.push({ type: 'levelUp', towerId: tower.id, level });
     learnAtLevel(state, tower, level, events);
   }
+  if (result.levelsGained.length > 0) queueEvolution(state, tower, events);
 }
 
 // ------------------------------------------------------------------ combat
@@ -390,9 +489,14 @@ function koEnemy(state: LevelState, enemy: Enemy, creditTowerId: number | null, 
   const exp = koExp(enemy.mon.baseExp, enemy.mon.level);
   state.kos++;
   removeEnemy(state, enemy);
+  const ids = new Set(enemy.damagedBy);
+  if (creditTowerId !== null) ids.add(creditTowerId);
+  const participants = state.towers.filter((t) => ids.has(t.id));
   const credit = creditTowerId !== null ? state.towers.find((t) => t.id === creditTowerId) : undefined;
   events.push({ type: 'ko', enemyId: enemy.id, exp, ...(credit ? { towerId: credit.id } : {}) });
-  if (credit) grantExp(state, credit, exp, events);
+  if (participants.length === 0) return;
+  const share = Math.max(1, Math.floor(exp / participants.length));
+  for (const tower of participants) grantExp(state, tower, share, events);
 }
 
 function effectTargetIsUser(move: MoveSpec): boolean {
@@ -479,6 +583,7 @@ function attack(state: LevelState, tower: Tower, move: MoveSpec, enemy: Enemy | 
   );
   enemy.mon.hp = Math.max(0, enemy.mon.hp - damage.damage);
   enemy.lastHitBy = tower.id;
+  enemy.damagedBy.add(tower.id);
   events.push({ type: 'hit', towerId: tower.id, enemyId: enemy.id, damage });
   if (enemy.mon.hp <= 0) {
     applyEffects(state, tower, move, undefined, damage.damage, events);
@@ -498,6 +603,8 @@ function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
     distance: -1,
     tilesPerSec: enemyTilesPerSec(mon.stats.spe, state.config.speed),
     lastHitBy: null,
+    damagedBy: new Set(),
+    trainer: def.trainer ?? false,
   };
   state.enemies.push(enemy);
   events.push({ type: 'spawn', enemyId: enemy.id, shiny });
@@ -608,15 +715,20 @@ export interface LevelSummary {
   wavesCleared: number;
   kos: number;
   leaks: number;
-  party: { name: string; levelFrom: number; levelTo: number; expGained: number }[];
+  party: { name: string; species: number; levelFrom: number; levelTo: number; expGained: number }[];
+  caught: { name: string; species: number; level: number; shiny: boolean }[];
 }
 
 export function summarize(state: LevelState): LevelSummary {
+  const caughtSet = new Set(state.caught);
   return {
     outcome: state.phase,
     wavesCleared: state.wavesCleared,
     kos: state.kos,
     leaks: state.leaks,
-    party: state.party.map((p) => ({ name: p.mon.name, levelFrom: p.levelFrom, levelTo: p.mon.level, expGained: p.expGained })),
+    party: state.party
+      .filter((p) => !caughtSet.has(p.mon))
+      .map((p) => ({ name: p.mon.name, species: p.mon.species, levelFrom: p.levelFrom, levelTo: p.mon.level, expGained: p.expGained })),
+    caught: state.caught.map((m) => ({ name: m.name, species: m.species, level: m.level, shiny: m.shiny })),
   };
 }

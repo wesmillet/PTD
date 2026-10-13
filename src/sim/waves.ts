@@ -22,6 +22,10 @@ export interface LevelDef {
   spawnInterval: number;
   /** How many Pokémon the player may place. */
   placements: number;
+  /** Level that must be completed first (null or absent = always open). */
+  requires?: string | null;
+  /** Trainer-owned waves: enemies cannot be caught. Unused by the current levels. */
+  trainer?: boolean;
 }
 
 export interface SpawnDef {
@@ -29,6 +33,8 @@ export interface SpawnDef {
   level: number;
   /** Seconds after the wave starts. */
   delay: number;
+  /** Trainer-owned: cannot be caught. */
+  trainer?: boolean;
 }
 
 export interface WaveOptions {
@@ -68,7 +74,7 @@ export function generateWave(
   for (let i = 0; i < count; i++) {
     const entry = pickEntry(table, rng);
     const level = opts.levelOverride ?? rng.int(entry.min, entry.max);
-    spawns.push({ species: entry.species, level, delay: i * def.spawnInterval });
+    spawns.push({ species: entry.species, level, delay: i * def.spawnInterval, ...(def.trainer ? { trainer: true } : {}) });
   }
   return spawns;
 }
