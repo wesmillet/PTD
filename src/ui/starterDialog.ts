@@ -1,13 +1,13 @@
 /** One-time starter choice. DOM modal. */
 import { getPokemon, typeName } from '../data/pokedata';
-import { capitalize, ensureOverlayStyles, TYPE_COLORS } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame, TYPE_COLORS } from './domOverlay';
 
 export function showStarterDialog(starters: readonly number[], portraitUrl: (species: number) => string | undefined, onPick: (species: number) => void): HTMLDivElement {
   ensureOverlayStyles();
   const root = document.createElement('div');
   root.className = 'ptd-panel ptd-modal';
   root.id = 'ptd-starter';
-  root.addEventListener('pointerdown', (e) => e.stopPropagation());
+  isolateFromGame(root);
   const title = document.createElement('h2');
   title.textContent = 'Choose your first Pokémon';
   const hint = document.createElement('div');

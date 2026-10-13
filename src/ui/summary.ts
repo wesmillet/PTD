@@ -15,7 +15,7 @@ const TITLES: Record<string, string> = {
 };
 
 /** End-of-level overlay with EXP per Pokémon and level-ups. */
-export function showSummary(scene: Phaser.Scene, summary: LevelSummary, callbacks: SummaryCallbacks): Phaser.GameObjects.Container {
+export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money?: number }, callbacks: SummaryCallbacks): Phaser.GameObjects.Container {
   const { width, height } = scene.scale;
   const container = scene.add.container(0, 0).setDepth(2000);
   container.add(scene.add.rectangle(0, 0, width, height, 0x000000, 0.6).setOrigin(0).setInteractive());
@@ -28,7 +28,7 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary, callback
   container.add(scene.add.text(px, py - panelH / 2 + 24, TITLES[summary.outcome] ?? summary.outcome, TEXT_BIG).setOrigin(0.5));
   container.add(
     scene.add
-      .text(px, py - panelH / 2 + 54, `Waves cleared ${summary.wavesCleared}   KOs ${summary.kos}   Leaks ${summary.leaks}`, TEXT_DIM)
+      .text(px, py - panelH / 2 + 54, `Waves cleared ${summary.wavesCleared}   KOs ${summary.kos}   Leaks ${summary.leaks}${summary.money ? `   +$${summary.money}` : ''}`, TEXT_DIM)
       .setOrigin(0.5),
   );
   let y = py - panelH / 2 + 90;

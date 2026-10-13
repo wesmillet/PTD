@@ -4,8 +4,9 @@ import { createPmdSprite, pickAction, playAnim, spriteDex, spriteDirection, sync
 import { getLevel } from '../data/levels';
 import { getMap } from '../data/maps';
 import { portraitUrl, runtime, runtimeConfig, spriteFolder, urlParam } from '../game/runtime';
-import { getGame, loadDebugPartyIfRequested } from '../game/session';
-import { addPokemon, recordLevelResult } from '../sim/game';
+import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
+import { addPokemon, markSeen, recordLevelResult } from '../sim/game';
+import { usePotion } from '../sim/items';
 import { BALLS } from '../sim/catch';
 import { EvolutionDialog } from '../ui/evolutionDialog';
 import {
@@ -116,6 +117,7 @@ export class LevelScene extends Phaser.Scene {
   private drag: { towerId: number; startX: number; startY: number; moved: boolean } | null = null;
   private dragGfx!: Phaser.GameObjects.Graphics;
   private levelSynced = false;
+  private moneyEarned = 0;
 
   constructor() {
     super('Level');
@@ -177,6 +179,19 @@ export class LevelScene extends Phaser.Scene {
         if (this.selectedTowerId === tower.id) this.selectedTowerId = null;
         return true;
       },
+      usePotion: (mon) => {
+        const game = getGame();
+        if (game.items.potions <= 0 || this.state.phase !== 'build' || mon.hp >= mon.stats.hp) {
+          this.showToast(this.state.phase !== 'build' ? 'Potions work between waves' : 'No Potion to use');
+          return null;
+        }
+        game.items.potions--;
+        const healed = usePotion(mon);
+        this.floatText(this.towerPixel(this.state.towers.find((t) => t.mon === mon)?.id ?? -1), `+${healed} HP`, '#9affc0');
+        saveGame();
+        return game.items.potions;
+      },
+      potionCount: () => getGame().items.potions,
       onClose: () => undefined,
     });
     this.learnDialog = new LearnDialog();
@@ -484,6 +499,7 @@ export class LevelScene extends Phaser.Scene {
     const speeds = [1, 2];
     const i = speeds.indexOf(runtime.gameSpeed);
     runtime.gameSpeed = speeds[(i + 1) % speeds.length] ?? 1;
+    saveGame();
   }
 
   private leave(): void {
@@ -534,9 +550,12 @@ export class LevelScene extends Phaser.Scene {
   private handleEvents(events: LevelEvent[]): void {
     for (const e of events) {
       switch (e.type) {
-        case 'spawn':
+        case 'spawn': {
           this.createEnemyView(e.enemyId as number, e.shiny ?? false);
+          const enemy = this.state.enemies.find((en) => en.id === e.enemyId);
+          if (enemy) markSeen(getGame(), enemy.mon.species);
           break;
+        }
         case 'status':
           if (e.enemyId !== undefined) this.floatText(this.enemyPixel(e.enemyId), e.block === 'flinch' ? 'Flinch!' : `${capitalize(e.ailment ?? '')}!`, '#e0a0ff');
           if (e.towerId !== undefined) this.floatText(this.towerPixel(e.towerId), `${capitalize(e.ailment ?? '')}!`, '#e0a0ff');
@@ -693,7 +712,12 @@ export class LevelScene extends Phaser.Scene {
         else addPokemon(game, mon);
       }
     }
-    if (isOver(this.state)) recordLevelResult(game, this.levelId, this.state.phase as 'won' | 'lost' | 'left', this.state.wavesCleared);
+    if (isOver(this.state)) {
+      const before = game.money;
+      recordLevelResult(game, this.levelId, this.state.phase as 'won' | 'lost' | 'left', this.state.wavesCleared, this.state.kos);
+      this.moneyEarned = game.money - before;
+    }
+    saveGame();
   }
 
   private endLevel(): void {
@@ -701,7 +725,7 @@ export class LevelScene extends Phaser.Scene {
     this.syncGame();
     for (const id of [...this.enemyViews.keys()]) this.removeEnemyView(id);
     this.hud.update(this.state, runtime.gameSpeed);
-    showSummary(this, summarize(this.state), {
+    showSummary(this, { ...summarize(this.state), money: this.moneyEarned }, {
       onRetry: () => this.scene.restart({ levelId: this.levelId, seed: this.seed + 1 }),
       onLevelSelect: () => this.scene.start('LevelSelect'),
     });

@@ -7,7 +7,13 @@ import { evolutionOptions } from '../sim/evolution';
 import { moveToBox, moveToParty, sortMonsters, MAX_PARTY, type GameState, type SortKey } from '../sim/game';
 import type { Monster } from '../sim/monster';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, TYPE_COLORS } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame, TYPE_COLORS } from './domOverlay';
+import { replaceMove, useRareCandy } from '../sim/items';
+import { evolveMonster } from '../sim/evolution';
+import { learnableAt } from '../sim/moves';
+import { makeMoveSlot } from '../sim/monster';
+import { LearnDialog } from './learnDialog';
+import { EvolutionDialog } from './evolutionDialog';
 
 export interface PartyScreenHooks {
   portraitUrl: (species: number) => string | undefined;
@@ -19,6 +25,8 @@ export class PartyScreen {
   private root: HTMLDivElement | null = null;
   private selected: Monster | null = null;
   private sortKey: SortKey = 'level';
+  private readonly learnDialog = new LearnDialog();
+  private readonly evolutionDialog = new EvolutionDialog();
 
   constructor(private readonly game: GameState, private readonly hooks: PartyScreenHooks) {}
 
@@ -35,7 +43,7 @@ export class PartyScreen {
     root.style.width = 'min(880px, calc(100vw - 24px))';
     root.style.maxHeight = 'calc(100vh - 24px)';
     root.style.overflow = 'auto';
-    root.addEventListener('pointerdown', (e) => e.stopPropagation());
+    isolateFromGame(root);
     document.body.appendChild(root);
     this.root = root;
     this.render();
@@ -43,6 +51,8 @@ export class PartyScreen {
 
   close(): void {
     if (!this.root) return;
+    this.learnDialog.close();
+    this.evolutionDialog.close();
     this.root.remove();
     this.root = null;
     this.hooks.onClose();
@@ -58,7 +68,7 @@ export class PartyScreen {
     close.addEventListener('click', () => this.close());
     root.appendChild(close);
     const title = document.createElement('h2');
-    title.textContent = `Party ${this.game.party.length} / ${MAX_PARTY}   PC box ${this.game.box.length}`;
+    title.textContent = `Party ${this.game.party.length} / ${MAX_PARTY}   PC box ${this.game.box.length}   Rare Candy ${this.game.items.rareCandies}`;
     root.appendChild(title);
 
     const sortRow = document.createElement('div');
@@ -207,7 +217,46 @@ export class PartyScreen {
       this.render();
     });
     actions.appendChild(move);
+    const candy = document.createElement('button');
+    candy.textContent = `Rare Candy (${this.game.items.rareCandies})`;
+    candy.disabled = this.game.items.rareCandies <= 0 || mon.level >= 100;
+    candy.addEventListener('click', () => this.giveCandy(mon));
+    actions.appendChild(candy);
     wrap.appendChild(actions);
     return wrap;
+  }
+
+  private giveCandy(mon: Monster): void {
+    if (this.game.items.rareCandies <= 0 || mon.level >= 100) return;
+    this.game.items.rareCandies--;
+    const result = useRareCandy(mon);
+    this.hooks.onChange();
+    this.render();
+    const next = () => {
+      const moveId = result.toLearn.shift();
+      if (moveId !== undefined) {
+        this.learnDialog.show(mon, moveId, (replaceIndex) => {
+          if (replaceIndex !== null) replaceMove(mon, replaceIndex, moveId);
+          this.hooks.onChange();
+          this.render();
+          next();
+        });
+        return;
+      }
+      if (result.evolution) {
+        const to = result.evolution.to;
+        this.evolutionDialog.show(mon, to, this.hooks.portraitUrl, (accept) => {
+          if (accept) {
+            evolveMonster(mon, to);
+            for (const id of learnableAt(mon.species, mon.level)) {
+              if (!mon.moves.some((m) => m.id === id) && mon.moves.length < 4) mon.moves.push(makeMoveSlot(id));
+            }
+          }
+          this.hooks.onChange();
+          this.render();
+        });
+      }
+    };
+    next();
   }
 }

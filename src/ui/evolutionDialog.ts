@@ -2,7 +2,7 @@
 import { getPokemon } from '../data/pokedata';
 import type { Monster } from '../sim/monster';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame } from './domOverlay';
 
 export class EvolutionDialog {
   private root: HTMLDivElement | null = null;
@@ -16,7 +16,7 @@ export class EvolutionDialog {
     this.close();
     const root = document.createElement('div');
     root.className = 'ptd-panel ptd-modal';
-    root.addEventListener('pointerdown', (e) => e.stopPropagation());
+    isolateFromGame(root);
     const title = document.createElement('h2');
     title.textContent = `What? ${capitalizeName(mon.name)} is evolving!`;
     root.appendChild(title);

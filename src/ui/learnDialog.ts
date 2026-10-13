@@ -4,7 +4,7 @@
  */
 import { getMove, typeName } from '../data/pokedata';
 import type { Monster } from '../sim/monster';
-import { capitalize, ensureOverlayStyles, TYPE_COLORS } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame, TYPE_COLORS } from './domOverlay';
 
 export class LearnDialog {
   private root: HTMLDivElement | null = null;
@@ -19,7 +19,7 @@ export class LearnDialog {
     this.close();
     const root = document.createElement('div');
     root.className = 'ptd-panel ptd-modal';
-    root.addEventListener('pointerdown', (e) => e.stopPropagation());
+    isolateFromGame(root);
     const title = document.createElement('h2');
     title.textContent = `${capitalize(mon.name)} wants to learn ${capitalize(getMove(newMoveId).name)}`;
     const hint = document.createElement('div');

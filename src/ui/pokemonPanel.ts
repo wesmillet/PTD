@@ -9,13 +9,16 @@ import type { Monster } from '../sim/monster';
 import { resolveMove } from '../sim/moves';
 import { evolutionOptions } from '../sim/evolution';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, TYPE_COLORS } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame, TYPE_COLORS } from './domOverlay';
 
 export interface PokemonPanelHooks {
   portraitUrl: (species: number) => string | undefined;
   setActiveMove: (mon: Monster, index: number) => void;
   /** Removes a placed Pokémon from the map (build phase); return false if it could not. */
   returnToParty: (mon: Monster) => boolean;
+  /** Uses a Potion on this Pokémon; returns the number of potions left, or null if it could not be used. */
+  usePotion: (mon: Monster) => number | null;
+  potionCount: () => number;
   onClose: () => void;
 }
 
@@ -34,6 +37,7 @@ export class PokemonPanel {
   private readonly moveList: HTMLUListElement;
   private readonly moveButton: HTMLSpanElement;
   private readonly returnButton: HTMLButtonElement;
+  private readonly potionButton: HTMLButtonElement;
   private lastKey = '';
 
   constructor(private readonly hooks: PokemonPanelHooks) {
@@ -41,7 +45,7 @@ export class PokemonPanel {
     this.root = document.createElement('div');
     this.root.className = 'ptd-panel ptd-side';
     this.root.style.display = 'none';
-    this.root.addEventListener('pointerdown', (e) => e.stopPropagation());
+    isolateFromGame(this.root);
 
     const close = document.createElement('button');
     close.className = 'ptd-close';
@@ -87,6 +91,17 @@ export class PokemonPanel {
       if (this.mon && this.hooks.returnToParty(this.mon)) this.hide();
     });
     actions.appendChild(this.returnButton);
+    this.potionButton = document.createElement('button');
+    this.potionButton.id = 'ptd-use-potion';
+    this.potionButton.addEventListener('click', () => {
+      if (!this.mon) return;
+      const left = this.hooks.usePotion(this.mon);
+      if (left !== null) {
+        this.lastKey = '';
+        this.refresh();
+      }
+    });
+    actions.appendChild(this.potionButton);
     this.root.appendChild(actions);
     document.body.appendChild(this.root);
   }
@@ -132,7 +147,7 @@ export class PokemonPanel {
   refresh(): void {
     const mon = this.mon;
     if (!mon || !this.isOpen) return;
-    const key = [mon.level, mon.hp, mon.stats.hp, mon.exp, mon.activeMove, mon.status.ailment, mon.status.flinchSeconds > 0, JSON.stringify(mon.status.stages), mon.moves.map((m) => `${m.id}:${m.pp}`).join(','), this.placed].join('|');
+    const key = [this.hooks.potionCount(), mon.level, mon.hp, mon.stats.hp, mon.exp, mon.activeMove, mon.status.ailment, mon.status.flinchSeconds > 0, JSON.stringify(mon.status.stages), mon.moves.map((m) => `${m.id}:${m.pp}`).join(','), this.placed].join('|');
     if (key === this.lastKey) return;
     this.lastKey = key;
 
@@ -200,6 +215,9 @@ export class PokemonPanel {
     }
     this.moveButton.style.display = this.placed ? '' : 'none';
     this.returnButton.style.display = this.placed ? '' : 'none';
+    const potions = this.hooks.potionCount();
+    this.potionButton.textContent = `Potion (${potions})`;
+    this.potionButton.disabled = potions <= 0 || mon.hp >= mon.stats.hp || !this.placed;
   }
 
   destroy(): void {

@@ -8,6 +8,7 @@ import config from '../data/config.json';
 import type { TimeOfDay } from '../data/pokedata';
 import type { LevelState } from '../sim/level';
 import { runtime, runtimeConfig } from '../game/runtime';
+import { isolateFromGame } from './domOverlay';
 
 export interface DebugPanelHooks {
   getState: () => LevelState;
@@ -47,6 +48,7 @@ export class DebugPanel {
       'border-radius:4px', 'z-index:10', 'display:none',
     ].join(';');
     this.build();
+    isolateFromGame(this.root);
     document.body.appendChild(this.root);
     window.addEventListener('keydown', this.onKey);
   }
