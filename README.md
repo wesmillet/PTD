@@ -39,6 +39,19 @@ artists' `credits.txt`) and regenerates `src/data/spriteIndex.json`.
 Every `credits.txt` is kept verbatim and will be shown in the in-game credits
 screen. Please keep them when adding or updating sprites.
 
+## Pokémon data
+
+Stats, moves, learnsets, the type chart, EXP curves, evolutions and Platinum
+encounter tables are generated from the PokeAPI CSVs (Gen 1 through 4 only)
+and committed as JSON under `src/data/`. To regenerate:
+
+```
+scripts/fetch-pokeapi.sh          # sparse checkout of data/v2/csv only, into /tmp/pokeapi
+node scripts/build-pokedata.ts    # writes src/data/*.json
+```
+
+The CSVs are never committed. Typed accessors live in `src/data/pokedata.ts`.
+
 ## Layout
 
 - `src/sim/` simulation logic, no Phaser imports, unit tested

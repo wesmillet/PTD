@@ -1,0 +1,154 @@
+/**
+ * Typed access to the generated PokeAPI data (see scripts/build-pokedata.ts).
+ * No Phaser imports; usable from src/sim.
+ */
+import pokemonJson from './pokemon.json';
+import learnsetsJson from './learnsets.json';
+import movesJson from './moves.json';
+import typesJson from './types.json';
+import expCurvesJson from './exp_curves.json';
+import evolutionsJson from './evolutions.json';
+import encountersJson from './encounters.json';
+
+export type StatKey = 'hp' | 'atk' | 'def' | 'spa' | 'spd' | 'spe';
+export type BaseStats = Record<StatKey, number>;
+export type GrowthRate =
+  | 'slow'
+  | 'medium'
+  | 'fast'
+  | 'medium-slow'
+  | 'slow-then-very-fast'
+  | 'fast-then-very-slow';
+export type MoveCategory = 'physical' | 'special' | 'status';
+export type TimeOfDay = 'morning' | 'day' | 'night';
+export type EncounterMethod = 'walk' | 'surf' | 'old-rod' | 'good-rod';
+
+export interface PokemonData {
+  name: string;
+  gen: number;
+  types: number[];
+  base: BaseStats;
+  growth: GrowthRate;
+  catchRate: number;
+  baseExp: number;
+  baseHappiness: number;
+  evolvesFrom: number;
+  chain: number;
+}
+
+export interface MoveData {
+  name: string;
+  type: number;
+  power: number | null;
+  accuracy: number | null;
+  pp: number | null;
+  category: MoveCategory;
+}
+
+export interface EvolutionData {
+  to: number;
+  trigger: string;
+  level?: number;
+  item?: string;
+  heldItem?: string;
+  happiness?: number;
+  time?: string;
+  knownMove?: number;
+  location?: number;
+  [extra: string]: unknown;
+}
+
+export interface EncounterEntry {
+  species: number;
+  min: number;
+  max: number;
+  rarity: number;
+  time?: TimeOfDay;
+}
+
+export interface EncounterArea {
+  location: string;
+  areaId: number;
+  walk?: EncounterEntry[];
+  surf?: EncounterEntry[];
+  'old-rod'?: EncounterEntry[];
+  'good-rod'?: EncounterEntry[];
+}
+
+const pokemon = pokemonJson as Record<string, PokemonData>;
+const learnsets = learnsetsJson as unknown as Record<string, [number, number][]>;
+const moves = movesJson as Record<string, MoveData>;
+const types = typesJson as { names: Record<string, string>; chart: Record<string, Record<string, number>> };
+const expCurves = expCurvesJson as Record<GrowthRate, number[]>;
+const evolutions = evolutionsJson as Record<string, EvolutionData[] | Record<string, number[]>>;
+const encounters = encountersJson as Record<string, EncounterArea>;
+
+export function getPokemon(id: number): PokemonData {
+  const p = pokemon[String(id)];
+  if (!p) throw new Error(`pokedata: unknown Pokémon ${id}`);
+  return p;
+}
+
+/** Species id for a lowercase name such as "turtwig", or undefined. */
+export function findPokemonId(name: string): number | undefined {
+  const needle = name.toLowerCase();
+  for (const [id, p] of Object.entries(pokemon)) if (p.name === needle) return Number(id);
+  return undefined;
+}
+
+export function getMove(id: number): MoveData {
+  const m = moves[String(id)];
+  if (!m) throw new Error(`pokedata: unknown move ${id}`);
+  return m;
+}
+
+export function findMoveId(name: string): number | undefined {
+  const needle = name.toLowerCase();
+  for (const [id, m] of Object.entries(moves)) if (m.name === needle) return Number(id);
+  return undefined;
+}
+
+/** Platinum level-up learnset as `[level, moveId]` pairs sorted by level. */
+export function getLearnset(id: number): readonly [number, number][] {
+  return learnsets[String(id)] ?? [];
+}
+
+export function typeName(id: number): string {
+  return types.names[String(id)] ?? `type-${id}`;
+}
+
+/** Gen 4 effectiveness multiplier of an attacking type against one defending type. */
+export function typeEffectiveness(attackType: number, defendType: number): number {
+  return types.chart[String(attackType)]?.[String(defendType)] ?? 1;
+}
+
+/** Total EXP needed to be at `level` (1..100) on a growth curve. */
+export function expForLevel(growth: GrowthRate, level: number): number {
+  const curve = expCurves[growth];
+  if (!curve) throw new Error(`pokedata: unknown growth rate ${growth}`);
+  const clamped = Math.max(1, Math.min(100, Math.floor(level)));
+  return curve[clamped - 1] ?? 0;
+}
+
+export function getEvolutions(id: number): EvolutionData[] {
+  const list = evolutions[String(id)];
+  return Array.isArray(list) ? list : [];
+}
+
+export function getEncounterArea(key: string): EncounterArea {
+  const area = encounters[key];
+  if (!area) throw new Error(`pokedata: unknown encounter area "${key}"`);
+  return area;
+}
+
+export function encounterAreaKeys(): string[] {
+  return Object.keys(encounters);
+}
+
+/**
+ * The entries of one method's table that apply at a time of day: entries
+ * with no time condition plus those matching `time`.
+ */
+export function encounterTable(area: EncounterArea, method: EncounterMethod, time: TimeOfDay): EncounterEntry[] {
+  return (area[method] ?? []).filter((e) => !e.time || e.time === time);
+}
