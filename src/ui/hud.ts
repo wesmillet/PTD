@@ -60,7 +60,7 @@ export class Hud {
     this.paused = paused;
   }
 
-  update(state: LevelState, gameSpeed: number): void {
+  update(state: LevelState, gameSpeed: number, selectedPartyIndex: number | null = null): void {
     const def = state.def;
     if (def.objective === 'defend') {
       this.wave.setText(`Wave ${state.wave} / ${def.waves}`);
@@ -91,7 +91,9 @@ export class Hud {
       if (!slot) return;
       slot.level.setText(`L${entry.mon.level}`);
       const isPlaced = state.towers.some((t) => t.mon === entry.mon);
+      slot.frame.setStrokeStyle(i === selectedPartyIndex ? 2 : 1, i === selectedPartyIndex ? COLORS.selected : isPlaced ? COLORS.placeable : COLORS.panelBorder);
       slot.placed.setText(isPlaced ? '●' : '');
+      if (entry.mon.shiny) slot.level.setText(`★L${entry.mon.level}`);
       const frac = entry.mon.stats.hp > 0 ? entry.mon.hp / entry.mon.stats.hp : 0;
       slot.hp.clear();
       slot.hp.fillStyle(COLORS.hpBack, 1).fillRect(slot.frame.x - 20, slot.frame.y + 18, 40, 3);

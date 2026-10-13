@@ -78,5 +78,15 @@
     "portraits": [
       "Normal"
     ]
+  },
+  "0491": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ]
   }
 }

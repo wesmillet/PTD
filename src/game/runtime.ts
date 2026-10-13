@@ -28,8 +28,11 @@ export function urlParam(name: string): string | undefined {
 
 /** The fixed Phase 1 party from party-debug.json. */
 export function createDebugParty(): Monster[] {
-  const party = (partyDebug as { party: { species: number; level: number; moves?: number[] }[] }).party;
-  return party.map((p) => createMonster(p.species, runtime.partyLevelOverride ?? p.level, p.moves));
+  const party = (partyDebug as { party: { species: number; level: number; moves?: number[]; shiny?: boolean }[] }).party;
+  // The debug panel's level control applies to the first party member only.
+  return party.map((p, i) =>
+    createMonster(p.species, i === 0 ? (runtime.partyLevelOverride ?? p.level) : p.level, p.moves, { shiny: p.shiny ?? false }),
+  );
 }
 
 /** Dex folder (zero-padded) for a species id. */

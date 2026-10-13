@@ -10,6 +10,7 @@ import {
   leaveLevel,
   moveTower,
   placeTower,
+  removeTower,
   resolveLearn,
   setActiveMove,
   setPartyLevel,
@@ -80,6 +81,8 @@ export class LevelScene extends Phaser.Scene {
   private readonly enemyViews = new Map<number, EnemyView>();
   private readonly towerViews = new Map<number, TowerView>();
   private selectedTowerId: number | null = null;
+  /** Party member chosen from the strip to be placed on the next tile click. */
+  private selectedPartyIndex: number | null = null;
   private accumulator = 0;
   private ended = false;
   private overlay!: Phaser.GameObjects.Graphics;
@@ -101,6 +104,7 @@ export class LevelScene extends Phaser.Scene {
     this.enemyViews.clear();
     this.towerViews.clear();
     this.selectedTowerId = null;
+    this.selectedPartyIndex = null;
     this.accumulator = 0;
     this.ended = false;
     this.hoverTile = null;
@@ -116,7 +120,7 @@ export class LevelScene extends Phaser.Scene {
       onStartWave: () => this.tryStartWave(),
       onToggleSpeed: () => this.toggleSpeed(),
       onLeave: () => this.leave(),
-      onPartySlot: (i) => this.openPanelFor(this.state.party[i]?.mon),
+      onPartySlot: (i) => this.handlePartySlot(i),
     });
     this.panel = new PokemonPanel({
       portraitUrl: (species) => portraitUrl(species),
@@ -130,6 +134,19 @@ export class LevelScene extends Phaser.Scene {
         if (!tower || isOver(this.state)) return false;
         this.selectedTowerId = tower.id;
         this.showToast(`Click a blue tile to move ${capitalize(mon.name)} (Esc cancels)`);
+        return true;
+      },
+      returnToParty: (mon) => {
+        const tower = this.state.towers.find((t) => t.mon === mon);
+        if (!tower) return false;
+        if (this.state.phase !== 'build') {
+          this.showToast('Pokémon can only return to the party between waves');
+          return false;
+        }
+        removeTower(this.state, tower.id);
+        this.towerViews.get(tower.id)?.sprite.destroy();
+        this.towerViews.delete(tower.id);
+        if (this.selectedTowerId === tower.id) this.selectedTowerId = null;
         return true;
       },
       onClose: () => undefined,
@@ -146,8 +163,10 @@ export class LevelScene extends Phaser.Scene {
     });
     this.input.keyboard?.on('keydown-ESC', () => {
       if (this.panel?.isOpen) this.panel.hide();
-      else if (this.selectedTowerId !== null) this.selectedTowerId = null;
-      else this.scene.start('LevelSelect');
+      else if (this.selectedTowerId !== null || this.selectedPartyIndex !== null) {
+        this.selectedTowerId = null;
+        this.selectedPartyIndex = null;
+      } else this.scene.start('LevelSelect');
     });
     this.input.keyboard?.on('keydown-SPACE', () => this.tryStartWave());
 
@@ -277,17 +296,44 @@ export class LevelScene extends Phaser.Scene {
         this.selectedTowerId = null;
       } else {
         const placed = new Set(state.towers.map((t) => t.mon));
-        const partyIndex = state.party.findIndex((p) => !placed.has(p.mon));
+        const partyIndex = this.selectedPartyIndex ?? state.party.findIndex((p) => !placed.has(p.mon));
         if (partyIndex < 0 || state.towers.length >= state.def.placements) {
-          this.showToast('No more Pokémon to place; open one and press Move');
+          this.showToast(
+            state.def.placements === 1
+              ? 'Only one Pokémon can be placed here; open the placed one and press Return to party'
+              : 'No more Pokémon to place; open one and press Move',
+          );
+          this.selectedPartyIndex = null;
           return;
         }
         const tower = placeTower(state, partyIndex, x, y);
+        this.selectedPartyIndex = null;
         this.createTowerView(tower);
       }
     } catch (err) {
       this.showToast(err instanceof Error ? err.message : String(err));
     }
+  }
+
+  /** Party strip click: open the panel for a placed member, or pick an unplaced one to place next. */
+  private handlePartySlot(index: number): void {
+    const entry = this.state.party[index];
+    if (!entry || this.ended) return;
+    const placed = this.state.towers.some((t) => t.mon === entry.mon);
+    if (placed) {
+      this.selectedPartyIndex = null;
+      this.openPanelFor(entry.mon);
+      return;
+    }
+    if (this.selectedPartyIndex === index) {
+      this.selectedPartyIndex = null;
+      this.openPanelFor(entry.mon);
+      return;
+    }
+    this.selectedPartyIndex = index;
+    this.selectedTowerId = null;
+    this.panel?.hide();
+    this.showToast(`Click a blue tile to place ${capitalize(entry.mon.name)} (click the slot again for its panel)`);
   }
 
   private openPanelFor(mon: Monster | undefined): void {
@@ -340,7 +386,7 @@ export class LevelScene extends Phaser.Scene {
     this.syncViews();
     this.drawOverlay();
     this.hud.setPaused(this.paused);
-    this.hud.update(this.state, runtime.gameSpeed);
+    this.hud.update(this.state, runtime.gameSpeed, this.selectedPartyIndex);
     this.panel?.refresh();
   }
 

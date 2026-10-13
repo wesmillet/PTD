@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { findMoveId } from '../data/pokedata';
+import { createMonster } from './monster';
 import { MOVE_OVERRIDE_DEFAULTS, learnableAt, resolveMove, startingMoves, unknownOverrideNames } from './moves';
 
 const id = (name: string) => findMoveId(name) as number;
@@ -35,6 +36,14 @@ describe('learnsets', () => {
     expect(startingMoves(387, 21).map((m) => resolveMove(m).name)).toEqual(['absorb', 'razor-leaf', 'curse', 'bite']);
     expect(startingMoves(387, 1).map((m) => resolveMove(m).name)).toEqual(['tackle']);
     expect(startingMoves(396, 2).map((m) => resolveMove(m).name)).toEqual(['tackle', 'growl']);
+  });
+
+  it('defaults the active move to the first damaging move', () => {
+    const darkrai = createMonster(491, 50); // Hypnosis, Feint Attack, Nightmare, Double Team
+    expect(darkrai.moves.map((m) => resolveMove(m.id).name)).toEqual(['hypnosis', 'feint-attack', 'nightmare', 'double-team']);
+    expect(darkrai.activeMove).toBe(1);
+    expect(createMonster(387, 5).activeMove).toBe(0); // Tackle, Withdraw
+    expect(createMonster(387, 5, [110]).activeMove).toBe(0); // only a status move
   });
 
   it('lists moves learned exactly at a level', () => {

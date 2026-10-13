@@ -243,7 +243,9 @@ describe('moves and effects', () => {
   });
 
   it('inflicts ailments from status moves and damaging moves, with no stacking', () => {
-    const state = createLevel(route201, route201Map, { seed: 11, party: [createMonster(387, 30, [move('poison-powder'), move('ember')])] });
+    const poisoner = createMonster(387, 30, [move('poison-powder'), move('ember')]);
+    poisoner.activeMove = 0; // the default would pick Ember, the first damaging move
+    const state = createLevel(route201, route201Map, { seed: 11, party: [poisoner] });
     const tower = placeTower(state, 0, 9, 5);
     startWave(state);
     const events = run(state, 40);

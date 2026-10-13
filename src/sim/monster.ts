@@ -56,10 +56,19 @@ export function createMonster(species: number, level: number, moves?: readonly n
     stats,
     hp: stats.hp,
     moves: moveIds.slice(0, 4).map(makeMoveSlot),
-    activeMove: 0,
+    activeMove: defaultActiveMove(moveIds.slice(0, 4)),
     status: createStatus(),
     shiny: options.shiny ?? false,
   };
+}
+
+/** The first damaging move's slot, or slot 0 when every move is a status move. */
+export function defaultActiveMove(moveIds: readonly number[]): number {
+  const i = moveIds.findIndex((id) => {
+    const m = getMove(id);
+    return m.category !== 'status' && m.power !== null;
+  });
+  return i < 0 ? 0 : i;
 }
 
 /** Id of the move the Pokémon attacks with, or undefined if it knows none. */

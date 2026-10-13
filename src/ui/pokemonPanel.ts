@@ -14,6 +14,8 @@ export interface PokemonPanelHooks {
   setActiveMove: (mon: Monster, index: number) => void;
   /** Called when the player wants to move this Pokémon; return false if it is not placed. */
   pickUp: (mon: Monster) => boolean;
+  /** Removes a placed Pokémon from the map (build phase); return false if it could not. */
+  returnToParty: (mon: Monster) => boolean;
   onClose: () => void;
 }
 
@@ -31,6 +33,7 @@ export class PokemonPanel {
   private readonly statusLine: HTMLElement;
   private readonly moveList: HTMLUListElement;
   private readonly moveButton: HTMLButtonElement;
+  private readonly returnButton: HTMLButtonElement;
   private lastKey = '';
 
   constructor(private readonly hooks: PokemonPanelHooks) {
@@ -80,6 +83,12 @@ export class PokemonPanel {
       if (this.mon && this.hooks.pickUp(this.mon)) this.hide();
     });
     actions.appendChild(this.moveButton);
+    this.returnButton = document.createElement('button');
+    this.returnButton.textContent = 'Return to party';
+    this.returnButton.addEventListener('click', () => {
+      if (this.mon && this.hooks.returnToParty(this.mon)) this.hide();
+    });
+    actions.appendChild(this.returnButton);
     this.root.appendChild(actions);
     document.body.appendChild(this.root);
   }
@@ -186,6 +195,7 @@ export class PokemonPanel {
     }
     this.moveButton.disabled = !this.placed;
     this.moveButton.textContent = this.placed ? 'Move' : 'Not placed';
+    this.returnButton.style.display = this.placed ? '' : 'none';
   }
 
   destroy(): void {
