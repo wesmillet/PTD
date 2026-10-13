@@ -7,13 +7,13 @@ import { expForLevel, getMove, typeName } from '../data/pokedata';
 import { expToNextFraction } from '../sim/exp';
 import type { Monster } from '../sim/monster';
 import { resolveMove } from '../sim/moves';
+import { evolutionOptions } from '../sim/evolution';
+import { capitalizeName } from '../sim/names';
 import { capitalize, ensureOverlayStyles, TYPE_COLORS } from './domOverlay';
 
 export interface PokemonPanelHooks {
   portraitUrl: (species: number) => string | undefined;
   setActiveMove: (mon: Monster, index: number) => void;
-  /** Called when the player wants to move this Pokémon; return false if it is not placed. */
-  pickUp: (mon: Monster) => boolean;
   /** Removes a placed Pokémon from the map (build phase); return false if it could not. */
   returnToParty: (mon: Monster) => boolean;
   onClose: () => void;
@@ -32,7 +32,7 @@ export class PokemonPanel {
   private readonly expText: HTMLElement;
   private readonly statusLine: HTMLElement;
   private readonly moveList: HTMLUListElement;
-  private readonly moveButton: HTMLButtonElement;
+  private readonly moveButton: HTMLSpanElement;
   private readonly returnButton: HTMLButtonElement;
   private lastKey = '';
 
@@ -77,11 +77,9 @@ export class PokemonPanel {
 
     const actions = document.createElement('div');
     actions.className = 'ptd-actions';
-    this.moveButton = document.createElement('button');
-    this.moveButton.textContent = 'Move';
-    this.moveButton.addEventListener('click', () => {
-      if (this.mon && this.hooks.pickUp(this.mon)) this.hide();
-    });
+    this.moveButton = document.createElement('span');
+    this.moveButton.className = 'ptd-dim';
+    this.moveButton.textContent = 'Drag it on the map to move it.';
     actions.appendChild(this.moveButton);
     this.returnButton = document.createElement('button');
     this.returnButton.textContent = 'Return to party';
@@ -164,6 +162,13 @@ export class PokemonPanel {
       this.statusLine.appendChild(span);
     }
 
+    const evo = evolutionOptions(mon);
+    const evoSpan = document.createElement('span');
+    if (evo.ready.length) evoSpan.textContent = `Evolves into ${capitalizeName(evo.ready[0]!.toName)} at the next level-up`;
+    else if (evo.blocked.length) evoSpan.textContent = `Evolution: ${evo.blocked.map((b) => `${capitalizeName(b.toName)} (${b.reason})`).join(', ')}`;
+    else evoSpan.textContent = 'Does not evolve';
+    this.statusLine.appendChild(evoSpan);
+
     this.moveList.innerHTML = '';
     mon.moves.forEach((slot, index) => {
       const spec = resolveMove(slot.id);
@@ -193,8 +198,7 @@ export class PokemonPanel {
       li.textContent = 'No moves';
       this.moveList.appendChild(li);
     }
-    this.moveButton.disabled = !this.placed;
-    this.moveButton.textContent = this.placed ? 'Move' : 'Not placed';
+    this.moveButton.style.display = this.placed ? '' : 'none';
     this.returnButton.style.display = this.placed ? '' : 'none';
   }
 

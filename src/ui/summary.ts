@@ -20,7 +20,7 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary, callback
   const container = scene.add.container(0, 0).setDepth(2000);
   container.add(scene.add.rectangle(0, 0, width, height, 0x000000, 0.6).setOrigin(0).setInteractive());
   const panelW = 440;
-  const lines = summary.party.length;
+  const lines = summary.party.length + summary.caught.length + (summary.caught.length ? 1 : 0);
   const panelH = 150 + lines * 22;
   const px = width / 2;
   const py = height / 2;
@@ -37,6 +37,15 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary, callback
     const levelText = p.levelTo > p.levelFrom ? `Lv ${p.levelFrom} -> ${p.levelTo}` : `Lv ${p.levelTo}`;
     container.add(scene.add.text(px - panelW / 2 + 24, y, `${name}   +${p.expGained} EXP   ${levelText}`, TEXT));
     y += 22;
+  }
+  if (summary.caught.length) {
+    container.add(scene.add.text(px - panelW / 2 + 24, y, 'Caught:', TEXT_DIM));
+    y += 22;
+    for (const c of summary.caught) {
+      const name = c.name.charAt(0).toUpperCase() + c.name.slice(1);
+      container.add(scene.add.text(px - panelW / 2 + 24, y, `${c.shiny ? '★ ' : ''}${name}   Lv ${c.level}`, TEXT));
+      y += 22;
+    }
   }
   container.add(new Button(scene, px - 80, py + panelH / 2 - 30, 'Retry', callbacks.onRetry));
   container.add(new Button(scene, px + 80, py + panelH / 2 - 30, 'Level select', callbacks.onLevelSelect));

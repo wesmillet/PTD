@@ -3,9 +3,7 @@
  * a mutable copy of config.json that the simulation reads every step.
  */
 import { defaultRuntimeConfig, type RuntimeConfig } from '../sim/level';
-import partyDebug from '../data/party-debug.json';
 import spriteFolders from '../data/spriteFolders.json';
-import { createMonster, type Monster } from '../sim/monster';
 
 export const runtimeConfig: RuntimeConfig = defaultRuntimeConfig();
 
@@ -26,14 +24,6 @@ export function urlParam(name: string): string | undefined {
   return new URLSearchParams(window.location.search).get(name) ?? undefined;
 }
 
-/** The fixed Phase 1 party from party-debug.json. */
-export function createDebugParty(): Monster[] {
-  const party = (partyDebug as { party: { species: number; level: number; moves?: number[]; shiny?: boolean }[] }).party;
-  // The debug panel's level control applies to the first party member only.
-  return party.map((p, i) =>
-    createMonster(p.species, i === 0 ? (runtime.partyLevelOverride ?? p.level) : p.level, p.moves, { shiny: p.shiny ?? false }),
-  );
-}
 
 /** Dex folder (zero-padded) for a species id. */
 export function dexFolder(species: number): string {
