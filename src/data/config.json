@@ -112,9 +112,26 @@
       "dusk": 2,
       "net": 2,
       "quick": 2
-    }
+    },
+    "potions": 2,
+    "rareCandies": 0
   },
   "party": {
     "maxParty": 6
+  },
+  "money": {
+    "starting": 1000,
+    "perKo": 12,
+    "perLevelCleared": 600
+  },
+  "shop": {
+    "potion": {
+      "name": "Potion",
+      "price": 300
+    },
+    "rareCandy": {
+      "name": "Rare Candy",
+      "price": 4800
+    }
   }
 }

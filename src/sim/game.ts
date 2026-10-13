@@ -16,12 +16,26 @@ export interface LevelProgress {
   completed: boolean;
 }
 
+export interface DexEntry {
+  seen: boolean;
+  caught: boolean;
+  shinyCaught: boolean;
+}
+
+export interface Inventory {
+  balls: Record<string, number>;
+  potions: number;
+  rareCandies: number;
+}
+
 export interface GameState {
   starter?: number;
   party: Monster[];
   box: Monster[];
   progress: Record<string, LevelProgress>;
-  items: { balls: Record<string, number> };
+  items: Inventory;
+  money: number;
+  pokedex: Record<string, DexEntry>;
 }
 
 export const MAX_PARTY = config.party.maxParty;
@@ -31,18 +45,59 @@ export function createGameState(): GameState {
     party: [],
     box: [],
     progress: {},
-    items: { balls: { ...config.startingItems.balls } },
+    items: { balls: { ...config.startingItems.balls }, potions: config.startingItems.potions, rareCandies: config.startingItems.rareCandies },
+    money: config.money.starting,
+    pokedex: {},
   };
+}
+
+export function dexEntry(game: GameState, species: number): DexEntry {
+  return (game.pokedex[String(species)] ??= { seen: false, caught: false, shinyCaught: false });
+}
+
+export function markSeen(game: GameState, species: number): void {
+  dexEntry(game, species).seen = true;
+}
+
+export function markCaught(game: GameState, species: number, shiny: boolean): void {
+  const e = dexEntry(game, species);
+  e.seen = true;
+  e.caught = true;
+  if (shiny) e.shinyCaught = true;
+}
+
+export function dexCounts(game: GameState): { seen: number; caught: number; shiny: number } {
+  let seen = 0;
+  let caught = 0;
+  let shiny = 0;
+  for (const e of Object.values(game.pokedex)) {
+    if (e.seen) seen++;
+    if (e.caught) caught++;
+    if (e.shinyCaught) shiny++;
+  }
+  return { seen, caught, shiny };
+}
+
+/** Money for a finished level: per KO plus the clear bonus when it counts as cleared. */
+export function levelMoney(kos: number, cleared: boolean): number {
+  return kos * config.money.perKo + (cleared ? config.money.perLevelCleared : 0);
+}
+
+export function spendMoney(game: GameState, amount: number): void {
+  if (amount > game.money) throw new Error('not enough money');
+  game.money -= amount;
 }
 
 export function chooseStarter(game: GameState, species: number, starter: Monster): void {
   if (game.starter !== undefined) throw new Error('starter already chosen');
   game.starter = species;
   game.party.unshift(starter);
+  markCaught(game, species, starter.shiny);
 }
 
 /** Adds a Pokémon to the party if there is room, else to the box. Returns where it went. */
 export function addPokemon(game: GameState, mon: Monster): 'party' | 'box' {
+  markCaught(game, mon.species, mon.shiny);
   if (game.party.length < MAX_PARTY) {
     game.party.push(mon);
     return 'party';
@@ -94,19 +149,25 @@ export function sortMonsters(list: Monster[], key: SortKey): Monster[] {
   return sorted;
 }
 
-/** Records a level outcome and returns whether it now counts as completed. */
-export function recordLevelResult(game: GameState, levelId: string, outcome: 'won' | 'lost' | 'left', wavesCleared: number): boolean {
+/** Records a level outcome, awards money, and returns whether the run counted as cleared. */
+export function recordLevelResult(game: GameState, levelId: string, outcome: 'won' | 'lost' | 'left', wavesCleared: number, kos = 0): boolean {
   const def = getLevel(levelId);
   const prev = game.progress[levelId] ?? { wavesCleared: 0, won: false, completed: false };
   const progress: LevelProgress = { ...prev, wavesCleared: Math.max(prev.wavesCleared, wavesCleared) };
+  let cleared = false;
   if (def.objective === 'defend') {
-    if (outcome === 'won') progress.won = true;
+    if (outcome === 'won') {
+      progress.won = true;
+      cleared = true;
+    }
     progress.completed = progress.won;
-  } else {
-    if (wavesCleared >= 1 && outcome !== 'lost') progress.completed = true;
+  } else if (wavesCleared >= 1 && outcome !== 'lost') {
+    progress.completed = true;
+    cleared = true;
   }
   game.progress[levelId] = progress;
-  return progress.completed;
+  game.money += levelMoney(kos, cleared);
+  return cleared;
 }
 
 export function isLevelCompleted(game: GameState, levelId: string): boolean {
