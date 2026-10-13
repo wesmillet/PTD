@@ -22,6 +22,7 @@
   },
   "waves": {
     "freeWaveMaxEnemies": 12,
+    "freeWaveGapSeconds": 4,
     "buildPhaseAutoStart": false
   },
   "gameSpeeds": [1, 2]

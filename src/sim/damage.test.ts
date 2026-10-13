@@ -47,10 +47,12 @@ describe('computeDamage', () => {
 
   it('applies STAB after the roll', () => {
     const razorLeaf: DamageContext = { ...tackle, moveType: 12, power: 55 };
-    // base: 4*55*13/6 = 476.67 -> 476; /50 -> 9; +2 = 11; roll 100 -> 11; STAB floor(16.5) -> 16
+    // base: 4*55*13/6 = 476.67 -> 476; /50 -> 9; +2 = 11; roll 100 -> 11; STAB floor(16.5) -> 16;
+    // Grass vs Normal/Flying: x1 then x0.5 -> 8
     const result = computeDamage(razorLeaf, false, 100);
     expect(result.stab).toBe(true);
-    expect(result.damage).toBe(16);
+    expect(result.effectiveness).toBe(0.5);
+    expect(result.damage).toBe(8);
   });
 
   it('applies type effectiveness per defending type', () => {
