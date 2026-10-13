@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import spriteIndex from '../data/spriteIndex.json';
 import { ALL_DIRECTIONS, DIRECTION_NAMES, Direction, directionFromVector } from '../assets/direction';
-import { createPmdSprite, playAnim } from '../assets/pmdLoader';
+import { createPmdSprite, playAnim, syncShadow } from '../assets/pmdLoader';
 
 const PRIMARY = 'turtwig';
 const ROW_ACTIONS = ['Idle', 'Walk'] as const;
@@ -13,7 +13,7 @@ const TEXT_STYLE = { fontFamily: 'monospace', fontSize: '13px', color: '#d8d8e8'
  * directions at once, plus a walker that picks its facing from its velocity.
  *
  * Keys: Space swaps the Idle/Walk rows, + and - change scale,
- * 1-5 switch Pokémon (Turtwig is the required one; the rest are a bonus).
+ * 1-9 switch Pokémon (Turtwig is the required one; the rest are a bonus). Esc returns to level select.
  */
 export class Phase0Scene extends Phaser.Scene {
   private readonly names = Object.keys(spriteIndex) as (keyof typeof spriteIndex)[];
@@ -56,6 +56,7 @@ export class Phase0Scene extends Phaser.Scene {
         this.rowsSwapped = !this.rowsSwapped;
         this.applyGridAnims();
       });
+      keyboard.on('keydown-ESC', () => this.scene.start('LevelSelect'));
       keyboard.on('keydown-PLUS', () => this.changeScale(1));
       keyboard.on('keydown-NUMPAD_ADD', () => this.changeScale(1));
       keyboard.on('keydown-MINUS', () => this.changeScale(-1));
@@ -82,6 +83,7 @@ export class Phase0Scene extends Phaser.Scene {
     this.walker.setPosition(cx + Math.cos(this.walkerAngle) * rx, cy + Math.sin(this.walkerAngle) * ry);
     const dir = directionFromVector(this.walker.x - prevX, this.walker.y - prevY, Direction.Right);
     playAnim(this.walker, 'Walk', dir);
+    syncShadow(this.walker);
   }
 
   private buildGrid(): void {
@@ -115,8 +117,14 @@ export class Phase0Scene extends Phaser.Scene {
 
   private applyScale(): void {
     const scale = SCALES[this.scaleIndex] ?? 1;
-    for (const row of this.grid) for (const sprite of row) sprite.setScale(scale);
+    for (const row of this.grid) {
+      for (const sprite of row) {
+        sprite.setScale(scale);
+        syncShadow(sprite);
+      }
+    }
     this.walker.setScale(scale);
+    syncShadow(this.walker);
     this.updateTitle();
   }
 

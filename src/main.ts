@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
+import { LevelScene } from './scenes/LevelScene';
+import { LevelSelectScene } from './scenes/LevelSelectScene';
 import { Phase0Scene } from './scenes/Phase0Scene';
 
 new Phaser.Game({
@@ -13,5 +15,5 @@ new Phaser.Game({
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [BootScene, Phase0Scene],
+  scene: [BootScene, LevelSelectScene, LevelScene, Phase0Scene],
 });

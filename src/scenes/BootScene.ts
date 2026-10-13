@@ -1,13 +1,16 @@
 import Phaser from 'phaser';
 import spriteIndex from '../data/spriteIndex.json';
 import { queuePokemon, registerAnims } from '../assets/pmdLoader';
+import { urlParam } from '../game/runtime';
 
-/** Actions every Pokémon in the Phase 0 demo needs. */
-const DEMO_ACTIONS = ['Idle', 'Walk'] as const;
+/** Actions loaded for every Pokémon in spriteIndex.json. */
+const ACTIONS = ['Idle', 'Walk', 'Attack', 'Hurt', 'Faint'] as const;
+/** Not every SpriteCollab folder has these; the scenes fall back when missing. */
+const OPTIONAL_ACTIONS = ['Attack', 'Hurt', 'Faint'] as const;
 
 /**
  * Loads every Pokémon listed in `src/data/spriteIndex.json`, registers their
- * animations and hands off to the demo scene.
+ * animations and hands off to the requested scene.
  */
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -30,7 +33,7 @@ export class BootScene extends Phaser.Scene {
     });
 
     for (const dex of Object.values(spriteIndex)) {
-      queuePokemon(this, dex, DEMO_ACTIONS);
+      queuePokemon(this, dex, ACTIONS, { optional: OPTIONAL_ACTIONS });
     }
   }
 
@@ -38,6 +41,9 @@ export class BootScene extends Phaser.Scene {
     for (const dex of Object.values(spriteIndex)) {
       registerAnims(this, dex);
     }
-    this.scene.start('Phase0');
+    const scene = urlParam('scene');
+    if (scene === 'demo') this.scene.start('Phase0');
+    else if (urlParam('level')) this.scene.start('Level');
+    else this.scene.start('LevelSelect');
   }
 }
