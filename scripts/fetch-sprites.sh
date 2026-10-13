@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Fetch PMDCollab SpriteCollab sprite folders via a sparse checkout.
+# Usage: scripts/fetch-sprites.sh <dexnum> [<dexnum>...]   e.g. 0387 0390
+#
+# Never clones the whole repo (see GAME_DESIGN.md, "Sprites and assets").
+# Copies only the top-level files of each sprite folder (AnimData.xml, the
+# *-Anim.png / *-Shadow.png / *-Offsets.png sheets and credits.txt). Form and
+# shiny subfolders are left for a later phase. credits.txt is copied verbatim.
+set -euo pipefail
+
+if [ "$#" -lt 1 ]; then
+  echo "usage: $0 <dexnum> [<dexnum>...]" >&2
+  exit 1
+fi
+
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+WORK="${SPRITECOLLAB_DIR:-/tmp/spritecollab}"
+REPO="https://github.com/PMDCollab/SpriteCollab"
+
+if [ ! -d "$WORK/.git" ]; then
+  GIT_LFS_SKIP_SMUDGE=1 git clone --depth 1 --filter=blob:none --sparse "$REPO" "$WORK"
+fi
+
+cd "$WORK"
+paths=(/tracker.json /sprite_config.json)
+for dex in "$@"; do
+  paths+=("/sprite/$dex/*")
+done
+git sparse-checkout set --no-cone "${paths[@]}"
+
+for dex in "$@"; do
+  src="$WORK/sprite/$dex"
+  dest="$ROOT/public/assets/sprites/$dex"
+  if [ ! -d "$src" ]; then
+    echo "no sprite folder for $dex in SpriteCollab" >&2
+    exit 1
+  fi
+  mkdir -p "$dest"
+  find "$src" -maxdepth 1 -type f -exec cp -f {} "$dest/" \;
+  echo "copied sprite/$dex -> public/assets/sprites/$dex"
+done
+
+node "$ROOT/scripts/build-sprite-index.mjs" "$WORK/tracker.json" "$ROOT/src/data/spriteIndex.json"

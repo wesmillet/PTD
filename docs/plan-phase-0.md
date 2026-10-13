@@ -56,7 +56,10 @@ then copies each folder (including `credits.txt`, untouched) into
 `public/assets/sprites/<dexnum>/`. It also copies `tracker.json` and
 `sprite_config.json` to `/tmp` only; they are not shipped to the client.
 
-Phase 0 fetches one Pokémon: **Turtwig, folder 0387** (first starter listed).
+Phase 0 fetches five Pokémon: **Turtwig (0387)** is the primary one and the
+parser test fixture; Chimchar (0390), Piplup (0393), Starly (0396) and
+Bidoof (0399) are fetched too so they are in the repo. The demo scene must
+animate Turtwig well; showing the others is a bonus.
 Only the top-level folder is copied, not the shiny/form subfolders (`0000/`,
 `0001/`), until Phase 6. Checked: the sparse checkout works from this
 environment, and Turtwig's top-level folder is about 560 KB.
@@ -90,17 +93,17 @@ a normal entry, a CopyOf entry, multi-frame durations, and HitFrame/ReturnFrame.
 ## 5. Phaser loader (`src/assets/pmdLoader.ts`)
 
 - `queuePokemon(scene, dexnum, actions[])`: queues `AnimData.xml` (as text) and
-  one spritesheet per action for both `<Action>-Anim.png` and
-  `<Action>-Shadow.png`, using that action's `FrameWidth`/`FrameHeight`.
-  Because frame sizes differ per action, each action is its own texture key:
-  `pmd-<dex>-<action>` and `pmd-<dex>-<action>-shadow`.
+  one spritesheet per action for `<Action>-Anim.png`, using that action's
+  `FrameWidth`/`FrameHeight`. Because frame sizes differ per action, each
+  action is its own texture key: `pmd-<dex>-<action>`. Shadow sheets stay in
+  the asset folders but are not loaded or registered until Phase 1.
 - `registerAnims(scene, dexnum)`: after load, creates one Phaser animation per
   action per direction: key `pmd-<dex>-<action>-<dir>`, dir 0..7 in the sheet's
   row order (down, down-right, right, up-right, up, up-left, left, down-left).
   Frame index = `row * columns + col`. Per-frame duration = `ticks * 1000 / 60`
   so uneven timings are preserved. Idle/Walk loop; others play once (used later).
 - `playAnim(sprite, action, direction)`: swaps texture if the action changed and
-  plays the animation. Attaches/updates a shadow sprite rendered under the body.
+  plays the animation, keeping progress when only the facing changes.
 - `Direction` enum exported from `src/assets/direction.ts` with a helper to pick
   the nearest of 8 directions from a movement vector (needed in Phase 1).
 
@@ -125,14 +128,15 @@ required combination on one screen without any input.
 
 1. `npm install && npm run test` passes (rng + animData tests).
 2. `npm run typecheck` and `npm run build` succeed.
-3. `npm run dev` shows Turtwig animating Idle and Walk in all 8 directions, with
-   shadows, at pixel-crisp scale.
+3. `npm run dev` shows Turtwig animating Idle and Walk in all 8 directions at
+   pixel-crisp scale.
 4. `public/assets/sprites/0387/credits.txt` is present and unmodified.
 5. One commit at the end of the phase.
 
-## Open questions
+## Decisions (approved)
 
-1. OK to add `jsdom` as a dev dependency for parser tests? (Or hand-rolled parser.)
-2. Turtwig (0387) as the Phase 0 Pokémon? Say otherwise if you want Piplup/Chimchar.
-3. Shadow rendering is included above because the format is already specified;
-   say so if you would rather defer it.
+1. `jsdom` is a dev dependency for Vitest only. The loader uses the browser's
+   built-in `DOMParser`; no hand-rolled XML parser.
+2. Turtwig is the primary Pokémon and the parser fixture; the other four
+   folders are fetched as well.
+3. Shadows are deferred to Phase 1. The Shadow PNGs stay in the asset folders.
