@@ -8,6 +8,6 @@ export default defineConfig({
     target: 'es2022',
     assetsInlineLimit: 0,
     // Phaser alone is ~1.2 MB minified; it is loaded once, so no code splitting yet.
-    chunkSizeWarningLimit: 1500,
+    chunkSizeWarningLimit: 2500,
   },
 });

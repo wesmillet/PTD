@@ -52,9 +52,12 @@ Phaser animations per action per direction, and exposes `playAnim(sprite, action
 direction)`. Towers mostly use Idle, Attack, and Hurt. Enemies use Walk, Hurt,
 and Faint.
 
-Portraits (40x40, 5 columns x 8 rows, emotions listed in `sprite_config.json`)
-come from `portrait/<dexnum>/`. Use the Normal emotion for party UI and Happy,
-Sad, Angry, Surprised for dialogue.
+Portraits come from `portrait/<dexnum>/` as one 40x40 PNG per emotion
+(`Normal.png`, `Happy.png`, ...; the emotion list is in `sprite_config.json`).
+The fetch script copies Normal, Happy, Sad, Angry and Surprised into
+`public/assets/portraits/<dexnum>/`. Use Normal for party UI and the others
+for dialogue. Shiny sprites for the base form live at
+`sprite/<dexnum>/0000/0001/` and are copied to `public/assets/sprites/<dexnum>/shiny/`.
 
 Pokémon stats, moves, types, learnsets, and evolution data: bundle a static JSON
 dump (PokeAPI data, Gen 4 ruleset) into `src/data/`. Do not call PokeAPI at
@@ -67,18 +70,47 @@ runtime.
   tiles. Some levels have water or air tiles only certain types can use.
 - Player places up to N Pokémon per level (N grows with story progress, starts
   at 1 and caps at 6).
-- Pokémon can be moved and swapped between waves, not mid-wave.
+- Pokémon can be picked up and re-placed on any placeable tile at any time,
+  including mid-wave. Moving restarts the attack cooldown at a full
+  interval, so it can never be used to skip one.
 
 ### Combat
 - Each Pokémon has up to 4 moves. One is selected as the active move per Pokémon.
-- Moves have: power, accuracy, type, category (physical/special/status), range,
-  cooldown, targeting rule (nearest, strongest, weakest, furthest along path,
-  multi-target for spread moves), and optional effects (status, stat change,
-  knockback, slow, heal).
-- Damage uses the Gen 4 formula with level, attack vs defense, STAB, type chart,
-  random roll 0.85 to 1.0, and crits. Keep it in `src/sim/damage.ts` with tests.
-- Status conditions: poison, burn, paralysis, sleep, freeze, confusion, and
-  flinch. Each has a defined effect on path movement and attack rate.
+- A placed Pokémon knows up to 4 moves from its Platinum level-up learnset,
+  starting with the last four it would know at its level. A level-up that
+  unlocks a move learns it at once with a free slot, or prompts a replace
+  dialog (the simulation pauses while it is open).
+- Move data (power, accuracy, type, category, PP, priority, target) and
+  secondary effects (ailment and chance, flinch chance, stat stage changes,
+  drain, healing) come from PokeAPI's move_meta tables into `moves.json`.
+  Range (tiles), cooldown (a multiplier on the Speed-derived interval) and
+  targeting rule (nearest, strongest, weakest, furthest along path, self) are
+  hand-written in `src/data/move_overrides.json`; unlisted moves default to
+  melee range 1.5, cooldown 1.0 and nearest. Multi-target spread moves are
+  not implemented yet.
+- Damage uses the Gen 4 formula with level, attack vs defense (with stat
+  stages), STAB, type chart, random roll 0.85 to 1.0, crits, and burn halving
+  physical damage. Keep it in `src/sim/damage.ts` with tests.
+- Status conditions (`src/sim/status.ts`, constants in `config.json` under
+  `status`). A Pokémon holds one ailment at a time; a second one does not
+  stack. Enemies do not attack placed Pokémon yet, so statuses reach towers
+  only from self-inflicted moves (Thrash, Outrage, Petal Dance confuse the
+  user) and the debug panel.
+
+  | Status    | Path speed (enemies)            | Attack rate (towers)                      | Other |
+  | --------- | ------------------------------- | ----------------------------------------- | ----- |
+  | Poison    | unchanged                       | unchanged                                 | loses 1/8 max HP every 2 s |
+  | Burn      | unchanged                       | unchanged                                 | loses 1/16 max HP every 2 s; physical damage dealt x0.5 |
+  | Paralysis | x0.5                            | x0.5, and 25% of attacks are skipped      | |
+  | Sleep     | stopped for 2 to 5 s            | no attacks for 2 to 5 s                   | not woken by damage |
+  | Freeze    | stopped for 3 to 6 s            | no attacks for 3 to 6 s                   | |
+  | Confusion | for 2 to 5 s, each second 50%: walks backwards | for 2 to 5 s, each second 50%: the attack is wasted | never walks back past the path start |
+  | Flinch    | stopped for 0.5 s               | the next attack waits 0.5 s               | only from moves with a flinch chance |
+
+  Stat stages (-6 to +6) use the Gen 4 multipliers on Attack, Defense,
+  Sp. Atk, Sp. Def and Speed; Speed stages scale enemy movement and tower
+  attack rate. Accuracy and evasion stages are parsed but ignored for now.
+  Poison and burn KOs award EXP to the Pokémon that inflicted or last hit.
 - Enemies walk the path; what happens when one reaches the end depends on
   the level's objective (see "Level objectives").
 - Every Pokémon instance (tower or enemy) has a level. Actual stats come from
@@ -195,13 +227,22 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   (resets on leaving the level, caps at 40 for an additional 4x), and
   "Shiny Event" levels with a flat 1/256 rate for a featured species.
 - Shiny Pokémon use the shiny sprite folder from SpriteCollab when present.
+  Since Phase 2 a shiny flag is rolled at spawn from `shinyRate` in
+  `config.json` (1/4096), shiny enemies use the shiny folder, sparkle on
+  spawn and get a gold HP bar outline. Charm, chaining and dex tracking are
+  Phase 6.
 - Pokédex shows shiny counts. A "shiny living dex" completion reward exists.
 
 ## UI
 - Level select map per act, styled after the Sinnoh region map
 - In-level HUD: wave counter, lives, money, speed toggle (1x, 2x, 4x),
   pause, Poké Ball bar
-- Pokémon panel: stats, moves, EXP bar, evolution button when eligible
+- Pokémon panel: portrait, level, HP and EXP bars with numbers, status and
+  stat stages, all four moves with type and power, the active move
+  highlighted (click a move to make it active), a Move button, and later an
+  evolution button when eligible. Opened by clicking a placed Pokémon or its
+  slot in the party strip along the bottom of the HUD. It is a DOM overlay so
+  it stays readable at phone width.
 - Party / PC screen with filters (type, level, shiny)
 - Dialogue boxes with portraits
 - Settings: volume, sprite scale, colorblind-friendly type colors
@@ -213,7 +254,9 @@ Phase 1: Two levels (Route 201 free, Oreburgh Mine 1F defend), one path each,
          one placeable Pokémon, waves generated from Platinum encounter
          tables, lives, win/lose/leave, PokeAPI stats pipeline, Gen 4 stats
          and damage with tests, speed from stats, debug tuning panel.
-Phase 2: Moves, type chart, status effects, targeting rules, 4-move selection.
+Phase 2: Moves from learnsets with learn/replace flow, move effects from
+         PokeAPI data, status conditions and stat stages, targeting rules,
+         mid-wave movement, in-level Pokémon panel, early shiny visual.
 Phase 3: Catching, party, PC box, EXP, level-up, move learning, evolution.
 Phase 4: Save/load with export code. Shop and items.
 Phase 5: Story Act 1, levels 1 through 11, with dialogue and gym bosses.

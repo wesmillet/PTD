@@ -109,6 +109,15 @@ export class DebugPanel {
         },
       ),
     );
+    this.root.appendChild(
+      this.numberInput(
+        'Shiny 1-in-N (1 = always)',
+        1,
+        1000000,
+        () => Math.round(1 / Math.max(1e-9, runtimeConfig.shinyRate)),
+        (v) => (runtimeConfig.shinyRate = 1 / v),
+      ),
+    );
     const timeRow = document.createElement('div');
     timeRow.style.marginTop = '6px';
     const timeLabel = document.createElement('span');
@@ -131,6 +140,8 @@ export class DebugPanel {
     buttons.appendChild(
       this.button('Reset constants', () => {
         Object.assign(runtimeConfig.speed, config.speed);
+        Object.assign(runtimeConfig.status, config.status);
+        runtimeConfig.shinyRate = config.shinyRate;
         delete runtimeConfig.enemyLevelOverride;
         this.refresh();
       }),

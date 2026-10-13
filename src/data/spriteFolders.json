@@ -1,0 +1,82 @@
+{
+  "0041": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ]
+  },
+  "0074": {
+    "shiny": true,
+    "portraits": [
+      "Happy",
+      "Normal"
+    ]
+  },
+  "0095": {
+    "shiny": true,
+    "portraits": [
+      "Normal",
+      "Surprised"
+    ]
+  },
+  "0387": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ]
+  },
+  "0390": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ]
+  },
+  "0393": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ]
+  },
+  "0396": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ]
+  },
+  "0399": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ]
+  },
+  "0401": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ]
+  }
+}

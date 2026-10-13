@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import spriteIndex from '../data/spriteIndex.json';
+import spriteFolders from '../data/spriteFolders.json';
 import { queuePokemon, registerAnims } from '../assets/pmdLoader';
 import { urlParam } from '../game/runtime';
 
@@ -32,15 +33,30 @@ export class BootScene extends Phaser.Scene {
       label.setText(`Failed to load ${file.src}`).setColor('#ff6b6b');
     });
 
+    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
     for (const dex of Object.values(spriteIndex)) {
       queuePokemon(this, dex, ACTIONS, { optional: OPTIONAL_ACTIONS });
+      if (folders[dex]?.shiny) queuePokemon(this, `${dex}/shiny`, ACTIONS, { optional: OPTIONAL_ACTIONS });
+      if (folders[dex]?.portraits.includes('Normal')) {
+        this.load.image(`portrait-${dex}`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/Normal.png`);
+      }
     }
   }
 
   create(): void {
+    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
     for (const dex of Object.values(spriteIndex)) {
       registerAnims(this, dex);
+      if (folders[dex]?.shiny) registerAnims(this, `${dex}/shiny`);
     }
+    // A small star for shiny sparkles.
+    const star = this.add.graphics();
+    star.fillStyle(0xffffff, 1);
+    star.fillPoints([
+      { x: 4, y: 0 }, { x: 5, y: 3 }, { x: 8, y: 4 }, { x: 5, y: 5 }, { x: 4, y: 8 }, { x: 3, y: 5 }, { x: 0, y: 4 }, { x: 3, y: 3 },
+    ], true);
+    star.generateTexture('star', 8, 8);
+    star.destroy();
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
     else if (urlParam('level')) this.scene.start('Level');

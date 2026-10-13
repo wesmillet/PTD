@@ -32,3 +32,15 @@ for (const dex of [...present].sort()) {
 
 writeFileSync(outPath, JSON.stringify(index, null, 2) + '\n');
 console.log(`wrote ${outPath} with ${Object.keys(index).length} entries`);
+
+// Which optional assets each folder has, so the loader can skip missing ones.
+const foldersPath = resolve(dirname(outPath), 'spriteFolders.json');
+const folders = {};
+for (const dex of [...present].sort()) {
+  const shiny = existsSync(resolve(spriteRoot, dex, 'shiny', 'AnimData.xml'));
+  const portraitDir = resolve(root, 'public/assets/portraits', dex);
+  const portraits = existsSync(portraitDir) ? readdirSync(portraitDir).filter((f) => f.endsWith('.png')).map((f) => f.replace('.png', '')).sort() : [];
+  folders[dex] = { shiny, portraits };
+}
+writeFileSync(foldersPath, JSON.stringify(folders, null, 2) + '\n');
+console.log(`wrote ${foldersPath}`);

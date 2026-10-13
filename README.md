@@ -46,10 +46,13 @@ Open the dev server and pick a level, or jump straight in:
 - Route 201 (free roam): http://localhost:5173/PTD/?level=route-201
 - Oreburgh Mine 1F (defend, 8 waves): http://localhost:5173/PTD/?level=oreburgh-mine-1f
 
-Add `&seed=<number>` to replay the same waves. Click a blue tile to place
-Turtwig, click it again and another tile to move it between waves. Press the
-backtick key for the debug panel (speed constants, Turtwig level, enemy level
-override, time of day, seed reroll). Esc returns to the level list.
+Add `&seed=<number>` to replay the same waves and `&shiny=1` to make every
+spawn shiny. Click a blue tile to place Turtwig. Click Turtwig (or its slot in
+the party strip) for its panel: click a move to make it active, or press Move
+and then a blue tile to re-place it, even mid-wave. Press the backtick key for
+the debug panel (speed and status constants, Turtwig level, enemy level
+override, shiny rate, time of day, seed reroll). Esc closes the panel, cancels
+a move, or returns to the level list.
 
 ## Pokémon data
 

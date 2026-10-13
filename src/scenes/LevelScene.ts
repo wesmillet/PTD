@@ -1,14 +1,17 @@
 import Phaser from 'phaser';
 import { Direction, directionFromVector } from '../assets/direction';
-import { createPmdSprite, pickAction, playAnim, spriteDirection, syncShadow } from '../assets/pmdLoader';
+import { createPmdSprite, pickAction, playAnim, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
 import { getLevel } from '../data/levels';
 import { getMap } from '../data/maps';
-import { createDebugParty, dexFolder, runtime, runtimeConfig, urlParam } from '../game/runtime';
+import { createDebugParty, portraitUrl, runtime, runtimeConfig, spriteFolder, urlParam } from '../game/runtime';
 import {
   createLevel,
+  isOver,
   leaveLevel,
   moveTower,
   placeTower,
+  resolveLearn,
+  setActiveMove,
   setPartyLevel,
   setTimeOfDay,
   startWave,
@@ -24,6 +27,11 @@ import {
 import { isPlaceable, pointAlongPath, tileKey } from '../sim/map';
 import { DebugPanel } from '../ui/debugPanel';
 import { Hud } from '../ui/hud';
+import { LearnDialog } from '../ui/learnDialog';
+import { PokemonPanel } from '../ui/pokemonPanel';
+import { capitalize } from '../ui/domOverlay';
+import { getMove } from '../data/pokedata';
+import type { Monster } from '../sim/monster';
 import { COLORS, TEXT, TEXT_DIM } from '../ui/styles';
 import { showSummary } from '../ui/summary';
 
@@ -32,9 +40,19 @@ const MAX_FRAME_SECONDS = 0.25;
 /** Sprites sit a little above the tile center so their feet land on the tile. */
 const SPRITE_Y_OFFSET = -4;
 
+const STATUS_COLORS: Record<string, number | undefined> = {
+  poison: 0xa040a0,
+  burn: 0xf08030,
+  paralysis: 0xf8d030,
+  sleep: 0x6890f0,
+  freeze: 0x98d8d8,
+  confusion: 0xf85888,
+};
+
 interface EnemyView {
   sprite: Phaser.GameObjects.Sprite;
   hpBar: Phaser.GameObjects.Graphics;
+  shiny: boolean;
   /** Playing Hurt or Faint; Walk must not override it. */
   busy: boolean;
   dying: boolean;
@@ -68,6 +86,9 @@ export class LevelScene extends Phaser.Scene {
   private hoverTile: [number, number] | null = null;
   private toast?: Phaser.GameObjects.Text;
   private debugPanel?: DebugPanel;
+  private panel?: PokemonPanel;
+  private learnDialog?: LearnDialog;
+  private paused = false;
 
   constructor() {
     super('Level');
@@ -95,7 +116,25 @@ export class LevelScene extends Phaser.Scene {
       onStartWave: () => this.tryStartWave(),
       onToggleSpeed: () => this.toggleSpeed(),
       onLeave: () => this.leave(),
+      onPartySlot: (i) => this.openPanelFor(this.state.party[i]?.mon),
     });
+    this.panel = new PokemonPanel({
+      portraitUrl: (species) => portraitUrl(species),
+      setActiveMove: (mon, index) => {
+        const tower = this.state.towers.find((t) => t.mon === mon);
+        if (tower) setActiveMove(this.state, tower.id, index);
+        else mon.activeMove = index;
+      },
+      pickUp: (mon) => {
+        const tower = this.state.towers.find((t) => t.mon === mon);
+        if (!tower || isOver(this.state)) return false;
+        this.selectedTowerId = tower.id;
+        this.showToast(`Click a blue tile to move ${capitalize(mon.name)} (Esc cancels)`);
+        return true;
+      },
+      onClose: () => undefined,
+    });
+    this.learnDialog = new LearnDialog();
     this.add.text(this.scale.width / 2, Hud.HEIGHT - 86, `seed ${this.seed}`, TEXT_DIM).setOrigin(0.5, 0).setDepth(1001);
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
@@ -105,7 +144,11 @@ export class LevelScene extends Phaser.Scene {
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
       this.hoverTile = this.tileAt(pointer.x, pointer.y);
     });
-    this.input.keyboard?.on('keydown-ESC', () => this.scene.start('LevelSelect'));
+    this.input.keyboard?.on('keydown-ESC', () => {
+      if (this.panel?.isOpen) this.panel.hide();
+      else if (this.selectedTowerId !== null) this.selectedTowerId = null;
+      else this.scene.start('LevelSelect');
+    });
     this.input.keyboard?.on('keydown-SPACE', () => this.tryStartWave());
 
     this.debugPanel = new DebugPanel({
@@ -119,10 +162,21 @@ export class LevelScene extends Phaser.Scene {
     });
 
     // Debug hook for automated checks.
-    (window as unknown as { __ptd?: unknown }).__ptd = { scene: this, state: this.state, runtime, runtimeConfig, debugPanel: this.debugPanel };
+    (window as unknown as { __ptd?: unknown }).__ptd = {
+      scene: this,
+      state: this.state,
+      runtime,
+      runtimeConfig,
+      debugPanel: this.debugPanel,
+      sim: { setPartyLevel, setTimeOfDay, resolveLearn, setActiveMove, moveTower, placeTower },
+    };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.debugPanel?.destroy();
       this.debugPanel = undefined;
+      this.panel?.destroy();
+      this.panel = undefined;
+      this.learnDialog?.close();
+      this.learnDialog = undefined;
       (window as unknown as { __ptd?: unknown }).__ptd = undefined;
     });
   }
@@ -205,14 +259,18 @@ export class LevelScene extends Phaser.Scene {
     const state = this.state;
     const clicked = towerAt(state, x, y);
     if (clicked) {
-      this.selectedTowerId = this.selectedTowerId === clicked.id ? null : clicked.id;
+      if (this.selectedTowerId === clicked.id) {
+        this.selectedTowerId = null;
+      } else {
+        this.selectedTowerId = null;
+        this.openPanelFor(clicked.mon);
+      }
       return;
     }
-    if (state.phase !== 'build') {
-      this.showToast('Pokémon can only be placed or moved between waves');
+    if (!isPlaceable(state.map, x, y)) {
+      this.selectedTowerId = null;
       return;
     }
-    if (!isPlaceable(state.map, x, y)) return;
     try {
       if (this.selectedTowerId !== null) {
         moveTower(state, this.selectedTowerId, x, y);
@@ -221,7 +279,7 @@ export class LevelScene extends Phaser.Scene {
         const placed = new Set(state.towers.map((t) => t.mon));
         const partyIndex = state.party.findIndex((p) => !placed.has(p.mon));
         if (partyIndex < 0 || state.towers.length >= state.def.placements) {
-          this.showToast('No more Pokémon to place; click one to move it');
+          this.showToast('No more Pokémon to place; open one and press Move');
           return;
         }
         const tower = placeTower(state, partyIndex, x, y);
@@ -230,6 +288,12 @@ export class LevelScene extends Phaser.Scene {
     } catch (err) {
       this.showToast(err instanceof Error ? err.message : String(err));
     }
+  }
+
+  private openPanelFor(mon: Monster | undefined): void {
+    if (!mon || !this.panel) return;
+    const placed = this.state.towers.some((t) => t.mon === mon);
+    this.panel.show(mon, placed);
   }
 
   private tryStartWave(): void {
@@ -266,24 +330,69 @@ export class LevelScene extends Phaser.Scene {
 
   override update(_time: number, delta: number): void {
     if (this.ended) return;
-    this.accumulator += Math.min(delta / 1000, MAX_FRAME_SECONDS) * runtime.gameSpeed;
-    while (this.accumulator >= SIM_STEP && !this.ended) {
-      this.accumulator -= SIM_STEP;
-      this.handleEvents(step(this.state, SIM_STEP));
+    if (!this.paused) {
+      this.accumulator += Math.min(delta / 1000, MAX_FRAME_SECONDS) * runtime.gameSpeed;
+      while (this.accumulator >= SIM_STEP && !this.ended && !this.paused) {
+        this.accumulator -= SIM_STEP;
+        this.handleEvents(step(this.state, SIM_STEP));
+      }
     }
     this.syncViews();
     this.drawOverlay();
+    this.hud.setPaused(this.paused);
     this.hud.update(this.state, runtime.gameSpeed);
+    this.panel?.refresh();
+  }
+
+  private promptLearn(towerId: number, moveId: number): void {
+    const tower = this.state.towers.find((t) => t.id === towerId);
+    if (!tower || !this.learnDialog) return;
+    this.paused = true;
+    this.learnDialog.show(tower.mon, moveId, (replaceIndex) => {
+      this.handleEvents(resolveLearn(this.state, towerId, moveId, replaceIndex));
+      if (replaceIndex === null) this.showToast(`${capitalize(tower.mon.name)} did not learn ${capitalize(getMove(moveId).name)}`);
+      const next = this.state.pendingLearns[0];
+      if (next) this.promptLearn(next.towerId, next.moveId);
+      else this.paused = false;
+    });
   }
 
   private handleEvents(events: LevelEvent[]): void {
     for (const e of events) {
       switch (e.type) {
         case 'spawn':
-          this.createEnemyView(e.enemyId as number);
+          this.createEnemyView(e.enemyId as number, e.shiny ?? false);
+          break;
+        case 'status':
+          if (e.enemyId !== undefined) this.floatText(this.enemyPixel(e.enemyId), e.block === 'flinch' ? 'Flinch!' : `${capitalize(e.ailment ?? '')}!`, '#e0a0ff');
+          if (e.towerId !== undefined) this.floatText(this.towerPixel(e.towerId), `${capitalize(e.ailment ?? '')}!`, '#e0a0ff');
+          break;
+        case 'statusDamage':
+          if (e.enemyId !== undefined) this.floatText(this.enemyPixel(e.enemyId), `${e.amount}`, '#c080ff');
+          if (e.towerId !== undefined) this.floatText(this.towerPixel(e.towerId), `${e.amount}`, '#c080ff');
+          break;
+        case 'statusEnd':
+          break;
+        case 'stages': {
+          const text = (e.changes ?? []).map((c) => `${c.change > 0 ? '+' : ''}${c.change} ${c.stat.toUpperCase()}`).join(' ');
+          if (e.enemyId !== undefined) this.floatText(this.enemyPixel(e.enemyId), text, '#ffb3b3');
+          if (e.towerId !== undefined) this.floatText(this.towerPixel(e.towerId), text, '#b3ffb3');
+          break;
+        }
+        case 'heal':
+          if (e.towerId !== undefined) this.floatText(this.towerPixel(e.towerId), `${(e.amount ?? 0) >= 0 ? '+' : ''}${e.amount} HP`, '#9affc0');
+          break;
+        case 'blocked':
+          if (e.towerId !== undefined && e.block !== 'flinch') this.floatText(this.towerPixel(e.towerId), `${capitalize(e.block ?? '')}...`, '#cccccc');
+          break;
+        case 'moveLearned':
+          if (e.towerId !== undefined) this.showToast(`${capitalize(this.state.towers.find((t) => t.id === e.towerId)?.mon.name ?? '')} learned ${capitalize(getMove(e.moveId ?? 0).name)}!`);
+          break;
+        case 'moveLearnPrompt':
+          if (e.towerId !== undefined && e.moveId !== undefined && !this.paused) this.promptLearn(e.towerId, e.moveId);
           break;
         case 'attack':
-          this.animateAttack(e.towerId as number, e.enemyId as number);
+          this.animateAttack(e.towerId as number, e.enemyId);
           break;
         case 'hit':
           this.animateHit(e.enemyId as number, e.damage?.damage ?? 0, e.damage?.crit ?? false, e.damage?.effectiveness ?? 1);
@@ -326,22 +435,40 @@ export class LevelScene extends Phaser.Scene {
   // ---------------------------------------------------------------- views
 
   private createTowerView(tower: Tower): void {
-    const dex = dexFolder(tower.mon.species);
+    const dex = spriteFolder(tower.mon.species, tower.mon.shiny);
     const { px, py } = this.tilePixel(tower.tile[0], tower.tile[1]);
     const sprite = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Idle', Direction.Down);
     this.towerViews.set(tower.id, { sprite, busy: false });
   }
 
-  private createEnemyView(enemyId: number): void {
+  private createEnemyView(enemyId: number, shiny: boolean): void {
     const enemy = this.state.enemies.find((e) => e.id === enemyId);
     if (!enemy) return;
-    const dex = dexFolder(enemy.mon.species);
+    const dex = spriteFolder(enemy.mon.species, shiny);
     const point = pointAlongPath(this.state.path, enemy.distance);
     const { px, py } = this.tilePixel(point.x, point.y);
     const dir = directionFromVector(point.dx, point.dy, Direction.Right);
     const sprite = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Walk', dir);
     const hpBar = this.add.graphics().setDepth(800);
-    this.enemyViews.set(enemyId, { sprite, hpBar, busy: false, dying: false });
+    this.enemyViews.set(enemyId, { sprite, hpBar, busy: false, dying: false, shiny });
+    if (shiny) this.sparkle(px + 32, py + SPRITE_Y_OFFSET);
+  }
+
+  private sparkle(x: number, y: number): void {
+    if (!this.textures.exists('star')) return;
+    const emitter = this.add.particles(x, y, 'star', {
+      speed: { min: 30, max: 90 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 1, end: 0 },
+      alpha: { start: 1, end: 0 },
+      lifespan: 700,
+      quantity: 14,
+      tint: [0xfff5a0, 0xffffff, 0x9ad0ff],
+      emitting: false,
+    }).setDepth(2500);
+    emitter.explode(14, 0, 0);
+    this.time.delayedCall(900, () => emitter.destroy());
+    this.floatText({ px: x, py: y }, '★ Shiny!', '#fff5a0');
   }
 
   private removeEnemyView(enemyId: number): void {
@@ -366,13 +493,13 @@ export class LevelScene extends Phaser.Scene {
     return tower ? this.tilePixel(tower.tile[0], tower.tile[1]) : { px: -100, py: -100 };
   }
 
-  private animateAttack(towerId: number, enemyId: number): void {
+  private animateAttack(towerId: number, enemyId: number | undefined): void {
     const view = this.towerViews.get(towerId);
     if (!view) return;
     const from = this.towerPixel(towerId);
-    const to = this.enemyPixel(enemyId);
+    const to = enemyId === undefined ? from : this.enemyPixel(enemyId);
     const dir = directionFromVector(to.px - from.px, to.py - from.py, spriteDirection(view.sprite) ?? Direction.Down);
-    const dex = dexFolder(this.state.towers.find((t) => t.id === towerId)?.mon.species ?? 0);
+    const dex = spriteDex(view.sprite);
     const action = pickAction(dex, ['Attack']);
     if (!action || view.busy) {
       if (!view.busy) playAnim(view.sprite, 'Idle', dir);
@@ -392,7 +519,7 @@ export class LevelScene extends Phaser.Scene {
     const color = crit ? '#ff6b6b' : effectiveness > 1 ? '#ffb347' : effectiveness < 1 ? '#a0a0c0' : '#ffffff';
     this.floatText(pos, crit ? `${damage}!` : `${damage}`, color);
     if (!view || view.dying || view.busy) return;
-    const dex = dexFolder(this.state.enemies.find((e) => e.id === enemyId)?.mon.species ?? 0);
+    const dex = spriteDex(view.sprite);
     const action = pickAction(dex, ['Hurt']);
     if (!action) return;
     view.busy = true;
@@ -409,8 +536,8 @@ export class LevelScene extends Phaser.Scene {
     view.dying = true;
     view.busy = true;
     view.hpBar.clear();
-    // The sim already removed the enemy; use the dex from the sprite's texture key.
-    const dex = (view.sprite.texture.key.match(/^pmd-(\d{4})-/) ?? [])[1] ?? '';
+    // The sim already removed the enemy; the sprite remembers its folder.
+    const dex = spriteDex(view.sprite);
     const action = pickAction(dex, ['Faint', 'Hurt']);
     const dir = spriteDirection(view.sprite) ?? Direction.Down;
     if (!action) {
@@ -455,21 +582,26 @@ export class LevelScene extends Phaser.Scene {
       view.sprite.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);
       if (!view.busy) playAnim(view.sprite, 'Walk', directionFromVector(point.dx, point.dy, Direction.Right));
       syncShadow(view.sprite);
-      this.drawHpBar(view.hpBar, enemy, px, py, size);
+      this.drawHpBar(view.hpBar, enemy, px, py, size, view.shiny);
     }
     for (const [id, view] of this.enemyViews) {
       if (!alive.has(id) && !view.dying) this.removeEnemyView(id);
     }
   }
 
-  private drawHpBar(gfx: Phaser.GameObjects.Graphics, enemy: Enemy, px: number, py: number, size: number): void {
+  private drawHpBar(gfx: Phaser.GameObjects.Graphics, enemy: Enemy, px: number, py: number, size: number, shiny: boolean): void {
     const w = size - 8;
     const x = px - w / 2;
     const y = py - size / 2 - 6;
     const frac = Math.max(0, Math.min(1, enemy.mon.hp / enemy.mon.stats.hp));
     const color = frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical;
     gfx.clear();
+    if (shiny) gfx.lineStyle(1, 0xffd700, 1).strokeRect(x - 1, y - 1, w + 2, 6);
     gfx.fillStyle(COLORS.hpBack, 1).fillRect(x, y, w, 4);
     gfx.fillStyle(color, 1).fillRect(x, y, w * frac, 4);
+    const ailment = enemy.mon.status.ailment;
+    const dot = STATUS_COLORS[ailment];
+    if (dot !== undefined) gfx.fillStyle(dot, 1).fillCircle(x + w + 6, y + 2, 3);
+    else if (enemy.mon.status.flinchSeconds > 0) gfx.fillStyle(0xffffff, 1).fillCircle(x + w + 6, y + 2, 2);
   }
 }

@@ -4,9 +4,15 @@
  */
 import { defaultRuntimeConfig, type RuntimeConfig } from '../sim/level';
 import partyDebug from '../data/party-debug.json';
+import spriteFolders from '../data/spriteFolders.json';
 import { createMonster, type Monster } from '../sim/monster';
 
 export const runtimeConfig: RuntimeConfig = defaultRuntimeConfig();
+
+/** `?shiny=1` forces every spawn shiny (debugging the visual). */
+if (typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('shiny') === '1') {
+  runtimeConfig.shinyRate = 1;
+}
 
 /** Game speed multiplier applied to simulation time (1x, 2x). */
 export const runtime = {
@@ -22,10 +28,26 @@ export function urlParam(name: string): string | undefined {
 
 /** The fixed Phase 1 party from party-debug.json. */
 export function createDebugParty(): Monster[] {
-  return partyDebug.party.map((p) => createMonster(p.species, runtime.partyLevelOverride ?? p.level, p.moves));
+  const party = (partyDebug as { party: { species: number; level: number; moves?: number[] }[] }).party;
+  return party.map((p) => createMonster(p.species, runtime.partyLevelOverride ?? p.level, p.moves));
 }
 
 /** Dex folder (zero-padded) for a species id. */
 export function dexFolder(species: number): string {
   return String(species).padStart(4, '0');
+}
+
+/** Sprite folder key for a monster: the shiny subfolder when loaded, else the base. */
+export function spriteFolder(species: number, shiny: boolean): string {
+  const dex = dexFolder(species);
+  const info = (spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>)[dex];
+  return shiny && info?.shiny ? `${dex}/shiny` : dex;
+}
+
+/** URL of a portrait emotion PNG, if the folder has it. */
+export function portraitUrl(species: number, emotion = 'Normal'): string | undefined {
+  const dex = dexFolder(species);
+  const info = (spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>)[dex];
+  if (!info?.portraits.includes(emotion)) return undefined;
+  return `${import.meta.env.BASE_URL}assets/portraits/${dex}/${emotion}.png`;
 }
