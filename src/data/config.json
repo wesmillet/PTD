@@ -1,0 +1,28 @@
+{
+  "stats": {
+    "iv": 31,
+    "ev": 0
+  },
+  "speed": {
+    "speedBase": 0.8,
+    "speedScale": 0.015,
+    "enemyClampMin": 0.5,
+    "enemyClampMax": 2.0,
+    "speedRef": 60,
+    "clampMin": 0.5,
+    "clampMax": 2.0,
+    "moveRate": 1.0
+  },
+  "combat": {
+    "critRate": 0.0625,
+    "defaultRangeTiles": 2.5
+  },
+  "exp": {
+    "expPerHitFraction": 0.05
+  },
+  "waves": {
+    "freeWaveMaxEnemies": 12,
+    "buildPhaseAutoStart": false
+  },
+  "gameSpeeds": [1, 2]
+}
