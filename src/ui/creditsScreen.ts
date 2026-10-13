@@ -1,5 +1,6 @@
 /** Credits: every shipped sprite folder's artists, plus data and engine credits. DOM overlay. */
 import creditsJson from '../data/credits.json';
+import { tilesetCredits } from '../map/catalogue';
 import { capitalize, ensureOverlayStyles, isolateFromGame } from './domOverlay';
 
 interface PokemonCredit {
@@ -21,6 +22,7 @@ export const GENERAL_CREDITS: { title: string; lines: string[] }[] = [
     ],
   },
   { title: 'Pokémon data', lines: ['PokeAPI, https://pokeapi.co and https://github.com/PokeAPI/pokeapi (Gen 1 to 4 CSV data)'] },
+  tilesetCredits(),
   { title: 'Engine', lines: ['Phaser 3, https://phaser.io'] },
   { title: 'RawAsset', lines: ['RawAsset'] },
   { title: 'Pokémon', lines: ['Pokémon is a trademark of Nintendo, Creatures Inc. and GAME FREAK. This is a non-commercial fan project.'] },

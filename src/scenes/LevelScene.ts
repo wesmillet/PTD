@@ -3,7 +3,11 @@ import { Direction, directionFromVector } from '../assets/direction';
 import { createPmdSprite, ensureLoaded, isLoaded, pickAction, playAnim, queuePokemon, registerAnims, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
 import { ALL_ACTIONS, OPTIONAL_ACTIONS, levelSpriteFolders } from '../game/assets';
 import { getLevel } from '../data/levels';
-import { getMap } from '../data/maps';
+import { getMapModel } from '../data/maps';
+import { MapEditor } from '../map/editor';
+import { editorStore } from '../map/editorStore';
+import { MapRenderer } from '../map/renderer';
+import { cloneModel, toMapDef, type MapModel } from '../map/tiled';
 import { portraitUrl, runtime, runtimeConfig, spriteFolder, urlParam } from '../game/runtime';
 import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
 import { addPokemon, markSeen, recordLevelResult } from '../sim/game';
@@ -34,7 +38,7 @@ import {
   type LevelState,
   type Tower,
 } from '../sim/level';
-import { isPlaceable, pointAlongPath, tileKey } from '../sim/map';
+import { isPlaceable, pointAlongPath, validateMap, type MapDef } from '../sim/map';
 import { DebugPanel } from '../ui/debugPanel';
 import { Button } from '../ui/button';
 import { Hud } from '../ui/hud';
@@ -111,6 +115,10 @@ export class LevelScene extends Phaser.Scene {
   private hoverTile: [number, number] | null = null;
   private toast?: Phaser.GameObjects.Text;
   private debugPanel?: DebugPanel;
+  private mapRenderer?: MapRenderer;
+  private mapEditor?: MapEditor;
+  private mapModel!: MapModel;
+  private placeableGfx?: Phaser.GameObjects.Graphics;
   private panel?: PokemonPanel;
   private learnDialog?: LearnDialog;
   private evolutionDialog?: EvolutionDialog;
@@ -161,13 +169,13 @@ export class LevelScene extends Phaser.Scene {
       this.loadFailed = true;
       label.setText(`Could not load ${file.src}`).setColor('#ff7b7b');
     });
+    MapRenderer.queueAssets(this);
     this.loadedFolders = levelSpriteFolders(def, game);
     for (const dex of this.loadedFolders) queuePokemon(this, dex, ALL_ACTIONS, { optional: OPTIONAL_ACTIONS });
   }
 
   create(): void {
     const def = getLevel(this.levelId);
-    const map = getMap(def.map);
     const game = getGame();
     if (game.party.length === 0) {
       this.scene.start('LevelSelect');
@@ -182,8 +190,13 @@ export class LevelScene extends Phaser.Scene {
     }
     for (const dex of this.loadedFolders) registerAnims(this, dex);
     this.children.removeAll(true);
+    const { model, map, error } = this.resolveMap(def.map);
+    this.mapModel = model;
     this.state = createLevel(def, map, { seed: this.seed, party: game.party, config: runtimeConfig, items: game.items });
+    // The renderer gets its own copy: the editor paints into it, and Discard restores from this.mapModel.
+    this.mapRenderer = new MapRenderer(this, cloneModel(model), Hud.HEIGHT);
     this.drawMap();
+    if (error) this.showToast(`Edited map rejected (${error}); using the shipped map`);
     this.overlay = this.add.graphics().setDepth(900);
     this.dragGfx = this.add.graphics().setDepth(901);
     this.hud = new Hud(this, this.state, {
@@ -254,6 +267,7 @@ export class LevelScene extends Phaser.Scene {
       },
       setTimeOfDay: (time) => setTimeOfDay(this.state, time),
       reroll: () => this.scene.restart({ levelId: this.levelId, seed: (Date.now() % 1_000_000) + 1 }),
+      openMapEditor: () => this.openMapEditor(),
     });
 
     // Debug hook for automated checks.
@@ -263,11 +277,17 @@ export class LevelScene extends Phaser.Scene {
       runtime,
       runtimeConfig,
       debugPanel: this.debugPanel,
+      mapEditor: () => this.mapEditor,
+      mapRenderer: () => this.mapRenderer,
       sim: { setPartyLevel, setTimeOfDay, resolveLearn, resolveEvolution, setActiveMove, moveTower, placeTower, throwBall },
     };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.debugPanel?.destroy();
       this.debugPanel = undefined;
+      this.mapEditor?.destroy();
+      this.mapEditor = undefined;
+      this.mapRenderer?.destroy();
+      this.mapRenderer = undefined;
       this.panel?.destroy();
       this.panel = undefined;
       this.learnDialog?.close();
@@ -298,34 +318,82 @@ export class LevelScene extends Phaser.Scene {
     return [x, y];
   }
 
-  private drawMap(): void {
-    const { map, path } = this.state;
-    const size = map.tileSize;
-    const cave = map.theme === 'cave';
-    const gfx = this.add.graphics().setDepth(0);
-    const blocked = new Set((map.blocked ?? []).map(([x, y]) => tileKey(x, y)));
-    const placeable = new Set(map.placeable.map(([x, y]) => tileKey(x, y)));
-    for (let y = 0; y < map.height; y++) {
-      for (let x = 0; x < map.width; x++) {
-        const key = tileKey(x, y);
-        let color: number;
-        if (path.tiles.has(key)) color = cave ? COLORS.pathCave : COLORS.pathGrass;
-        else if (blocked.has(key)) color = cave ? COLORS.blockedCave : COLORS.blockedGrass;
-        else if ((x + y) % 2 === 0) color = cave ? COLORS.cave : COLORS.grass;
-        else color = cave ? COLORS.caveAlt : COLORS.grassAlt;
-        gfx.fillStyle(color, 1).fillRect(x * size, Hud.HEIGHT + y * size, size, size);
-        if (placeable.has(key)) {
-          gfx.lineStyle(2, COLORS.placeable, 0.9).strokeRect(x * size + 3, Hud.HEIGHT + y * size + 3, size - 6, size - 6);
-        }
+  /**
+   * The map to play: the editor's draft for this level when there is one and
+   * it is valid, else the shipped map.
+   */
+  private resolveMap(mapName: string): { model: MapModel; map: MapDef; error?: string } {
+    const draft = editorStore.get(this.levelId);
+    if (draft) {
+      try {
+        const map = toMapDef(draft);
+        validateMap(map);
+        return { model: draft, map };
+      } catch (err) {
+        editorStore.clear(this.levelId);
+        const model = getMapModel(mapName);
+        return { model, map: toMapDef(model), error: err instanceof Error ? err.message : String(err) };
       }
     }
-    // Path entrance and exit markers.
+    const model = getMapModel(mapName);
+    return { model, map: toMapDef(model) };
+  }
+
+  /** Placeable outlines and the path entrance and exit markers; the tiles themselves come from MapRenderer. */
+  private drawMap(): void {
+    const { map } = this.state;
+    const size = map.tileSize;
+    const gfx = this.add.graphics().setDepth(1);
+    for (const [x, y] of map.placeable) {
+      gfx.lineStyle(2, COLORS.placeable, 0.9).strokeRect(x * size + 3, Hud.HEIGHT + y * size + 3, size - 6, size - 6);
+    }
+    this.placeableGfx = gfx;
     const first = map.path[0]!;
     const last = map.path[map.path.length - 1]!;
     const a = this.tilePixel(first[0], first[1]);
     const b = this.tilePixel(last[0], last[1]);
     this.add.text(a.px, a.py - 22, 'IN', TEXT_DIM).setOrigin(0.5).setDepth(1);
     this.add.text(b.px, b.py - 22, 'OUT', TEXT_DIM).setOrigin(0.5).setDepth(1);
+  }
+
+  // ------------------------------------------------------------- map editor
+
+  private openMapEditor(): void {
+    if (this.mapEditor || !this.mapRenderer || this.ended) return;
+    const wasPaused = this.paused;
+    this.paused = true;
+    this.selectedBall = null;
+    this.selectedTowerId = null;
+    this.selectedPartyIndex = null;
+    this.drag = null;
+    this.placeableGfx?.setVisible(false);
+    const close = () => {
+      this.mapEditor?.destroy();
+      this.mapEditor = undefined;
+      this.paused = wasPaused;
+      this.placeableGfx?.setVisible(true);
+    };
+    this.mapEditor = new MapEditor({
+      scene: this,
+      renderer: this.mapRenderer,
+      offsetY: Hud.HEIGHT,
+      tileAt: (px, py) => this.tileAt(px, py),
+      onPlay: (model) => {
+        editorStore.set(this.levelId, model);
+        close();
+        this.scene.restart({ levelId: this.levelId, seed: this.seed });
+      },
+      onDiscard: () => {
+        // Put the tiles back the way the running level has them.
+        this.mapRenderer?.setModel(this.mapModel);
+        close();
+      },
+      onReset: () => {
+        editorStore.clear(this.levelId);
+        close();
+        this.scene.restart({ levelId: this.levelId, seed: this.seed });
+      },
+    });
   }
 
   private drawOverlay(): void {
@@ -385,6 +453,10 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private onPointerDown(pointer: Phaser.Input.Pointer): void {
+    if (this.mapEditor?.active) {
+      this.mapEditor.onPointerDown(pointer);
+      return;
+    }
     if (this.ended || this.paused) return;
     const tile = this.tileAt(pointer.x, pointer.y);
     if (!tile) return;
@@ -412,6 +484,10 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private onPointerMove(pointer: Phaser.Input.Pointer): void {
+    if (this.mapEditor?.active) {
+      this.mapEditor.onPointerMove(pointer);
+      return;
+    }
     this.hoverTile = this.tileAt(pointer.x, pointer.y);
     const drag = this.drag;
     if (!drag || !pointer.isDown) return;
@@ -426,6 +502,10 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private onPointerUp(pointer: Phaser.Input.Pointer): void {
+    if (this.mapEditor?.active) {
+      this.mapEditor.onPointerUp();
+      return;
+    }
     const drag = this.drag;
     this.drag = null;
     this.dragGfx.clear();
@@ -520,7 +600,7 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private tryStartWave(): void {
-    if (this.ended || this.state.phase !== 'build') return;
+    if (this.ended || this.state.phase !== 'build' || this.mapEditor?.active) return;
     if (this.state.towers.length === 0) {
       this.showToast('Place your Pokémon first');
       return;
@@ -554,6 +634,7 @@ export class LevelScene extends Phaser.Scene {
 
   override update(_time: number, delta: number): void {
     if (this.ended) return;
+    this.mapRenderer?.update(delta);
     if (!this.paused) {
       this.accumulator += Math.min(delta / 1000, MAX_FRAME_SECONDS) * runtime.gameSpeed;
       while (this.accumulator >= SIM_STEP && !this.ended && !this.paused) {

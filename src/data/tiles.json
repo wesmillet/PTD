@@ -1,0 +1,2049 @@
+{
+ "$comment": "Tile catalogue for the map editor. Hand-written; scripts/build-tilesets.mjs packs the named tiles into public/assets/tilesets/ and writes src/data/tilesets.json. Append new entries at the end so packed indices stay stable. See docs/maps.md.",
+ "sources": {
+  "outside": {
+   "file": "assets-src/tilesets/gen5/kyle-dove-outside.png",
+   "artist": "Kyle-Dove",
+   "description": "Terrain, grass, trees, cliffs, water edges"
+  },
+  "exterior": {
+   "file": "assets-src/tilesets/gen5/gen5-exterior.png",
+   "artist": "UltimoSpriter (signed on the sheet); listed as cmm6jjn in the source pack",
+   "description": "Buildings, fences, signs, town and route decoration"
+  }
+ },
+ "credits": {
+  "title": "Tilesets (Gen 5 style)",
+  "lines": [
+   "Compiled in \"Tiles - Ready to use Tilesets\" by Aki, https://eeveeexpo.com/resources/15/",
+   "Outside tileset (terrain, grass, trees, cliffs, water): Kyle-Dove",
+   "Gen 5 exterior tileset (fences, signs, flowers, rocks): UltimoSpriter (sheet signature), pack entry cmm6jjn",
+   "Full notes in assets-src/tilesets/gen5/CREDITS.txt"
+  ]
+ },
+ "tilesets": {
+  "gen5-outdoor": {
+   "name": "Gen 5 outdoor",
+   "columns": 8,
+   "theme": "grass"
+  },
+  "placeholder": {
+   "name": "Placeholder (flat colours)",
+   "columns": 8,
+   "theme": "cave"
+  }
+ },
+ "tiles": [
+  {
+   "id": "grass",
+   "name": "Grass",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 5
+  },
+  {
+   "id": "grass-2",
+   "name": "Grass (sparse)",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 5
+  },
+  {
+   "id": "meadow",
+   "name": "Meadow grass",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 11
+  },
+  {
+   "id": "meadow-tufts",
+   "name": "Meadow grass, tufts",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 11
+  },
+  {
+   "id": "grass-dark",
+   "name": "Dark grass",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 17
+  },
+  {
+   "id": "grass-dark-2",
+   "name": "Dark grass (plain)",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 18
+  },
+  {
+   "id": "grass-flowers",
+   "name": "Grass with orange flowers",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 5,
+   "row": 7
+  },
+  {
+   "id": "dirt",
+   "name": "Dirt",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 7
+  },
+  {
+   "id": "dirt-dark",
+   "name": "Dark soil patch",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 25
+  },
+  {
+   "id": "soil",
+   "name": "Dark soil",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 27
+  },
+  {
+   "id": "pebbles",
+   "name": "Pebble patch",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 31
+  },
+  {
+   "id": "gravel",
+   "name": "Pebbles",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 33
+  },
+  {
+   "id": "sand",
+   "name": "Sand",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 13
+  },
+  {
+   "id": "rock-floor",
+   "name": "Rock floor",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 113
+  },
+  {
+   "id": "water-open",
+   "name": "Water (open)",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 37
+  },
+  {
+   "id": "pool-open",
+   "name": "Pool water (open)",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 118
+  },
+  {
+   "id": "grass-pale",
+   "name": "Pale grass",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 13
+  },
+  {
+   "id": "grass-pale-2",
+   "name": "Pale grass (tufts)",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 14
+  },
+  {
+   "id": "grass-bright",
+   "name": "Bright grass",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 13
+  },
+  {
+   "id": "grass-bright-2",
+   "name": "Bright grass (tufts)",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 14
+  },
+  {
+   "id": "grass-yellow",
+   "name": "Yellow grass",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 21
+  },
+  {
+   "id": "grass-teal",
+   "name": "Teal grass",
+   "group": "Ground",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 21
+  },
+  {
+   "id": "cliff-tl",
+   "name": "Cliff top-left",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 87
+  },
+  {
+   "id": "cliff-t",
+   "name": "Cliff top",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 87
+  },
+  {
+   "id": "cliff-tr",
+   "name": "Cliff top-right",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 87
+  },
+  {
+   "id": "cliff-l",
+   "name": "Cliff left",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 88
+  },
+  {
+   "id": "cliff-top",
+   "name": "Cliff top (centre)",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 88
+  },
+  {
+   "id": "cliff-r",
+   "name": "Cliff right",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 88
+  },
+  {
+   "id": "cliff-bl",
+   "name": "Cliff bottom-left face",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 89
+  },
+  {
+   "id": "cliff-face",
+   "name": "Cliff face",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 89
+  },
+  {
+   "id": "cliff-br",
+   "name": "Cliff bottom-right face",
+   "group": "Cliffs",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 89
+  },
+  {
+   "id": "water-lily-pink",
+   "name": "Water with pink lily",
+   "group": "Water",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 38
+  },
+  {
+   "id": "water-lily-pads",
+   "name": "Water with lily pads",
+   "group": "Water",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 4,
+   "row": 38
+  },
+  {
+   "id": "water-lily-purple",
+   "name": "Water with purple lily",
+   "group": "Water",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 39
+  },
+  {
+   "id": "water-lily-yellow",
+   "name": "Water with yellow lily",
+   "group": "Water",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 40
+  },
+  {
+   "id": "rock-in-water",
+   "name": "Rock in water",
+   "group": "Water",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 41,
+   "w": 2,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "boulder-in-pool",
+   "name": "Boulder in pool",
+   "group": "Water",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 115,
+   "w": 2,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "flowers-purple",
+   "name": "Purple flowers",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 4
+  },
+  {
+   "id": "flowers-violet",
+   "name": "Violet flowers",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 4
+  },
+  {
+   "id": "flowers-blue",
+   "name": "Blue flowers",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 4
+  },
+  {
+   "id": "flowers-orange",
+   "name": "Orange flowers",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 5,
+   "row": 4
+  },
+  {
+   "id": "clump",
+   "name": "Grass clump",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 4
+  },
+  {
+   "id": "clump-teal",
+   "name": "Grass clump (teal)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 4,
+   "row": 4
+  },
+  {
+   "id": "clump-tall",
+   "name": "Tall grass clump",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "clump-tall-teal",
+   "name": "Tall grass clump (teal)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 4,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "fern",
+   "name": "Fern",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 7,
+   "row": 3,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "mushrooms",
+   "name": "Mushroom cluster",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 48,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "mushrooms-red",
+   "name": "Red mushrooms",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 49
+  },
+  {
+   "id": "reeds-green",
+   "name": "Reeds (green)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "reeds-green-2",
+   "name": "Reeds (green 2)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "reeds-teal",
+   "name": "Reeds (teal)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "reeds-teal-2",
+   "name": "Reeds (teal 2)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "reeds-olive",
+   "name": "Reeds (olive)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "reeds-brown",
+   "name": "Reeds (brown)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "reeds-dry",
+   "name": "Reeds (dry)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "reeds-tan",
+   "name": "Reeds (tan)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 2,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "sunflower",
+   "name": "Sunflower",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 4,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "bush-dead",
+   "name": "Dead bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 4,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "bush-dry",
+   "name": "Dry bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 4,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "bush-pink",
+   "name": "Pink flowering bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 4,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "bush-olive",
+   "name": "Olive bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 5
+  },
+  {
+   "id": "bush-dark",
+   "name": "Dark bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 6
+  },
+  {
+   "id": "bush-olive-2",
+   "name": "Olive bush (small)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 6
+  },
+  {
+   "id": "bush-teal",
+   "name": "Teal bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 7
+  },
+  {
+   "id": "bush-brown",
+   "name": "Brown bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 7
+  },
+  {
+   "id": "bush-blue",
+   "name": "Blue bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 8
+  },
+  {
+   "id": "bush-green",
+   "name": "Green bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 8
+  },
+  {
+   "id": "flowers-white",
+   "name": "White flowers",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 6
+  },
+  {
+   "id": "flowers-white-2",
+   "name": "White flowers (pair)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 6
+  },
+  {
+   "id": "petals-pink",
+   "name": "Pink petals",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 6
+  },
+  {
+   "id": "pebbles-brown",
+   "name": "Scattered pebbles",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 7
+  },
+  {
+   "id": "pebbles-tan",
+   "name": "Scattered pebbles (tan)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 7
+  },
+  {
+   "id": "weeds-1",
+   "name": "Weeds 1",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 8
+  },
+  {
+   "id": "weeds-2",
+   "name": "Weeds 2",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 8
+  },
+  {
+   "id": "weeds-3",
+   "name": "Weeds 3",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 8
+  },
+  {
+   "id": "weeds-4",
+   "name": "Weeds 4",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 8
+  },
+  {
+   "id": "weeds-5",
+   "name": "Weeds 5",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 8
+  },
+  {
+   "id": "weeds-grey",
+   "name": "Grey weeds",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 9,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "sand-patch",
+   "name": "Sand patch",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 9,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "flower-patch-pink",
+   "name": "Pink flower patch",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 9,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "sand-patch-2",
+   "name": "Sand patch (wide)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 9,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "flower-bed-red",
+   "name": "Red flower bed",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 11,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "sprout",
+   "name": "Sprout",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 11
+  },
+  {
+   "id": "leaves",
+   "name": "Leaves",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 12
+  },
+  {
+   "id": "flower-bed-orange",
+   "name": "Orange flower bed",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 11,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "plant",
+   "name": "Plant",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 11,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "flower-patch-orange",
+   "name": "Orange flower patch",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 17,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "sand-patch-3",
+   "name": "Sand patch (round)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 17,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "flower-patch-white",
+   "name": "White flower patch",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 17,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "sand-patch-4",
+   "name": "Sand patch (round, wide)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 17,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "sprig-teal",
+   "name": "Teal sprig",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 19
+  },
+  {
+   "id": "flower-bed-purple",
+   "name": "Purple flower bed",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 19,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "berry-plant",
+   "name": "Berry plant",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 19,
+   "w": 1,
+   "h": 2
+  },
+  {
+   "id": "sprig-yellow",
+   "name": "Yellow sprig",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 19
+  },
+  {
+   "id": "cloud-bush",
+   "name": "White bush",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 19,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "leaves-autumn",
+   "name": "Autumn leaves",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 20
+  },
+  {
+   "id": "bush-white",
+   "name": "White bush (small)",
+   "group": "Flowers & plants",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 20
+  },
+  {
+   "id": "tree",
+   "name": "Tree",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 50,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-ivy",
+   "name": "Tree with ivy",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 53,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-pair",
+   "name": "Tree pair",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 50,
+   "w": 4,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-big",
+   "name": "Big tree",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 54,
+   "w": 4,
+   "h": 5,
+   "solid": true
+  },
+  {
+   "id": "tree-2",
+   "name": "Tree (variant)",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 59,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-ivy-2",
+   "name": "Tree with ivy (variant)",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 62,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-water",
+   "name": "Tree in water",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 65,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-ivy-water",
+   "name": "Tree with ivy in water",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 68,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-tall-ivy",
+   "name": "Tall ivy tree",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 72,
+   "w": 2,
+   "h": 5,
+   "solid": true
+  },
+  {
+   "id": "tree-pair-2",
+   "name": "Tree pair (variant)",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 59,
+   "w": 4,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "tree-big-2",
+   "name": "Big tree (variant)",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 63,
+   "w": 4,
+   "h": 5,
+   "solid": true
+  },
+  {
+   "id": "tree-pair-water",
+   "name": "Tree pair in water",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 68,
+   "w": 4,
+   "h": 4,
+   "solid": true
+  },
+  {
+   "id": "tree-big-water",
+   "name": "Big tree in water",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 72,
+   "w": 4,
+   "h": 5,
+   "solid": true
+  },
+  {
+   "id": "pine-pair",
+   "name": "Pine pair",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 4,
+   "row": 80,
+   "w": 4,
+   "h": 4,
+   "solid": true
+  },
+  {
+   "id": "pine-pair-2",
+   "name": "Pine pair (variant)",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 4,
+   "row": 84,
+   "w": 4,
+   "h": 4,
+   "solid": true
+  },
+  {
+   "id": "pine-big",
+   "name": "Big pine",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 88,
+   "w": 5,
+   "h": 5,
+   "solid": true
+  },
+  {
+   "id": "stump-big",
+   "name": "Hollow stump",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 43,
+   "w": 3,
+   "h": 4,
+   "solid": true
+  },
+  {
+   "id": "stump",
+   "name": "Stump",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 4,
+   "solid": true
+  },
+  {
+   "id": "log",
+   "name": "Log",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 5,
+   "row": 3,
+   "w": 2,
+   "h": 1,
+   "solid": true
+  },
+  {
+   "id": "palm",
+   "name": "Palm tree",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 143,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "palm-pair",
+   "name": "Palm pair",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 146,
+   "w": 4,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "cactus",
+   "name": "Cactus",
+   "group": "Trees",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 156,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "rock-big",
+   "name": "Big rock",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 41,
+   "w": 2,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "rock-small",
+   "name": "Small rock",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 7,
+   "row": 108,
+   "solid": true
+  },
+  {
+   "id": "rock-small-2",
+   "name": "Small rock (variant)",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 7,
+   "row": 109,
+   "solid": true
+  },
+  {
+   "id": "boulder",
+   "name": "Boulder",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 113,
+   "w": 2,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "rock-grey-small",
+   "name": "Small grey rock",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 251,
+   "solid": true
+  },
+  {
+   "id": "rock-grey",
+   "name": "Grey rock",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 248,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "rock-grey-2",
+   "name": "Grey rock (variant)",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 252,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "ledge-left",
+   "name": "Ledge (left end)",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 5,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "ledge",
+   "name": "Ledge",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "ledge-right",
+   "name": "Ledge (right end)",
+   "group": "Rocks & ledges",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 7,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "fence-post",
+   "name": "Fence post",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 5,
+   "row": 165,
+   "solid": true
+  },
+  {
+   "id": "fence-left",
+   "name": "Fence (left end)",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 5,
+   "row": 166,
+   "w": 1,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "fence",
+   "name": "Fence",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 166,
+   "w": 1,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "fence-right",
+   "name": "Fence (right end)",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 7,
+   "row": 166,
+   "w": 1,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "sign",
+   "name": "Route sign",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 1220,
+   "w": 1,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "sign-board",
+   "name": "Sign board",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 1216,
+   "w": 3,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "sign-board-2",
+   "name": "Sign board (wood)",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 1218,
+   "w": 3,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "lamp-post",
+   "name": "Lamp post",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 1151,
+   "w": 1,
+   "h": 4,
+   "solid": true
+  },
+  {
+   "id": "mailbox",
+   "name": "Mailbox",
+   "group": "Objects",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 1151,
+   "w": 1,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "snow-grass",
+   "name": "Snowy grass",
+   "group": "Snow",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 122
+  },
+  {
+   "id": "snow-grass-2",
+   "name": "Snowy grass (variant)",
+   "group": "Snow",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 122
+  },
+  {
+   "id": "snow-grass-3",
+   "name": "Snowy grass (light)",
+   "group": "Snow",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 122
+  },
+  {
+   "id": "snow-grass-4",
+   "name": "Snowy grass (patches)",
+   "group": "Snow",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 123
+  },
+  {
+   "id": "snow",
+   "name": "Snow",
+   "group": "Snow",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 123
+  },
+  {
+   "id": "ice",
+   "name": "Ice",
+   "group": "Snow",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 128
+  },
+  {
+   "id": "snow-bush",
+   "name": "Snow-covered bush",
+   "group": "Snow",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 122
+  },
+  {
+   "id": "snow-log",
+   "name": "Snow-covered log",
+   "group": "Snow",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 6,
+   "row": 122,
+   "w": 2,
+   "h": 1,
+   "solid": true
+  },
+  {
+   "id": "snow-rock",
+   "name": "Snow-covered rock",
+   "group": "Snow",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 3,
+   "row": 124,
+   "w": 2,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "snow-tree",
+   "name": "Snow-covered tree",
+   "group": "Snow",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 131,
+   "w": 2,
+   "h": 3,
+   "solid": true
+  },
+  {
+   "id": "snow-tree-pair",
+   "name": "Snow-covered tree pair",
+   "group": "Snow",
+   "layer": "decoration",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 134,
+   "w": 4,
+   "h": 4,
+   "solid": true
+  },
+  {
+   "id": "beach-sand",
+   "name": "Beach sand",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 145
+  },
+  {
+   "id": "beach-sand-2",
+   "name": "Beach sand (plain)",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 147
+  },
+  {
+   "id": "shallow-water",
+   "name": "Shallow water",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 154
+  },
+  {
+   "id": "shallow-water-2",
+   "name": "Shallow water (open)",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 152
+  },
+  {
+   "id": "beach-shell",
+   "name": "Beach sand with shell",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 149
+  },
+  {
+   "id": "beach-shell-2",
+   "name": "Beach sand with striped shell",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 1,
+   "row": 149
+  },
+  {
+   "id": "beach-coconut",
+   "name": "Beach sand with coconut",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 149
+  },
+  {
+   "id": "beach-log",
+   "name": "Beach sand with log",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 0,
+   "row": 150,
+   "w": 2,
+   "h": 1,
+   "solid": true
+  },
+  {
+   "id": "beach-crab",
+   "name": "Beach sand with crab",
+   "group": "Beach",
+   "layer": "ground",
+   "tileset": "gen5-outdoor",
+   "source": "outside",
+   "col": 2,
+   "row": 150
+  },
+  {
+   "id": "cave-floor",
+   "name": "Cave floor",
+   "group": "Cave (placeholder)",
+   "layer": "ground",
+   "tileset": "placeholder",
+   "color": "#4a3f38",
+   "placeholder": true
+  },
+  {
+   "id": "cave-floor-2",
+   "name": "Cave floor (light)",
+   "group": "Cave (placeholder)",
+   "layer": "ground",
+   "tileset": "placeholder",
+   "color": "#51463f",
+   "placeholder": true
+  },
+  {
+   "id": "cave-path",
+   "name": "Cave path",
+   "group": "Cave (placeholder)",
+   "layer": "ground",
+   "tileset": "placeholder",
+   "color": "#7d6a5a",
+   "placeholder": true
+  },
+  {
+   "id": "cave-wall",
+   "name": "Cave wall",
+   "group": "Cave (placeholder)",
+   "layer": "decoration",
+   "tileset": "placeholder",
+   "color": "#2e2622",
+   "placeholder": true,
+   "solid": true
+  },
+  {
+   "id": "cave-rock",
+   "name": "Cave rock",
+   "group": "Cave (placeholder)",
+   "layer": "decoration",
+   "tileset": "placeholder",
+   "color": "#3a302a",
+   "placeholder": true,
+   "solid": true
+  },
+  {
+   "id": "flat-grass",
+   "name": "Flat grass",
+   "group": "Cave (placeholder)",
+   "layer": "ground",
+   "tileset": "placeholder",
+   "color": "#3f7a3a",
+   "placeholder": true
+  },
+  {
+   "id": "flat-grass-2",
+   "name": "Flat grass (light)",
+   "group": "Cave (placeholder)",
+   "layer": "ground",
+   "tileset": "placeholder",
+   "color": "#447f3f",
+   "placeholder": true
+  },
+  {
+   "id": "flat-path",
+   "name": "Flat path",
+   "group": "Cave (placeholder)",
+   "layer": "ground",
+   "tileset": "placeholder",
+   "color": "#b59a63",
+   "placeholder": true
+  },
+  {
+   "id": "flat-tree",
+   "name": "Flat tree",
+   "group": "Cave (placeholder)",
+   "layer": "decoration",
+   "tileset": "placeholder",
+   "color": "#2d5a2a",
+   "placeholder": true,
+   "solid": true
+  }
+ ],
+ "terrains": [
+  {
+   "id": "dirt-path",
+   "name": "Dirt path",
+   "source": "outside",
+   "block": [
+    0,
+    6
+   ],
+   "inner": [
+    0,
+    9
+   ],
+   "group": "Paths",
+   "base": "grass"
+  },
+  {
+   "id": "dirt-path-dark",
+   "name": "Dirt path on dark grass",
+   "source": "outside",
+   "block": [
+    0,
+    18
+   ],
+   "group": "Paths",
+   "base": "grass-dark"
+  },
+  {
+   "id": "sand",
+   "name": "Sand patch",
+   "source": "outside",
+   "block": [
+    0,
+    12
+   ],
+   "inner": [
+    0,
+    15
+   ],
+   "group": "Ground",
+   "base": "meadow"
+  },
+  {
+   "id": "soil",
+   "name": "Dark soil patch",
+   "source": "outside",
+   "block": [
+    0,
+    24
+   ],
+   "group": "Ground",
+   "base": "dirt"
+  },
+  {
+   "id": "pebbles",
+   "name": "Pebble patch",
+   "source": "outside",
+   "block": [
+    0,
+    30
+   ],
+   "group": "Ground",
+   "base": "dirt"
+  },
+  {
+   "id": "tall-grass",
+   "name": "Tall grass",
+   "source": "outside",
+   "block": [
+    5,
+    44
+   ],
+   "group": "Grass"
+  },
+  {
+   "id": "tall-grass-yellow",
+   "name": "Tall grass (yellow)",
+   "source": "outside",
+   "block": [
+    5,
+    41
+   ],
+   "group": "Grass"
+  },
+  {
+   "id": "water",
+   "name": "Water (pond)",
+   "source": "outside",
+   "block": [
+    0,
+    36
+   ],
+   "inner": [
+    0,
+    39
+   ],
+   "group": "Water",
+   "base": "grass"
+  },
+  {
+   "id": "pool",
+   "name": "Pool (rock rim)",
+   "source": "outside",
+   "block": [
+    5,
+    117
+   ],
+   "inner": [
+    5,
+    120
+   ],
+   "group": "Water"
+  },
+  {
+   "id": "shallow-water",
+   "name": "Shallow water",
+   "source": "outside",
+   "block": [
+    0,
+    153
+   ],
+   "group": "Water",
+   "base": "beach-sand-2"
+  },
+  {
+   "id": "snow-grass",
+   "name": "Snowy grass patch",
+   "source": "outside",
+   "block": [
+    0,
+    124
+   ],
+   "group": "Snow",
+   "base": "snow"
+  },
+  {
+   "id": "ice",
+   "name": "Ice",
+   "source": "outside",
+   "block": [
+    0,
+    127
+   ],
+   "blockSize": 4,
+   "group": "Snow",
+   "base": "snow"
+  },
+  {
+   "id": "beach-sand",
+   "name": "Beach sand",
+   "source": "outside",
+   "block": [
+    0,
+    144
+   ],
+   "group": "Beach",
+   "base": "grass"
+  }
+ ]
+}

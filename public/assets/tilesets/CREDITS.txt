@@ -1,0 +1,28 @@
+Gen 5 (Black/White) style tilesets
+Both compiled in "Tiles - Ready to use Tilesets" by Aki,
+https://eeveeexpo.com/resources/15/
+Per that page, credit the original artists, not the compiler.
+
+kyle-dove-outside.png
+  Artist: Kyle-Dove (signed on the sheet).
+  Format: RPG Maker XP tileset, 256 px wide (8 tiles x 32 px), 6720 px tall.
+  Contents: terrain, grass, trees, cliffs, water edges. The terrain edges
+  (dirt path, sand, pond, pool, tall grass, snow, beach) are drawn into the
+  sheet as 3x3 edge blocks, some with a 2x2 inner-corner block; the game
+  rebuilds RPG Maker XP autotiles from them (scripts/build-tilesets.mjs).
+
+gen5-exterior.png
+  Pack entry: cmm6jjn (the name of this sheet in the source pack).
+  Artist: UltimoSpriter (signed on the sheet, top and bottom).
+  Format: RPG Maker XP tileset, 256 px wide (8 tiles x 32 px), 41504 px tall.
+  Contents: buildings, roofs, fences, signs, town and route decoration.
+  Only the flowers, bushes, weeds, grass variants, signs, lamp post, mailbox
+  and grey rocks are shipped (see src/data/tiles.json).
+
+Shipped files (generated, do not edit by hand):
+  public/assets/tilesets/gen5-outdoor.png      the catalogue's tiles, packed
+  public/assets/tilesets/autotiles/*.png       one RMXP autotile per terrain
+  public/assets/tilesets/placeholder.png       flat colours for cave maps
+
+Still needed: a cave tileset (Oreburgh Gate and Oreburgh Mine use
+placeholder tiles until one is added).

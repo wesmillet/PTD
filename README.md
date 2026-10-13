@@ -58,6 +58,9 @@ cleared; defend levels when you win.
   `&shiny=1` makes every spawn shiny, `?party=debug` loads the test party.
 - Backtick opens the debug panel (speed and status constants, party level,
   enemy level override, shiny rate, time of day, seed reroll).
+- The debug panel's "Map editor" button opens the in-game map editor (paint
+  tiles, autotile terrains, path, placeable tiles, test play, export and
+  import Tiled JSON). See `docs/maps.md`.
 
 ## Pokémon data
 
@@ -75,10 +78,21 @@ The CSVs are never committed. Typed accessors live in `src/data/pokedata.ts`.
 (with evolution lines); pass its output to `scripts/fetch-sprites.sh`, which
 also regenerates `spriteIndex.json`, `spriteFolders.json` and `credits.json`.
 
+## Maps and tilesets
+
+Levels are Tiled JSON maps under `src/data/maps/`, drawn with Gen 5 style
+tiles. The source sheets live in `assets-src/tilesets/gen5/` (with their
+credits) and are never loaded by the game; `src/data/tiles.json` names the
+tiles the editor offers and `npm run build-tilesets` packs those into
+`public/assets/tilesets/`, builds the autotiles and writes
+`src/data/tilesets.json`. The format, the autotiler, the editor and how to
+add levels or tiles are documented in `docs/maps.md`.
+
 ## Layout
 
 - `src/sim/` simulation logic, no Phaser imports, unit tested
 - `src/assets/` sprite data parsing and the Phaser animation loader
 - `src/scenes/`, `src/ui/` rendering and input
+- `src/map/` map format, autotiler, renderer and editor (see `docs/maps.md`)
 - `src/data/` all game content as JSON
 - `docs/` per-phase plans
