@@ -429,3 +429,22 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   order) plus the nine named extras; Shaymin Sky counts as its own species
   (form id), Type: Null, Cosmog and Kubfu are included as listed.
 - Levels respect a species' evolution floor (Solgaleo never below 53).
+
+## Phase 9 batch 2, item 4 (title screen)
+
+- Solidity comes from the Tiled data the map session painted: catalogue
+  `solid` on ground and decoration stamps plus the water, pool and
+  shallow-water terrains; ice and sand stay walkable. The grid lives in
+  `src/map/tiled.ts` (`walkGrid`) so a level could use it later.
+- Paths are breadth-first over four neighbours and simplified to corners,
+  one tween per corner; a goal off the map lets the search leave the map
+  (actors running out of frame), otherwise it stays on it. A goal on a
+  solid cell snaps to the nearest open one, as every spawn point does.
+- The rift hopper runs to the nearest open cell toward the forest instead
+  of through the trees; the title check now samples every actor each
+  second and finds no one on a solid cell.
+- Casting is a weighted shuffle drawn without replacement (final forms and
+  legendaries three times as likely to come early, new forms twice);
+  whoever is on screen is skipped until they leave.
+- The diorama's `playAnim` never throws: a missing action (Thundurus's
+  Walk sheet is malformed) falls back to Idle or leaves the frame.

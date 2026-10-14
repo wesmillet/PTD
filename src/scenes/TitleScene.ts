@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { getMapModel } from '../data/maps';
 import { MapRenderer } from '../map/renderer';
-import { cloneModel } from '../map/tiled';
+import { cloneModel, walkGrid } from '../map/tiled';
 import { hasSave } from '../game/storage';
 import { badgeTextureKey } from '../game/runtime';
 import { getGame, resetGame, saveGameIfLoaded } from '../game/session';
@@ -62,6 +62,7 @@ export class TitleScene extends Phaser.Scene {
       this.pages = undefined;
       this.diorama?.destroy();
       this.diorama = undefined;
+      (window as unknown as { __ptdTitle?: unknown }).__ptdTitle = undefined;
       this.mapView?.destroy();
       this.mapView = undefined;
     });
@@ -86,7 +87,9 @@ export class TitleScene extends Phaser.Scene {
       ledge: points.ledge ?? [25, 2],
       sky: points.sky ?? [15, 1],
     };
-    this.diorama = new Diorama(this, MAP_TOP, model.path.map((t) => [t[0], t[1]]), stage);
+    this.diorama = new Diorama(this, MAP_TOP, model.path.map((t) => [t[0], t[1]]), stage, walkGrid(model));
+    // Debug hook for the automated title checks.
+    (window as unknown as { __ptdTitle?: unknown }).__ptdTitle = { diorama: this.diorama, scene: this };
     this.addTint(model.width * 32, model.height * 32);
     this.addWeather(model.width * 32, model.height * 32, stage);
   }

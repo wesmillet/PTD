@@ -15,6 +15,7 @@
  * convert, and `toMapDef` produces the simulation's MapDef.
  */
 import type { MapDef, Tile } from '../sim/map';
+import type { WalkGrid } from './gridPath';
 import { entryAtIndex, hasTerrain, terrains, tileset, type TilesetInfo } from './catalogue';
 
 export const TILE_SIZE = 32;
@@ -183,6 +184,24 @@ export function resizeModel(model: MapModel, width: number, height: number): Map
   out.points = model.points.filter((p) => p.tile[0] < width && p.tile[1] < height).map((p) => ({ ...p, tile: [p.tile[0], p.tile[1]] as Tile }));
   out.spotProps = Object.fromEntries(Object.entries(model.spotProps).filter(([k]) => out.placeable.some(([x, y]) => `${x},${y}` === k)));
   return out;
+}
+
+/** Terrains an actor cannot walk on. */
+const WATER_TERRAINS = new Set(['water', 'pool', 'shallow-water']);
+
+/** Cells an actor cannot stand on: solid ground or decoration stamps (trees, cliffs, rocks) and water terrain. */
+export function walkGrid(model: MapModel): WalkGrid {
+  const solid: boolean[] = [];
+  for (let i = 0; i < model.width * model.height; i++) {
+    const ground = model.ground[i] ?? 0;
+    const deco = model.decoration[i] ?? 0;
+    solid.push(
+      (ground !== 0 && (entryAtIndex(model.tileset, ground - 1)?.solid ?? false)) ||
+        (deco !== 0 && (entryAtIndex(model.tileset, deco - 1)?.solid ?? false)) ||
+        WATER_TERRAINS.has(model.terrain[i] ?? ''),
+    );
+  }
+  return { width: model.width, height: model.height, solid };
 }
 
 /** Cells covered by solid decoration stamps. */

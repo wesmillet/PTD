@@ -493,6 +493,17 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   business, flyover, rift, re-cast every 90 s) behind a Platinum menu frame
   (New game, Continue, PC, Options, Credits), the title in Power Clear Bold
   and the badge case at the top right. The menu never waits on the scenes.
+  Actors walk only over the map's open cells: `walkGrid` in
+  `src/map/tiled.ts` marks solid ground and decoration stamps (trees,
+  cliffs, rocks) and water terrain, `src/map/gridPath.ts` finds the
+  breadth-first path, and every walk and spawn point snaps to it (the
+  chase keeps to the route polyline; only the fishing trip's fish and
+  Gyarados are in the lake). Casting draws Pokémon and trainers from a
+  shuffled pool without replacement and never re-casts someone on screen.
+  Overworld trainers are drawn at 2x (16 px sheets on a 32 px map).
+  Flyovers cross the sky lane on a straight line at constant height with
+  the Walk loop and a ground shadow drifting beneath; the flyer list holds
+  every legendary bird and dragon with a folder.
 - Level select on the Platinum town map at 3x (768x576, centred, nearest
   filtering): every level is a marker at its `mapPos` (town-map pixels; a
   dot for routes, lakes and caves, the square for towns), red when open,
