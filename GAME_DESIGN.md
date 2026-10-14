@@ -186,6 +186,23 @@ runtime.
   1.9/s cap needs base Speed 162). Move `cooldown` multipliers apply on
   top. The Pokémon panel and PC summary show "Attack speed: x.x/s".
 
+### Scripted levels, rules and rewards
+A level's `waves` may be a list instead of a number: each entry names wild
+spawns (`wild`, `count`, `levels`), a `trainer` (or `trainers` for tag
+battles) with bosses, `allies` (free towers on named spots for a wave
+range), `lines` and `outro` dialogue, a `lane` and a `banner`. `rules`
+names the rules in play (`src/sim/rules/`: rockfall, sun-and-shade,
+darkness, two-lanes, tide, iron-defense, ice-floor, charge, gravity-shift,
+tag-ally, timer, escort, shadow-wave, wind, nightmare, gratitude,
+distortion, challenge), each a small module with hooks. `unlock` lists
+levels, badges and flags the save needs; `reward` gives the badge, a TM, a
+money bonus, items and flags (HMs). `levelCap` stops EXP at that level.
+Gyms 2 to 8 live in `src/data/levels/10-gyms.json` as ten scripted waves on
+their arena maps (six gym-trainer waves, three leader waves, the ace as a
+4x boss with its signature move) with one rule each, as in
+`docs/design-content.md`. Badge perks: outside demo mode a save can place
+two Pokémon plus one per badge.
+
 ### Level objectives
 Each level definition (`src/data/levels.json`) has an `objective`:
 - `defend`: a fixed wave count and a number of lives. Each enemy that reaches

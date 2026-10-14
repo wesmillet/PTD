@@ -194,3 +194,16 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
 - The six opening routes keep the 15-level cap and the one-featured-level
   rule; every other level declares its own range through `levels` /
   `maxWildLevel`.
+
+## Phase 8 item 2 (gyms)
+
+- Leaders with three Pokémon fill waves 7 to 9 as first, second, then both
+  together a level higher; Candice and Volkner (four) use their first three.
+- A trainer's VS intro and opening lines play once per level; their later
+  waves only show the wave toast and the field pose.
+- Gym levels use `levelCap` 25, 29, 35, 40, 44, 47 and 53 (a few levels
+  above each leader's ace) so a first run stays near the gym's level.
+- The placement perk is `min(level placements, 2 + badges)` for non-demo
+  saves; demo saves keep the level's six.
+- Pastoria sends every even wave down the water lane (`path-water`), the
+  high-tide waves, so the water spots matter.

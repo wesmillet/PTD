@@ -1,0 +1,1545 @@
+{
+  "eterna-gym": {
+    "name": "Eterna Gym",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "eterna-gym",
+    "mapPos": [
+      100,
+      80
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 2,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 25,
+    "levels": [
+      17,
+      22
+    ],
+    "maxWildLevel": 100,
+    "requires": "oreburgh-mine-1f",
+    "unlock": {
+      "badges": [
+        "coal"
+      ]
+    },
+    "rules": [
+      {
+        "id": "sun-and-shade"
+      }
+    ],
+    "waves": [
+      {
+        "trainer": {
+          "id": "aroma-lady",
+          "name": "Aroma Lady Jenna",
+          "party": [
+            {
+              "species": "budew",
+              "level": 16
+            },
+            {
+              "species": "roselia",
+              "level": 18
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "lass",
+          "name": "Lass Caroline",
+          "party": [
+            {
+              "species": "cherubi",
+              "level": 17
+            },
+            {
+              "species": "cherubi",
+              "level": 17
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "aroma-lady",
+          "name": "Aroma Lady Jaden",
+          "party": [
+            {
+              "species": "tangela",
+              "level": 18
+            },
+            {
+              "species": "bellossom",
+              "level": 19
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "lass",
+          "name": "Lass Kate",
+          "party": [
+            {
+              "species": "budew",
+              "level": 18
+            },
+            {
+              "species": "cherubi",
+              "level": 18
+            },
+            {
+              "species": "roselia",
+              "level": 19
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "aroma-lady",
+          "name": "Aroma Lady Taylor",
+          "party": [
+            {
+              "species": "tangela",
+              "level": 19
+            },
+            {
+              "species": "tangela",
+              "level": 19
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "lass",
+          "name": "Lass Natalie",
+          "party": [
+            {
+              "species": "bellossom",
+              "level": 20
+            },
+            {
+              "species": "roselia",
+              "level": 20
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-gardenia",
+          "name": "Leader Gardenia",
+          "party": [
+            {
+              "species": "turtwig",
+              "level": 20
+            }
+          ],
+          "intro": "I'm Gardenia, the Eterna Gym Leader! Let's see how your Pokémon fare in my garden."
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-gardenia",
+          "name": "Leader Gardenia",
+          "party": [
+            {
+              "species": "cherrim",
+              "level": 20
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-gardenia",
+          "name": "Leader Gardenia",
+          "party": [
+            {
+              "species": "turtwig",
+              "level": 21
+            },
+            {
+              "species": "cherrim",
+              "level": 21
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-gardenia",
+          "name": "Leader Gardenia",
+          "party": [
+            {
+              "species": "roserade",
+              "level": 22,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "magical-leaf",
+                  "every": 6
+                }
+              ]
+            }
+          ],
+          "outro": "That was fun! Take the Forest Badge. You could use Cut now, you know?"
+        },
+        "banner": "Leader Gardenia’s ace",
+        "outro": [
+          {
+            "speaker": "leader-gardenia",
+            "text": "That was fun! Take the Forest Badge. You could use Cut now, you know?"
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "forest",
+        "name": "Forest Badge"
+      },
+      "tm": "grass-knot",
+      "flags": [
+        "cut"
+      ],
+      "money": 2400
+    }
+  },
+  "hearthome-gym": {
+    "name": "Hearthome Gym",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "hearthome-gym",
+    "mapPos": [
+      140,
+      120
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 2,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 29,
+    "levels": [
+      21,
+      26
+    ],
+    "maxWildLevel": 100,
+    "requires": "eterna-gym",
+    "unlock": {
+      "badges": [
+        "forest"
+      ]
+    },
+    "rules": [
+      {
+        "id": "darkness",
+        "range": 2,
+        "lit": 1,
+        "lanterns": 5
+      }
+    ],
+    "waves": [
+      {
+        "trainer": {
+          "id": "youngster",
+          "name": "Youngster Donny",
+          "party": [
+            {
+              "species": "gastly",
+              "level": 21
+            },
+            {
+              "species": "gastly",
+              "level": 21
+            }
+          ]
+        },
+        "lines": [
+          {
+            "speaker": "leader-fantina",
+            "text": "A riddle, mon ami! What has keys but opens no locks?",
+            "options": [
+              "A piano",
+              "A map",
+              "A ghost"
+            ],
+            "answer": 0,
+            "onCorrect": {
+              "rule": "darkness",
+              "action": "light"
+            }
+          }
+        ]
+      },
+      {
+        "trainer": {
+          "id": "picnicker",
+          "name": "Picnicker Lauren",
+          "party": [
+            {
+              "species": "misdreavus",
+              "level": 22
+            },
+            {
+              "species": "drifloon",
+              "level": 22
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "youngster",
+          "name": "Youngster Cody",
+          "party": [
+            {
+              "species": "gastly",
+              "level": 22
+            },
+            {
+              "species": "misdreavus",
+              "level": 23
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "picnicker",
+          "name": "Picnicker Rachel",
+          "party": [
+            {
+              "species": "drifloon",
+              "level": 23
+            },
+            {
+              "species": "dusclops",
+              "level": 24
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "youngster",
+          "name": "Youngster Tim",
+          "party": [
+            {
+              "species": "gastly",
+              "level": 23
+            },
+            {
+              "species": "gastly",
+              "level": 23
+            },
+            {
+              "species": "misdreavus",
+              "level": 24
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "picnicker",
+          "name": "Picnicker Hillary",
+          "party": [
+            {
+              "species": "dusclops",
+              "level": 24
+            },
+            {
+              "species": "drifloon",
+              "level": 24
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-fantina",
+          "name": "Leader Fantina",
+          "party": [
+            {
+              "species": "duskull",
+              "level": 24
+            }
+          ],
+          "intro": "Bonjour! I am Fantina. In my gym, the dark is your opponent too. Answer my riddle and the lanterns will help you."
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-fantina",
+          "name": "Leader Fantina",
+          "party": [
+            {
+              "species": "haunter",
+              "level": 24
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-fantina",
+          "name": "Leader Fantina",
+          "party": [
+            {
+              "species": "duskull",
+              "level": 25
+            },
+            {
+              "species": "haunter",
+              "level": 25
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-fantina",
+          "name": "Leader Fantina",
+          "party": [
+            {
+              "species": "mismagius",
+              "level": 26,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "shadow-ball",
+                  "every": 6
+                }
+              ]
+            }
+          ],
+          "outro": "Magnifique! The Relic Badge is yours, and with it Defog."
+        },
+        "banner": "Leader Fantina’s ace",
+        "outro": [
+          {
+            "speaker": "leader-fantina",
+            "text": "Magnifique! The Relic Badge is yours, and with it Defog."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "relic",
+        "name": "Relic Badge"
+      },
+      "tm": "shadow-claw",
+      "flags": [
+        "defog"
+      ],
+      "money": 2400
+    }
+  },
+  "veilstone-gym": {
+    "name": "Veilstone Gym",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "veilstone-gym",
+    "mapPos": [
+      200,
+      92
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 2,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 35,
+    "levels": [
+      27,
+      32
+    ],
+    "maxWildLevel": 100,
+    "requires": "hearthome-gym",
+    "unlock": {
+      "badges": [
+        "relic"
+      ]
+    },
+    "rules": [
+      {
+        "id": "two-lanes",
+        "names": [
+          "Left lane",
+          "Right lane"
+        ]
+      }
+    ],
+    "waves": [
+      {
+        "trainer": {
+          "id": "black-belt",
+          "name": "Black Belt Darren",
+          "party": [
+            {
+              "species": "machop",
+              "level": 25
+            },
+            {
+              "species": "machop",
+              "level": 25
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "battle-girl",
+          "name": "Battle Girl Helen",
+          "party": [
+            {
+              "species": "riolu",
+              "level": 26
+            },
+            {
+              "species": "croagunk",
+              "level": 26
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "black-belt",
+          "name": "Black Belt Rafael",
+          "party": [
+            {
+              "species": "hitmonlee",
+              "level": 27
+            },
+            {
+              "species": "machop",
+              "level": 26
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "battle-girl",
+          "name": "Battle Girl Cassidy",
+          "party": [
+            {
+              "species": "medicham",
+              "level": 27
+            },
+            {
+              "species": "riolu",
+              "level": 27
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "black-belt",
+          "name": "Black Belt Jeffrey",
+          "party": [
+            {
+              "species": "hitmonchan",
+              "level": 28
+            },
+            {
+              "species": "croagunk",
+              "level": 28
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "battle-girl",
+          "name": "Battle Girl Jill",
+          "party": [
+            {
+              "species": "medicham",
+              "level": 28
+            },
+            {
+              "species": "hitmonlee",
+              "level": 28
+            },
+            {
+              "species": "machop",
+              "level": 28
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-maylene",
+          "name": "Leader Maylene",
+          "party": [
+            {
+              "species": "meditite",
+              "level": 28
+            }
+          ],
+          "intro": "I'm Maylene. I'm the Gym Leader, but I still have a lot to learn. Pick a lane, they say... let's go!"
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-maylene",
+          "name": "Leader Maylene",
+          "party": [
+            {
+              "species": "machoke",
+              "level": 29
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-maylene",
+          "name": "Leader Maylene",
+          "party": [
+            {
+              "species": "meditite",
+              "level": 29
+            },
+            {
+              "species": "machoke",
+              "level": 30
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-maylene",
+          "name": "Leader Maylene",
+          "party": [
+            {
+              "species": "lucario",
+              "level": 32,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "aura-sphere",
+                  "every": 6
+                }
+              ]
+            }
+          ],
+          "outro": "I lost... but you earned the Cobble Badge. Fly lets you revisit any place you have cleared."
+        },
+        "banner": "Leader Maylene’s ace",
+        "outro": [
+          {
+            "speaker": "leader-maylene",
+            "text": "I lost... but you earned the Cobble Badge. Fly lets you revisit any place you have cleared."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "cobble",
+        "name": "Cobble Badge"
+      },
+      "tm": "drain-punch",
+      "flags": [
+        "fly"
+      ],
+      "money": 2400
+    },
+    "lanes": [
+      "path",
+      "path-2"
+    ]
+  },
+  "pastoria-gym": {
+    "name": "Pastoria Gym",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "pastoria-gym",
+    "mapPos": [
+      168,
+      156
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 2,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 40,
+    "levels": [
+      32,
+      37
+    ],
+    "maxWildLevel": 100,
+    "requires": "veilstone-gym",
+    "unlock": {
+      "badges": [
+        "cobble"
+      ]
+    },
+    "rules": [
+      {
+        "id": "tide",
+        "every": 2
+      }
+    ],
+    "waves": [
+      {
+        "trainer": {
+          "id": "sailor",
+          "name": "Sailor Marc",
+          "party": [
+            {
+              "species": "remoraid",
+              "level": 29
+            },
+            {
+              "species": "wooper",
+              "level": 29
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "fisherman",
+          "name": "Fisherman Cory",
+          "party": [
+            {
+              "species": "marill",
+              "level": 30
+            },
+            {
+              "species": "finneon",
+              "level": 30
+            }
+          ]
+        },
+        "lane": "path-water"
+      },
+      {
+        "trainer": {
+          "id": "tuber-female",
+          "name": "Tuber Caitlin",
+          "party": [
+            {
+              "species": "mantyke",
+              "level": 31
+            },
+            {
+              "species": "azumarill",
+              "level": 31
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "sailor",
+          "name": "Sailor Parker",
+          "party": [
+            {
+              "species": "octillery",
+              "level": 32
+            },
+            {
+              "species": "wooper",
+              "level": 31
+            }
+          ]
+        },
+        "lane": "path-water"
+      },
+      {
+        "trainer": {
+          "id": "fisherman",
+          "name": "Fisherman Dave",
+          "party": [
+            {
+              "species": "lumineon",
+              "level": 32
+            },
+            {
+              "species": "finneon",
+              "level": 32
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "tuber-male",
+          "name": "Tuber Charlie",
+          "party": [
+            {
+              "species": "azumarill",
+              "level": 33
+            },
+            {
+              "species": "octillery",
+              "level": 33
+            },
+            {
+              "species": "mantyke",
+              "level": 32
+            }
+          ]
+        },
+        "lane": "path-water"
+      },
+      {
+        "trainer": {
+          "id": "leader-wake",
+          "name": "Leader Crasher Wake",
+          "party": [
+            {
+              "species": "gyarados",
+              "level": 33
+            }
+          ],
+          "intro": "Crasher Wake is here! The tide comes and goes in my gym, so mind where you stand!"
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-wake",
+          "name": "Leader Crasher Wake",
+          "party": [
+            {
+              "species": "quagsire",
+              "level": 34
+            }
+          ]
+        },
+        "lane": "path-water"
+      },
+      {
+        "trainer": {
+          "id": "leader-wake",
+          "name": "Leader Crasher Wake",
+          "party": [
+            {
+              "species": "gyarados",
+              "level": 34
+            },
+            {
+              "species": "quagsire",
+              "level": 35
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-wake",
+          "name": "Leader Crasher Wake",
+          "party": [
+            {
+              "species": "floatzel",
+              "level": 37,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "aqua-jet",
+                  "every": 6
+                }
+              ]
+            }
+          ],
+          "outro": "Wahahah! The Fen Badge is yours! With Surf, the lakes have more to show you."
+        },
+        "banner": "Leader Crasher Wake’s ace",
+        "lane": "path-water",
+        "outro": [
+          {
+            "speaker": "leader-wake",
+            "text": "Wahahah! The Fen Badge is yours! With Surf, the lakes have more to show you."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "fen",
+        "name": "Fen Badge"
+      },
+      "tm": "brine",
+      "flags": [
+        "surf"
+      ],
+      "money": 2400
+    },
+    "lanes": [
+      "path",
+      "path-water"
+    ]
+  },
+  "canalave-gym": {
+    "name": "Canalave Gym",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "canalave-gym",
+    "mapPos": [
+      48,
+      120
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 2,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 44,
+    "levels": [
+      36,
+      41
+    ],
+    "maxWildLevel": 100,
+    "requires": "pastoria-gym",
+    "unlock": {
+      "badges": [
+        "fen"
+      ]
+    },
+    "rules": [
+      {
+        "id": "iron-defense",
+        "shield": 0.25
+      }
+    ],
+    "waves": [
+      {
+        "trainer": {
+          "id": "worker",
+          "name": "Worker Gerardo",
+          "party": [
+            {
+              "species": "magnemite",
+              "level": 33
+            },
+            {
+              "species": "bronzor",
+              "level": 33
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "black-belt",
+          "name": "Black Belt Ricky",
+          "party": [
+            {
+              "species": "shieldon",
+              "level": 34
+            },
+            {
+              "species": "skarmory",
+              "level": 34
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "worker",
+          "name": "Worker Jackson",
+          "party": [
+            {
+              "species": "magnemite",
+              "level": 34
+            },
+            {
+              "species": "magnemite",
+              "level": 34
+            },
+            {
+              "species": "bronzor",
+              "level": 35
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "black-belt",
+          "name": "Black Belt Cole",
+          "party": [
+            {
+              "species": "steelix",
+              "level": 36
+            },
+            {
+              "species": "shieldon",
+              "level": 35
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "worker",
+          "name": "Worker Mitchell",
+          "party": [
+            {
+              "species": "skarmory",
+              "level": 36
+            },
+            {
+              "species": "bronzor",
+              "level": 36
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "black-belt",
+          "name": "Black Belt Kyle",
+          "party": [
+            {
+              "species": "steelix",
+              "level": 37
+            },
+            {
+              "species": "skarmory",
+              "level": 37
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-byron",
+          "name": "Leader Byron",
+          "party": [
+            {
+              "species": "magneton",
+              "level": 37
+            }
+          ],
+          "intro": "I'm Byron, Roark's father. My Steel Pokémon carry an iron shield; only special moves, Fire, Fighting or Ground can crack it."
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-byron",
+          "name": "Leader Byron",
+          "party": [
+            {
+              "species": "steelix",
+              "level": 38
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-byron",
+          "name": "Leader Byron",
+          "party": [
+            {
+              "species": "magneton",
+              "level": 38
+            },
+            {
+              "species": "steelix",
+              "level": 39
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-byron",
+          "name": "Leader Byron",
+          "party": [
+            {
+              "species": "bastiodon",
+              "level": 41,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "flash-cannon",
+                  "every": 6
+                }
+              ]
+            }
+          ],
+          "outro": "Well done! You have the Mine Badge. Strength will move the boulders in your way."
+        },
+        "banner": "Leader Byron’s ace",
+        "outro": [
+          {
+            "speaker": "leader-byron",
+            "text": "Well done! You have the Mine Badge. Strength will move the boulders in your way."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "mine",
+        "name": "Mine Badge"
+      },
+      "tm": "flash-cannon",
+      "flags": [
+        "strength"
+      ],
+      "money": 2400
+    }
+  },
+  "snowpoint-gym": {
+    "name": "Snowpoint Gym",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "snowpoint-gym",
+    "mapPos": [
+      124,
+      30
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 2,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 47,
+    "levels": [
+      39,
+      44
+    ],
+    "maxWildLevel": 100,
+    "requires": "canalave-gym",
+    "unlock": {
+      "badges": [
+        "mine"
+      ]
+    },
+    "rules": [
+      {
+        "id": "ice-floor",
+        "speed": 1.6,
+        "hailShrink": 1,
+        "hailSeconds": 5
+      }
+    ],
+    "waves": [
+      {
+        "trainer": {
+          "id": "skier-female",
+          "name": "Skier Rebecca",
+          "party": [
+            {
+              "species": "snover",
+              "level": 36
+            },
+            {
+              "species": "swinub",
+              "level": 36
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "ace-trainer-snow-male",
+          "name": "Ace Trainer Isaiah",
+          "party": [
+            {
+              "species": "snorunt",
+              "level": 37
+            },
+            {
+              "species": "glalie",
+              "level": 38
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "skier-male",
+          "name": "Skier Jamie",
+          "party": [
+            {
+              "species": "swinub",
+              "level": 37
+            },
+            {
+              "species": "swinub",
+              "level": 37
+            },
+            {
+              "species": "snover",
+              "level": 38
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "ace-trainer-snow-female",
+          "name": "Ace Trainer Maria",
+          "party": [
+            {
+              "species": "glaceon",
+              "level": 39
+            },
+            {
+              "species": "snorunt",
+              "level": 38
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "skier-female",
+          "name": "Skier Shelby",
+          "party": [
+            {
+              "species": "glalie",
+              "level": 39
+            },
+            {
+              "species": "snover",
+              "level": 39
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "ace-trainer-snow-male",
+          "name": "Ace Trainer Carlos",
+          "party": [
+            {
+              "species": "weavile",
+              "level": 40
+            },
+            {
+              "species": "mamoswine",
+              "level": 40
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-candice",
+          "name": "Leader Candice",
+          "party": [
+            {
+              "species": "sneasel",
+              "level": 40
+            }
+          ],
+          "intro": "I'm Candice! Focus! The ice floor is fast and Abomasnow's hail cuts your reach. Give it everything!"
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-candice",
+          "name": "Leader Candice",
+          "party": [
+            {
+              "species": "piloswine",
+              "level": 40
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-candice",
+          "name": "Leader Candice",
+          "party": [
+            {
+              "species": "abomasnow",
+              "level": 42
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-candice",
+          "name": "Leader Candice",
+          "party": [
+            {
+              "species": "froslass",
+              "level": 44,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "ice-shard",
+                  "every": 6
+                }
+              ]
+            }
+          ],
+          "outro": "Wow! You're strong! The Icicle Badge is yours. Rock Climb takes you up the cliffs."
+        },
+        "banner": "Leader Candice’s ace",
+        "outro": [
+          {
+            "speaker": "leader-candice",
+            "text": "Wow! You're strong! The Icicle Badge is yours. Rock Climb takes you up the cliffs."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "icicle",
+        "name": "Icicle Badge"
+      },
+      "tm": "avalanche",
+      "flags": [
+        "rock-climb"
+      ],
+      "money": 2400
+    }
+  },
+  "sunyshore-gym": {
+    "name": "Sunyshore Gym",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "sunyshore-gym",
+    "mapPos": [
+      232,
+      128
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 2,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 53,
+    "levels": [
+      45,
+      50
+    ],
+    "maxWildLevel": 100,
+    "requires": "snowpoint-gym",
+    "unlock": {
+      "badges": [
+        "icicle"
+      ]
+    },
+    "rules": [
+      {
+        "id": "charge",
+        "needed": 3,
+        "seconds": 5
+      }
+    ],
+    "waves": [
+      {
+        "trainer": {
+          "id": "guitarist",
+          "name": "Guitarist Lonnie",
+          "party": [
+            {
+              "species": "pichu",
+              "level": 42
+            },
+            {
+              "species": "pikachu",
+              "level": 42
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "scientist",
+          "name": "Scientist Marcus",
+          "party": [
+            {
+              "species": "shinx",
+              "level": 42
+            },
+            {
+              "species": "luxio",
+              "level": 43
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "poke-kid",
+          "name": "Poké Kid Danielle",
+          "party": [
+            {
+              "species": "elekid",
+              "level": 43
+            },
+            {
+              "species": "pachirisu",
+              "level": 43
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "guitarist",
+          "name": "Guitarist Jerry",
+          "party": [
+            {
+              "species": "electabuzz",
+              "level": 44
+            },
+            {
+              "species": "pikachu",
+              "level": 44
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "scientist",
+          "name": "Scientist Cole",
+          "party": [
+            {
+              "species": "magnezone",
+              "level": 45
+            },
+            {
+              "species": "rotom",
+              "level": 45
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "poke-kid",
+          "name": "Poké Kid Ariel",
+          "party": [
+            {
+              "species": "luxio",
+              "level": 45
+            },
+            {
+              "species": "electabuzz",
+              "level": 45
+            },
+            {
+              "species": "pachirisu",
+              "level": 45
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-volkner",
+          "name": "Leader Volkner",
+          "party": [
+            {
+              "species": "jolteon",
+              "level": 46
+            }
+          ],
+          "intro": "I'm Volkner, the Gym Leader. Finally, a challenger worth it! Charge the generators and hit the Magnetic Flux when you need it."
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-volkner",
+          "name": "Leader Volkner",
+          "party": [
+            {
+              "species": "raichu",
+              "level": 46
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-volkner",
+          "name": "Leader Volkner",
+          "party": [
+            {
+              "species": "luxray",
+              "level": 48
+            }
+          ]
+        }
+      },
+      {
+        "trainer": {
+          "id": "leader-volkner",
+          "name": "Leader Volkner",
+          "party": [
+            {
+              "species": "electivire",
+              "level": 50,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "thunder-punch",
+                  "every": 6
+                }
+              ],
+              "immune": [
+                "electric"
+              ]
+            }
+          ],
+          "outro": "That was the battle I've been waiting for! The Beacon Badge, and Waterfall, are yours."
+        },
+        "banner": "Leader Volkner’s ace",
+        "outro": [
+          {
+            "speaker": "leader-volkner",
+            "text": "That was the battle I've been waiting for! The Beacon Badge, and Waterfall, are yours."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "beacon",
+        "name": "Beacon Badge"
+      },
+      "tm": "charge-beam",
+      "flags": [
+        "waterfall"
+      ],
+      "money": 2400
+    }
+  }
+}

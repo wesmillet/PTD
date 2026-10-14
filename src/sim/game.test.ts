@@ -62,7 +62,7 @@ describe('party and box', () => {
 describe('level unlock chain', () => {
   it('follows levels.json order and completion rules', () => {
     const game = createGameState();
-    expect(orderedLevelIds()).toEqual(['route-201', 'lake-verity', 'route-202', 'route-203', 'oreburgh-gate', 'oreburgh-mine-1f']);
+    expect(orderedLevelIds().slice(0, 6)).toEqual(['route-201', 'lake-verity', 'route-202', 'route-203', 'oreburgh-gate', 'oreburgh-mine-1f']);
     expect(isLevelUnlocked(game, 'route-201')).toBe(true);
     if (DEMO_MODE) {
       // Demo builds open everything; completion still records normally.
@@ -93,7 +93,7 @@ describe('level unlock chain', () => {
     const badges = allBadges();
     expect(badges.map((b) => b.id)).toEqual(['coal', 'forest', 'cobble', 'fen', 'relic', 'mine', 'icicle', 'beacon']);
     expect(badges[0]).toMatchObject({ id: 'coal', name: 'Coal Badge', levelId: 'oreburgh-mine-1f' });
-    expect(badges[1]?.levelId).toBeUndefined();
+    expect(badges[1]?.levelId).toBe('eterna-gym');
     recordLevelResult(game, 'oreburgh-mine-1f', 'lost', 7);
     expect(game.badges).toEqual([]);
     recordLevelResult(game, 'oreburgh-mine-1f', 'won', 8);

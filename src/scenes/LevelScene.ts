@@ -139,6 +139,8 @@ export class LevelScene extends Phaser.Scene {
   private dialogue?: DialogueBox;
   private vsIntro?: VsIntro;
   private escortView?: Phaser.GameObjects.Sprite;
+  /** Trainers whose VS intro and opening lines have played this level (later waves of theirs skip them). */
+  private readonly introduced = new Set<string>();
   /** The trainer's throwing pose beside the entrance while their wave is being sent. */
   private trainerSprite?: Phaser.GameObjects.Image;
   private paused = false;
@@ -1057,6 +1059,8 @@ export class LevelScene extends Phaser.Scene {
    */
   private showTrainer(trainer: NonNullable<LevelEvent['trainer']>, boss: boolean): void {
     if (!this.dialogue) return;
+    if (this.introduced.has(trainer.id) && !trainer.intro) return; // the same trainer's next wave: no new speech
+    this.introduced.add(trainer.id);
     this.paused = true;
     this.selectedBall = null;
     const portrait = trainerTextureKey(trainer.id);

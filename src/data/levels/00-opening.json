@@ -295,9 +295,22 @@
         }
       ]
     },
-    "badge": {
-      "id": "coal",
-      "name": "Coal Badge"
+    "rules": [
+      {
+        "id": "rockfall",
+        "every": 3
+      }
+    ],
+    "reward": {
+      "badge": {
+        "id": "coal",
+        "name": "Coal Badge"
+      },
+      "tm": "stealth-rock",
+      "flags": [
+        "rock-smash"
+      ],
+      "money": 1200
     }
   }
 }

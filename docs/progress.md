@@ -20,10 +20,23 @@ which maps the maps session still needs to build. Updated per commit.
   immunity, Shadow and Alpha and Dynamax spawn flags, fleeing and
   catch-only Pokémon live in `src/sim/level.ts`.
 
+- **Gyms 2 to 8** (`src/data/levels/10-gyms.json`): ten scripted waves each
+  on the arena maps, six Platinum gym-trainer waves, three leader waves, the
+  ace as a 4x boss with its signature move, the gym's rule, the leader's VS
+  intro and dialogue, badge + TM + HM flag in `reward`. Gym 1 got its
+  rockfall rule and its Coal Badge reward (Stealth Rock, Rock Smash). Badge
+  perks: placements = 2 + badges outside demo mode.
+
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
 - The wave banner and rule texts show as toasts until the polish item.
+- Fantina's riddle is one question ("What has keys but opens no locks?");
+  the right answer lights two lanterns.
+- Gym trainer names are made up (the Platinum gyms' trainers are not in the
+  repo's data); their classes and Pokémon follow the design table.
+- The Snowpoint hail pulse fires at every wave start (the design ties it to
+  Abomasnow; the rule has no way to know who is on the field yet).
 
 ## Maps still needed
 

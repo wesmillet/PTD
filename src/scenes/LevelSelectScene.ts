@@ -14,8 +14,8 @@ import {
   STARTERS,
 } from '../game/session';
 import { BALL_IDS, BALLS } from '../sim/catch';
-import { allBadges, hasBadge, isLevelCompleted, isLevelUnlocked, orderedLevelIds } from '../sim/game';
-import { levelPopup } from '../sim/waves';
+import { allBadges, hasBadge, isLevelCompleted, isLevelUnlocked, orderedLevelIds, unlockBlockers } from '../sim/game';
+import { levelPopup, waveCount } from '../sim/waves';
 import { Button, framePanel } from '../ui/button';
 import { SavePanel } from '../ui/savePanel';
 import { ShopScreen } from '../ui/shopScreen';
@@ -170,9 +170,9 @@ export class LevelSelectScene extends Phaser.Scene {
     const def = getLevel(id);
     const game = getGame();
     const unlocked = isLevelUnlocked(game, id);
-    const kind = def.objective === 'free' ? 'free roam' : `defend, ${def.waves} waves`;
+    const kind = def.objective === 'free' ? 'free roam' : `defend, ${waveCount(def)} waves`;
     const extra = def.trainer ? (def.badge ? ' · gym' : ' · trainer') : '';
-    const line2 = unlocked ? `${kind}${extra}${isLevelCompleted(game, id) ? ' · cleared' : ''}` : `Locked: clear ${def.requires ? getLevel(def.requires).name : 'the previous level'} first`;
+    const line2 = unlocked ? `${kind}${extra}${isLevelCompleted(game, id) ? ' · cleared' : ''}` : `Locked: ${unlockBlockers(game, id).slice(0, 2).join(', ') || 'not yet'}`;
     const name = this.add.text(0, -8, def.name, TEXT).setOrigin(0.5);
     const info = this.add.text(0, 8, line2, TEXT_DIM).setOrigin(0.5);
     const w = Math.max(name.width, info.width) + 28;

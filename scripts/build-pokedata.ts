@@ -272,7 +272,9 @@ const learnsets: Record<string, [number, number][]> = {};
 // Later species and forms: every level-up row by version group, resolved below.
 const laterMoves = new Map<string, Map<number, [number, number][]>>();
 const movesCsv = readCsv('moves.csv');
-const knownMoveIds = new Set(movesCsv.filter((r) => (int(r.generation_id) <= MAX_GENERATION && int(r.id) < 10000 && int(r.type_id) <= MAX_TYPE) || EXTRA_MOVES.has(r.identifier)).map((r) => r.id));
+// Moves that became Fairy-type later (Sweet Kiss, Charm, Moonlight) were Normal in Gen 4.
+const gen4Type = (r: Row): number => (int(r.type_id) > MAX_TYPE ? 1 : int(r.type_id));
+const knownMoveIds = new Set(movesCsv.filter((r) => (int(r.generation_id) <= MAX_GENERATION && int(r.id) < 10000) || EXTRA_MOVES.has(r.identifier)).map((r) => r.id));
 for (const r of readCsv('pokemon_moves.csv')) {
   if (r.pokemon_move_method_id !== String(LEVEL_UP_METHOD)) continue;
   if (r.version_group_id === String(PLATINUM_VERSION_GROUP) && speciesIds.has(r.pokemon_id)) {
@@ -335,7 +337,7 @@ for (const r of movesCsv) {
   const maxHits = m ? optInt(m.max_hits) : null;
   moves[r.id] = {
     name: r.identifier,
-    type: int(r.type_id),
+    type: gen4Type(r),
     power: optInt(r.power),
     accuracy: optInt(r.accuracy),
     pp: optInt(r.pp),
