@@ -528,7 +528,7 @@
    "solid": false
   },
   {
-   "id": "pt-temple-floor-light",
+   "id": "pt-temple-dark",
    "source": "pt-temple",
    "col": 1,
    "row": 0,
@@ -538,9 +538,19 @@
    "solid": false
   },
   {
-   "id": "pt-temple-ice-a",
+   "id": "pt-temple-floor-light",
    "source": "pt-temple",
    "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-ice-a",
+   "source": "pt-temple",
+   "col": 3,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -600,7 +610,7 @@
   {
    "id": "pt-temple-wall",
    "source": "pt-temple",
-   "col": 3,
+   "col": 4,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -610,7 +620,7 @@
   {
    "id": "pt-temple-wall-s",
    "source": "pt-temple",
-   "col": 4,
+   "col": 5,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -620,7 +630,7 @@
   {
    "id": "pt-temple-wall-e",
    "source": "pt-temple",
-   "col": 5,
+   "col": 6,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -630,7 +640,7 @@
   {
    "id": "pt-temple-wall-w",
    "source": "pt-temple",
-   "col": 6,
+   "col": 7,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -650,8 +660,8 @@
   {
    "id": "pt-temple-rocks",
    "source": "pt-temple",
-   "col": 7,
-   "row": 0,
+   "col": 0,
+   "row": 9,
    "w": 1,
    "h": 1,
    "kind": "deco",
@@ -678,9 +688,19 @@
    "solid": false
   },
   {
-   "id": "pt-mine-floor-b",
+   "id": "pt-mine-dark",
    "source": "pt-mine",
    "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-mine-floor-b",
+   "source": "pt-mine",
+   "col": 2,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -720,7 +740,7 @@
   {
    "id": "pt-mine-wall",
    "source": "pt-mine",
-   "col": 2,
+   "col": 3,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -730,7 +750,7 @@
   {
    "id": "pt-mine-wall-s",
    "source": "pt-mine",
-   "col": 3,
+   "col": 4,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -740,7 +760,7 @@
   {
    "id": "pt-mine-wall-e",
    "source": "pt-mine",
-   "col": 4,
+   "col": 5,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -750,7 +770,7 @@
   {
    "id": "pt-mine-wall-w",
    "source": "pt-mine",
-   "col": 5,
+   "col": 6,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -760,7 +780,7 @@
   {
    "id": "pt-mine-wall-c",
    "source": "pt-mine",
-   "col": 6,
+   "col": 7,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -780,8 +800,8 @@
   {
    "id": "pt-mine-rocks",
    "source": "pt-mine",
-   "col": 7,
-   "row": 0,
+   "col": 0,
+   "row": 7,
    "w": 1,
    "h": 1,
    "kind": "deco",
@@ -811,7 +831,7 @@
    "id": "pt-mine-belt",
    "source": "pt-mine",
    "col": 0,
-   "row": 7,
+   "row": 8,
    "w": 1,
    "h": 2,
    "kind": "deco",
@@ -821,7 +841,7 @@
    "id": "pt-mine-panel",
    "source": "pt-mine",
    "col": 1,
-   "row": 7,
+   "row": 8,
    "w": 2,
    "h": 2,
    "kind": "deco",
@@ -831,7 +851,7 @@
    "id": "pt-mine-lift",
    "source": "pt-mine",
    "col": 3,
-   "row": 7,
+   "row": 8,
    "w": 2,
    "h": 2,
    "kind": "deco",
@@ -841,6 +861,16 @@
    "id": "pt-stark-floor",
    "source": "pt-stark",
    "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-stark-dark",
+   "source": "pt-stark",
+   "col": 1,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -860,7 +890,7 @@
   {
    "id": "pt-stark-magma",
    "source": "pt-stark",
-   "col": 1,
+   "col": 2,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -948,9 +978,19 @@
    "solid": false
   },
   {
-   "id": "pt-ruins-floor-b",
+   "id": "pt-ruins-dark",
    "source": "pt-ruins",
    "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-ruins-floor-b",
+   "source": "pt-ruins",
+   "col": 2,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -980,7 +1020,7 @@
   {
    "id": "pt-ruins-water",
    "source": "pt-ruins",
-   "col": 2,
+   "col": 3,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -990,7 +1030,7 @@
   {
    "id": "pt-ruins-wall",
    "source": "pt-ruins",
-   "col": 3,
+   "col": 4,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1000,7 +1040,7 @@
   {
    "id": "pt-ruins-wall-s",
    "source": "pt-ruins",
-   "col": 4,
+   "col": 5,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1010,7 +1050,7 @@
   {
    "id": "pt-ruins-wall-e",
    "source": "pt-ruins",
-   "col": 5,
+   "col": 6,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1020,7 +1060,7 @@
   {
    "id": "pt-ruins-wall-w",
    "source": "pt-ruins",
-   "col": 6,
+   "col": 7,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1030,8 +1070,8 @@
   {
    "id": "pt-ruins-wall-c",
    "source": "pt-ruins",
-   "col": 7,
-   "row": 0,
+   "col": 0,
+   "row": 7,
    "w": 1,
    "h": 1,
    "kind": "deco",
@@ -1050,7 +1090,7 @@
   {
    "id": "pt-ruins-rocks",
    "source": "pt-ruins",
-   "col": 0,
+   "col": 1,
    "row": 7,
    "w": 1,
    "h": 1,
@@ -1078,9 +1118,19 @@
    "solid": false
   },
   {
-   "id": "pt-vroad-floor-b",
+   "id": "pt-vroad-dark",
    "source": "pt-vroad",
    "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-vroad-floor-b",
+   "source": "pt-vroad",
+   "col": 2,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1110,7 +1160,7 @@
   {
    "id": "pt-vroad-water",
    "source": "pt-vroad",
-   "col": 2,
+   "col": 3,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1120,7 +1170,7 @@
   {
    "id": "pt-vroad-wall",
    "source": "pt-vroad",
-   "col": 3,
+   "col": 4,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1130,7 +1180,7 @@
   {
    "id": "pt-vroad-wall-s",
    "source": "pt-vroad",
-   "col": 4,
+   "col": 5,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1140,7 +1190,7 @@
   {
    "id": "pt-vroad-wall-e",
    "source": "pt-vroad",
-   "col": 5,
+   "col": 6,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1150,7 +1200,7 @@
   {
    "id": "pt-vroad-wall-w",
    "source": "pt-vroad",
-   "col": 6,
+   "col": 7,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1170,8 +1220,8 @@
   {
    "id": "pt-vroad-rocks",
    "source": "pt-vroad",
-   "col": 7,
-   "row": 0,
+   "col": 0,
+   "row": 7,
    "w": 1,
    "h": 1,
    "kind": "deco",
@@ -1198,7 +1248,7 @@
    "solid": false
   },
   {
-   "id": "pt-coronet-floor-b",
+   "id": "pt-coronet-dark",
    "source": "pt-coronet",
    "col": 1,
    "row": 0,
@@ -1208,7 +1258,7 @@
    "solid": false
   },
   {
-   "id": "pt-coronet-floor-c",
+   "id": "pt-coronet-floor-b",
    "source": "pt-coronet",
    "col": 2,
    "row": 0,
@@ -1218,9 +1268,19 @@
    "solid": false
   },
   {
-   "id": "pt-coronet-floor-d",
+   "id": "pt-coronet-floor-c",
    "source": "pt-coronet",
    "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-floor-d",
+   "source": "pt-coronet",
+   "col": 4,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1250,7 +1310,7 @@
   {
    "id": "pt-coronet-water",
    "source": "pt-coronet",
-   "col": 4,
+   "col": 5,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1260,7 +1320,7 @@
   {
    "id": "pt-coronet-pad-a",
    "source": "pt-coronet",
-   "col": 5,
+   "col": 6,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1270,7 +1330,7 @@
   {
    "id": "pt-coronet-pad-b",
    "source": "pt-coronet",
-   "col": 6,
+   "col": 7,
    "row": 0,
    "w": 1,
    "h": 1,
@@ -1280,16 +1340,6 @@
   {
    "id": "pt-coronet-wall",
    "source": "pt-coronet",
-   "col": 7,
-   "row": 0,
-   "w": 1,
-   "h": 1,
-   "kind": "deco",
-   "solid": true
-  },
-  {
-   "id": "pt-coronet-wall-s",
-   "source": "pt-coronet",
    "col": 0,
    "row": 7,
    "w": 1,
@@ -1298,7 +1348,7 @@
    "solid": true
   },
   {
-   "id": "pt-coronet-wall-e",
+   "id": "pt-coronet-wall-s",
    "source": "pt-coronet",
    "col": 1,
    "row": 7,
@@ -1308,7 +1358,7 @@
    "solid": true
   },
   {
-   "id": "pt-coronet-wall-w",
+   "id": "pt-coronet-wall-e",
    "source": "pt-coronet",
    "col": 2,
    "row": 7,
@@ -1318,9 +1368,19 @@
    "solid": true
   },
   {
-   "id": "pt-coronet-wall-c",
+   "id": "pt-coronet-wall-w",
    "source": "pt-coronet",
    "col": 3,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-wall-c",
+   "source": "pt-coronet",
+   "col": 4,
    "row": 7,
    "w": 1,
    "h": 1,
@@ -1340,7 +1400,7 @@
   {
    "id": "pt-coronet-rocks",
    "source": "pt-coronet",
-   "col": 4,
+   "col": 5,
    "row": 7,
    "w": 1,
    "h": 1,

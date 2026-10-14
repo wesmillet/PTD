@@ -302,10 +302,49 @@ What the builder adds for them (see the `Map` class):
   `ledge` and `sky` stages; Spear Pillar's `altar`).
 - `road=None` draws no path terrain; the designs then colour the path cells
   with a floor texture so the enemy path stays visible.
+- Shapes: `blob(rng, cx, cy, rx, ry)` is an organic patch (tall grass, pools,
+  cave chambers), `octagon(x0, y0, x1, y1, cut)` a lake with the games' cut
+  corners, `smooth(cells, m)` fills notches and drops lone cells;
+  `grass_blob` and `water_blob` lay them down.
+- Trees: `TREE_KINDS` now also has `conifer-teal`, `autumn`, `round` and
+  `round-teal`; a kind may be a list (`MIXED`, `TEAL_MIX`) picked per tree,
+  which is what the routes and most forests use.
+- Landmarks from the exterior sheet: `bw-hall`, `bw-mansion`, `bw-plant`,
+  `bw-factory`, `bw-lighthouse`, `bw-pokecenter`, `bw-hedge-ring`,
+  `bw-pier`. `put(m, tid, x, y)` stamps over anything (clipped at the map
+  edge, never on a lane) for a building that stands half off the top.
+- Open air: `sky(m, x0, y0, x1, y1)` fills a rectangle with flat sky
+  (`bw-sky`) and drifting cloud stamps, or with `stars=True` the night
+  (`bw-dusk` under Galactic's starry wall texture). Flat colours live in
+  `assets-src/tilesets/gen5/solid.png`, written by the script from
+  `SOLID_COLOURS`. No map edge is black any more.
 
-Preview any map without level data: add a temporary entry to
-`src/data/levels.json` whose `map` is the map name, build, and open
+### Caves
+
+Cave maps are carved, not floored. `cave_room(name, seed, path, src,
+chambers=[(cx, cy, rx, ry)...], water=[...], lanes=[...], extra=fn)` takes
+a Platinum cave set (`coronet`, `mine`, `vroad`, `ruins`, `temple`,
+`stark`) and:
+
+1. `corridor(m, width, jitter)` makes a passage along every lane whose
+   edge wanders in and out, `blob` chambers are added, `smooth` tidies.
+2. `carve(m, src, cells, ...)` lays the set's floor on those cells and its
+   `dark` texture (the floor darkened, made by `build-platinum-tiles.py`'s
+   `@dark:` composite) everywhere else, colours the lanes with `floor-b` (or
+   any ground id), sinks pools (the `pool` autotile, or `water_ground` for
+   Stark's magma) and raises rock faces two tiles tall on every top edge
+   of the floor, with the set's `wall-e`/`wall-w` end caps where a run
+   stops. Stark's 2x2 `cliff` stamp is split over the two rows.
+3. The void and the faces are reserved, so spots and props only land on
+   the floor. Doorways (`pt-<set>-door`) go into a face with `put()`.
+
+Preview any map without level data: add a temporary entry to one of the
+`src/data/levels/*.json` files whose `map` is the map name, build, and open
 `?level=<id>&party=debug`.
+
+`python3 scripts/bw-maps.py` always rewrites every map: the shared
+`bw-outdoor` sheet is repacked on each run, which renumbers the tiles, so a
+partial write would leave the other maps drawing the wrong tiles.
 
 ## Platinum's own textures for its unique places
 

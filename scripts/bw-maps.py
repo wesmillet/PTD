@@ -19,6 +19,7 @@ Usage: python3 scripts/bw-maps.py   (always rewrites every BW map: the shared sh
 Placement spots are checked against melee range like scripts/sinnoh-maps.py.
 """
 import json
+import math
 import random
 import subprocess
 import sys
@@ -82,6 +83,15 @@ STATIC.update({
     'bw-container': (0, 1164, 3, 3, True),    # yellow cargo container
     'bw-machine': (0, 1155, 2, 3, True),      # vending machine (a generator in Sunyshore)
     'bw-barrel': (1, 1161, 1, 1, True),
+    # buildings and big props (landmarks for the yards and story maps)
+    'bw-hall': (0, 778, 6, 8, True),          # grey stone hall with a clock tower
+    'bw-mansion': (0, 896, 8, 11, True),      # the tall gothic mansion (Old Chateau)
+    'bw-plant': (0, 1076, 8, 9, True),        # industrial plant with pipes (Valley Windworks)
+    'bw-factory': (0, 1063, 8, 7, True),      # steel-roofed warehouse
+    'bw-lighthouse': (0, 785, 5, 10, True),   # Sunyshore's lighthouse
+    'bw-pokecenter': (0, 491, 7, 9, True),
+    'bw-hedge-ring': (5, 1216, 3, 5, True),   # flowering hedge ring
+    'bw-pier': (0, 1248, 4, 8, True),         # wooden pier
 })
 # Ground textures other than grass (seamless 1x1 or small repeating blocks):
 # id -> (col, row, w, h). Written on the ground layer by Map.floor().
@@ -96,6 +106,16 @@ GROUND = {
 }
 # Kyle-Dove ('outside' sheet) pieces: plain snow for snowfields.
 GROUND['bw-snow'] = (2, 123, 1, 1, 'outside')
+# Flat colours (assets-src/tilesets/gen5/solid.png, written here): the pure
+# black beyond a cave's walls.
+SOLID = ROOT / 'assets-src/tilesets/gen5/solid.png'
+SOLID_COLOURS = [('bw-black', (8, 8, 12)), ('bw-sky', (132, 190, 238)), ('bw-dusk', (44, 34, 78))]
+_solid = Image.new('RGBA', (TILE * len(SOLID_COLOURS), TILE))
+for _i, (_gid, _rgb) in enumerate(SOLID_COLOURS):
+    _solid.paste(Image.new('RGBA', (TILE, TILE), _rgb + (255,)), (_i * TILE, 0))
+    GROUND[_gid] = (_i, 0, 1, 1, 'solid')
+if not SOLID.exists() or Image.open(SOLID).tobytes() != _solid.tobytes():
+    _solid.save(SOLID)
 for gid, spec in GROUND.items():
     col, row, w, h = spec[:4]
     for i in range(w * h):
@@ -132,7 +152,11 @@ for cname, rows in CLIFF_SETS.items():
                         'fl': (0, face), 'f': (1, face), 'fr': (3, face), 'fl2': (0, face2), 'f2': (1, face2), 'fr2': (3, face2)}.items():
         STATIC[f'bw-{cname}cliff-{key}'] = (c, r, 1, 1, True)
 TREE_SRC = (2, 360)  # green BW conifer, transparent base, 2x4
-TREE_KINDS = {'conifer': (2, 360), 'pine-snow': (2, 296), 'pine-dirt': (6, 296)}
+TREE_KINDS = {'conifer': (2, 360), 'pine-snow': (2, 296), 'pine-dirt': (6, 296),
+              'conifer-teal': (2, 376), 'autumn': (2, 344), 'round': (2, 392), 'round-teal': (2, 408)}
+# Named mixes for forests: a kind, or a list to pick from per tree.
+MIXED = ['conifer', 'conifer', 'round']
+TEAL_MIX = ['conifer-teal', 'conifer-teal', 'round-teal']
 
 
 def load_catalogue():
@@ -227,6 +251,8 @@ class Map:
         return True
 
     def tree(self, x, y, must=False, kind='conifer'):
+        if isinstance(kind, (list, tuple)):
+            kind = self.rng.choice(kind)
         cells = [(x + dx, y + dy) for dy in range(4) for dx in range(2)]
         blocked = any(self.inb(cx, cy) and ((cx, cy) in self.reserved or self.deco[cy][cx]) for cx, cy in cells)
         if blocked:
@@ -348,7 +374,7 @@ def finish_trace(m, n_spots=10, flowers=8):
         for x in range(-2 - off, m.w + 1, 2):
             cells = [(x + dx, y + dy) for dy in range(4) for dx in range(2)]
             if all((c in forest_cells) or not m.inb(*c) for c in cells) and any(m.inb(*c) for c in cells):
-                m.tree(x, y)
+                m.tree(x, y, kind=getattr(m, 'tree_kind', MIXED))
     # Second pass: fill irregular forest edges with trees that are mostly over
     # forest and never touch water, rock, the path or a spot.
     def ok(x, y):
@@ -361,7 +387,7 @@ def finish_trace(m, n_spots=10, flowers=8):
         for x in range(-1, m.w):
             if (x, y) in forest_cells and (x, y) not in m.tree_cells:
                 for tx, ty in ((x, y - 3), (x - 1, y - 3), (x, y - 2), (x - 1, y - 2), (x, y - 1), (x - 1, y - 1), (x, y), (x - 1, y)):
-                    if ok(tx, ty) and m.tree(tx, ty):
+                    if ok(tx, ty) and m.tree(tx, ty, kind=getattr(m, 'tree_kind', MIXED)):
                         break
     # Tall grass: smooth the noisy trace into solid patches (fill holes,
     # drop lone tufts), the way the routes group their grass.
@@ -484,6 +510,196 @@ def rect(x0, y0, x1, y1):
     return {(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
 
 
+def blob(rng, cx, cy, rx, ry, wobble=0.3):
+    """An organic roundish patch: the cells inside an ellipse whose radius
+    wanders with the angle, so grass, pools and chambers are never boxes."""
+    phases = [rng.random() * math.tau for _ in range(4)]
+    cells = set()
+    for y in range(int(cy - ry - 2), int(cy + ry + 3)):
+        for x in range(int(cx - rx - 2), int(cx + rx + 3)):
+            dx, dy = (x - cx) / rx, (y - cy) / ry
+            r = math.hypot(dx, dy)
+            a = math.atan2(dy, dx)
+            f = 1 + sum(wobble / (i + 1) * math.sin((i + 2) * a + ph) for i, ph in enumerate(phases))
+            if r <= f:
+                cells.add((x, y))
+    return cells
+
+
+def smooth(cells, m, passes=2, keep=None):
+    """Fill one-cell holes and notches and drop lone cells, so a region reads
+    as one shape. `keep` cells are never removed."""
+    keep = keep or set()
+    nb4 = lambda c, S: sum((c[0] + dx, c[1] + dy) in S for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+    for _ in range(passes):
+        add = set()
+        for y in range(m.h):
+            for x in range(m.w):
+                c = (x, y)
+                if c in cells:
+                    continue
+                if nb4(c, cells) >= 3 or (((x - 1, y) in cells and (x + 1, y) in cells) or ((x, y - 1) in cells and (x, y + 1) in cells)):
+                    add.add(c)
+        cells = cells | add
+        cells = {c for c in cells if nb4(c, cells) >= 2 or c in keep}
+    return cells
+
+
+def lane_order(m):
+    """Every lane cell in walking order (the path, then the extra lanes)."""
+    out = []
+    for pts in [m.path] + [p for _, p in getattr(m, 'extra_paths', [])]:
+        for (ax, ay), (bx, by) in zip(pts, pts[1:]):
+            dx, dy = (bx > ax) - (bx < ax), (by > ay) - (by < ay)
+            for st in range(abs(bx - ax) + abs(by - ay) + 1):
+                c = (ax + dx * st, ay + dy * st)
+                if not out or out[-1] != c:
+                    out.append(c)
+    return out
+
+
+def corridor(m, width=1, jitter=1):
+    """The cells of a passage along every enemy lane: `width` cells each side,
+    the edge wandering in and out by up to `jitter` cells along the way."""
+    cells = set()
+    p1, p2 = m.rng.random() * math.tau, m.rng.random() * math.tau
+    for i, (x, y) in enumerate(lane_order(m)):
+        r = width + round(jitter * (0.7 * math.sin(i / 2.7 + p1) + 0.5 * math.sin(i / 6.1 + p2)))
+        r = max(1, r)
+        for dy in range(-r, r + 1):
+            for dx in range(-r, r + 1):
+                if dx * dx + dy * dy <= r * r + r:
+                    cells.add((x + dx, y + dy))
+    return cells
+
+
+def carve(m, src, cells, path_floor='floor-b', water=(), faces=('wall', 'wall-s'), caps=True, water_ground=None):
+    """A Platinum-style cave: `cells` are the floor, everything else is the
+    black of the cave beyond the lamp light. Rock faces two tiles tall rise
+    from the floor's top edges (the way the DS camera shows the walls), with
+    the end-cap textures where a face run stops; a 2x2 face stamp (Stark's
+    cliffs) is split over the two rows. `water` cells are a pool sunk into
+    the floor (the pool autotile, or `water_ground` for magma). The void and
+    the faces block placement."""
+    lanes = m.path_cells | getattr(m, 'lane_cells', set())
+    cells = {c for c in cells if m.inb(*c)} | lanes | set(water)
+    cells = smooth(cells, m, keep=lanes)
+    m.cave = cells
+    floor_pat = GROUND[f'pt-{src}-floor'][:4]
+    for y in range(m.h):
+        for x in range(m.w):
+            if (x, y) in cells:
+                m.ground[y][x] = f'pt-{src}-floor-{(x % floor_pat[2]) + (y % floor_pat[3]) * floor_pat[2]}'
+            else:
+                m.ground[y][x] = f'pt-{src}-dark-0'
+                m.reserved.add((x, y))
+    if path_floor:
+        pid = path_floor if path_floor.startswith('pt-') else f'pt-{src}-{path_floor}'
+        pat = GROUND[pid][:4]
+        for (x, y) in lanes:
+            if m.inb(x, y):
+                m.ground[y][x] = f'{pid}-{(x % pat[2]) + (y % pat[3]) * pat[2]}'
+    pool = {c for c in water if m.inb(*c) and c not in lanes}
+    if water_ground:
+        pat = GROUND[water_ground][:4]
+        for (x, y) in pool:
+            m.ground[y][x] = f'{water_ground}-{(x % pat[2]) + (y % pat[3]) * pat[2]}'
+    else:
+        m.terrain_cells('pool', pool)
+    m.reserved |= pool
+    m.water |= pool
+    face = {}
+    for (x, y) in cells:
+        for k in (1, 2):
+            c = (x, y - k)
+            if not m.inb(*c) or c in cells:
+                break
+            face.setdefault(c, k)
+    have = {f'pt-{src}-wall-e', f'pt-{src}-wall-w'} <= set(STATIC)
+    stamp_w, stamp_h = STATIC[f'pt-{src}-{faces[0]}'][2:4]
+    for (x, y), k in face.items():
+        if stamp_h == 2:
+            m.deco[y][x] = (f'pt-{src}-{faces[0]}', x % stamp_w, 2 - k)
+        else:
+            tid = faces[k - 1]
+            if caps and have and k == 1:
+                left_open = (x - 1, y) not in face and (x - 1, y) not in cells and m.inb(x - 1, y)
+                right_open = (x + 1, y) not in face and (x + 1, y) not in cells and m.inb(x + 1, y)
+                if left_open and not right_open:
+                    tid = 'wall-w'
+                elif right_open and not left_open:
+                    tid = 'wall-e'
+            m.deco[y][x] = (f'pt-{src}-{tid}', 0, 0)
+        m.reserved.add((x, y))
+    return cells
+
+
+def put(m, tid, x0, y0):
+    """Stamp a decoration over whatever is there (a doorway in a rock face),
+    clipped to the map."""
+    col, row, w, h, solid = STATIC[tid][:5]
+    lanes = m.path_cells | getattr(m, 'lane_cells', set())
+    for dy in range(h):
+        for dx in range(w):
+            if m.inb(x0 + dx, y0 + dy):
+                assert (x0 + dx, y0 + dy) not in lanes, f'{m.name}: {tid} at {(x0, y0)} covers the path'
+                m.deco[y0 + dy][x0 + dx] = (tid, dx, dy)
+                m.reserved.add((x0 + dx, y0 + dy))
+
+
+def ground_patch(m, gid, cells):
+    """Lay a ground pattern over a set of cells (ice sheets, metal plates)."""
+    col, row, w, h = GROUND[gid][:4]
+    for (x, y) in cells:
+        if m.inb(x, y):
+            m.ground[y][x] = f'{gid}-{(x % w) + (y % h) * w}'
+
+
+def sky(m, x0, y0, x1, y1, ground='bw-sky', clouds=6, stars=False):
+    """Open air past a summit's edge: flat sky with drifting clouds, or the
+    night sky as a field of stars (Galactic's starry wall texture tiled)."""
+    m.floor(ground, x0, y0, x1, y1)
+    m.wall(x0, y0, x1, y1)
+    if stars:
+        for y in range(y0, y1 + 1, 4):
+            for x in range(x0, x1 + 1, 2):
+                put(m, 'pt-hq-wall', x, y)
+        return
+    tries = 0
+    placed = 0
+    while placed < clouds and tries < 200:
+        tries += 1
+        x, y = m.rng.randint(x0 - 1, x1), m.rng.randint(y0 - 1, y1)
+        cells = [(x + dx, y + dy) for dy in range(2) for dx in range(2)]
+        if any(m.inb(*c) and (c[0] < x0 or c[0] > x1 or c[1] < y0 or c[1] > y1 or m.deco[c[1]][c[0]]) for c in cells):
+            continue
+        put(m, 'pt-spear-cloud', x, y)
+        placed += 1
+
+
+def octagon(x0, y0, x1, y1, cut=3):
+    """A rectangle with its corners cut on the diagonal, the way the games
+    draw their lakes (the step pattern reads as a shoreline, not a box)."""
+    cells = set()
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            d = min(x - x0 + y - y0, x1 - x + y - y0, x - x0 + y1 - y, x1 - x + y1 - y)
+            if d >= cut:
+                cells.add((x, y))
+    return cells
+
+
+def grass_blob(m, cx, cy, rx, ry):
+    for (x, y) in blob(m.rng, cx, cy, rx, ry):
+        m.tall_grass(x, y, x, y)
+
+
+def water_blob(m, cx, cy, rx, ry, tid='water', wobble=0.25):
+    cells = smooth(blob(m.rng, cx, cy, rx, ry, wobble=wobble), m, passes=1)
+    water(m, cells, tid=tid)
+    return cells
+
+
 def border_forest(m, kind='conifer', top=True, bottom=True, left=True, right=True):
     """A ring of trees just outside and along the map edges."""
     if top:
@@ -500,29 +716,34 @@ def border_forest(m, kind='conifer', top=True, bottom=True, left=True, right=Tru
 # cobbled clock face; the path winds through tall grass between the beds.
 def eterna_gym():
     m = blank('eterna-gym', 2001, [(0, 11), (5, 11), (5, 4), (12, 4), (12, 9), (19, 9), (19, 3), (26, 3), (26, 13)])
-    border_forest(m)
+    border_forest(m, kind=MIXED)
     m.floor('bw-cobble', 14, 5, 17, 8)
-    for x, y in ((7, 1), (21, 1), (7, 11), (21, 11), (14, 11), (1, 1), (1, 7)):
+    for x, y in ((7, 5), (21, 4), (8, 9), (22, 9)):
+        put(m, 'bw-hedge-ring', x, y)
+    for x, y in ((1, 1), (1, 7), (14, 11), (27, 7)):
         m.stamp('bw-flower-bush-red' if (x + y) % 2 else 'bw-flower-bush-mix', x, y, must=False)
-    for x, y in ((9, 6), (22, 6), (2, 4), (27, 8), (15, 1), (9, 11)):
+    for x, y in ((9, 6), (22, 6), (2, 4), (15, 1), (9, 11)):
         m.stamp('bw-flower-patch-pink', x, y, must=False)
-    m.tall_grass(6, 5, 11, 8)
-    m.tall_grass(20, 5, 25, 8)
-    m.tall_grass(13, 10, 18, 12)
+    grass_blob(m, 8.5, 6.5, 3, 1.8)
+    grass_blob(m, 22.5, 6.5, 3, 1.8)
+    grass_blob(m, 15.5, 11, 3, 1.3)
     pick_spots(m, 10)
-    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig'], 10, (0, 0, 29, 13))
+    m.scatter(['bw-flowers-white', 'bw-flowers-white-2'], 10, (0, 0, 29, 13))
     return m
 
 
 # Hearthome Gym: the courtyard behind Fantina's gym at night. A long dark
 # zigzag over cobbles with a lantern post at every turn.
 def hearthome_gym():
-    m = blank('hearthome-gym', 2002, [(0, 7), (4, 7), (4, 2), (10, 2), (10, 11), (16, 11), (16, 2), (22, 2), (22, 11), (29, 11)])
+    m = blank('hearthome-gym', 2002, [(0, 7), (4, 7), (4, 3), (10, 3), (10, 11), (16, 11), (16, 3), (22, 3), (22, 11), (29, 11)])
     m.floor('bw-cobble', 2, 1, 27, 12)
-    border_forest(m)
+    put(m, 'bw-hall', 12, -5)
+    border_forest(m, kind=MIXED)
     for x, y in ((6, 3), (12, 8), (18, 3), (24, 8), (2, 9), (26, 1)):
         m.stamp('bw-lantern', x, y, must=False)
-    for x, y in ((8, 7), (14, 5), (20, 7), (26, 5)):
+    for x, y in ((7, 7), (13, 5), (19, 7), (25, 5)):
+        m.stamp('bw-hedge-ring', x, y, must=False)
+    for x, y in ((8, 11), (20, 11), (2, 5)):
         m.stamp('bw-flower-patch-pink', x, y, must=False)
     pick_spots(m, 10)
     return m
@@ -551,17 +772,21 @@ def veilstone_gym():
 def pastoria_gym():
     m = blank('pastoria-gym', 2004, [(0, 6), (4, 6), (4, 1), (25, 1), (25, 12), (29, 12)], road=None)
     m.floor('bw-bluetile', 2, 0, 27, 13)
+    m.floor('bw-cream', 0, 0, 1, 13)
+    m.floor('bw-cream', 28, 0, 29, 13)
     for (x, y) in m.path_cells:
         m.ground[y][x] = 'bw-cream-' + str((x % 2) + (y % 2) * 2)
     moat = rect(7, 3, 22, 10) - rect(9, 5, 20, 8)
     swim = [(0, 9), (7, 9), (7, 4), (22, 4), (22, 9), (29, 9)]
     m.extra_paths = [('path-water', swim)]
     lane2 = lane(m, swim, road=False)
-    water(m, moat | lane2)
+    water(m, moat | lane2, tid='pool')
     m.spot_props = {(5, 3): {'tide': True}, (24, 10): {'tide': True}}
     m.add_spots([(5, 3), (24, 10)])
-    m.stamp('bw-barrel', 1, 1, must=False)
-    m.stamp('bw-barrel', 28, 1, must=False)
+    for x, y in ((1, 1), (28, 1), (1, 12), (28, 12)):
+        m.stamp('bw-barrel', x, y, must=False)
+    for x, y in ((10, 11), (18, 11)):
+        m.stamp('bw-flower-patch-pink', x, y, must=False)
     pick_spots(m, 10)
     return m
 
@@ -570,18 +795,20 @@ def pastoria_gym():
 # (street lights) and the harbour water along the bottom. The path zigzags
 # like the gym's lifts.
 def canalave_gym():
-    m = blank('canalave-gym', 2005, [(0, 2), (8, 2), (8, 9), (16, 9), (16, 2), (24, 2), (24, 9), (29, 9)], road=None)
+    m = blank('canalave-gym', 2005, [(0, 3), (8, 3), (8, 9), (16, 9), (16, 3), (24, 3), (24, 9), (29, 9)], road=None)
     m.floor('bw-steel', 0, 0, 29, 10)
     for (x, y) in m.path_cells:
         m.ground[y][x] = 'bw-orangetile-' + str((x % 2) + (y % 2) * 2)
     m.floor('bw-cobble', 0, 11, 29, 11)
     water(m, rect(0, 12, 29, 13))
-    for x in (2, 12, 20):
+    put(m, 'bw-factory', 10, -4)
+    put(m, 'bw-pier', 4, 10)
+    for x in (2, 20):
         m.stamp('bw-container', x, 4, must=False)
     for x, y in ((5, 7), (27, 3), (19, 11)):
         m.stamp('bw-streetlamp', x, y - 2, must=False)
-    for x, y in ((11, 11), (1, 11), (27, 11)):
-        m.stamp('bw-barrel', x, y - 1, must=False)
+    for x, y in ((11, 11), (1, 11), (27, 11), (13, 5)):
+        m.stamp('bw-barrel', x, y - 1 if y == 11 else y, must=False)
     pick_spots(m, 10)
     return m
 
@@ -591,14 +818,15 @@ def canalave_gym():
 def snowpoint_gym():
     m = blank('snowpoint-gym', 2006, [(0, 6), (8, 6), (8, 3), (14, 3), (14, 10), (21, 10), (21, 6), (29, 6)], road='pebbles')
     m.floor('bw-snow', 0, 0, 29, 13)
-    m.terrain_cells('ice', rect(9, 4, 20, 9) - m.path_cells)
-    m.terrain_cells('snow-grass', rect(2, 1, 5, 3) | rect(24, 9, 28, 12))
+    m.terrain_cells('ice', blob(m.rng, 14.5, 6.5, 6.5, 3.4, wobble=0.18) - m.path_cells)
+    for cx, cy, rx, ry in ((3, 2, 2.2, 1.4), (26, 10.5, 2.5, 1.5)):
+        m.terrain_cells('snow-grass', blob(m.rng, cx, cy, rx, ry))
     border_forest(m, kind='pine-snow')
     m.stamp('bw-snow-rock-big', 2, 8, must=False)
     m.stamp('bw-snow-rock-big', 24, 0, must=False)
     for x, y in ((3, 1), (26, 10), (11, 11), (17, 0)):
         m.stamp('bw-snow-rock', x, y, must=False)
-    m.scatter(['bw-grey-rock-small'], 5, (0, 0, 29, 13))
+    m.scatter(['bw-grey-rock-small', 'bw-snow-log'], 6, (0, 0, 29, 13))
     pick_spots(m, 10)
     return m
 
@@ -611,10 +839,17 @@ def sunyshore_gym():
     m.floor('bw-bluetile', 0, 0, 29, 9)
     for (x, y) in m.path_cells:
         m.ground[y][x] = 'bw-steel-0'
-    m.terrain_cells('beach-sand', rect(0, 10, 29, 11))
-    water(m, rect(0, 12, 29, 13))
-    for x, y in ((6, 5), (14, 0), (22, 5)):
-        m.stamp('bw-machine', x, y)
+    shore = blob(m.rng, 14, 15, 20, 5.2, wobble=0.1)
+    sea = blob(m.rng, 14, 16, 19, 4.3, wobble=0.1)
+    for (x, y) in shore:
+        if m.inb(x, y) and y >= 9:
+            m.ground[y][x] = f'bw-grass-{(x % 4) + (y % 4) * 4}'
+    m.terrain_cells('beach-sand', (shore - sea) - m.path_cells)
+    water(m, sea)
+    put(m, 'bw-lighthouse', 24, 5)
+    for x, y in ((5, 5), (14, 0)):
+        m.stamp('bw-machine', x, y, must=False)
+    m.stamp('bw-streetlamp', 1, 5, must=False)
     m.spot_props = {}
     pick_spots(m, 10)
     return m
@@ -628,7 +863,6 @@ def spear_pillar():
     m = blank('spear-pillar', 2008, [(4, 13), (4, 9), (15, 9), (15, 1)], road=None)
     m.extra_paths = [('path-2', [(25, 13), (25, 9), (15, 9), (15, 1)])]
     lane(m, m.extra_paths[0][1], road=False)
-    m.floor('pt-spear-cliff', 0, 0, 29, 13)
     m.floor('pt-spear-carpet', 3, 0, 26, 11)
     for (x, y) in m.path_cells | m.lane_cells:
         if 3 <= x <= 26 and y <= 11:
@@ -644,12 +878,16 @@ def spear_pillar():
         m.stamp('pt-spear-pillar-broken', x, y, must=False)
     m.stamp('pt-spear-panel', 4, 0, must=False)
     m.stamp('pt-spear-panel', 24, 0, must=False)
-    for x, y in ((0, 11), (28, 11), (0, 0), (28, 0)):
-        m.stamp('pt-spear-cloud', x, y, must=False)
-    for x, y in ((1, 5), (28, 6), (2, 8), (27, 3)):
+    # The summit's edge: a strip of the mountain's rock, then open sky.
+    m.floor('pt-spear-cliff', 2, 0, 2, 13)
+    m.floor('pt-spear-cliff', 27, 0, 27, 13)
+    m.wall(2, 0, 2, 13)
+    m.wall(27, 0, 27, 13)
+    sky(m, 0, 0, 1, 13, clouds=4)
+    sky(m, 28, 0, 29, 13, clouds=4)
+    sky(m, 7, 13, 22, 13, clouds=3)
+    for x, y in ((3, 5), (26, 6), (3, 8), (26, 3)):
         m.stamp('pt-spear-rock', x, y, must=False)
-    m.wall(0, 0, 2, 13)
-    m.wall(27, 0, 29, 13)
     pick_spots(m, 10)
     m.points = [('altar', 'stage', 15, 0)]
     return m
@@ -658,28 +896,26 @@ def spear_pillar():
 # Temporal Spire: the Mystery Dungeon capstone. Spear Pillar's summit gone
 # grey and broken, floating in the dark, the path spiralling up to the top.
 def temporal_spire():
-    m = blank('temporal-spire', 2011, [(2, 13), (2, 9), (27, 9), (27, 4), (6, 4), (6, 1), (15, 1)], road=None)
-    m.extra_paths = [('path-2', [(27, 13), (27, 9), (27, 4), (6, 4), (6, 1), (15, 1)])]
+    m = blank('temporal-spire', 2011, [(4, 13), (4, 9), (25, 9), (25, 4), (7, 4), (7, 1), (15, 1)], road=None)
+    m.extra_paths = [('path-2', [(25, 13), (25, 9), (25, 4), (7, 4), (7, 1), (15, 1)])]
     lane(m, m.extra_paths[0][1], road=False)
     m.theme = 'cave'
-    m.floor('bw-void', 0, 0, 29, 13)
-    m.floor('pt-spear-grey', 1, 0, 28, 12)
+    m.floor('pt-spear-grey', 3, 0, 26, 12)
     for (x, y) in m.path_cells | m.lane_cells:
-        if 1 <= x <= 28 and y <= 12:
+        if 3 <= x <= 26 and y <= 12:
             m.ground[y][x] = 'pt-spear-carpet-' + str((x % 4) + (y % 4) * 4)
     m.floor('pt-spear-altar', 14, 0, 15, 1)
-    m.floor('pt-spear-grey-steps', 1, 13, 4, 13)
-    m.floor('pt-spear-grey-steps', 25, 13, 28, 13)
-    for x in (4, 10, 19, 25):
+    m.floor('pt-spear-grey-steps', 3, 13, 6, 13)
+    m.floor('pt-spear-grey-steps', 23, 13, 26, 13)
+    sky(m, 0, 0, 2, 13, ground='bw-dusk', stars=True)
+    sky(m, 27, 0, 29, 13, ground='bw-dusk', stars=True)
+    sky(m, 7, 13, 22, 13, ground='bw-dusk', stars=True)
+    for x in (5, 10, 19, 24):
         for y in (1, 6):
             if (x, y) not in m.path_cells:
                 m.stamp('pt-spear-pillar', x, y, must=False)
-    for x, y in ((8, 11), (21, 11), (13, 6), (16, 6), (24, 1)):
+    for x, y in ((9, 11), (20, 11), (13, 6), (16, 6), (22, 1)):
         m.stamp('pt-spear-pillar-broken', x, y, must=False)
-    for x, y in ((0, 11), (28, 11), (0, 1), (28, 0)):
-        m.stamp('pt-spear-cloud', x, y, must=False, clip=True)
-    m.wall(0, 0, 0, 13)
-    m.wall(29, 0, 29, 13)
     pick_spots(m, 10)
     m.points = [('dialga', 'stage', 15, 0)]
     return m
@@ -687,18 +923,26 @@ def temporal_spire():
 
 # A walled cave room on one of the Platinum cave texture sets: floor,
 # a lighter floor under the path, wall bands top and bottom, rocks.
-def cave_room(name, seed, path, src, floor='floor', path_floor='floor-b', extra=None):
+def cave_room(name, seed, path, src, chambers=(), width=1, jitter=1, water=(), lanes=(), extra=None,
+              path_floor='floor-b', faces=('wall', 'wall-s'), water_ground=None, spots=10):
+    """A carved cave on one of Platinum's cave sets: a passage along the
+    lanes, round chambers (cx, cy, rx, ry) and pools (same), black beyond."""
     m = blank(name, seed, path, road=None)
     m.theme = 'cave'
-    m.floor(f'pt-{src}-{floor}', 0, 0, 29, 13)
-    for (x, y) in m.path_cells:
-        m.ground[y][x] = f'pt-{src}-{path_floor}-0'
-    for x in range(0, 30):
-        m.stamp(f'pt-{src}-wall-s', x, 0, must=False)
-        m.stamp(f'pt-{src}-wall', x, 13, must=False)
+    if lanes:
+        m.extra_paths = list(lanes)
+        for _, pts in lanes:
+            lane(m, pts, road=False)
+    cells = corridor(m, width, jitter)
+    for cx, cy, rx, ry in chambers:
+        cells |= blob(m.rng, cx, cy, rx, ry)
+    pool = set()
+    for cx, cy, rx, ry in water:
+        pool |= blob(m.rng, cx, cy, rx, ry, wobble=0.2)
+    carve(m, src, cells, path_floor=path_floor, water=pool, faces=faces, water_ground=water_ground)
     if extra:
         extra(m)
-    pick_spots(m, 10)
+    pick_spots(m, spots)
     return m
 
 
@@ -706,64 +950,55 @@ def cave_room(name, seed, path, src, floor='floor', path_floor='floor-b', extra=
 # with a plank bridge, Strength boulders and rubble.
 def victory_road():
     def deco(m):
-        m.floor('pt-vroad-water', 10, 10, 16, 12)
-        m.wall(10, 10, 16, 12)
-        m.floor('pt-vroad-bridge', 12, 10, 13, 12)
-        m.floor('pt-vroad-water', 22, 1, 29, 2)
-        m.wall(22, 1, 29, 2)
-        for x, y in ((3, 2), (18, 5), (25, 10), (8, 11)):
+        put(m, 'pt-vroad-door', 27, 5)
+        for x, y in ((3, 2), (17, 6), (24, 10), (9, 11)):
             m.stamp('pt-vroad-boulder', x, y, must=False)
-        m.stamp('pt-vroad-door', 27, 11, must=False)
         m.scatter(['pt-vroad-rocks'], 8, (0, 1, 29, 12))
-    return cave_room('victory-road', 416, [(0, 4), (7, 4), (7, 8), (13, 8), (13, 3), (20, 3), (20, 8), (29, 8)], 'vroad', extra=deco)
+    path = [(0, 4), (7, 4), (7, 9), (14, 9), (14, 3), (21, 3), (21, 8), (29, 8)]
+    return cave_room('victory-road', 416, path, 'vroad', chambers=[(4, 7, 3, 2), (18, 6, 3.5, 2.5), (26, 4, 2.5, 2)],
+                     water=[(11, 11, 4.5, 2.2), (26, 11, 3, 1.5)], extra=deco)
 
 
 # Turnback Cave: the ruins set in the dark, pillar rooms joined by doors;
 # the path winds past the stair hole where Giratina waits.
 def turnback_cave():
     def deco(m):
-        for x, y in ((4, 2), (24, 2), (4, 10), (24, 10)):
-            m.stamp('pt-ruins-door', x, y, must=False)
+        for x, y in ((5, 1), (23, 1)):
+            put(m, 'pt-ruins-door', x, y)
         m.stamp('pt-ruins-stairs', 13, 5, must=False)
-        for x, y in ((9, 1), (19, 1), (9, 11), (19, 11)):
+        for x, y in ((9, 2), (19, 2), (3, 10), (26, 10)):
             m.stamp('pt-spear-pillar-broken', x, y, must=False)
         m.scatter(['pt-ruins-rocks'], 6, (0, 1, 29, 12))
-    def deco2(m):
-        m.extra_paths = [('path-2', [(0, 12), (29, 12)])]
-        cells = lane(m, m.extra_paths[0][1], road=False)
-        for (x, y) in cells:
-            m.ground[y][x] = 'pt-ruins-floor-b-0'
-        deco(m)
-    return cave_room('turnback-cave', 417, [(0, 7), (6, 7), (6, 3), (11, 3), (11, 9), (18, 9), (18, 3), (23, 3), (23, 7), (29, 7)], 'ruins', floor='floor', path_floor='floor-b', extra=deco2)
+    return cave_room('turnback-cave', 417, [(0, 7), (6, 7), (6, 3), (11, 3), (11, 9), (18, 9), (18, 3), (23, 3), (23, 7), (29, 7)], 'ruins',
+                     chambers=[(15, 6, 4.5, 3), (4, 10, 3, 2), (25, 10, 3, 2)], lanes=[('path-2', [(0, 12), (29, 12)])], extra=deco)
 
 
 # The Regi chambers: three small ruins rooms, each dressed for its Regi.
 def regi_chamber(name, seed, kind):
     def deco(m):
         if kind == 'rock':
-            for x, y in ((3, 2), (24, 2), (12, 10), (20, 10)):
+            for x, y in ((3, 2), (24, 2), (12, 11), (20, 11)):
                 m.stamp('pt-mine-boulder', x, y, must=False)
             m.scatter(['pt-mine-rocks'], 8, (0, 1, 29, 12))
         elif kind == 'ice':
-            m.floor('pt-temple-ice-a', 3, 2, 9, 5)
-            m.floor('pt-temple-ice-b', 18, 8, 25, 11)
+            ground_patch(m, 'pt-temple-ice-b', blob(m.rng, 6, 4, 3.5, 2) & m.cave)
+            ground_patch(m, 'pt-temple-ice-b', blob(m.rng, 22, 10, 4, 2) & m.cave)
             m.stamp('bw-ice-block', 12, 2, must=False)
             m.stamp('bw-ice-rock', 26, 2, must=False)
         else:
-            for x, y in ((3, 2), (24, 2), (12, 10)):
+            for x, y in ((3, 2), (24, 2), (12, 11)):
                 m.stamp('pt-mine-panel', x, y, must=False)
-            m.stamp('pt-mine-lift', 24, 10, must=False)
+            m.stamp('pt-mine-lift', 24, 11, must=False)
             m.scatter(['pt-mine-rocks'], 4, (0, 1, 29, 12))
-        m.stamp('pt-ruins-door', 14, 0, must=False)
+        put(m, 'pt-ruins-door', 14, 1)
     path = [(0, 9), (6, 9), (6, 4), (14, 4), (14, 9), (22, 9), (22, 4), (29, 4)]
-    return cave_room(name, seed, path, 'ruins', floor='floor-b' if kind == 'ice' else 'floor', path_floor='floor' if kind == 'ice' else 'floor-b', extra=deco)
+    return cave_room(name, seed, path, 'ruins', chambers=[(14, 7, 13, 4.5)], extra=deco)
 
 
 # Hall of Origin: one straight stair of white stone up into the sky, grey
 # pillars on both sides and cloud below; Arceus at the top.
 def hall_of_origin():
     m = blank('hall-of-origin', 418, [(10, 13), (10, 11), (19, 11), (19, 7), (10, 7), (10, 3), (15, 3), (15, 1)], road=None)
-    m.floor('bw-void', 0, 0, 29, 13)
     m.floor('pt-spear-grey', 8, 0, 21, 13)
     for (x, y) in m.path_cells:
         m.ground[y][x] = 'pt-spear-grey-steps-' + str(x % 2)
@@ -771,10 +1006,8 @@ def hall_of_origin():
     for y in (0, 4, 8):
         m.stamp('pt-spear-pillar', 8, y, must=False)
         m.stamp('pt-spear-pillar', 20, y, must=False)
-    for x, y in ((5, 2), (22, 2), (4, 9), (23, 9), (1, 5), (26, 5), (3, 12), (25, 12)):
-        m.stamp('pt-spear-cloud', x, y, must=False)
-    m.wall(0, 0, 7, 13)
-    m.wall(22, 0, 29, 13)
+    sky(m, 0, 0, 7, 13, clouds=9)
+    sky(m, 22, 0, 29, 13, clouds=9)
     pick_spots(m, 10)
     m.points = [('altar', 'stage', 15, 0)]
     return m
@@ -786,7 +1019,7 @@ def hall_of_origin():
 def distortion_world():
     m = blank('distortion-world', 2009, [(0, 2), (6, 2), (6, 7), (13, 7), (13, 3), (20, 3), (20, 10), (27, 10), (27, 13)], road=None)
     m.theme = 'cave'
-    m.floor('bw-void', 0, 0, 29, 13)
+    m.floor('bw-dusk', 0, 0, 29, 13)
     platforms = [(0, 0, 8, 4), (4, 5, 15, 9), (11, 1, 22, 5), (18, 8, 29, 12)]
     for x0, y0, x1, y1 in platforms:
         m.floor('pt-dw-floor', x0, y0, x1, y1)
@@ -816,15 +1049,19 @@ def distortion_world():
 # of stands, the path snaking down the field.
 def stadium(kind):
     path = [(0, 3), (26, 3), (26, 7), (3, 7), (3, 11), (29, 11)]
-    m = blank(f'stadium-{kind}', 2010, path, road={'grass': 'bw-path', 'rock': 'dirt-path-dark', 'water': 'bw-path', 'ice': 'pebbles'}[kind])
+    m = blank(f'stadium-{kind}', 2010, path, road={'grass': 'bw-path', 'rock': None, 'water': 'bw-path', 'ice': 'pebbles'}[kind])
     m.floor('bw-cobble', 0, 0, 29, 13)
     field = rect(2, 1, 27, 12)
     for x, y in field:
         m.ground[y][x] = f'bw-grass-{(x % 4) + (y % 4) * 4}'
     if kind == 'rock':
-        m.terrain_cells('pebbles', field - m.path_cells)
+        m.floor('pt-mine-floor', 2, 1, 27, 12)
+        for (x, y) in m.path_cells:
+            if (x, y) in field:
+                m.ground[y][x] = 'pt-mine-floor-b-0'
         for x, y in ((8, 5), (20, 9), (14, 1)):
             m.stamp('bw-rock', x, y, must=False)
+        m.scatter(['bw-rock-small'], 6, (2, 1, 27, 12))
     elif kind == 'water':
         m.terrain_cells('sand', field - m.path_cells)
         water(m, rect(8, 5, 11, 6) | rect(18, 9, 21, 10) | rect(12, 1, 15, 1), tid='pool')
@@ -844,16 +1081,17 @@ def stadium(kind):
 # Hisui rifts: the same places long ago, no roads.
 def hisui_fieldlands():
     m = blank('hisui-fieldlands', 2101, [(0, 9), (7, 9), (7, 4), (16, 4), (16, 10), (24, 10), (24, 5), (29, 5)], road='dirt-path')
-    border_forest(m)
-    m.forest(9, -1, 14, 1)
-    m.forest(18, 11, 23, 14)
-    for x, y in ((11, 6), (19, 6)):
-        m.tree(x, y, kind='conifer')
-    m.tall_grass(2, 2, 6, 6)
-    m.tall_grass(18, 1, 23, 3)
-    m.tall_grass(9, 11, 14, 12)
+    border_forest(m, kind=MIXED)
+    m.forest(9, -1, 14, 1, MIXED)
+    m.forest(18, 11, 23, 14, MIXED)
+    for x, y in ((11, 6), (19, 6), (3, 11)):
+        m.tree(x, y, kind='round')
+    grass_blob(m, 4, 4, 3, 2)
+    grass_blob(m, 20.5, 2, 3, 1.3)
+    grass_blob(m, 11.5, 12, 3, 1.2)
     m.stamp('bw-logpile', 27, 11, must=False)
     m.stamp('bw-log', 2, 12, must=False)
+    m.stamp('bw-rock', 26, 1, must=False)
     pick_spots(m, 10)
     m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig', 'bw-sprig-2'], 10, (0, 0, 29, 13))
     return m
@@ -861,39 +1099,48 @@ def hisui_fieldlands():
 
 def hisui_mirelands():
     m = blank('hisui-mirelands', 2102, [(0, 4), (8, 4), (8, 10), (15, 10), (15, 3), (22, 3), (22, 9), (29, 9)], road='soil')
-    water(m, rect(2, 7, 6, 9) | rect(10, 1, 13, 2) | rect(18, 11, 23, 13) | rect(25, 2, 29, 5), tid='shallow-water')
-    border_forest(m, top=True, bottom=False, left=True, right=False)
-    m.tall_grass(9, 6, 14, 8)
-    m.tall_grass(17, 6, 21, 8)
-    m.tall_grass(1, 11, 7, 12)
-    for x, y in ((7, 6), (14, 0), (17, 10), (24, 6), (1, 6)):
+    for cx, cy, rx, ry in ((4, 8.5, 3, 1.8), (11.5, 1, 2.5, 1.3), (20, 12, 3, 1.5), (27, 3, 2.5, 1.8)):
+        water_blob(m, cx, cy, rx, ry, tid='shallow-water', wobble=0.3)
+    border_forest(m, kind=['autumn', 'autumn', 'round'], top=True, bottom=False, left=True, right=False)
+    for x, y in ((5, 1), (25, 6), (17, 11)):
+        m.tree(x, y, kind='autumn')
+    grass_blob(m, 11.5, 7, 3, 1.6)
+    grass_blob(m, 19, 7, 2.5, 1.5)
+    grass_blob(m, 4, 12, 3, 1)
+    for x, y in ((7, 6), (14, 0), (17, 10), (24, 6), (1, 6), (9, 10)):
         m.stamp('bw-reeds', x, y, must=False)
     m.stamp('bw-log', 25, 11, must=False)
     pick_spots(m, 10)
+    m.scatter(['bw-sprig', 'bw-sprig-3'], 6, (0, 0, 29, 13))
     return m
 
 
 def hisui_coastlands():
     m = blank('hisui-coastlands', 2103, [(0, 5), (9, 5), (9, 9), (19, 9), (19, 4), (29, 4)], road='sand')
-    m.terrain_cells('beach-sand', rect(0, 8, 29, 11) - m.path_cells)
-    water(m, rect(0, 12, 29, 13) | rect(23, 10, 29, 11))
+    shore = blob(m.rng, 14, 14, 20, 4.5, wobble=0.12)
+    sea = blob(m.rng, 14, 15.5, 19, 4, wobble=0.12)
+    m.terrain_cells('beach-sand', (shore - sea) - m.path_cells)
+    water(m, sea)
     m.plateau(21, 0, 29, 2, cliff='rock')
     m.stamp('bw-cave-mouth', 23, 0, must=False)
     m.stamp('bw-rock-big', 1, 0, must=False)
-    for x, y in ((12, 1), (16, 11), (5, 11), (27, 7)):
+    for x, y in ((12, 1), (5, 11), (27, 7)):
         m.stamp('bw-rock', x, y, must=False)
     m.scatter(['bw-rock-small'], 6, (0, 6, 29, 11))
-    border_forest(m, top=False, bottom=False, left=True, right=False)
-    m.tall_grass(11, 1, 18, 3)
+    border_forest(m, kind=MIXED, top=False, bottom=False, left=True, right=False)
+    grass_blob(m, 14.5, 2, 3.5, 1.5)
     pick_spots(m, 10)
+    m.scatter(['bw-flowers-white', 'bw-sprig'], 5, (0, 0, 20, 7))
     return m
 
 
 def hisui_icelands():
     m = blank('hisui-icelands', 2104, [(0, 8), (6, 8), (6, 3), (14, 3), (14, 9), (22, 9), (22, 4), (29, 4)], road='pebbles')
     m.floor('bw-snow', 0, 0, 29, 13)
-    m.terrain_cells('snow-grass', rect(1, 1, 4, 3) | rect(15, 11, 20, 13))
-    m.terrain_cells('ice', (rect(8, 5, 12, 8) | rect(16, 1, 20, 2) | rect(24, 7, 29, 10)) - m.path_cells)
+    for cx, cy, rx, ry in ((2.5, 2, 2, 1.3), (17.5, 12, 3, 1.3)):
+        m.terrain_cells('snow-grass', blob(m.rng, cx, cy, rx, ry) - m.path_cells)
+    for cx, cy, rx, ry in ((10, 6.5, 2.5, 1.8), (18, 1.5, 2.5, 1.2), (26.5, 8.5, 3, 2)):
+        m.terrain_cells('ice', blob(m.rng, cx, cy, rx, ry, wobble=0.2) - m.path_cells)
     border_forest(m, kind='pine-snow')
     m.plateau(0, 10, 5, 13, cliff='snow')
     m.stamp('bw-snow-rock-big', 25, 0, must=False)
@@ -901,7 +1148,7 @@ def hisui_icelands():
         m.stamp('bw-snow-rock', x, y, must=False)
     m.stamp('bw-ice-block', 9, 0, must=False)
     m.stamp('bw-ice-rock', 24, 11, must=False)
-    m.scatter(['bw-grey-rock-small'], 5, (0, 0, 29, 13))
+    m.scatter(['bw-grey-rock-small', 'bw-snow-log'], 6, (0, 0, 29, 13))
     pick_spots(m, 10)
     return m
 
@@ -976,19 +1223,20 @@ def lake_verity_island():
 # story (the level code drains and refills it); same bones as Verity.
 def lake_valor():
     m = blank('lake-valor', 303, [(0, 12), (4, 12), (4, 2), (25, 2), (25, 12), (29, 12)])
-    lake = rect(6, 3, 23, 10) - {(6, 3), (7, 3), (6, 4), (22, 3), (23, 3), (23, 4), (6, 9), (6, 10), (7, 10), (22, 10), (23, 10), (23, 9)} | rect(9, 2, 20, 2) | rect(9, 11, 20, 11)
+    lake = octagon(6, 3, 23, 10, cut=3) | rect(10, 2, 19, 2) | rect(10, 11, 19, 11)
     island = rect(13, 6, 16, 7)
     water(m, lake - island)
-    m.stamp('bw-rock', 14, 6)
+    m.stamp('bw-rock', 14, 6, must=False)
     m.stamp('bw-rock-small', 16, 7, must=False)
-    border_forest(m)
-    m.forest(0, 4, 2, 9)
-    m.forest(27, 4, 29, 9)
-    for x, y in ((5, 2), (24, 2), (5, 11), (24, 11), (7, 1), (22, 1)):
+    border_forest(m, kind=MIXED)
+    m.forest(0, 4, 2, 9, MIXED)
+    m.forest(27, 4, 29, 9, MIXED)
+    for x, y in ((5, 3), (24, 3), (6, 10), (23, 10), (9, 1), (20, 11)):
         m.stamp('bw-reeds', x, y, must=False)
-    m.tall_grass(6, 12, 22, 12)
+    grass_blob(m, 13, 12, 5, 1.2)
+    grass_blob(m, 12, 1, 3, 0.9)
     pick_spots(m, 10)
-    m.scatter(['bw-flowers-white', 'bw-sprig'], 6, (0, 0, 29, 13))
+    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig'], 8, (0, 0, 29, 13))
     return m
 
 
@@ -997,15 +1245,16 @@ def lake_valor():
 def lake_acuity():
     m = blank('lake-acuity', 304, [(0, 11), (3, 11), (3, 1), (26, 1), (26, 11), (29, 11)], road='pebbles')
     m.floor('bw-snow', 0, 0, 29, 13)
-    lake = rect(7, 3, 22, 10) - {(7, 3), (22, 3), (7, 10), (22, 10)}
+    rim = octagon(5, 2, 24, 11, cut=3)
+    lake = octagon(7, 3, 22, 10, cut=3)
     island = rect(13, 6, 16, 7)
     water(m, lake - island)
-    m.terrain_cells('ice', (rect(5, 2, 24, 11) - lake - m.path_cells))
+    m.terrain_cells('ice', (rim - lake - m.path_cells))
     m.stamp('bw-snow-rock', 14, 5, must=False)
     border_forest(m, kind='pine-snow')
     m.stamp('bw-snow-rock-big', 0, 2, must=False)
     m.stamp('bw-snow-rock-big', 26, 2, must=False)
-    m.scatter(['bw-grey-rock-small', 'bw-ice-block'], 5, (0, 0, 29, 13))
+    m.scatter(['bw-grey-rock-small', 'bw-ice-block', 'bw-snow-log'], 7, (0, 0, 29, 13))
     pick_spots(m, 10)
     return m
 
@@ -1013,20 +1262,24 @@ def lake_acuity():
 # Valley Windworks: the river valley below the plant. The river runs down the
 # map with a shallow ford, tall grass on both banks, fences of logs.
 def valley_windworks():
-    m = blank('valley-windworks', 401, [(0, 3), (9, 3), (9, 8), (19, 8), (19, 4), (29, 4)])
-    river = rect(13, 0, 15, 13)
-    water(m, river - rect(13, 8, 15, 8))
-    m.terrain_cells('shallow-water', rect(13, 8, 15, 8) - m.path_cells)
-    border_forest(m, bottom=False)
-    m.forest(0, 10, 10, 14)
-    m.tall_grass(1, 5, 7, 7)
-    m.tall_grass(21, 9, 28, 11)
-    m.tall_grass(17, 0, 24, 1)
-    for x, y in ((4, 1), (23, 6), (10, 11)):
+    m = blank('valley-windworks', 401, [(0, 10), (9, 10), (9, 6), (19, 6), (19, 11), (29, 11)])
+    # The river comes down from the plant and bends east along the bottom.
+    river = rect(13, 0, 15, 8) | rect(13, 8, 29, 9) | {(12, y) for y in range(1, 4)} | {(16, y) for y in range(4, 8)}
+    water(m, river)
+    # fords where the path crosses: shallow water over the road
+    m.terrain_cells('shallow-water', river & m.path_cells, on_path=True)
+    m.stamp('bw-plant', 3, -4, must=False, clip=True)
+    border_forest(m, kind=MIXED, bottom=False, top=False)
+    m.forest(20, -1, 29, 2, MIXED)
+    m.forest(0, 12, 8, 14, MIXED)
+    grass_blob(m, 5, 8, 3.2, 1.3)
+    grass_blob(m, 24, 4, 3.5, 1.6)
+    grass_blob(m, 23, 12.5, 3, 1)
+    for x, y in ((11, 11), (26, 2)):
         m.stamp('bw-log', x, y, must=False)
-    m.stamp('bw-sign', 1, 2, must=False)
+    m.stamp('bw-sign', 1, 8, must=False)
     pick_spots(m, 10)
-    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig'], 8, (0, 0, 29, 13))
+    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig'], 10, (0, 0, 29, 13))
     return m
 
 
@@ -1034,14 +1287,14 @@ def valley_windworks():
 # (tall grass) and fallen logs.
 def eterna_forest():
     m = blank('eterna-forest', 402, [(0, 2), (6, 2), (6, 9), (13, 9), (13, 3), (21, 3), (21, 11), (29, 11)], road='dirt-path-dark')
-    border_forest(m)
-    m.forest(8, 4, 11, 7)
-    m.forest(15, 5, 19, 8)
-    m.forest(23, 0, 29, 8)
-    m.forest(0, 4, 4, 8)
-    m.forest(8, 11, 19, 14)
-    m.tall_grass(1, 10, 4, 12)
-    m.tall_grass(23, 9, 27, 10)
+    border_forest(m, kind=TEAL_MIX)
+    m.forest(8, 4, 11, 7, TEAL_MIX)
+    m.forest(15, 5, 19, 8, TEAL_MIX)
+    m.forest(23, 0, 29, 8, TEAL_MIX)
+    m.forest(0, 4, 4, 8, TEAL_MIX)
+    m.forest(8, 11, 19, 14, TEAL_MIX)
+    grass_blob(m, 2.5, 11, 2.5, 1.5)
+    grass_blob(m, 25, 10, 2.5, 1.2)
     m.stamp('bw-log', 10, 1, must=False)
     m.stamp('bw-logpile', 16, 0, must=False)
     pick_spots(m, 10)
@@ -1052,16 +1305,17 @@ def eterna_forest():
 # Old Chateau grounds at night: overgrown garden, lanterns, dead-looking
 # pines, a cobbled drive.
 def old_chateau():
-    m = blank('old-chateau', 403, [(0, 7), (5, 7), (5, 3), (12, 3), (12, 10), (18, 10), (18, 3), (25, 3), (25, 13)], road=None)
+    m = blank('old-chateau', 403, [(0, 8), (5, 8), (5, 4), (12, 4), (12, 11), (18, 11), (18, 4), (25, 4), (25, 13)], road=None)
     for (x, y) in m.path_cells:
         m.ground[y][x] = 'bw-cobble-0'
-    border_forest(m, kind='pine-dirt')
-    m.forest(7, 6, 10, 8, kind='pine-dirt')
-    m.forest(20, 6, 23, 8, kind='pine-dirt')
-    for x, y in ((3, 2), (14, 1), (26, 8), (9, 11), (21, 11)):
+    m.stamp('bw-mansion', 11, -6, must=False, clip=True)
+    border_forest(m, kind=TEAL_MIX)
+    m.forest(7, 6, 10, 9, kind=TEAL_MIX)
+    m.forest(20, 6, 23, 9, kind=TEAL_MIX)
+    for x, y in ((3, 2), (26, 8), (9, 12), (21, 12), (14, 1), (17, 1)):
         m.stamp('bw-lantern', x, y, must=False)
-    m.tall_grass(1, 9, 4, 12)
-    m.tall_grass(13, 5, 17, 8)
+    grass_blob(m, 2.5, 11, 2.5, 1.6)
+    grass_blob(m, 15, 7, 2.5, 1.6)
     m.stamp('bw-logpile', 27, 0, must=False)
     m.stamp('bw-barrel', 1, 1, must=False)
     pick_spots(m, 10)
@@ -1072,18 +1326,26 @@ def old_chateau():
 # Iron Island: a rock island. Brown cliffs step up to the mine mouth, a
 # beach along the bottom, two lanes for the grunts.
 def iron_island():
-    m = blank('iron-island', 404, [(0, 9), (6, 9), (6, 5), (14, 5), (14, 9), (22, 9), (22, 5), (29, 5)], road='pebbles')
+    m = blank('iron-island', 404, [(0, 9), (6, 9), (6, 5), (14, 5), (14, 9), (22, 9), (22, 5), (29, 5)], road=None)
     m.extra_paths = [('path-2', [(0, 11), (10, 11), (10, 7), (18, 7), (18, 11), (29, 11)])]
     lane(m, m.extra_paths[0][1])
-    m.floor('bw-darkrock', 0, 0, 29, 13)
-    m.terrain_cells('beach-sand', rect(0, 12, 29, 12) - m.path_cells - m.lane_cells)
+    # Bare brown rock everywhere, a worn track where the grunts walk, two
+    # stepped rock terraces along the top with the mine mouth between them,
+    # the beach and sea below.
+    m.floor('pt-mine-floor', 0, 0, 29, 11)
+    for (x, y) in m.path_cells | m.lane_cells:
+        m.ground[y][x] = 'pt-mine-floor-b-0'
+    m.terrain_cells('shallow-water', rect(0, 12, 29, 12) - m.path_cells - m.lane_cells)
+    m.reserved |= rect(0, 12, 29, 12)
     water(m, rect(0, 13, 29, 13))
-    m.plateau(0, 0, 29, 3, cliff='rock', interior=False)
-    m.stamp('bw-cave-mouth', 12, 4, must=False)
-    m.stamp('bw-rock-big', 25, 4, must=False)
-    for x, y in ((3, 6), (26, 7), (16, 1)):
+    m.plateau(0, 0, 10, 3, cliff='rock', interior=False)
+    m.plateau(17, 0, 29, 3, cliff='rock', interior=False)
+    m.plateau(2, 0, 7, 1, cliff='rock', interior=False)
+    m.plateau(21, 0, 27, 1, cliff='rock', interior=False)
+    m.stamp('bw-cave-mouth', 11, 1, must=False)
+    for x, y in ((3, 6), (26, 7), (12, 10), (20, 2)):
         m.stamp('bw-rock', x, y, must=False)
-    m.scatter(['bw-rock-small'], 8, (0, 3, 29, 11))
+    m.scatter(['bw-rock-small', 'bw-grey-rock-small'], 10, (0, 3, 29, 11))
     pick_spots(m, 10)
     return m
 
@@ -1122,23 +1384,15 @@ def galactic_hq():
 # Snowpoint Temple: blue stone halls, the ice floor puzzle, Regigigas's
 # chamber at the far end.
 def snowpoint_temple():
-    m = blank('snowpoint-temple', 411, [(0, 11), (6, 11), (6, 3), (14, 3), (14, 10), (22, 10), (22, 4), (29, 4)], road=None)
-    m.theme = 'cave'
-    m.floor('pt-temple-floor', 0, 0, 29, 13)
-    for (x, y) in m.path_cells:
-        m.ground[y][x] = 'pt-temple-floor-light-0'
-    m.floor('pt-temple-ice-a', 8, 5, 12, 8)
-    m.floor('pt-temple-ice-b', 16, 5, 20, 8)
-    m.floor('pt-temple-ice-c', 24, 7, 27, 10)
-    for x in range(0, 30):
-        m.stamp('pt-temple-wall-s', x, 0, must=False)
-    for x in range(0, 30):
-        m.stamp('pt-temple-wall', x, 13, must=False)
-    m.stamp('pt-temple-door', 14, 0, must=False)
-    for x, y in ((2, 2), (26, 1), (10, 11), (18, 12)):
-        m.stamp('pt-temple-boulder', x, y, must=False)
-    m.scatter(['pt-temple-rocks'], 6, (0, 1, 29, 12))
-    pick_spots(m, 10)
+    def deco(m):
+        for cx, cy, rx, ry in ((9, 6, 3, 1.8), (19, 7, 3, 1.8), (25, 9, 2.2, 1.5)):
+            ground_patch(m, 'pt-temple-ice-b', blob(m.rng, cx, cy, rx, ry, wobble=0.2) & m.cave - m.path_cells)
+        put(m, 'pt-temple-door', 14, 1)
+        for x, y in ((2, 3), (26, 1), (10, 11), (18, 12)):
+            m.stamp('pt-temple-boulder', x, y, must=False)
+        m.scatter(['pt-temple-rocks'], 6, (0, 1, 29, 12))
+    m = cave_room('snowpoint-temple', 411, [(0, 11), (6, 11), (6, 3), (14, 3), (14, 10), (22, 10), (22, 4), (29, 4)], 'temple',
+                  chambers=[(9, 6, 4, 2.5), (19, 7, 4, 2.5), (3, 4, 2.5, 2), (26, 9, 3, 2)], path_floor='floor-light', extra=deco)
     m.points = [('regigigas', 'stage', 28, 3)]
     return m
 
@@ -1146,23 +1400,18 @@ def snowpoint_temple():
 # Mt. Coronet: the purple cave, an underground stream, the glowing pads on
 # the way up to the summit.
 def mt_coronet():
-    m = blank('mt-coronet', 412, [(0, 3), (7, 3), (7, 9), (15, 9), (15, 2), (23, 2), (23, 11), (29, 11)], road=None)
+    m = blank('mt-coronet', 412, [(0, 4), (7, 4), (7, 9), (15, 9), (15, 3), (23, 3), (23, 11), (29, 11)], road=None)
     m.theme = 'cave'
-    m.floor('pt-coronet-floor', 0, 0, 29, 13)
-    for (x, y) in m.path_cells:
-        m.ground[y][x] = 'pt-coronet-floor-b-0'
-    m.floor('pt-coronet-water', 9, 11, 14, 13)
-    m.floor('pt-coronet-water', 25, 0, 29, 1)
-    m.wall(9, 11, 14, 13)
-    m.wall(25, 0, 29, 1)
-    for x, y in ((11, 5), (19, 6), (3, 10)):
-        m.ground[y][x] = 'pt-coronet-pad-a-0'
-    for x in range(0, 30):
-        m.stamp('pt-coronet-wall-s', x, 0, must=False)
-        m.stamp('pt-coronet-wall', x, 13, must=False)
-    m.stamp('pt-coronet-door', 23, 0, must=False)
-    for x, y in ((2, 6), (18, 11), (26, 6), (10, 1)):
+    pool = blob(m.rng, 11, 12, 3.2, 1.6) | blob(m.rng, 27, 1, 2.6, 1.4)
+    cells = corridor(m, 1, 1) | blob(m.rng, 4, 9, 3.5, 2.5) | blob(m.rng, 19, 6, 3, 2.2) | blob(m.rng, 26, 7, 2.5, 2)
+    carve(m, 'coronet', cells, water=pool - m.path_cells)
+    for x, y in ((3, 4), (11, 9), (19, 3), (26, 11)):
+        if (x, y) in m.path_cells:
+            m.ground[y][x] = 'pt-coronet-pad-a-0'
+    m.stamp('pt-coronet-door', 23, 1, must=False)
+    for x, y in ((2, 8), (18, 5), (27, 8), (12, 7)):
         m.stamp('pt-coronet-boulder', x, y, must=False)
+    m.scatter(['pt-coronet-rocks'], 8, (0, 0, 29, 13))
     pick_spots(m, 10)
     return m
 
@@ -1170,47 +1419,35 @@ def mt_coronet():
 # Oreburgh Gate and Mine on the mine's own textures: brown cave, coal
 # conveyors and the lift in the mine.
 def oreburgh_cave(name, seed, path, mine):
-    m = blank(name, seed, path, road=None)
-    m.theme = 'cave'
-    m.floor('pt-mine-floor', 0, 0, 29, 13)
-    for (x, y) in m.path_cells:
-        m.ground[y][x] = 'pt-mine-floor-b-0'
-    for x in range(0, 30):
-        m.stamp('pt-mine-wall-s', x, 0, must=False)
-        m.stamp('pt-mine-wall', x, 13, must=False)
-    if mine:
-        for x, y in ((3, 2), (20, 2)):
-            m.stamp('pt-mine-belt', x, y, must=False)
-        m.stamp('pt-mine-lift', 26, 1, must=False)
-        m.stamp('pt-mine-panel', 12, 11, must=False)
-    else:
-        m.stamp('pt-mine-door', 2, 0, must=False)
-        m.stamp('pt-mine-door', 26, 11, must=False)
-    for x, y in ((5, 8), (15, 1), (24, 7), (10, 11)):
-        m.stamp('pt-mine-boulder', x, y, must=False)
-    m.scatter(['pt-mine-rocks'], 8, (0, 1, 29, 12))
-    pick_spots(m, 10)
-    return m
+    def deco(m):
+        if mine:
+            for x, y in ((2, 7), (16, 7)):
+                m.stamp('pt-mine-belt', x, y, must=False)
+            m.stamp('pt-mine-lift', 25, 5, must=False)
+            m.stamp('pt-mine-panel', 12, 5, must=False)
+            m.stamp('pt-mine-rubble', 20, 4, must=False)
+        else:
+            put(m, 'pt-mine-door', 2, 0)
+            put(m, 'pt-mine-door', 26, 1)
+        for x, y in ((5, 8), (15, 1), (24, 7), (10, 11)):
+            m.stamp('pt-mine-boulder', x, y, must=False)
+        m.scatter(['pt-mine-rocks'], 8, (0, 1, 29, 12))
+    chambers = [(4, 5, 3.5, 2.5), (14, 6, 3, 2.5), (24, 6, 3.5, 2.5)] if mine else [(5, 5, 3, 2), (14, 5, 3.5, 2.5), (24, 6, 3, 2)]
+    return cave_room(name, seed, path, 'mine', chambers=chambers, extra=deco)
 
 
 # Stark Mountain, outside: volcanic ground, dark cliffs with magma seams,
 # the cave mouth to Heatran's chamber.
 def stark_mountain():
-    m = blank('stark-mountain', 413, [(0, 9), (6, 9), (6, 4), (14, 4), (14, 10), (22, 10), (22, 5), (29, 5)], road=None)
-    m.floor('pt-stark-floor', 0, 0, 29, 13)
-    for (x, y) in m.path_cells:
-        m.ground[y][x] = 'pt-mine-floor-b-0'
-    m.floor('pt-stark-magma', 9, 11, 13, 13)
-    m.floor('pt-stark-magma', 24, 0, 29, 2)
-    m.wall(9, 11, 13, 13)
-    m.wall(24, 0, 29, 2)
-    for x in range(0, 30, 2):
-        m.stamp('pt-stark-cliff-magma' if x % 6 == 0 else 'pt-stark-cliff', x, 0, must=False)
-    m.stamp('pt-stark-cave', 16, 0, must=False)
-    for x, y in ((2, 11), (17, 7), (26, 8)):
-        m.stamp('pt-stark-rock', x, y, must=False)
-    m.scatter(['pt-stark-rocks'], 6, (0, 2, 29, 12))
-    pick_spots(m, 10)
+    def deco(m):
+        put(m, 'pt-stark-cave', 15, 0)
+        for x, y in ((2, 11), (17, 7), (26, 8)):
+            m.stamp('pt-stark-rock', x, y, must=False)
+        m.scatter(['pt-stark-rocks'], 6, (0, 2, 29, 12))
+    m = cave_room('stark-mountain', 413, [(0, 9), (6, 9), (6, 4), (14, 4), (14, 10), (22, 10), (22, 5), (29, 5)], 'stark',
+                  chambers=[(3, 6, 3, 2.5), (10, 7, 3, 2), (18, 7, 3, 2.5), (26, 8, 3, 2.5)],
+                  water=[(10, 12, 3, 1.5), (26, 1, 3, 1.5)], extra=deco, faces=('cliff', 'cliff'), water_ground='pt-stark-magma',
+                  path_floor='pt-mine-floor-b')
     return m
 
 
@@ -1242,12 +1479,10 @@ def flower_paradise():
     m = blank('flower-paradise', 407, [(0, 10), (4, 10), (4, 6), (29, 6)], road='sand')
     m.terrain_cells('beach-sand', rect(0, 11, 6, 13) - m.path_cells)
     water(m, rect(0, 13, 29, 13) | rect(7, 12, 29, 12))
-    border_forest(m, top=True, bottom=False, left=False, right=False)
-    for y in (2, 4, 8, 10):
-        for x in range(6, 28, 3):
-            m.stamp(['bw-flower-bush-red', 'bw-flower-bush-mix', 'bw-flower-patch-pink'][(x // 3 + y) % 3], x, y, must=False)
+    border_forest(m, kind=MIXED, top=True, bottom=False, left=False, right=False)
+    m.scatter(['bw-flower-bush-red', 'bw-flower-bush-mix', 'bw-flower-patch-pink'], 14, (5, 0, 28, 11), margin=0)
     pick_spots(m, 10)
-    m.scatter(['bw-flowers-white', 'bw-flowers-white-2'], 14, (5, 0, 29, 11))
+    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig'], 24, (5, 0, 29, 11))
     m.points = [('shaymin', 'stage', 28, 6)]
     return m
 
@@ -1256,21 +1491,25 @@ def flower_paradise():
 # is sand and flowers, Newmoon's is rock and dark pines.
 def moon_island(name, dark):
     m = blank(name, 408 if dark else 409, [(0, 7), (4, 7), (4, 3), (12, 3), (12, 10), (20, 10), (20, 5), (29, 5)], road='dirt-path-dark' if dark else 'bw-path')
-    sea = rect(0, 0, 29, 0) | rect(0, 13, 29, 13) | rect(0, 1, 1, 12) | rect(28, 1, 29, 12)
+    land = blob(m.rng, 14.5, 6.5, 15, 7.2, wobble=0.12)
+    sea = {(x, y) for y in range(14) for x in range(30)} - land
     water(m, sea - m.path_cells)
-    kind = 'pine-dirt' if dark else 'conifer'
+    kind = TEAL_MIX if dark else MIXED
     m.forest(6, 5, 10, 8, kind)
     m.forest(14, 5, 18, 8, kind)
     m.forest(22, 7, 26, 11, kind)
     if dark:
-        m.floor('bw-darkrock', 2, 1, 27, 12)
+        for (x, y) in land:
+            if m.inb(x, y):
+                m.ground[y][x] = f'bw-darkrock-{(x % 2) + (y % 4) * 2}'
         for x, y in ((3, 1), (24, 1), (8, 11)):
             m.stamp('bw-rock', x, y, must=False)
     else:
-        m.terrain_cells('beach-sand', (rect(2, 1, 27, 1) | rect(2, 12, 27, 12)) - m.path_cells)
+        shore = blob(m.rng, 14.5, 6.5, 15, 7.2, wobble=0.12) - blob(m.rng, 14.5, 6.5, 13.5, 6, wobble=0.12)
+        m.terrain_cells('beach-sand', shore - m.path_cells - sea)
         m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-flower-patch-pink'], 8, (2, 1, 27, 12))
-    m.tall_grass(22, 1, 26, 3)
-    m.tall_grass(6, 10, 10, 12)
+    grass_blob(m, 24, 2, 2.5, 1.3)
+    grass_blob(m, 8, 11, 2.5, 1.2)
     pick_spots(m, 10)
     return m
 
@@ -1279,16 +1518,23 @@ def moon_island(name, dark):
 # mud paths, tall grass in patches.
 def great_marsh():
     m = blank('great-marsh', 410, [(0, 2), (6, 2), (6, 11), (14, 11), (14, 2), (22, 2), (22, 11), (29, 11)], road='soil')
-    water(m, rect(8, 4, 12, 7) | rect(16, 5, 20, 9) | rect(1, 5, 4, 8) | rect(24, 3, 28, 6), tid='shallow-water')
-    for x, y in ((7, 3), (13, 8), (15, 4), (21, 10), (0, 9), (23, 7), (27, 7)):
-        m.stamp('bw-reeds', x, y, must=False)
-    m.tall_grass(1, 10, 5, 12)
-    m.tall_grass(9, 9, 12, 10)
-    m.tall_grass(24, 8, 28, 10)
-    m.tall_grass(8, 0, 12, 1)
-    m.forest(16, -1, 20, 1)
-    m.stamp('bw-log', 2, 3, must=False)
+    pools = [(3, 6, 3, 2), (10, 5, 3.2, 2), (18, 7, 3, 2.4), (26, 5, 3, 2), (18, 1, 2.5, 1.2), (9, 12, 3, 1.1)]
+    for cx, cy, rx, ry in pools:
+        cells = water_blob(m, cx, cy, rx, ry, tid='shallow-water', wobble=0.3)
+        # reeds along the muddy edges
+        for (x, y) in sorted(cells):
+            for nx, ny in ((x + 1, y), (x - 1, y), (x, y + 1), (x, y - 1)):
+                if m.inb(nx, ny) and (nx, ny) not in m.water and m.rng.random() < 0.22:
+                    m.stamp('bw-reeds', nx, ny, must=False)
+    for cx, cy, rx, ry in ((3, 11, 3, 1.5), (11, 8, 2.5, 1.5), (25, 10, 3.5, 1.6), (9, 1, 3, 1.1), (26, 1, 2.5, 1)):
+        grass_blob(m, cx, cy, rx, ry)
+    border_forest(m, kind=['round', 'round', 'conifer'], bottom=False)
+    for x, y in ((16, 4), (23, 8), (2, 9), (12, 0)):
+        m.tree(x, y, kind='round')
+    for x, y in ((7, 8), (20, 10), (27, 9)):
+        m.stamp('bw-log', x, y, must=False)
     pick_spots(m, 10)
+    m.scatter(['bw-sprig', 'bw-sprig-2', 'bw-sprig-3'], 8, (0, 0, 29, 13))
     return m
 
 
@@ -1344,6 +1590,8 @@ def composite(maps):
 def register(n_tree_tiles):
     c = load_catalogue()
     c['tilesets'][TS] = {'name': 'Gen 5 BW outdoor', 'columns': 8, 'theme': 'grass'}
+    c['sources']['solid'] = {'file': 'assets-src/tilesets/gen5/solid.png', 'artist': 'scripts/bw-maps.py',
+                             'description': 'flat colours (cave black)'}
     c['sources']['generated-bw'] = {
         'file': 'assets-src/tilesets/gen5/generated-bw.png',
         'artist': 'UltimoSpriter (trees composited by scripts/bw-maps.py)',

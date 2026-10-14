@@ -87,6 +87,7 @@ LOCATIONS = {
     ]),
     'temple': (64, [
         ('dun_floor', 2, 'floor', 'ground', False),
+        ('@dark:dun_floor', 1, 'dark', 'ground', False),           # the unlit rock beyond the walls
         ('dun_floor2', 2, 'floor-light', 'ground', False),
         ('fice_a', 2, 'ice-a', 'ground', False),
         ('fice_b', 2, 'ice-b', 'ground', False),
@@ -104,6 +105,7 @@ LOCATIONS = {
     ]),
     'mine': (54, [
         ('dun_floor', 2, 'floor', 'ground', False),          # brown cave floor
+        ('@dark:dun_floor', 1, 'dark', 'ground', False),           # the unlit rock beyond the walls
         ('dun_floor2', 2, 'floor-b', 'ground', False),
         ('dun_step', 2, 'steps', 'ground', False),
         ('dun_hashi', 2, 'bridge', 'ground', False),
@@ -123,6 +125,7 @@ LOCATIONS = {
     ]),
     'stark': (17, [
         ('brown', 2, 'floor', 'ground', False),              # volcanic ground
+        ('@dark:brown', 1, 'dark', 'ground', False),           # the unlit rock beyond the walls
         ('ckado', 2, 'floor-b', 'ground', False),
         ('magma', 2, 'magma', 'ground', False),
         ('criffp', 2, 'cliff', 'deco', True),                # dark cliff faces
@@ -135,6 +138,7 @@ LOCATIONS = {
     ]),
     'ruins': (55, [
         ('dun_floor', 2, 'floor', 'ground', False),          # grey-green stone
+        ('@dark:dun_floor', 1, 'dark', 'ground', False),           # the unlit rock beyond the walls
         ('dun_floor2', 2, 'floor-b', 'ground', False),       # tan stone
         ('dun_step', 2, 'steps', 'ground', False),
         ('dun_hashi', 2, 'bridge', 'ground', False),
@@ -150,6 +154,7 @@ LOCATIONS = {
     ]),
     'vroad': (70, [
         ('dun_floor', 2, 'floor', 'ground', False),          # olive cave floor
+        ('@dark:dun_floor', 1, 'dark', 'ground', False),           # the unlit rock beyond the walls
         ('dun_floor2', 2, 'floor-b', 'ground', False),
         ('dun_step', 2, 'steps', 'ground', False),
         ('dun_hashi', 2, 'bridge', 'ground', False),
@@ -164,6 +169,7 @@ LOCATIONS = {
     ]),
     'coronet': (68, [
         ('dun_floor', 2, 'floor', 'ground', False),
+        ('@dark:dun_floor', 1, 'dark', 'ground', False),           # the unlit rock beyond the walls
         ('dun_floor2', 2, 'floor-b', 'ground', False),
         ('dun_floor3', 2, 'floor-c', 'ground', False),
         ('dun_floor4', 2, 'floor-d', 'ground', False),
@@ -227,6 +233,15 @@ def composite(name, by_name, d, t, palettes, tdo, cdo, cio, pal_data):
         return outline(img)
     if name == '@dw-tree':
         img = get('tree_sbt01').crop((0, 0, 32, 64))
+        return img
+    if name.startswith('@dark:'):
+        img = get(name[6:])
+        img = img.resize((img.width * 2, img.height * 2), Image.NEAREST)
+        px = img.load()
+        for y in range(img.height):
+            for x in range(img.width):
+                r, g, b, a = px[x, y]
+                px[x, y] = (int(r * 0.34), int(g * 0.34), int(b * 0.40), 255)
         return img
     if name == '@pillar-broken':
         shaft = get('colum_a').resize((24, 32), Image.NEAREST)
