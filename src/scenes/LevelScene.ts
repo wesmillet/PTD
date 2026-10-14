@@ -71,7 +71,7 @@ import { capitalize } from '../ui/domOverlay';
 import { findPokemonId, getMove } from '../data/pokedata';
 import { counterStarter, levelPopup, type DialogueLine, type LevelDef } from '../sim/waves';
 import { resolveRound, type ConferenceRun } from '../sim/conference';
-import type { Monster } from '../sim/monster';
+import { activeMoveId, type Monster } from '../sim/monster';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM, TEXT_SMALL, TEXT_SMALL_DIM } from '../ui/styles';
 import { STATUS_BADGE } from '../ui/domOverlay';
 import { showSummary } from '../ui/summary';
@@ -575,15 +575,25 @@ export class LevelScene extends Phaser.Scene {
         gfx.fillStyle(COLORS.placeableHover, 0.35).fillEllipse(c.px + SPOT_ELLIPSE.dx, c.py + SPOT_ELLIPSE.dy, SPOT_ELLIPSE.w + 2, SPOT_ELLIPSE.h + 2);
       }
     }
+    // The attack radius shows for the selected Pokémon and for one being dragged (where it would land); never for enemies.
+    const dragged = this.drag?.moved ? this.state.towers.find((t) => t.id === this.drag?.towerId) : undefined;
     const selected = this.selectedTowerId !== null ? this.state.towers.find((t) => t.id === this.selectedTowerId) : undefined;
-    for (const tower of this.state.towers) {
-      const { px, py } = this.tilePixel(tower.tile[0], tower.tile[1]);
-      if (tower === selected) {
-        gfx.lineStyle(2, COLORS.selected, 1).strokeRect(tower.tile[0] * size + 2, Hud.HEIGHT + tower.tile[1] * size + 2, size - 4, size - 4);
+    if (selected) {
+      gfx.lineStyle(2, COLORS.selected, 1).strokeRect(selected.tile[0] * size + 2, Hud.HEIGHT + selected.tile[1] * size + 2, size - 4, size - 4);
+      if (selected !== dragged) {
+        const { px, py } = this.tilePixel(selected.tile[0], selected.tile[1]);
+        gfx.lineStyle(1, COLORS.range, 0.35).strokeCircle(px, py, (towerMove(selected)?.range ?? 0) * size);
       }
-      if (tower === selected || this.state.phase === 'build') {
-        gfx.lineStyle(1, COLORS.range, 0.35).strokeCircle(px, py, (towerMove(tower)?.range ?? 0) * size);
-      }
+    }
+    const stripMon = this.stripDrag?.moved ? this.state.party[this.stripDrag.partyIndex]?.mon : undefined;
+    const dragMon = dragged?.mon ?? (stripMon && !this.state.towers.some((t) => t.mon === stripMon) ? stripMon : undefined);
+    if (dragMon) {
+      const moveId = activeMoveId(dragMon);
+      const range = moveId === undefined ? 0 : resolveMove(moveId).range;
+      const pointer = this.input.activePointer;
+      const [hx, hy] = this.hoverTile ?? [-1, -1];
+      const landing = this.hoverTile && isPlaceable(this.state.map, hx, hy) && !towerAt(this.state, hx, hy) ? this.tilePixel(hx, hy) : { px: pointer.x, py: pointer.y - 8 };
+      gfx.lineStyle(1, COLORS.range, 0.35).strokeCircle(landing.px, landing.py, range * size);
     }
   }
 

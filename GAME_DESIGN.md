@@ -166,6 +166,9 @@ Numbers before and after each pass are in `docs/decisions.md`.
 - Pokémon can be picked up and re-placed on any placeable tile at any time,
   including mid-wave. Moving restarts the attack cooldown at a full
   interval, so it can never be used to skip one.
+- The attack radius is drawn only for the selected Pokémon and for one
+  being dragged (around the patch it would land on, else the pointer);
+  enemies never show one.
 
 ### Combat
 - Each Pokémon has up to 4 moves. One is selected as the active move per Pokémon.

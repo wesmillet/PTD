@@ -516,3 +516,14 @@ portrait the showcase might want.
   (toast banners, Rowan and Looker stand-ins, the hail rule, Shift speed
   keys, the Origin level) are gone; the map stand-ins stay as the maps
   session asked.
+
+## Phase 9 batch 2, item 7 (range only when selected)
+
+- The build phase used to ring every placed Pokémon; now only the
+  selected one and a dragged one are ringed, so the field reads clean
+  and the ring means "this one". A dragged Pokémon's ring sits on the
+  free patch under the pointer (where the drop would land), otherwise
+  on the pointer, so the player can judge reach before letting go; a
+  placed party member dragged off the strip (a drop that does nothing)
+  gets none. Enemies never had one and still have none.
+
