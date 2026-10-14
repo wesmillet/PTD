@@ -1,0 +1,20 @@
+Pokémon Platinum interface sheets, ripped from the game and hosted on
+The Spriters Resource: https://www.spriters-resource.com/ds_dsi/pokemonplatinum/
+Original art by Game Freak / The Pokémon Company. Ripper credits below,
+as requested on each sheet.
+
+box-backgrounds.png   PC box wallpapers. Ripped by Dragoon (TSR).
+                      Contains one custom shiny Croagunk recolor (bottom left).
+battle-gui.png        HP/EXP bars, status badges, ball icons, name font, numbers.
+                      Ripped by RetroniGamer.
+bag.png               Bag screen, pocket selector, bottom-screen buttons.
+                      Ripped by Dragoon (TSR).
+menu-icons.png        Start-menu icons (normal and Underground).
+                      Ripped by spaceemotion.
+text-box-styles.png   Dialogue box frames. Ripped by Dragoon (TSR).
+
+Sheets have solid background colours (green, grey, white) that need
+keying out; they are not transparent.
+
+Still needed: Box System sheet (PC storage frame and cursor),
+https://www.spriters-resource.com/ds_dsi/pokemonplatinum/asset/25637/
