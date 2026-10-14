@@ -22,33 +22,7 @@ function hex(h) {
   return [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16), 255];
 }
 
-// ---------------------------------------------------------------- wallpapers
-// 6x5 slots of 48 px plus a 12 px margin: 312x264. Two tones in a checker so
-// the slot grid reads, plus a darker band at the top for the box name.
-const WALLPAPER_COLORS = {
-  forest: ['#2f6b3a', '#3a7a45'],
-  city: ['#4a5566', '#56627a'],
-  desert: ['#b08a4a', '#c09a58'],
-  savanna: ['#8a8a3a', '#9a9a48'],
-  crag: ['#6b5a4a', '#7a6858'],
-  volcano: ['#7a2f2f', '#8a3a3a'],
-  snow: ['#8fb0c8', '#a0c0d8'],
-  cave: ['#3a3348', '#463f58'],
-};
-const W = 12 + pc.columns * 48 + 12;
-const H = 36 + pc.rows * 48 + 12;
-for (const wp of pc.wallpapers) {
-  const [a, b] = WALLPAPER_COLORS[wp.id] ?? ['#444444', '#505050'];
-  const img = createImage(W, H);
-  fillRect(img, 0, 0, W, H, hex(a));
-  for (let y = 0; y < pc.rows; y++) {
-    for (let x = 0; x < pc.columns; x++) {
-      if ((x + y) % 2 === 0) fillRect(img, 12 + x * 48, 36 + y * 48, 48, 48, hex(b));
-    }
-  }
-  fillRect(img, 0, 0, W, 28, [0, 0, 0, 90]);
-  save(wp.image, img);
-}
+// Wallpapers come from the Platinum sheet (scripts/build-gen4-ui.mjs); only the frame and cursor are placeholders.
 
 // --------------------------------------------------------------- box frame
 // A 9-slice frame: 48x48 with 12 px borders (light outer ring, dark inner).

@@ -4,16 +4,191 @@
   "rows": 5,
   "frame": "assets/pc/frame.png",
   "cursor": "assets/pc/cursor.png",
-  "defaultNames": ["Box 1", "Box 2", "Box 3", "Box 4", "Box 5", "Box 6", "Box 7", "Box 8"],
-  "defaultWallpapers": ["forest", "city", "desert", "savanna", "crag", "volcano", "snow", "cave"],
+  "defaultNames": [
+    "Box 1",
+    "Box 2",
+    "Box 3",
+    "Box 4",
+    "Box 5",
+    "Box 6",
+    "Box 7",
+    "Box 8"
+  ],
+  "defaultWallpapers": [
+    "gen4-01",
+    "gen4-02",
+    "gen4-03",
+    "gen4-04",
+    "gen4-05",
+    "gen4-06",
+    "gen4-07",
+    "gen4-08"
+  ],
   "wallpapers": [
-    { "id": "forest", "name": "Forest", "image": "assets/pc/wallpapers/forest.png" },
-    { "id": "city", "name": "City", "image": "assets/pc/wallpapers/city.png" },
-    { "id": "desert", "name": "Desert", "image": "assets/pc/wallpapers/desert.png" },
-    { "id": "savanna", "name": "Savanna", "image": "assets/pc/wallpapers/savanna.png" },
-    { "id": "crag", "name": "Crag", "image": "assets/pc/wallpapers/crag.png" },
-    { "id": "volcano", "name": "Volcano", "image": "assets/pc/wallpapers/volcano.png" },
-    { "id": "snow", "name": "Snow", "image": "assets/pc/wallpapers/snow.png" },
-    { "id": "cave", "name": "Cave", "image": "assets/pc/wallpapers/cave.png" }
+    {
+      "id": "gen4-01",
+      "name": "Grass",
+      "image": "assets/ui/gen4/wallpapers/gen4-01.png"
+    },
+    {
+      "id": "gen4-02",
+      "name": "Stone",
+      "image": "assets/ui/gen4/wallpapers/gen4-02.png"
+    },
+    {
+      "id": "gen4-03",
+      "name": "Sand Pale",
+      "image": "assets/ui/gen4/wallpapers/gen4-03.png"
+    },
+    {
+      "id": "gen4-04",
+      "name": "Desert",
+      "image": "assets/ui/gen4/wallpapers/gen4-04.png"
+    },
+    {
+      "id": "gen4-05",
+      "name": "Lilac",
+      "image": "assets/ui/gen4/wallpapers/gen4-05.png"
+    },
+    {
+      "id": "gen4-06",
+      "name": "Coral",
+      "image": "assets/ui/gen4/wallpapers/gen4-06.png"
+    },
+    {
+      "id": "gen4-07",
+      "name": "Ice",
+      "image": "assets/ui/gen4/wallpapers/gen4-07.png"
+    },
+    {
+      "id": "gen4-08",
+      "name": "Cave",
+      "image": "assets/ui/gen4/wallpapers/gen4-08.png"
+    },
+    {
+      "id": "gen4-09",
+      "name": "Beach",
+      "image": "assets/ui/gen4/wallpapers/gen4-09.png"
+    },
+    {
+      "id": "gen4-10",
+      "name": "Sea",
+      "image": "assets/ui/gen4/wallpapers/gen4-10.png"
+    },
+    {
+      "id": "gen4-11",
+      "name": "Tiles",
+      "image": "assets/ui/gen4/wallpapers/gen4-11.png"
+    },
+    {
+      "id": "gen4-12",
+      "name": "Sky",
+      "image": "assets/ui/gen4/wallpapers/gen4-12.png"
+    },
+    {
+      "id": "gen4-13",
+      "name": "Checker Orange",
+      "image": "assets/ui/gen4/wallpapers/gen4-13.png"
+    },
+    {
+      "id": "gen4-14",
+      "name": "Plaid",
+      "image": "assets/ui/gen4/wallpapers/gen4-14.png"
+    },
+    {
+      "id": "gen4-15",
+      "name": "Gingham",
+      "image": "assets/ui/gen4/wallpapers/gen4-15.png"
+    },
+    {
+      "id": "gen4-16",
+      "name": "Ribbon",
+      "image": "assets/ui/gen4/wallpapers/gen4-16.png"
+    },
+    {
+      "id": "gen4-17",
+      "name": "Torterra",
+      "image": "assets/ui/gen4/wallpapers/gen4-17.png"
+    },
+    {
+      "id": "gen4-18",
+      "name": "Contest",
+      "image": "assets/ui/gen4/wallpapers/gen4-18.png"
+    },
+    {
+      "id": "gen4-19",
+      "name": "Room",
+      "image": "assets/ui/gen4/wallpapers/gen4-19.png"
+    },
+    {
+      "id": "gen4-20",
+      "name": "Croagunk Blue",
+      "image": "assets/ui/gen4/wallpapers/gen4-20.png"
+    },
+    {
+      "id": "gen4-21",
+      "name": "Starters",
+      "image": "assets/ui/gen4/wallpapers/gen4-21.png"
+    },
+    {
+      "id": "gen4-22",
+      "name": "Pikachu Trio",
+      "image": "assets/ui/gen4/wallpapers/gen4-22.png"
+    },
+    {
+      "id": "gen4-23",
+      "name": "Giratina",
+      "image": "assets/ui/gen4/wallpapers/gen4-23.png"
+    },
+    {
+      "id": "gen4-24",
+      "name": "Team",
+      "image": "assets/ui/gen4/wallpapers/gen4-24.png"
+    },
+    {
+      "id": "gen4-25",
+      "name": "Palkia",
+      "image": "assets/ui/gen4/wallpapers/gen4-25.png"
+    },
+    {
+      "id": "gen4-26",
+      "name": "Route",
+      "image": "assets/ui/gen4/wallpapers/gen4-26.png"
+    },
+    {
+      "id": "gen4-27",
+      "name": "Torchic",
+      "image": "assets/ui/gen4/wallpapers/gen4-27.png"
+    },
+    {
+      "id": "gen4-28",
+      "name": "Space",
+      "image": "assets/ui/gen4/wallpapers/gen4-28.png"
+    },
+    {
+      "id": "gen4-29",
+      "name": "Machine",
+      "image": "assets/ui/gen4/wallpapers/gen4-29.png"
+    },
+    {
+      "id": "gen4-30",
+      "name": "Seal",
+      "image": "assets/ui/gen4/wallpapers/gen4-30.png"
+    },
+    {
+      "id": "gen4-31",
+      "name": "Pikachu",
+      "image": "assets/ui/gen4/wallpapers/gen4-31.png"
+    },
+    {
+      "id": "gen4-32",
+      "name": "Dialga",
+      "image": "assets/ui/gen4/wallpapers/gen4-32.png"
+    },
+    {
+      "id": "gen4-33",
+      "name": "Croagunk",
+      "image": "assets/ui/gen4/wallpapers/gen4-33.png"
+    }
   ]
 }

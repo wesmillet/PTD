@@ -29,6 +29,15 @@ export const GENERAL_CREDITS: { title: string; lines: string[] }[] = [
     ],
   },
   tilesetCredits(),
+  {
+    title: 'Interface (Pokémon Platinum)',
+    lines: [
+      'Platinum interface sheets ripped from the game and hosted on The Spriters Resource, https://www.spriters-resource.com/ds_dsi/pokemonplatinum/. Original art by Game Freak / The Pokémon Company.',
+      'Text box frames (text-box-styles), the bag screen (bag) and the PC box wallpapers (box-backgrounds, with a custom shiny Croagunk recolour): ripped by Dragoon (TSR).',
+      'Battle GUI (HP and EXP bars, status badges, Lv label, name and number fonts): ripped by RetroniGamer.',
+      'Start-menu icons: ripped by spaceemotion.',
+    ],
+  },
   { title: 'Engine', lines: ['Phaser 3, https://phaser.io'] },
   { title: 'Pokémon', lines: ['Pokémon is a trademark of Nintendo, Creatures Inc. and GAME FREAK. This is a non-commercial fan project.'] },
 ];

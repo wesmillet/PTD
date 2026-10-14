@@ -2,7 +2,8 @@ import Phaser from 'phaser';
 import { findPokemonId } from '../data/pokedata';
 import { iconTextureKey, trainerTextureKey } from '../game/runtime';
 import { counterStarter, type TrainerDef } from '../sim/waves';
-import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
+import { framePanel } from './button';
+import { TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 
 /**
  * "Trainer X wants to battle!" card shown when a trainer wave starts: the
@@ -18,17 +19,14 @@ export function showTrainerCard(scene: Phaser.Scene, trainer: TrainerDef, starte
   const h = 150;
   const px = width / 2;
   const py = height / 2 - 40;
-  const frame = scene.add.graphics();
-  frame.fillStyle(COLORS.borderOuter, 1).fillRoundedRect(px - w / 2 - 3, py - h / 2 - 3, w + 6, h + 6, 12);
-  frame.fillStyle(boss ? 0x3a1f26 : COLORS.panel, 1).fillRoundedRect(px - w / 2, py - h / 2, w, h, 10);
-  frame.lineStyle(2, boss ? 0xd35a5a : COLORS.panelBorder, 1).strokeRoundedRect(px - w / 2, py - h / 2, w, h, 10);
-  container.add(frame);
+  // Trainers get the green frame, gym bosses the red one with white dots.
+  container.add(framePanel(scene, px, py, w, h, boss ? 'red-dots' : 'green'));
   const portraitKey = trainerTextureKey(trainer.id);
   if (scene.textures.exists(portraitKey)) {
     container.add(scene.add.image(px - w / 2 + 56, py - 10, portraitKey).setScale(1.4));
   }
   container.add(scene.add.text(px - w / 2 + 110, py - h / 2 + 18, trainer.name, TEXT_BIG));
-  container.add(scene.add.text(px - w / 2 + 110, py - h / 2 + 48, boss ? 'Gym battle! Beat the boss to earn the badge.' : 'wants to battle!', { ...TEXT, color: boss ? '#ffb3b3' : '#f4ecd8' }));
+  container.add(scene.add.text(px - w / 2 + 110, py - h / 2 + 48, boss ? 'Gym battle! Beat the boss to earn the badge.' : 'wants to battle!', { ...TEXT, color: boss ? '#e03820' : '#404848' }));
   if (trainer.intro) {
     container.add(scene.add.text(px - w / 2 + 110, py - h / 2 + 72, trainer.intro, { ...TEXT_DIM, wordWrap: { width: w - 130 } }));
   }
@@ -46,7 +44,7 @@ export function showTrainerCard(scene: Phaser.Scene, trainer: TrainerDef, starte
     container.add(scene.add.text(ix + 18, iy - 7, `L${p.level}`, { ...TEXT_DIM, fontSize: '11px' }));
     ix += 58;
   }
-  container.add(scene.add.text(px, py + h / 2 + 18, 'Click to continue', TEXT_DIM).setOrigin(0.5));
+  container.add(scene.add.text(px, py + h / 2 + 18, 'Click to continue', { ...TEXT_DIM, color: '#f8f8f8', stroke: '#283028', strokeThickness: 3 }).setOrigin(0.5));
   let done = false;
   const finish = () => {
     if (done) return;

@@ -2,8 +2,8 @@ import Phaser from 'phaser';
 import type { LevelSummary } from '../sim/level';
 import { BALLS } from '../sim/catch';
 import { badgeTextureKey, iconTextureKey, itemTextureKey } from '../game/runtime';
-import { Button } from './button';
-import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
+import { Button, framePanel } from './button';
+import { TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 
 export interface SummaryCallbacks {
   onRetry: () => void;
@@ -27,11 +27,7 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
   const panelH = Math.min(height - 20, 150 + lines * 26);
   const px = width / 2;
   const py = height / 2;
-  const frame = scene.add.graphics();
-  frame.fillStyle(COLORS.borderOuter, 1).fillRoundedRect(px - panelW / 2 - 3, py - panelH / 2 - 3, panelW + 6, panelH + 6, 12);
-  frame.fillStyle(COLORS.panel, 1).fillRoundedRect(px - panelW / 2, py - panelH / 2, panelW, panelH, 10);
-  frame.lineStyle(2, COLORS.panelBorder, 1).strokeRoundedRect(px - panelW / 2, py - panelH / 2, panelW, panelH, 10);
-  container.add(frame);
+  container.add(framePanel(scene, px, py, panelW, panelH, summary.outcome === 'won' ? 'green' : 'blue'));
   container.add(scene.add.text(px, py - panelH / 2 + 24, TITLES[summary.outcome] ?? summary.outcome, TEXT_BIG).setOrigin(0.5));
   container.add(
     scene.add
@@ -46,13 +42,13 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
     if (scene.textures.exists(key)) container.add(scene.add.image(x, cy, key).setScale(key === icon ? 1 : 0.6));
   };
   if (summary.trainer) {
-    container.add(scene.add.text(left + 24, y, `Defeated ${summary.trainer}!`, { ...TEXT, color: '#ffe066' }));
+    container.add(scene.add.text(left + 24, y, `Defeated ${summary.trainer}!`, { ...TEXT, color: '#c87818' }));
     y += 26;
   }
   if (summary.badge) {
     const key = badgeTextureKey(summary.badge.id);
     if (scene.textures.exists(key)) container.add(scene.add.image(left + 30, y + 10, key).setScale(0.75));
-    container.add(scene.add.text(left + 50, y, summary.newBadge === false ? `${summary.badge.name} (already earned)` : `Earned the ${summary.badge.name}!`, { ...TEXT, color: '#ffe066' }));
+    container.add(scene.add.text(left + 50, y, summary.newBadge === false ? `${summary.badge.name} (already earned)` : `Earned the ${summary.badge.name}!`, { ...TEXT, color: '#c87818' }));
     y += 26;
   }
   for (const p of summary.party) {

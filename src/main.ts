@@ -14,7 +14,7 @@ function start(): void {
     parent: 'game',
     width: 960,
     height: Hud.HEIGHT + 14 * 32 + Hud.BOTTOM,
-    backgroundColor: '#10121f',
+    backgroundColor: '#c0ccdc',
     pixelArt: true,
     loader: { maxRetries: 4 },
     scale: {

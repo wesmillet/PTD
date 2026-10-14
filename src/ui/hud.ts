@@ -4,8 +4,13 @@ import type { LevelState } from '../sim/level';
 import { getGame } from '../game/session';
 import { iconInfo, iconTextureKey, itemTextureKey } from '../game/runtime';
 import config from '../data/config.json';
-import { Button } from './button';
-import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
+import uiGen4 from '../data/ui-gen4.json';
+import { Button, framePanel } from './button';
+import { COLORS, FONT_NAME, FONT_NUM, TEXT, TEXT_BIG, TEXT_DIM, TEXT_LIGHT } from './styles';
+
+const HPBOX = (uiGen4 as { hpBoxes: Record<string, { width: number; height: number; hpFill: { x: number; y: number; width: number; height: number } | null; lv: { x: number; y: number } | null }> }).hpBoxes;
+/** The boss HP box (battle GUI enemy box) is drawn at this scale. */
+const BOSS_BOX_SCALE = 2;
 
 export interface HudCallbacks {
   onStartWave: () => void;
@@ -59,7 +64,11 @@ export class Hud {
   private readonly speedButton: Button;
   private readonly leaveButton: Button | undefined;
   private readonly bossGfx: Phaser.GameObjects.Graphics;
-  private readonly bossName: Phaser.GameObjects.Text;
+  private readonly bossBox?: Phaser.GameObjects.Image;
+  private readonly bossName: Phaser.GameObjects.Text | Phaser.GameObjects.BitmapText;
+  private readonly bossLevel?: Phaser.GameObjects.BitmapText;
+  private readonly bossHp: Phaser.GameObjects.Text;
+  private bossShown = false;
   private slots: Slot[] = [];
   private readonly balls: BallButton[] = [];
   private paused = false;
@@ -74,18 +83,32 @@ export class Hud {
     const width = scene.scale.width;
     const height = scene.scale.height;
     this.bottomY = height - Hud.BOTTOM;
-    const bar = scene.add.graphics().setDepth(1000);
-    bar.fillStyle(COLORS.hudBg, 1).fillRect(0, 0, width, Hud.HEIGHT);
-    bar.fillStyle(COLORS.borderOuter, 1).fillRect(0, Hud.HEIGHT - 3, width, 3);
-    bar.fillStyle(COLORS.hudBg, 1).fillRect(0, this.bottomY, width, Hud.BOTTOM);
-    bar.fillStyle(COLORS.borderOuter, 1).fillRect(0, this.bottomY, width, 3);
-    scene.add.text(16, 8, state.def.name, TEXT_BIG).setDepth(1001);
-    this.wave = scene.add.text(16, 42, '', TEXT).setDepth(1001);
-    this.lives = scene.add.text(16, 62, '', TEXT).setDepth(1001);
-    this.money = scene.add.text(250, 42, '', { ...TEXT, color: '#ffe066' }).setDepth(1001);
+    // Both bars are Platinum text-box frames spanning the width.
+    framePanel(scene, width / 2, Hud.HEIGHT / 2, width, Hud.HEIGHT, 'blue').setDepth(1000);
+    framePanel(scene, width / 2, this.bottomY + Hud.BOTTOM / 2, width, Hud.BOTTOM, 'blue').setDepth(1000);
+    scene.add.text(20, 8, state.def.name, TEXT_BIG).setDepth(1001);
+    this.wave = scene.add.text(20, 42, '', TEXT).setDepth(1001);
+    this.lives = scene.add.text(20, 62, '', TEXT).setDepth(1001);
+    this.money = scene.add.text(250, 42, '', { ...TEXT, color: '#c87818' }).setDepth(1001);
     this.hint = scene.add.text(width / 2, 70, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
-    this.bossGfx = scene.add.graphics().setDepth(1002);
-    this.bossName = scene.add.text(width / 2, 58, '', { ...TEXT_DIM, color: '#ffb3b3' }).setOrigin(0.5, 1).setDepth(1003).setVisible(false);
+    // Boss bar: the battle GUI enemy HP box at 2x with the name font, Lv number and HP fill drawn over it.
+    this.bossGfx = scene.add.graphics().setDepth(1003);
+    const box = HPBOX['enemy'];
+    const boxX = width / 2 - (box ? (box.width * BOSS_BOX_SCALE) / 2 : 128);
+    const boxY = 20;
+    if (box && scene.textures.exists('ui-hpbox-enemy')) {
+      this.bossBox = scene.add.image(boxX, boxY, 'ui-hpbox-enemy').setOrigin(0).setScale(BOSS_BOX_SCALE).setDepth(1002).setVisible(false);
+    }
+    if (scene.cache.bitmapFont.has(FONT_NAME)) {
+      // RetroFont sizes are relative to the cell width (7 and 9 px), so 14 / 18 draw the glyphs at 2x like the box.
+      this.bossName = scene.add.bitmapText(boxX + 16, boxY + 14, FONT_NAME, '', 14).setDepth(1004).setVisible(false);
+    } else {
+      this.bossName = scene.add.text(boxX + 16, boxY + 12, '', TEXT_LIGHT).setDepth(1004).setVisible(false);
+    }
+    if (box?.lv && scene.cache.bitmapFont.has(FONT_NUM)) {
+      this.bossLevel = scene.add.bitmapText(boxX + (box.lv.x + 13) * BOSS_BOX_SCALE, boxY + box.lv.y * BOSS_BOX_SCALE, FONT_NUM, '', 18).setDepth(1004).setVisible(false);
+    }
+    this.bossHp = scene.add.text(boxX + (box ? box.width * BOSS_BOX_SCALE : 256) - 20, boxY + 60, '', { ...TEXT_LIGHT, fontSize: '12px' }).setOrigin(1, 0.5).setDepth(1004).setVisible(false);
     this.startButton = new Button(scene, width - 80, 22, 'Start wave', callbacks.onStartWave, 130, 30).setDepth(1001);
     this.speedButton = new Button(scene, width - 185, 22, '1x', callbacks.onToggleSpeed, 60, 30).setDepth(1001);
     if (state.def.objective === 'free') {
@@ -174,22 +197,33 @@ export class Hud {
     }
   }
 
-  /** Boss HP bar across the top bar; null hides it. */
-  setBoss(boss: BossStatus | null): void {
+  /** Boss HP box across the top bar; null hides it. */
+  setBoss(boss: BossStatus & { level?: number } | null): void {
     this.bossGfx.clear();
-    if (!boss) {
-      this.bossName.setVisible(false);
-      return;
-    }
-    const width = this.scene.scale.width;
-    const w = Math.min(520, width - 300);
-    const x = width / 2 - w / 2;
-    const y = 62;
+    this.bossShown = boss !== null;
+    this.bossBox?.setVisible(boss !== null);
+    this.bossName.setVisible(boss !== null);
+    this.bossLevel?.setVisible(boss !== null);
+    this.bossHp.setVisible(boss !== null);
+    if (!boss) return;
     const frac = boss.maxHp > 0 ? Math.max(0, Math.min(1, boss.hp / boss.maxHp)) : 0;
-    this.bossGfx.fillStyle(COLORS.borderOuter, 1).fillRoundedRect(x - 2, y - 2, w + 4, 16, 5);
-    this.bossGfx.fillStyle(COLORS.hpBack, 1).fillRoundedRect(x, y, w, 12, 4);
-    if (frac > 0) this.bossGfx.fillStyle(frac > 0.5 ? 0xd35a5a : frac > 0.2 ? 0xd3b05a : 0xff7b7b, 1).fillRoundedRect(x, y, Math.max(8, w * frac), 12, 4);
-    this.bossName.setText(`${boss.name}   ${boss.hp} / ${boss.maxHp}`).setVisible(true);
+    const colour = frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical;
+    const box = HPBOX['enemy'];
+    if (this.bossBox && box?.hpFill) {
+      const f = box.hpFill;
+      const s = BOSS_BOX_SCALE;
+      this.bossGfx.fillStyle(colour, 1).fillRect(this.bossBox.x + f.x * s, this.bossBox.y + f.y * s, Math.round(f.width * s * frac), f.height * s);
+    } else {
+      const width = this.scene.scale.width;
+      const w = Math.min(520, width - 300);
+      const x = width / 2 - w / 2;
+      this.bossGfx.fillStyle(COLORS.borderOuter, 1).fillRect(x - 1, 61, w + 2, 14);
+      this.bossGfx.fillStyle(0x000000, 1).fillRect(x, 62, w, 12);
+      this.bossGfx.fillStyle(colour, 1).fillRect(x, 62, Math.round(w * frac), 12);
+    }
+    this.bossName.setText(boss.name);
+    this.bossLevel?.setText(String(boss.level ?? ''));
+    this.bossHp.setText(`${boss.hp} / ${boss.maxHp}`);
   }
 
   update(state: LevelState, gameSpeed: number, selectedPartyIndex: number | null = null, selectedBall: string | null = null): void {
@@ -207,7 +241,7 @@ export class Hud {
     this.startButton.setEnabled(canStart);
     const nextIn = def.objective === 'free' && state.phase === 'build' && state.towers.length > 0 ? ` (auto in ${Math.ceil(state.buildTimer)}s)` : '';
     this.startButton.setText(state.phase === 'build' ? `Start wave${nextIn}` : 'Wave running');
-    const bossShown = this.bossName.visible;
+    const bossShown = this.bossShown;
     if (this.paused) {
       this.hint.setText('Paused');
     } else if (selectedBall) {
@@ -219,8 +253,7 @@ export class Hud {
     } else {
       this.hint.setText('');
     }
-    this.hint.setVisible(!bossShown || this.paused || selectedBall !== null);
-    this.hint.setY(bossShown ? 84 : 70);
+    this.hint.setVisible(!bossShown);
     this.leaveButton?.setEnabled(state.phase === 'build' || state.phase === 'wave');
 
     if (this.slots.length !== state.party.length || this.slots.some((s, i) => s.species !== state.party[i]?.mon.species)) {
@@ -235,8 +268,10 @@ export class Hud {
       slot.placed.setText(isPlaced ? '●' : '');
       const frac = entry.mon.stats.hp > 0 ? entry.mon.hp / entry.mon.stats.hp : 0;
       slot.hp.clear();
-      slot.hp.fillStyle(COLORS.hpBack, 1).fillRect(slot.frame.x - 20, slot.frame.y + 18, 40, 3);
-      slot.hp.fillStyle(frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical, 1).fillRect(slot.frame.x - 20, slot.frame.y + 18, 40 * frac, 3);
+      // Battle-GUI bar: dark outline, black body, coloured fill.
+      slot.hp.fillStyle(COLORS.borderOuter, 1).fillRect(slot.frame.x - 21, slot.frame.y + 17, 42, 5);
+      slot.hp.fillStyle(0x000000, 1).fillRect(slot.frame.x - 20, slot.frame.y + 18, 40, 3);
+      slot.hp.fillStyle(frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical, 1).fillRect(slot.frame.x - 20, slot.frame.y + 18, Math.round(40 * frac), 3);
     });
     for (const b of this.balls) {
       const n = state.items.balls[b.id] ?? 0;

@@ -2,8 +2,28 @@ import Phaser from 'phaser';
 import config from '../data/config.json';
 import levelsJson from '../data/levels.json';
 import spriteFolders from '../data/spriteFolders.json';
+import uiGen4 from '../data/ui-gen4.json';
 import { assetUrl, badgeTextureKey, itemTextureKey, itemUrl, trainerTextureKey, urlParam } from '../game/runtime';
 import { PC } from '../sim/pc';
+import { FONT_NAME, FONT_NUM, frameKey } from '../ui/styles';
+
+interface RetroFontMeta {
+  file: string;
+  chars: string;
+  width: number;
+  height: number;
+  charsPerRow: number;
+}
+
+const ui = uiGen4 as {
+  frames: Record<string, { file: string }>;
+  hpBoxes: Record<string, { file: string }>;
+  status: Record<string, string>;
+  balls: Record<string, string>;
+  fonts: { name: RetroFontMeta; numbers: RetroFontMeta };
+  bag: { pokeball: string; pokeballPressed: string; buttons: Record<string, Record<string, string>>; pocketIcons: string; pocketIconsDim: string; pocketCursor: string; pocketPanel: string };
+  menu: Record<string, { on: string; off: string }>;
+};
 
 /**
  * Loads the small shared assets (portraits, generated textures) and hands
@@ -50,6 +70,23 @@ export class BootScene extends Phaser.Scene {
     this.load.image('pc-frame', assetUrl(PC.frame));
     this.load.image('pc-cursor', assetUrl(PC.cursor));
     for (const wp of PC.wallpapers) this.load.image(`wallpaper-${wp.id}`, assetUrl(wp.image));
+    // Platinum interface pieces (scripts/build-gen4-ui.mjs): frames, HP boxes, badges, fonts, bag, menu icons.
+    for (const [name, f] of Object.entries(ui.frames)) this.load.image(frameKey(name), assetUrl(f.file));
+    for (const [name, b] of Object.entries(ui.hpBoxes)) this.load.image(`ui-hpbox-${name}`, assetUrl(b.file));
+    for (const [name, file] of Object.entries(ui.status)) this.load.image(`ui-status-${name}`, assetUrl(file));
+    for (const [name, file] of Object.entries(ui.balls)) this.load.image(`ui-ball-${name}`, assetUrl(file));
+    this.load.image('ui-font-name', assetUrl(ui.fonts.name.file));
+    this.load.image('ui-font-numbers', assetUrl(ui.fonts.numbers.file));
+    this.load.image('ui-pokeball', assetUrl(ui.bag.pokeball));
+    this.load.image('ui-pokeball-pressed', assetUrl(ui.bag.pokeballPressed));
+    for (const [pocket, states] of Object.entries(ui.bag.buttons)) for (const [state, file] of Object.entries(states)) this.load.image(`ui-button-${pocket}-${state}`, assetUrl(file));
+    this.load.image('ui-pocket-icons', assetUrl(ui.bag.pocketIcons));
+    this.load.image('ui-pocket-cursor', assetUrl(ui.bag.pocketCursor));
+    this.load.image('ui-pocket-panel', assetUrl(ui.bag.pocketPanel));
+    for (const [name, icon] of Object.entries(ui.menu)) {
+      this.load.image(`ui-menu-${name}`, assetUrl(icon.on));
+      this.load.image(`ui-menu-${name}-off`, assetUrl(icon.off));
+    }
     // Trainer portraits and badges named by the levels.
     for (const def of Object.values(levelsJson as Record<string, { trainer?: { id: string }; badge?: { id: string } }>)) {
       if (def.trainer) this.load.image(trainerTextureKey(def.trainer.id), assetUrl(`assets/trainers/${def.trainer.id}.png`));
@@ -61,6 +98,25 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Bitmap fonts from the battle GUI: the name font and the Lv / HP numbers.
+    const retro = (key: string, image: string, f: RetroFontMeta) => {
+      if (!this.textures.exists(image) || this.cache.bitmapFont.has(key)) return;
+      const config: Phaser.Types.GameObjects.BitmapText.RetroFontConfig = {
+        image,
+        'offset.x': 0,
+        'offset.y': 0,
+        width: f.width,
+        height: f.height,
+        chars: f.chars,
+        charsPerRow: f.charsPerRow,
+        'spacing.x': 0,
+        'spacing.y': 0,
+        lineSpacing: 0,
+      };
+      this.cache.bitmapFont.add(key, Phaser.GameObjects.RetroFont.Parse(this, config));
+    };
+    retro(FONT_NAME, 'ui-font-name', ui.fonts.name);
+    retro(FONT_NUM, 'ui-font-numbers', ui.fonts.numbers);
     // A small star for shiny sparkles.
     const star = this.add.graphics();
     star.fillStyle(0xffffff, 1);

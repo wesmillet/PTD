@@ -56,11 +56,12 @@ export class LevelSelectScene extends Phaser.Scene {
       y += 40;
     }
     const row = y + 16;
-    new Button(this, width / 2 - 170, row, 'PC', () => this.guard(() => this.scene.start('PC')), 150, 30);
-    new Button(this, width / 2, row, 'Shop', () => this.guard(() => this.shop?.show()), 150, 30);
-    new Button(this, width / 2 + 170, row, 'Save', () => this.savePanel?.show(), 150, 30);
-    new Button(this, width / 2 - 85, row + 38, 'Credits', () => this.credits?.show(), 150, 26);
-    new Button(this, width / 2 + 85, row + 38, 'Sprite demo', () => this.scene.start('Phase0'), 150, 26);
+    // Start-menu icons from Platinum on the menu buttons.
+    new Button(this, width / 2 - 170, row, 'PC', () => this.guard(() => this.scene.start('PC')), 150, 30, 'ui-menu-party');
+    new Button(this, width / 2, row, 'Shop', () => this.guard(() => this.shop?.show()), 150, 30, 'ui-menu-bag');
+    new Button(this, width / 2 + 170, row, 'Save', () => this.savePanel?.show(), 150, 30, 'ui-menu-save');
+    new Button(this, width / 2 - 85, row + 38, 'Credits', () => this.credits?.show(), 150, 26, 'ui-menu-card');
+    new Button(this, width / 2 + 85, row + 38, 'Sprite demo', () => this.scene.start('Phase0'), 150, 26, 'ui-menu-options');
     this.add.text(width / 2, this.scale.height - 16, 'Tip: ?level=<id> opens a level, ?party=debug loads the test party', TEXT_DIM).setOrigin(0.5);
 
     const refresh = () => {
@@ -89,25 +90,37 @@ export class LevelSelectScene extends Phaser.Scene {
     if (needsStarter()) this.askStarter();
   }
 
-  /** The bag: every ball, Potion and Rare Candy with its sprite and count, plus money. */
+  /**
+   * The bag: the bag screen's round pocket buttons (Poké Balls, Medicine,
+   * Items) each followed by that pocket's items with their sprites and
+   * counts, plus money.
+   */
   private drawBag(cx: number, y: number): void {
     const game = getGame();
-    const entries: { key: string; count: number; name: string }[] = [];
+    const entries: { key: string; count: number; name: string; pocket?: string }[] = [];
+    let first = true;
     for (const id of BALL_IDS) {
       const ball = BALLS[id];
       if (!ball || ball.obtainable === false) continue;
-      entries.push({ key: itemTextureKey(ball.sprite), count: game.items.balls[id] ?? 0, name: ball.name });
+      entries.push({ key: itemTextureKey(ball.sprite), count: game.items.balls[id] ?? 0, name: ball.name, ...(first ? { pocket: 'balls' } : {}) });
+      first = false;
     }
-    entries.push({ key: itemTextureKey(config.shop.potion.sprite), count: game.items.potions, name: config.shop.potion.name });
-    entries.push({ key: itemTextureKey(config.shop.rareCandy.sprite), count: game.items.rareCandies, name: config.shop.rareCandy.name });
-    const gap = 58;
-    const total = entries.length * gap + 90;
+    entries.push({ key: itemTextureKey(config.shop.potion.sprite), count: game.items.potions, name: config.shop.potion.name, pocket: 'medicine' });
+    entries.push({ key: itemTextureKey(config.shop.rareCandy.sprite), count: game.items.rareCandies, name: config.shop.rareCandy.name, pocket: 'items' });
+    const gap = 54;
+    const pocketGap = 34;
+    const total = entries.length * gap + 3 * pocketGap + 90;
     let x = cx - total / 2;
-    this.add.text(x, y, `$${game.money}`, { ...TEXT_DIM, color: '#ffe066' }).setOrigin(0, 0.5);
+    this.add.text(x, y, `$${game.money}`, { ...TEXT_DIM, color: '#c87818' }).setOrigin(0, 0.5);
     x += 90;
     for (const e of entries) {
+      if (e.pocket) {
+        const key = `ui-button-${e.pocket}-normal`;
+        if (this.textures.exists(key)) this.add.image(x, y, key).setScale(0.7);
+        x += pocketGap;
+      }
       if (this.textures.exists(e.key)) this.add.image(x, y, e.key);
-      this.add.text(x + 14, y + 2, String(e.count), { ...TEXT_DIM, fontSize: '12px', color: e.count > 0 ? '#f4ecd8' : '#6d6b85' }).setOrigin(0, 0.5);
+      this.add.text(x + 14, y + 2, String(e.count), { ...TEXT_DIM, fontSize: '12px', color: e.count > 0 ? '#404848' : '#a0a8b0' }).setOrigin(0, 0.5);
       x += gap;
     }
   }

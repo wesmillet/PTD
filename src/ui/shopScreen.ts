@@ -1,26 +1,43 @@
-/** Shop between levels: balls, Potion, Rare Candy. DOM overlay. */
+/**
+ * Shop between levels, laid out like the Platinum bag: the pocket selector
+ * strip with its red cursor, the round pocket buttons as tabs (Poké Balls,
+ * Medicine, Items) and the wares of the open pocket. DOM overlay.
+ */
 import config from '../data/config.json';
+import uiGen4 from '../data/ui-gen4.json';
+import { itemUrl } from '../game/runtime';
 import { BALL_IDS, BALLS } from '../sim/catch';
 import { spendMoney, type GameState } from '../sim/game';
-import { itemUrl } from '../game/runtime';
-import { ensureOverlayStyles, isolateFromGame } from './domOverlay';
+import { ensureOverlayStyles, isolateFromGame, uiUrl } from './domOverlay';
 
 export interface ShopHooks {
   onChange: () => void;
   onClose: () => void;
 }
 
+type Pocket = 'balls' | 'medicine' | 'items';
+
 interface Ware {
   id: string;
   name: string;
   sprite: string;
   price: number;
+  pocket: Pocket;
   count: () => number;
   add: (n: number) => void;
 }
 
+const POCKETS: { id: Pocket; name: string; index: number }[] = [
+  { id: 'balls', name: 'Poké Balls', index: 2 },
+  { id: 'medicine', name: 'Medicine', index: 1 },
+  { id: 'items', name: 'Items', index: 0 },
+];
+
+const bag = (uiGen4 as { bag: { buttons: Record<string, Record<string, string>>; pocketIcons: string; pocketCursor: string } }).bag;
+
 export class ShopScreen {
   private root: HTMLDivElement | null = null;
+  private pocket: Pocket = 'balls';
 
   constructor(private readonly game: GameState, private readonly hooks: ShopHooks) {}
 
@@ -35,13 +52,14 @@ export class ShopScreen {
       name: BALLS[id]?.name ?? id,
       sprite: BALLS[id]?.sprite ?? 'poke-ball',
       price: BALLS[id]?.price ?? 0,
+      pocket: 'balls',
       count: () => g.items.balls[id] ?? 0,
       add: (n) => (g.items.balls[id] = (g.items.balls[id] ?? 0) + n),
     }));
     return [
       ...balls,
-      { id: 'potion', name: config.shop.potion.name, sprite: config.shop.potion.sprite, price: config.shop.potion.price, count: () => g.items.potions, add: (n) => (g.items.potions += n) },
-      { id: 'rareCandy', name: config.shop.rareCandy.name, sprite: config.shop.rareCandy.sprite, price: config.shop.rareCandy.price, count: () => g.items.rareCandies, add: (n) => (g.items.rareCandies += n) },
+      { id: 'potion', name: config.shop.potion.name, sprite: config.shop.potion.sprite, price: config.shop.potion.price, pocket: 'medicine', count: () => g.items.potions, add: (n) => (g.items.potions += n) },
+      { id: 'rareCandy', name: config.shop.rareCandy.name, sprite: config.shop.rareCandy.sprite, price: config.shop.rareCandy.price, pocket: 'items', count: () => g.items.rareCandies, add: (n) => (g.items.rareCandies += n) },
     ];
   }
 
@@ -83,9 +101,48 @@ export class ShopScreen {
     money.id = 'ptd-shop-money';
     money.textContent = `Money: $${this.game.money}`;
     root.append(title, money);
+
+    // Pocket selector strip (2x) with the red cursor over the open pocket, then the round pocket buttons.
+    const strip = document.createElement('div');
+    strip.style.cssText = 'position:relative;width:206px;height:24px;margin:8px 0 4px;image-rendering:pixelated';
+    const icons = document.createElement('img');
+    icons.alt = '';
+    icons.src = uiUrl(bag.pocketIcons);
+    icons.style.cssText = 'width:206px;height:24px;image-rendering:pixelated';
+    const cursor = document.createElement('img');
+    cursor.alt = '';
+    cursor.src = uiUrl(bag.pocketCursor);
+    const active = POCKETS.find((p) => p.id === this.pocket) ?? POCKETS[0]!;
+    cursor.style.cssText = `position:absolute;top:-2px;left:${active.index * 25.75 - 1}px;width:28px;height:28px;image-rendering:pixelated`;
+    strip.append(icons, cursor);
+    root.appendChild(strip);
+    const tabs = document.createElement('div');
+    tabs.className = 'ptd-actions';
+    tabs.id = 'ptd-shop-pockets';
+    for (const p of POCKETS) {
+      const b = document.createElement('button');
+      b.className = 'ptd-pocket';
+      b.title = p.name;
+      b.dataset.pocket = p.id;
+      const img = document.createElement('img');
+      img.alt = p.name;
+      img.src = uiUrl(bag.buttons[p.id]?.[p.id === this.pocket ? 'selected' : 'normal'] ?? '');
+      b.appendChild(img);
+      b.addEventListener('click', () => {
+        this.pocket = p.id;
+        this.render();
+      });
+      tabs.appendChild(b);
+      const label = document.createElement('span');
+      label.className = 'ptd-label';
+      label.textContent = p.id === this.pocket ? p.name : '';
+      tabs.appendChild(label);
+    }
+    root.appendChild(tabs);
+
     const list = document.createElement('ul');
     list.className = 'ptd-moves';
-    for (const ware of this.wares()) {
+    for (const ware of this.wares().filter((w) => w.pocket === this.pocket)) {
       const li = document.createElement('li');
       li.className = 'ptd-move';
       li.style.cursor = 'default';
@@ -124,7 +181,7 @@ export class ShopScreen {
     root.appendChild(list);
     const note = document.createElement('div');
     note.className = 'ptd-dim';
-    note.textContent = 'Potions restore a placed Pokémon between waves (its panel). Rare Candy raises a level from the Party screen. Master Balls are not for sale.';
+    note.textContent = 'Potions restore a placed Pokémon between waves (its panel). Rare Candy raises a level from the PC. Master Balls are not for sale.';
     root.appendChild(note);
   }
 }

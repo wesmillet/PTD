@@ -2,6 +2,128 @@
  * DOM overlay helpers. The stylesheet is src/ui/theme.css (imported from
  * main.ts); see docs/ui.md for the variables and component classes.
  */
+import uiGen4 from '../data/ui-gen4.json';
+import { expForLevel } from '../data/pokedata';
+import type { Monster } from '../sim/monster';
+
+interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+interface HpBoxMeta {
+  file: string;
+  width: number;
+  height: number;
+  hpFill: Rect | null;
+  expFill: Rect | null;
+  lv: { x: number; y: number } | null;
+}
+
+const ui = uiGen4 as { hpBoxes: Record<string, HpBoxMeta>; status: Record<string, string> };
+
+/** URL of a shipped asset path as the config files write it. */
+export function uiUrl(rel: string): string {
+  return `${import.meta.env.BASE_URL}${rel}`;
+}
+
+/** Battle-GUI badge name for an ailment (psn, par, slp, brn, frz), or null. */
+export const STATUS_BADGE: Record<string, string | undefined> = { poison: 'psn', paralysis: 'par', sleep: 'slp', burn: 'brn', freeze: 'frz' };
+
+/** The Platinum status badge image for an ailment, or null when it has none. */
+export function statusBadge(ailment: string): HTMLImageElement | null {
+  const name = STATUS_BADGE[ailment];
+  const file = name ? ui.status[name] : undefined;
+  if (!file) return null;
+  const img = document.createElement('img');
+  img.className = 'ptd-status-badge';
+  img.alt = ailment;
+  img.src = uiUrl(file);
+  return img;
+}
+
+/** The HP box from the battle GUI at 2x, with name, level, HP bar (and EXP bar) laid over it. */
+export function hpBox(mon: Monster, variant: 'player' | 'player-exp' | 'enemy' = 'player-exp'): HTMLDivElement {
+  const box = document.createElement('div');
+  box.className = `ptd-hpbox ${variant === 'enemy' ? 'enemy' : 'player'}`;
+  box.dataset.variant = variant;
+  const meta = ui.hpBoxes[variant];
+  if (meta) box.style.backgroundImage = `url(${uiUrl(meta.file)})`;
+  const name = document.createElement('span');
+  name.className = 'ptd-hpbox-name';
+  const lv = document.createElement('span');
+  lv.className = 'ptd-hpbox-lv';
+  const bar = document.createElement('div');
+  bar.className = 'ptd-hpbox-bar';
+  const fill = document.createElement('div');
+  fill.className = 'ptd-hpbox-fill';
+  bar.appendChild(fill);
+  const numbers = document.createElement('span');
+  numbers.className = 'ptd-hpbox-numbers';
+  const exp = document.createElement('div');
+  exp.className = 'ptd-hpbox-exp';
+  const expFill = document.createElement('div');
+  expFill.className = 'ptd-hpbox-fill';
+  exp.appendChild(expFill);
+  const badge = document.createElement('span');
+  badge.className = 'ptd-hpbox-badge';
+  box.append(name, lv, bar, numbers, exp, badge);
+  if (meta) {
+    const s = 2;
+    if (meta.lv) {
+      lv.style.left = `${(meta.lv.x + 13) * s}px`;
+      lv.style.top = `${meta.lv.y * s - 1}px`;
+    }
+    if (meta.hpFill) {
+      bar.style.left = `${meta.hpFill.x * s}px`;
+      bar.style.top = `${meta.hpFill.y * s}px`;
+      bar.style.width = `${meta.hpFill.width * s}px`;
+      bar.style.height = `${meta.hpFill.height * s}px`;
+      numbers.style.right = `${(meta.width - meta.hpFill.x - meta.hpFill.width) * s + 2}px`;
+      numbers.style.top = `${(meta.hpFill.y + 6) * s}px`;
+      badge.style.left = `${(meta.hpFill.x - 30) * s}px`;
+      badge.style.top = `${(meta.hpFill.y + 5) * s}px`;
+    }
+    if (meta.expFill) {
+      exp.style.left = `${meta.expFill.x * s}px`;
+      exp.style.top = `${meta.expFill.y * s}px`;
+      exp.style.width = `${meta.expFill.width * s}px`;
+      exp.style.height = `${meta.expFill.height * s}px`;
+    } else {
+      exp.style.display = 'none';
+    }
+    if (variant === 'enemy') numbers.style.display = 'none';
+  }
+  updateHpBox(box, mon);
+  return box;
+}
+
+/** Refreshes an HP box's name, level, bars, numbers and status badge. */
+export function updateHpBox(box: HTMLDivElement, mon: Monster): void {
+  const q = (cls: string) => box.querySelector(`.${cls}`) as HTMLElement;
+  q('ptd-hpbox-name').textContent = `${capitalize(mon.name)}${mon.shiny ? ' ★' : ''}`;
+  q('ptd-hpbox-lv').textContent = String(mon.level);
+  const frac = mon.stats.hp > 0 ? Math.max(0, Math.min(1, mon.hp / mon.stats.hp)) : 0;
+  const bar = q('ptd-hpbox-bar');
+  bar.className = `ptd-hpbox-bar${frac <= 0.2 ? ' critical' : frac <= 0.5 ? ' low' : ''}`;
+  (bar.firstElementChild as HTMLElement).style.width = `${Math.round(frac * 100)}%`;
+  q('ptd-hpbox-numbers').textContent = `${mon.hp}/${mon.stats.hp}`;
+  const exp = q('ptd-hpbox-exp');
+  const next = mon.level >= 100 ? 0 : expForLevel(mon.growth, mon.level + 1) - expForLevel(mon.growth, mon.level);
+  const gained = mon.exp - expForLevel(mon.growth, mon.level);
+  (exp.firstElementChild as HTMLElement).style.width = `${next > 0 ? Math.round(Math.max(0, Math.min(1, gained / next)) * 100) : 100}%`;
+  const badgeSlot = q('ptd-hpbox-badge');
+  const current = badgeSlot.dataset.ailment ?? '';
+  if (current !== mon.status.ailment) {
+    badgeSlot.innerHTML = '';
+    const img = statusBadge(mon.status.ailment);
+    if (img) badgeSlot.appendChild(img);
+    badgeSlot.dataset.ailment = mon.status.ailment;
+  }
+}
+
 export function ensureOverlayStyles(): void {
   // Styles ship in theme.css; kept so callers do not need to change.
 }

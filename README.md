@@ -69,6 +69,14 @@ cleared; defend levels when you win.
   tiles, autotile terrains, path, placeable tiles, test play, export and
   import Tiled JSON). See `docs/maps.md`.
 
+## Interface
+
+The UI is skinned with the Pokémon Platinum sheets in `assets-src/ui/gen4/`
+(rippers credited in `CREDITS.txt` and on the credits screen).
+`node scripts/build-gen4-ui.mjs` keys out the sheet backgrounds and cuts the
+frames, HP boxes, fonts, bag buttons, menu icons and box wallpapers into
+`public/assets/ui/gen4/`; see `docs/ui.md`.
+
 ## Pokémon data
 
 Stats, moves, learnsets, the type chart, EXP curves, evolutions and Platinum

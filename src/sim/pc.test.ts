@@ -27,7 +27,8 @@ describe('PC boxes', () => {
     expect(boxes[0]?.name).toBe('Box 1');
     expect(boxes.every((b) => b.slots.length === SLOTS_PER_BOX && b.slots.every((s) => s === null))).toBe(true);
     expect(boxes.every((b) => PC.wallpapers.some((w) => w.id === b.wallpaper))).toBe(true);
-    expect(wallpaperDef(boxes[1]!.wallpaper).image).toMatch(/^assets\/pc\/wallpapers\//);
+    expect(wallpaperDef(boxes[1]!.wallpaper).image).toMatch(/^assets\/ui\/gen4\/wallpapers\//);
+    expect(PC.wallpapers.length).toBeGreaterThanOrEqual(32);
   });
 
   it('deposits into the first free slot, box by box, and reports a full PC', () => {
@@ -91,8 +92,8 @@ describe('PC boxes', () => {
     expect(box.slots.filter((m) => m && matchesFilter(m, { shiny: true })).map((m) => m!.name)).toEqual(['zubat']);
     expect(box.slots.filter((m) => m && matchesFilter(m, { type: 12 })).map((m) => m!.name)).toEqual(['turtwig']); // grass
     expect(box.slots.filter((m) => m && matchesFilter(m, {})).length).toBe(3);
-    setWallpaper(box, 'cave');
-    expect(box.wallpaper).toBe('cave');
+    setWallpaper(box, 'gen4-08');
+    expect(box.wallpaper).toBe('gen4-08');
     expect(() => setWallpaper(box, 'nope')).toThrow(/wallpaper/);
   });
 });

@@ -4,12 +4,11 @@
  * it active; "Move" hands control back to the scene to pick a new tile.
  */
 import { expForLevel, getMove, typeName } from '../data/pokedata';
-import { expToNextFraction } from '../sim/exp';
 import type { Monster } from '../sim/monster';
 import { resolveMove } from '../sim/moves';
 import { evolutionOptions } from '../sim/evolution';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, isolateFromGame } from './domOverlay';
+import { capitalize, ensureOverlayStyles, hpBox, isolateFromGame, updateHpBox } from './domOverlay';
 
 export interface PokemonPanelHooks {
   portraitUrl: (species: number) => string | undefined;
@@ -29,9 +28,8 @@ export class PokemonPanel {
   private readonly portrait: HTMLImageElement;
   private readonly title: HTMLElement;
   private readonly subtitle: HTMLElement;
-  private readonly hpBar: HTMLDivElement;
-  private readonly hpText: HTMLElement;
-  private readonly expBar: HTMLDivElement;
+  private readonly hpSlot: HTMLDivElement;
+  private hpBoxEl: HTMLDivElement | null = null;
   private readonly expText: HTMLElement;
   private readonly statusLine: HTMLElement;
   private readonly moveList: HTMLUListElement;
@@ -66,14 +64,13 @@ export class PokemonPanel {
     head.append(this.portrait, titles);
     this.root.appendChild(head);
 
-    this.hpText = document.createElement('div');
-    this.hpBar = this.bar('hp');
+    // The battle-GUI HP box (name, Lv, HP bar and numbers, EXP bar, status badge).
+    this.hpSlot = document.createElement('div');
     this.expText = document.createElement('div');
     this.expText.className = 'ptd-dim';
-    this.expBar = this.bar('exp');
     this.statusLine = document.createElement('div');
     this.statusLine.className = 'ptd-status';
-    this.root.append(this.hpText, this.hpBar, this.expText, this.expBar, this.statusLine);
+    this.root.append(this.hpSlot, this.expText, this.statusLine);
 
     this.moveList = document.createElement('ul');
     this.moveList.className = 'ptd-moves';
@@ -106,13 +103,6 @@ export class PokemonPanel {
     document.body.appendChild(this.root);
   }
 
-  private bar(kind: string): HTMLDivElement {
-    const bar = document.createElement('div');
-    bar.className = `ptd-bar ${kind}`;
-    bar.appendChild(document.createElement('div'));
-    return bar;
-  }
-
   get isOpen(): boolean {
     return this.root.style.display !== 'none';
   }
@@ -126,6 +116,9 @@ export class PokemonPanel {
     this.placed = placed;
     this.lastKey = '';
     this.root.style.display = 'block';
+    this.hpSlot.innerHTML = '';
+    this.hpBoxEl = hpBox(mon, 'player-exp');
+    this.hpSlot.appendChild(this.hpBoxEl);
     const url = this.hooks.portraitUrl(mon.species);
     if (url) {
       this.portrait.src = url;
@@ -153,13 +146,9 @@ export class PokemonPanel {
 
     this.title.textContent = `${capitalize(mon.name)}${mon.shiny ? ' ★' : ''}`;
     this.subtitle.textContent = `Lv ${mon.level}  ${mon.types.map((t) => capitalize(typeName(t))).join(' / ')}  ${this.placed ? 'placed' : 'in party'}`;
-    const frac = mon.stats.hp > 0 ? mon.hp / mon.stats.hp : 0;
-    this.hpText.textContent = `HP ${mon.hp} / ${mon.stats.hp}`;
-    this.hpBar.className = `ptd-bar hp${frac <= 0.2 ? ' critical' : frac <= 0.5 ? ' low' : ''}`;
-    (this.hpBar.firstElementChild as HTMLElement).style.width = `${Math.round(frac * 100)}%`;
+    if (this.hpBoxEl) updateHpBox(this.hpBoxEl, mon);
     const next = mon.level >= 100 ? 0 : expForLevel(mon.growth, mon.level + 1) - mon.exp;
     this.expText.textContent = mon.level >= 100 ? 'EXP: max level' : `EXP ${mon.exp}  (${next} to Lv ${mon.level + 1})`;
-    (this.expBar.firstElementChild as HTMLElement).style.width = `${Math.round(expToNextFraction({ growth: mon.growth, level: mon.level, exp: mon.exp }) * 100)}%`;
 
     const chips: string[] = [];
     if (mon.status.ailment !== 'none') chips.push(capitalize(mon.status.ailment));

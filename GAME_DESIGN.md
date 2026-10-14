@@ -308,10 +308,17 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Pokédex shows shiny counts. A "shiny living dex" completion reward exists.
 
 ## UI
-- Theme: dark navy panels with a light border in the style of the PMD
-  dialogue boxes, cream text, the 17 type colours as CSS variables, Pixelify
-  Sans (OFL, bundled) for headings, labels and the HUD, a system sans-serif
-  for long text. Variables and components are listed in `docs/ui.md`.
+- Theme: Pokémon Platinum. Light panels with dark text inside the
+  blue-edged text-box frame (a 9-slice cut from the Platinum sheets in
+  `assets-src/ui/gen4/`, coloured frames for trainer and boss cards), the
+  battle GUI's HP boxes, bar fills, Lv label, status badges and name /
+  number fonts on placed Pokémon, the Pokémon panel, the PC summary and the
+  boss bar, the bag screen's round buttons and pocket selector in the shop
+  and inventory, the big Poké Ball on the title screen, the start-menu
+  icons on level select and the title screen, and the 33 PC box wallpapers.
+  The 17 type colours are CSS variables; Pixelify Sans (OFL, bundled) for
+  general text, a system sans-serif for long text. Variables, components
+  and the sheet cutter are documented in `docs/ui.md`.
 - Title screen: game name, Continue, New Game, Credits.
 - Level select map per act, styled after the Sinnoh region map (a plain list
   with the unlock chain for now)

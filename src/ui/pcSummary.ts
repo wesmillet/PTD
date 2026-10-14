@@ -6,13 +6,12 @@
 import { expForLevel, getMove, typeName } from '../data/pokedata';
 import typesJson from '../data/types.json';
 import { evolutionOptions, evolveMonster } from '../sim/evolution';
-import { expToNextFraction } from '../sim/exp';
 import { replaceMove, useRareCandy } from '../sim/items';
 import { makeMoveSlot, type Monster } from '../sim/monster';
 import { learnableAt } from '../sim/moves';
 import { capitalizeName } from '../sim/names';
 import type { BoxFilter, SortKey } from '../sim/pc';
-import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame, typeBadge } from './domOverlay';
+import { capitalize, ensureOverlayStyles, hpBox, iconImage, isolateFromGame, typeBadge } from './domOverlay';
 import { EvolutionDialog } from './evolutionDialog';
 import { LearnDialog } from './learnDialog';
 
@@ -184,25 +183,12 @@ export class PcSummary {
     head.append(portrait, text);
     body.appendChild(head);
 
-    const hp = document.createElement('div');
-    hp.className = 'ptd-label';
-    hp.textContent = `HP ${mon.hp} / ${mon.stats.hp}`;
-    const hpBar = document.createElement('div');
-    const frac = mon.stats.hp > 0 ? mon.hp / mon.stats.hp : 0;
-    hpBar.className = `ptd-bar hp${frac <= 0.2 ? ' critical' : frac <= 0.5 ? ' low' : ''}`;
-    const hpFill = document.createElement('div');
-    hpFill.style.width = `${Math.round(frac * 100)}%`;
-    hpBar.appendChild(hpFill);
+    // The battle-GUI HP box carries name, Lv, HP bar and numbers, EXP bar and the status badge.
     const exp = document.createElement('div');
     exp.className = 'ptd-label';
     const next = mon.level >= 100 ? 0 : expForLevel(mon.growth, mon.level + 1) - mon.exp;
     exp.textContent = `EXP ${mon.exp}${mon.level >= 100 ? '' : `  ·  ${next} to next level`}`;
-    const expBar = document.createElement('div');
-    expBar.className = 'ptd-bar exp';
-    const expFill = document.createElement('div');
-    expFill.style.width = `${Math.round(expToNextFraction({ growth: mon.growth, level: mon.level, exp: mon.exp }) * 100)}%`;
-    expBar.appendChild(expFill);
-    body.append(hp, hpBar, exp, expBar);
+    body.append(hpBox(mon, 'player-exp'), exp);
 
     const stats = document.createElement('div');
     stats.style.cssText = 'display:grid;grid-template-columns:repeat(3,1fr);gap:2px 10px;margin:8px 0;font-size:12px';

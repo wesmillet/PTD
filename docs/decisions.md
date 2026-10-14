@@ -87,3 +87,16 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
 - Exit from the pause menu leaves a free level with its summary (EXP and
   catches kept) and abandons a defend level (caught Pokémon still kept, no
   progress recorded).
+- Platinum frames are applied at 1.5x in the DOM (`border-image`) and 1x on
+  the canvas (NineSlice); the sheet's wider right edge is kept as drawn.
+- The battle-GUI name and number fonts are packed into fixed cells for
+  Phaser's RetroFont and used only where the games use them (Lv labels, the
+  boss box); Pixelify Sans stays for everything else, as asked.
+- Small HP bars on the map follow the battle GUI's look (white outline,
+  black body, green / yellow / red fill) rather than placing the 128 px HP
+  box over 32 px tiles; the full HP box is used in the panels and the boss
+  bar.
+- Shop pockets map Poké Balls, Medicine (Potion) and Items (Rare Candy) to
+  the bag's round buttons; the other five pockets are not sold yet.
+- The 33 Platinum wallpapers replace the placeholder ones; old saves that
+  named a placeholder wallpaper fall back to the first Platinum one.

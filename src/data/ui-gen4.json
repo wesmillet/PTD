@@ -1,0 +1,699 @@
+{
+  "frames": {
+    "blue": {
+      "file": "assets/ui/gen4/frames/blue.png",
+      "width": 250,
+      "height": 44,
+      "left": 11,
+      "right": 19,
+      "top": 5,
+      "bottom": 5,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "grey": {
+      "file": "assets/ui/gen4/frames/grey.png",
+      "width": 248,
+      "height": 44,
+      "left": 3,
+      "right": 3,
+      "top": 3,
+      "bottom": 3,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "black": {
+      "file": "assets/ui/gen4/frames/black.png",
+      "width": 252,
+      "height": 44,
+      "left": 4,
+      "right": 4,
+      "top": 5,
+      "bottom": 5,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "pink-lace": {
+      "file": "assets/ui/gen4/frames/pink-lace.png",
+      "width": 253,
+      "height": 46,
+      "left": 15,
+      "right": 19,
+      "top": 5,
+      "bottom": 5,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "brown-lace": {
+      "file": "assets/ui/gen4/frames/brown-lace.png",
+      "width": 253,
+      "height": 46,
+      "left": 13,
+      "right": 18,
+      "top": 8,
+      "bottom": 8,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "red-dots": {
+      "file": "assets/ui/gen4/frames/red-dots.png",
+      "width": 253,
+      "height": 47,
+      "left": 11,
+      "right": 22,
+      "top": 8,
+      "bottom": 5,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "purple": {
+      "file": "assets/ui/gen4/frames/purple.png",
+      "width": 254,
+      "height": 46,
+      "left": 14,
+      "right": 18,
+      "top": 6,
+      "bottom": 6,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "lime": {
+      "file": "assets/ui/gen4/frames/lime.png",
+      "width": 251,
+      "height": 43,
+      "left": 13,
+      "right": 16,
+      "top": 3,
+      "bottom": 3,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "checker": {
+      "file": "assets/ui/gen4/frames/checker.png",
+      "width": 254,
+      "height": 46,
+      "left": 13,
+      "right": 18,
+      "top": 4,
+      "bottom": 4,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "grey-round": {
+      "file": "assets/ui/gen4/frames/grey-round.png",
+      "width": 250,
+      "height": 44,
+      "left": 8,
+      "right": 18,
+      "top": 6,
+      "bottom": 6,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "orange": {
+      "file": "assets/ui/gen4/frames/orange.png",
+      "width": 250,
+      "height": 44,
+      "left": 11,
+      "right": 19,
+      "top": 6,
+      "bottom": 6,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "green": {
+      "file": "assets/ui/gen4/frames/green.png",
+      "width": 250,
+      "height": 44,
+      "left": 7,
+      "right": 17,
+      "top": 5,
+      "bottom": 6,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "teal": {
+      "file": "assets/ui/gen4/frames/teal.png",
+      "width": 250,
+      "height": 46,
+      "left": 9,
+      "right": 18,
+      "top": 7,
+      "bottom": 7,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "blue-dots": {
+      "file": "assets/ui/gen4/frames/blue-dots.png",
+      "width": 250,
+      "height": 44,
+      "left": 9,
+      "right": 21,
+      "top": 6,
+      "bottom": 6,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "red-tab": {
+      "file": "assets/ui/gen4/frames/red-tab.png",
+      "width": 250,
+      "height": 46,
+      "left": 11,
+      "right": 19,
+      "top": 5,
+      "bottom": 5,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "green-tab": {
+      "file": "assets/ui/gen4/frames/green-tab.png",
+      "width": 252,
+      "height": 44,
+      "left": 11,
+      "right": 21,
+      "top": 4,
+      "bottom": 4,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "pink-tab": {
+      "file": "assets/ui/gen4/frames/pink-tab.png",
+      "width": 252,
+      "height": 44,
+      "left": 11,
+      "right": 21,
+      "top": 4,
+      "bottom": 4,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "blue-tab": {
+      "file": "assets/ui/gen4/frames/blue-tab.png",
+      "width": 252,
+      "height": 44,
+      "left": 11,
+      "right": 21,
+      "top": 4,
+      "bottom": 4,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "grey-tab": {
+      "file": "assets/ui/gen4/frames/grey-tab.png",
+      "width": 252,
+      "height": 44,
+      "left": 11,
+      "right": 21,
+      "top": 4,
+      "bottom": 4,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    },
+    "brown-tab": {
+      "file": "assets/ui/gen4/frames/brown-tab.png",
+      "width": 252,
+      "height": 44,
+      "left": 11,
+      "right": 21,
+      "top": 4,
+      "bottom": 4,
+      "interior": [
+        248,
+        248,
+        248
+      ]
+    }
+  },
+  "hpBoxes": {
+    "enemy": {
+      "file": "assets/ui/gen4/hpbox-enemy.png",
+      "width": 128,
+      "height": 33,
+      "hpBar": {
+        "x": 49,
+        "y": 22,
+        "width": 50,
+        "height": 1
+      },
+      "expBar": null,
+      "hpFill": {
+        "x": 50,
+        "y": 23,
+        "width": 48,
+        "height": 2
+      },
+      "expFill": null,
+      "lv": {
+        "x": 73,
+        "y": 9
+      }
+    },
+    "player": {
+      "file": "assets/ui/gen4/hpbox-player.png",
+      "width": 128,
+      "height": 42,
+      "hpBar": {
+        "x": 71,
+        "y": 23,
+        "width": 50,
+        "height": 1
+      },
+      "expBar": {
+        "x": 24,
+        "y": 39,
+        "width": 96,
+        "height": 1
+      },
+      "hpFill": {
+        "x": 72,
+        "y": 24,
+        "width": 48,
+        "height": 2
+      },
+      "expFill": {
+        "x": 24,
+        "y": 39,
+        "width": 96,
+        "height": 1
+      },
+      "lv": {
+        "x": 95,
+        "y": 10
+      }
+    },
+    "player-exp": {
+      "file": "assets/ui/gen4/hpbox-player-exp.png",
+      "width": 128,
+      "height": 42,
+      "hpBar": {
+        "x": 71,
+        "y": 23,
+        "width": 50,
+        "height": 1
+      },
+      "expBar": {
+        "x": 24,
+        "y": 39,
+        "width": 96,
+        "height": 1
+      },
+      "hpFill": {
+        "x": 72,
+        "y": 24,
+        "width": 48,
+        "height": 2
+      },
+      "expFill": {
+        "x": 24,
+        "y": 39,
+        "width": 96,
+        "height": 1
+      },
+      "lv": {
+        "x": 95,
+        "y": 10
+      }
+    }
+  },
+  "bars": {
+    "hpHigh": [
+      24,
+      195,
+      32
+    ],
+    "hpMid": [
+      235,
+      170,
+      0
+    ],
+    "hpLow": [
+      251,
+      65,
+      16
+    ],
+    "exp": [
+      72,
+      136,
+      232
+    ],
+    "frame": [
+      0,
+      0,
+      0
+    ],
+    "back": [
+      251,
+      251,
+      251
+    ]
+  },
+  "status": {
+    "psn": "assets/ui/gen4/status-psn.png",
+    "par": "assets/ui/gen4/status-par.png",
+    "slp": "assets/ui/gen4/status-slp.png",
+    "brn": "assets/ui/gen4/status-brn.png",
+    "frz": "assets/ui/gen4/status-frz.png"
+  },
+  "balls": {
+    "empty": "assets/ui/gen4/ball-empty.png",
+    "ok": "assets/ui/gen4/ball-ok.png",
+    "fnt": "assets/ui/gen4/ball-fnt.png",
+    "status": "assets/ui/gen4/ball-status.png"
+  },
+  "fonts": {
+    "name": {
+      "file": "assets/ui/gen4/font-name.png",
+      "chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ",
+      "width": 7,
+      "height": 13,
+      "charsPerRow": 13,
+      "lineHeight": 13
+    },
+    "numbers": {
+      "file": "assets/ui/gen4/font-numbers.png",
+      "chars": "0123456789",
+      "width": 9,
+      "height": 7,
+      "charsPerRow": 10,
+      "lineHeight": 7
+    }
+  },
+  "bag": {
+    "pokeball": "assets/ui/gen4/pokeball-big.png",
+    "pokeballPressed": "assets/ui/gen4/pokeball-big-pressed.png",
+    "buttons": {
+      "items": {
+        "normal": "assets/ui/gen4/button-items-normal.png",
+        "selected": "assets/ui/gen4/button-items-selected.png",
+        "pressed": "assets/ui/gen4/button-items-pressed.png"
+      },
+      "medicine": {
+        "normal": "assets/ui/gen4/button-medicine-normal.png",
+        "selected": "assets/ui/gen4/button-medicine-selected.png",
+        "pressed": "assets/ui/gen4/button-medicine-pressed.png"
+      },
+      "balls": {
+        "normal": "assets/ui/gen4/button-balls-normal.png",
+        "selected": "assets/ui/gen4/button-balls-selected.png",
+        "pressed": "assets/ui/gen4/button-balls-pressed.png"
+      },
+      "tms": {
+        "normal": "assets/ui/gen4/button-tms-normal.png",
+        "selected": "assets/ui/gen4/button-tms-selected.png",
+        "pressed": "assets/ui/gen4/button-tms-pressed.png"
+      },
+      "berries": {
+        "normal": "assets/ui/gen4/button-berries-normal.png",
+        "selected": "assets/ui/gen4/button-berries-selected.png",
+        "pressed": "assets/ui/gen4/button-berries-pressed.png"
+      },
+      "mail": {
+        "normal": "assets/ui/gen4/button-mail-normal.png",
+        "selected": "assets/ui/gen4/button-mail-selected.png",
+        "pressed": "assets/ui/gen4/button-mail-pressed.png"
+      },
+      "battle": {
+        "normal": "assets/ui/gen4/button-battle-normal.png",
+        "selected": "assets/ui/gen4/button-battle-selected.png",
+        "pressed": "assets/ui/gen4/button-battle-pressed.png"
+      },
+      "key": {
+        "normal": "assets/ui/gen4/button-key-normal.png",
+        "selected": "assets/ui/gen4/button-key-selected.png",
+        "pressed": "assets/ui/gen4/button-key-pressed.png"
+      }
+    },
+    "pocketPanel": "assets/ui/gen4/pocket-panel.png",
+    "pocketIcons": "assets/ui/gen4/pocket-icons.png",
+    "pocketIconsDim": "assets/ui/gen4/pocket-icons-dim.png",
+    "pocketCursor": "assets/ui/gen4/pocket-cursor.png",
+    "itemPanel": "assets/ui/gen4/item-panel.png",
+    "exit": "assets/ui/gen4/exit.png"
+  },
+  "menu": {
+    "pokedex": {
+      "on": "assets/ui/gen4/menu-pokedex.png",
+      "off": "assets/ui/gen4/menu-pokedex-off.png"
+    },
+    "party": {
+      "on": "assets/ui/gen4/menu-party.png",
+      "off": "assets/ui/gen4/menu-party-off.png"
+    },
+    "bag": {
+      "on": "assets/ui/gen4/menu-bag.png",
+      "off": "assets/ui/gen4/menu-bag-off.png"
+    },
+    "card": {
+      "on": "assets/ui/gen4/menu-card.png",
+      "off": "assets/ui/gen4/menu-card-off.png"
+    },
+    "save": {
+      "on": "assets/ui/gen4/menu-save.png",
+      "off": "assets/ui/gen4/menu-save-off.png"
+    },
+    "options": {
+      "on": "assets/ui/gen4/menu-options.png",
+      "off": "assets/ui/gen4/menu-options-off.png"
+    },
+    "exit": {
+      "on": "assets/ui/gen4/menu-exit.png",
+      "off": "assets/ui/gen4/menu-exit-off.png"
+    },
+    "chat": {
+      "on": "assets/ui/gen4/menu-chat.png",
+      "off": "assets/ui/gen4/menu-chat-off.png"
+    },
+    "flag": {
+      "on": "assets/ui/gen4/menu-flag.png",
+      "off": "assets/ui/gen4/menu-flag-off.png"
+    },
+    "poketch": {
+      "on": "assets/ui/gen4/menu-poketch.png",
+      "off": "assets/ui/gen4/menu-poketch-off.png"
+    }
+  },
+  "wallpapers": [
+    {
+      "id": "gen4-01",
+      "name": "grass",
+      "image": "assets/ui/gen4/wallpapers/gen4-01.png"
+    },
+    {
+      "id": "gen4-02",
+      "name": "stone",
+      "image": "assets/ui/gen4/wallpapers/gen4-02.png"
+    },
+    {
+      "id": "gen4-03",
+      "name": "sand-pale",
+      "image": "assets/ui/gen4/wallpapers/gen4-03.png"
+    },
+    {
+      "id": "gen4-04",
+      "name": "desert",
+      "image": "assets/ui/gen4/wallpapers/gen4-04.png"
+    },
+    {
+      "id": "gen4-05",
+      "name": "lilac",
+      "image": "assets/ui/gen4/wallpapers/gen4-05.png"
+    },
+    {
+      "id": "gen4-06",
+      "name": "coral",
+      "image": "assets/ui/gen4/wallpapers/gen4-06.png"
+    },
+    {
+      "id": "gen4-07",
+      "name": "ice",
+      "image": "assets/ui/gen4/wallpapers/gen4-07.png"
+    },
+    {
+      "id": "gen4-08",
+      "name": "cave",
+      "image": "assets/ui/gen4/wallpapers/gen4-08.png"
+    },
+    {
+      "id": "gen4-09",
+      "name": "beach",
+      "image": "assets/ui/gen4/wallpapers/gen4-09.png"
+    },
+    {
+      "id": "gen4-10",
+      "name": "sea",
+      "image": "assets/ui/gen4/wallpapers/gen4-10.png"
+    },
+    {
+      "id": "gen4-11",
+      "name": "tiles",
+      "image": "assets/ui/gen4/wallpapers/gen4-11.png"
+    },
+    {
+      "id": "gen4-12",
+      "name": "sky",
+      "image": "assets/ui/gen4/wallpapers/gen4-12.png"
+    },
+    {
+      "id": "gen4-13",
+      "name": "checker-orange",
+      "image": "assets/ui/gen4/wallpapers/gen4-13.png"
+    },
+    {
+      "id": "gen4-14",
+      "name": "plaid",
+      "image": "assets/ui/gen4/wallpapers/gen4-14.png"
+    },
+    {
+      "id": "gen4-15",
+      "name": "gingham",
+      "image": "assets/ui/gen4/wallpapers/gen4-15.png"
+    },
+    {
+      "id": "gen4-16",
+      "name": "ribbon",
+      "image": "assets/ui/gen4/wallpapers/gen4-16.png"
+    },
+    {
+      "id": "gen4-17",
+      "name": "torterra",
+      "image": "assets/ui/gen4/wallpapers/gen4-17.png"
+    },
+    {
+      "id": "gen4-18",
+      "name": "contest",
+      "image": "assets/ui/gen4/wallpapers/gen4-18.png"
+    },
+    {
+      "id": "gen4-19",
+      "name": "room",
+      "image": "assets/ui/gen4/wallpapers/gen4-19.png"
+    },
+    {
+      "id": "gen4-20",
+      "name": "croagunk-blue",
+      "image": "assets/ui/gen4/wallpapers/gen4-20.png"
+    },
+    {
+      "id": "gen4-21",
+      "name": "starters",
+      "image": "assets/ui/gen4/wallpapers/gen4-21.png"
+    },
+    {
+      "id": "gen4-22",
+      "name": "pikachu-trio",
+      "image": "assets/ui/gen4/wallpapers/gen4-22.png"
+    },
+    {
+      "id": "gen4-23",
+      "name": "giratina",
+      "image": "assets/ui/gen4/wallpapers/gen4-23.png"
+    },
+    {
+      "id": "gen4-24",
+      "name": "team",
+      "image": "assets/ui/gen4/wallpapers/gen4-24.png"
+    },
+    {
+      "id": "gen4-25",
+      "name": "palkia",
+      "image": "assets/ui/gen4/wallpapers/gen4-25.png"
+    },
+    {
+      "id": "gen4-26",
+      "name": "route",
+      "image": "assets/ui/gen4/wallpapers/gen4-26.png"
+    },
+    {
+      "id": "gen4-27",
+      "name": "torchic",
+      "image": "assets/ui/gen4/wallpapers/gen4-27.png"
+    },
+    {
+      "id": "gen4-28",
+      "name": "space",
+      "image": "assets/ui/gen4/wallpapers/gen4-28.png"
+    },
+    {
+      "id": "gen4-29",
+      "name": "machine",
+      "image": "assets/ui/gen4/wallpapers/gen4-29.png"
+    },
+    {
+      "id": "gen4-30",
+      "name": "seal",
+      "image": "assets/ui/gen4/wallpapers/gen4-30.png"
+    },
+    {
+      "id": "gen4-31",
+      "name": "pikachu",
+      "image": "assets/ui/gen4/wallpapers/gen4-31.png"
+    },
+    {
+      "id": "gen4-32",
+      "name": "dialga",
+      "image": "assets/ui/gen4/wallpapers/gen4-32.png"
+    },
+    {
+      "id": "gen4-33",
+      "name": "croagunk",
+      "image": "assets/ui/gen4/wallpapers/gen4-33.png"
+    }
+  ]
+}

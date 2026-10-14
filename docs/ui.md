@@ -1,9 +1,38 @@
 # UI guide
 
-Dark is the only theme. Everything on screen is either Phaser canvas (map,
-sprites, HUD) or a DOM overlay (panels and dialogs), and both read the same
-palette: `src/ui/theme.css` defines it as CSS variables and
-`src/ui/styles.ts` mirrors the values for Phaser text and graphics.
+The theme is Pokémon Platinum: light panels, dark text, the blue-edged
+text-box frame around every panel, and the battle GUI's bars, badges and
+fonts. Everything on screen is either Phaser canvas (map, sprites, HUD) or a
+DOM overlay (panels and dialogs), and both read the same palette:
+`src/ui/theme.css` defines it as CSS variables and `src/ui/styles.ts`
+mirrors the values for Phaser text and graphics.
+
+## Platinum sheets
+`assets-src/ui/gen4/` holds the ripped Platinum interface sheets (credits in
+`CREDITS.txt`, shown on the credits screen). `scripts/build-gen4-ui.mjs`
+keys out their solid backgrounds and cuts them into
+`public/assets/ui/gen4/` with the measurements in `src/data/ui-gen4.json`:
+- `frames/<name>.png`: the 20 text-box frames as 9-slices (`blue` is the
+  default; `green` for trainer cards, `red-dots` for gym bosses, `green`
+  for a won summary). Canvas: `framePanel(scene, x, y, w, h, name)` in
+  `button.ts`; DOM: `.ptd-panel` uses `blue` as a CSS `border-image`.
+- `hpbox-enemy.png`, `hpbox-player.png`, `hpbox-player-exp.png`: the HP
+  boxes, with the HP and EXP fill rectangles and the Lv label position.
+  DOM: `hpBox(mon)` / `updateHpBox` in `domOverlay.ts` (Pokémon panel, PC
+  summary); canvas: the boss bar in `Hud.setBoss`.
+- `status-psn/par/slp/brn/frz.png`: status badges (`statusBadge(ailment)`
+  in the DOM, `ui-status-<name>` textures beside bars on the map).
+- `font-name.png`, `font-numbers.png`: the name font and the Lv / HP number
+  glyphs packed into fixed cells; BootScene registers them as the bitmap
+  fonts `FONT_NAME` and `FONT_NUM` (Lv labels on placed Pokémon, the boss
+  box). Pixelify Sans stays for all other text.
+- `button-<pocket>-<state>.png` (round bag buttons), `pocket-icons.png`,
+  `pocket-cursor.png`, `pocket-panel.png`, `pokeball-big.png`: shop pocket
+  tabs, the bag strip on level select, the title screen.
+- `menu-<name>.png` / `-off.png`: start-menu icons (`Button`'s `iconKey`).
+- `wallpapers/gen4-NN.png`: the 33 PC box wallpapers listed in `pc.json`.
+  The PC frame and cursor stay placeholders until a Box System sheet is
+  added.
 
 ## Fonts
 - **Pixelify Sans** (`public/assets/fonts/PixelifySans.ttf`, SIL Open Font
@@ -17,20 +46,24 @@ palette: `src/ui/theme.css` defines it as CSS variables and
 ## Palette (CSS variables)
 | Variable | Use |
 | --- | --- |
-| `--ptd-bg` | page background, portrait backgrounds |
-| `--ptd-panel`, `--ptd-panel-2` | panel surface, nested cards and buttons |
-| `--ptd-border`, `--ptd-border-outer` | PMD-style double frame: light inner border, dark outer ring |
-| `--ptd-text`, `--ptd-text-dim`, `--ptd-text-faint` | cream text and two dimmer steps |
-| `--ptd-accent` | selection, active move, headings inside panels |
+| `--ptd-bg` | page background (Platinum menu blue-grey with diagonal stripes) |
+| `--ptd-panel`, `--ptd-panel-2` | white panel surface, light blue cards and rows |
+| `--ptd-border`, `--ptd-border-outer` | the frame's blue and its dark outline |
+| `--ptd-text`, `--ptd-text-dim`, `--ptd-text-faint` | dark grey text and two lighter steps |
+| `--ptd-accent` | selection cursor red, active move |
+| `--ptd-frame`, `--ptd-frame-slice`, `--ptd-frame-width` | the 9-slice border image used by every `.ptd-panel` |
 | `--ptd-good`, `--ptd-bad`, `--ptd-info` | positive, negative, informational text |
 | `--ptd-hp`, `--ptd-hp-low`, `--ptd-hp-critical`, `--ptd-hp-back`, `--ptd-exp`, `--ptd-bar-back` | bars |
 | `--type-<name>` | the 17 type colours (normal, fighting, flying, poison, ground, rock, bug, ghost, steel, fire, water, grass, electric, psychic, ice, dragon, dark) |
 | `--ptd-radius`, `--ptd-radius-sm`, `--ptd-pad` | shape and spacing |
 
 ## Components (DOM)
-- `.ptd-panel` base frame; `.ptd-side` docks top-right (bottom sheet under
-  600 px); `.ptd-modal` centres. Always call `isolateFromGame(root)` so
-  clicks never fall through to the canvas.
+- `.ptd-panel` base frame (Platinum text box as a border image);
+  `.ptd-side` docks top-right (bottom sheet under 600 px); `.ptd-modal`
+  centres. Always call `isolateFromGame(root)` so clicks never fall through
+  to the canvas.
+- `.ptd-hpbox` battle-GUI HP box at 2x (`hpBox(mon)`), `img.ptd-status-badge`.
+- `button.ptd-pocket` round bag button (shop pocket tabs).
 - `h2` panel title (pixel font); `.ptd-heading` section heading (accent).
 - `.ptd-head` portrait + text row; `.ptd-portrait` (80 px) and
   `.ptd-portrait.small` (40 px); use `portraitImage(url)` from
@@ -45,7 +78,8 @@ palette: `src/ui/theme.css` defines it as CSS variables and
   `.ptd-status` chips; `.ptd-grid` + `.ptd-card` for grids.
 
 ## Components (canvas)
-- `Button` (`src/ui/button.ts`): rounded frame with the double border.
+- `Button` (`src/ui/button.ts`): the blue frame as a NineSlice with an
+  optional start-menu icon on the left; `framePanel()` for any panel.
 - `Hud` (`src/ui/hud.ts`): top bar (level name, wave, lives, money, speed
   1x/2x/4x, Start / Leave, boss HP bar via `setBoss`) and bottom bar (party
   strip, ball bar with the item sprites; `ballOrigin(id)` is where a thrown

@@ -53,7 +53,8 @@ import { PokemonPanel } from '../ui/pokemonPanel';
 import { capitalize } from '../ui/domOverlay';
 import { getMove } from '../data/pokedata';
 import type { Monster } from '../sim/monster';
-import { COLORS, TEXT, TEXT_DIM } from '../ui/styles';
+import { COLORS, FONT_NAME, FONT_NUM, TEXT, TEXT_DIM } from '../ui/styles';
+import { STATUS_BADGE } from '../ui/domOverlay';
 import { showSummary } from '../ui/summary';
 
 /** Sprites sit a little above the tile center so their feet land on the tile. */
@@ -61,18 +62,10 @@ const SPRITE_Y_OFFSET = -4;
 /** How long the trainer intro card stays up without a click. */
 const TRAINER_CARD_MS = 2500;
 
-const STATUS_COLORS: Record<string, number | undefined> = {
-  poison: 0xa040a0,
-  burn: 0xf08030,
-  paralysis: 0xf8d030,
-  sleep: 0x6890f0,
-  freeze: 0x98d8d8,
-  confusion: 0xf85888,
-};
-
 interface EnemyView {
   sprite: Phaser.GameObjects.Sprite;
   hpBar: Phaser.GameObjects.Graphics;
+  badge?: Phaser.GameObjects.Image;
   shiny: boolean;
   /** Caught: frozen in place while the ball animation plays. */
   captured: boolean;
@@ -86,6 +79,11 @@ interface EnemyView {
 interface TowerView {
   sprite: Phaser.GameObjects.Sprite;
   busy: boolean;
+  /** Battle-GUI HP bar, Lv label and status badge under the placed Pokémon. */
+  hpBar: Phaser.GameObjects.Graphics;
+  lvLabel?: Phaser.GameObjects.BitmapText;
+  lvNumber?: Phaser.GameObjects.BitmapText;
+  badge?: Phaser.GameObjects.Image;
 }
 
 export interface LevelSceneData {
@@ -221,8 +219,7 @@ export class LevelScene extends Phaser.Scene {
           return false;
         }
         removeTower(this.state, tower.id);
-        this.towerViews.get(tower.id)?.sprite.destroy();
-        this.towerViews.delete(tower.id);
+        this.destroyTowerView(tower.id);
         if (this.selectedTowerId === tower.id) this.selectedTowerId = null;
         return true;
       },
@@ -665,7 +662,7 @@ export class LevelScene extends Phaser.Scene {
   private showToast(text: string): void {
     this.toast?.destroy();
     this.toast = this.add
-      .text(this.scale.width / 2, Hud.HEIGHT + 12, text, { ...TEXT, backgroundColor: '#000000aa', padding: { x: 8, y: 4 } })
+      .text(this.scale.width / 2, Hud.HEIGHT + 12, text, { ...TEXT, backgroundColor: '#f8f8f8ee', padding: { x: 10, y: 5 } })
       .setOrigin(0.5, 0)
       .setDepth(1500);
     this.time.delayedCall(1800, () => this.toast?.destroy());
@@ -686,7 +683,7 @@ export class LevelScene extends Phaser.Scene {
     this.syncViews();
     this.drawOverlay();
     const boss = activeBoss(this.state);
-    this.hud.setBoss(boss ? { name: capitalize(boss.mon.name), hp: boss.mon.hp, maxHp: boss.mon.stats.hp } : null);
+    this.hud.setBoss(boss ? { name: capitalize(boss.mon.name), hp: boss.mon.hp, maxHp: boss.mon.stats.hp, level: boss.mon.level } : null);
     this.hud.setPaused(this.paused);
     this.hud.tick(delta);
     this.hud.update(this.state, runtime.gameSpeed, this.selectedPartyIndex, this.selectedBall);
@@ -774,8 +771,7 @@ export class LevelScene extends Phaser.Scene {
         case 'evolved': {
           const tower = this.state.towers.find((t) => t.id === e.towerId);
           if (tower) {
-            this.towerViews.get(tower.id)?.sprite.destroy();
-            this.towerViews.delete(tower.id);
+            this.destroyTowerView(tower.id);
             this.createTowerView(tower);
             this.floatText(this.towerPixel(tower.id), `Evolved into ${capitalize(tower.mon.name)}!`, '#ffe066');
           }
@@ -1041,7 +1037,40 @@ export class LevelScene extends Phaser.Scene {
     }
     const { px, py } = this.tilePixel(tower.tile[0], tower.tile[1]);
     const sprite = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Idle', Direction.Down);
-    this.towerViews.set(tower.id, { sprite, busy: false });
+    const view: TowerView = { sprite, busy: false, hpBar: this.add.graphics().setDepth(800) };
+    if (this.cache.bitmapFont.has(FONT_NAME) && this.cache.bitmapFont.has(FONT_NUM)) {
+      // RetroFont sizes are relative to the cell width: 7 and 9 draw the glyphs at 1x.
+      view.lvLabel = this.add.bitmapText(0, 0, FONT_NAME, 'Lv', 7).setDepth(801);
+      view.lvNumber = this.add.bitmapText(0, 0, FONT_NUM, String(tower.mon.level), 9).setDepth(801);
+    }
+    this.towerViews.set(tower.id, view);
+  }
+
+  private destroyTowerView(towerId: number): void {
+    const view = this.towerViews.get(towerId);
+    if (!view) return;
+    view.sprite.destroy();
+    view.hpBar.destroy();
+    view.lvLabel?.destroy();
+    view.lvNumber?.destroy();
+    view.badge?.destroy();
+    this.towerViews.delete(towerId);
+  }
+
+  /** Shows or hides the battle-GUI status badge beside a bar. */
+  private syncBadge(owner: { badge?: Phaser.GameObjects.Image }, ailment: string, x: number, y: number): void {
+    const name = STATUS_BADGE[ailment];
+    const key = name ? `ui-status-${name}` : undefined;
+    if (!key || !this.textures.exists(key)) {
+      owner.badge?.destroy();
+      delete owner.badge;
+      return;
+    }
+    if (!owner.badge || owner.badge.texture.key !== key) {
+      owner.badge?.destroy();
+      owner.badge = this.add.image(x, y, key).setOrigin(0, 0.5).setDepth(802);
+    }
+    owner.badge.setPosition(x, y);
   }
 
   private createEnemyView(enemyId: number, shiny: boolean): void {
@@ -1091,6 +1120,7 @@ export class LevelScene extends Phaser.Scene {
     if (!view) return;
     view.sprite.destroy();
     view.hpBar.destroy();
+    view.badge?.destroy();
     this.enemyViews.delete(enemyId);
   }
 
@@ -1183,10 +1213,32 @@ export class LevelScene extends Phaser.Scene {
         view = this.towerViews.get(tower.id);
         if (!view) continue;
       }
-      if (this.drag?.moved && this.drag.towerId === tower.id) continue;
+      if (this.drag?.moved && this.drag.towerId === tower.id) {
+        view.hpBar.clear();
+        view.lvLabel?.setVisible(false);
+        view.lvNumber?.setVisible(false);
+        view.badge?.setVisible(false);
+        continue;
+      }
       const { px, py } = this.tilePixel(tower.tile[0], tower.tile[1]);
       view.sprite.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);
       syncShadow(view.sprite);
+      // Battle-GUI bar under the tile, Lv at the top right, status badge beside the bar.
+      const w = size - 8;
+      const bx = px - w / 2;
+      const by = py + size / 2 - 5;
+      const frac = Math.max(0, Math.min(1, tower.mon.hp / tower.mon.stats.hp));
+      const colour = frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical;
+      view.hpBar.clear();
+      view.hpBar.fillStyle(0xf8f8f8, 1).fillRect(bx - 1, by - 1, w + 2, 5);
+      view.hpBar.fillStyle(0x000000, 1).fillRect(bx, by, w, 3);
+      view.hpBar.fillStyle(colour, 1).fillRect(bx, by, Math.round(w * frac), 3);
+      if (view.lvLabel && view.lvNumber) {
+        view.lvLabel.setPosition(px + 2, py - size / 2 - 6).setVisible(true);
+        view.lvNumber.setText(String(tower.mon.level)).setPosition(px + 15, py - size / 2 - 3).setVisible(true);
+      }
+      this.syncBadge(view, tower.mon.status.ailment, bx + w + 3, by + 1);
+      view.badge?.setVisible(true);
     }
     const alive = new Set<number>();
     for (const enemy of state.enemies) {
@@ -1198,8 +1250,12 @@ export class LevelScene extends Phaser.Scene {
       view.sprite.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);
       if (!view.busy) playAnim(view.sprite, 'Walk', directionFromVector(point.dx, point.dy, Direction.Right));
       syncShadow(view.sprite);
-      if (view.inBall) continue;
+      if (view.inBall) {
+        view.badge?.setVisible(false);
+        continue;
+      }
       this.drawHpBar(view.hpBar, enemy, px, py, size, view.shiny);
+      this.syncBadge(view, enemy.mon.status.ailment, px + (size - 8) / 2 + 3, py - size / 2 - 4);
     }
     for (const [id, view] of this.enemyViews) {
       if (!alive.has(id) && !view.dying && !view.captured) this.removeEnemyView(id);
@@ -1213,14 +1269,13 @@ export class LevelScene extends Phaser.Scene {
     const frac = Math.max(0, Math.min(1, enemy.mon.hp / enemy.mon.stats.hp));
     const color = frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical;
     gfx.clear();
-    if (enemy.boss) gfx.lineStyle(1, 0xff6b6b, 1).strokeRect(x - 1, y - 1, w + 2, 6);
-    else if (enemy.trainer) gfx.lineStyle(1, 0x9ad0ff, 1).strokeRect(x - 1, y - 1, w + 2, 6);
-    if (shiny) gfx.lineStyle(1, 0xffd700, 1).strokeRect(x - 1, y - 1, w + 2, 6);
-    gfx.fillStyle(COLORS.hpBack, 1).fillRect(x, y, w, 4);
-    gfx.fillStyle(color, 1).fillRect(x, y, w * frac, 4);
-    const ailment = enemy.mon.status.ailment;
-    const dot = STATUS_COLORS[ailment];
-    if (dot !== undefined) gfx.fillStyle(dot, 1).fillCircle(x + w + 6, y + 2, 3);
-    else if (enemy.mon.status.flinchSeconds > 0) gfx.fillStyle(0xffffff, 1).fillCircle(x + w + 6, y + 2, 2);
+    // Battle-GUI bar: white outline, black body, coloured fill; trainer, boss and shiny rings outside it.
+    if (enemy.boss) gfx.lineStyle(1, 0xff6b6b, 1).strokeRect(x - 2, y - 2, w + 4, 7);
+    else if (enemy.trainer) gfx.lineStyle(1, 0x3878e0, 1).strokeRect(x - 2, y - 2, w + 4, 7);
+    if (shiny) gfx.lineStyle(1, 0xffd700, 1).strokeRect(x - 2, y - 2, w + 4, 7);
+    gfx.fillStyle(0xf8f8f8, 1).fillRect(x - 1, y - 1, w + 2, 5);
+    gfx.fillStyle(0x000000, 1).fillRect(x, y, w, 3);
+    gfx.fillStyle(color, 1).fillRect(x, y, Math.round(w * frac), 3);
+    if (enemy.mon.status.ailment === 'none' && enemy.mon.status.flinchSeconds > 0) gfx.fillStyle(0xffffff, 1).fillCircle(x + w + 5, y + 1, 2);
   }
 }
