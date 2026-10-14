@@ -126,3 +126,43 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   the level on its own after 2, 4 and 8 s before showing the manual Retry
   screen; the sprite loader forgets a folder whose AnimData failed so the
   reload requests it again.
+
+## Phase 7 (zoom, Speed-based attack rate, shiny art, Platinum art, forms)
+
+- Attack rate uses the formula as given, `0.55 + base Speed / 120` clamped
+  to 0.6 to 1.9; with it Electrode (base Speed 150) lands on 1.8/s, not the
+  1.9/s cap mentioned as an example, and Geodude on 0.72/s. The formula won
+  over the examples; the tests pin the real values.
+- A fixed zoom switches Phaser to NONE scale mode and clears the FIT aspect
+  constraint on the display size (otherwise the canvas stays clamped to the
+  window); the page scrolls when the canvas is bigger than the window.
+  Zoom changes made before a save exists stay in memory for the session.
+- Shiny box icons are the shiny Normal portrait scaled to 32x32 with nearest
+  filtering, built as canvas textures at boot (as asked, the same recipe as
+  the fallback icons), so they keep the portrait's background square like
+  the fallback icons do. The sparkle badge is the star texture on canvas
+  and a small ★ in the DOM.
+- The VS intro plays for any trainer whose `trainers/index.json` entry has a
+  mugshot (gym leaders, Elite Four, Cynthia, Frontier Brains, the player
+  mugshots), with red diagonal stripes behind, PTD-style; trainers without
+  one go straight to the dialogue. Click, Enter or Space skip it.
+- The throwing pose stands one and a half tiles beside the path entrance
+  (on whichever side has room) for the length of the trainer's wave, and
+  disappears at `waveEnd`.
+- Location popup kinds: a level's `popup` wins; otherwise lakes, mines,
+  gates and caves, and forests are recognised from the area name, and
+  everything else is a route. Oreburgh Gate and Oreburgh Mine use `cave`.
+- Town map: markers use the dot frame for routes, lakes and caves and the
+  square for towns and cities, flat red when open and gold when cleared
+  (Platinum paints the places you can fly to red), greyed when locked. The
+  player icon walks in a straight line at about 4 ms per pixel. Twinleaf
+  Town is not a level yet, so it has no marker. The level select now only
+  shows levels that carry `mapPos` (a test requires every level to).
+- `badges.json` lists the eight badges with leader and gym; `allBadges()`
+  marks which level awards each, and the trainer card, title and level
+  select show all eight (lit when earned) instead of only badges a level
+  awards.
+- Type and move-category icons replace the drawn badges in every DOM
+  move row (Pokémon panel, PC summary, learn dialog) and in the party
+  page and starter choice; `typeBadge` stays for the type filter dropdown.
+

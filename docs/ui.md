@@ -34,6 +34,26 @@ keys out their solid backgrounds and cuts them into
   The PC frame and cursor stay placeholders until a Box System sheet is
   added.
 
+The Platinum trainer art, badges, type icons, popups and town map come
+ready-cut from `scripts/build-platinum.py` (pret/pokeplatinum; credits in
+`public/assets/trainers/CREDITS.txt`):
+- `trainers/<id>.png`, `<id>-pose.png`: `trainerTextureKey(id, pose)`;
+  the dialogue box shows the standing pose, `LevelScene.showTrainerOnField`
+  the throwing pose beside the entrance during the trainer's wave.
+- `trainers/mugshots/`, `trainers/banners/`, `trainers/vs.png`:
+  `mugshotTextureKey` / `bannerTextureKey` / the `ui-vs` sheet, used by
+  `VsIntro` (`src/ui/vsIntro.ts`).
+- `badges/<id>.png`, `<id>-off.png`: `badgeTextureKey(id, lit)`; the list is
+  `src/data/badges.json` through `allBadges()`.
+- `ui/gen4/types/<name>.png`: `typeIcon(name)` in `domOverlay.ts` (DOM
+  `<img class="ptd-type-icon">`, 32x16) and `typeIconTextureKey` on canvas.
+- `ui/gen4/popups/<kind>.png`: `showLocationPopup(scene, kind, name, top)`
+  (`src/ui/locationPopup.ts`), drawn at 2x with the name in Power Clear Bold.
+- `ui/gen4/sinnoh-map.png`, `map-markers.png` (16x16 frames: 0 dot, 1 tall
+  marker, 2 town square, 3 and 4 corners, 5 bar, 6 ring) and
+  `trainers/overworld/player_m.png` (`ow-player`, 32x32 frames, four per
+  facing in the order up, down, left, right): `LevelSelectScene`.
+
 ## Fonts
 - **Power Clear** and **Power Clear Bold** (`public/assets/fonts/`, from
   Pokémon Essentials, CC BY-NC-SA 4.0, credits in `CREDITS.txt` and on the
@@ -110,7 +130,11 @@ keys out their solid backgrounds and cuts them into
 
 ## Screens
 Title (`TitleScene`, with the badge case) → Level select
-(`LevelSelectScene`, with the bag strip, badges, and the Shop, Save and
-Credits overlays) → PC (`PCScene`, full screen: party column, box grid,
-`PcSummary` side panel) or Level (`LevelScene`, with the Pokémon panel,
-replace dialog, evolution prompt, trainer card, boss bar and summary).
+(`LevelSelectScene`: the town map at 3x with a marker per level, the
+player sprite as the cursor, the bag and badge case in the left column, the
+PC, Shop, Save, Credits and Demo buttons in the right column) → PC (`PCScene`, full screen: party column, box grid,
+`PcSummary` side panel) or Level (`LevelScene`, with the location popup, Pokémon panel,
+replace dialog, evolution prompt, VS intro and trainer dialogue, boss bar
+and summary). Zoom (Options, `+`/`-`) lives in `src/game/zoom.ts`: Fit is
+Phaser's FIT mode, a fixed zoom is NONE mode with that zoom factor and the
+page scrolls (`html.ptd-zoomed` in index.html).

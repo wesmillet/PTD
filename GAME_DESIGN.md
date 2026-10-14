@@ -59,6 +59,24 @@ The fetch script copies Normal, Happy, Sad, Angry and Surprised into
 for dialogue. Shiny sprites for the base form live at
 `sprite/<dexnum>/0000/0001/` and are copied to `public/assets/sprites/<dexnum>/shiny/`.
 
+Sprite folders are named `NNNN` for a species' base form and `NNNN-form`
+for the forms listed in `scripts/sprite-list.txt` (`0058-hisui`,
+`0150-shadow`, `0487-origin`, `0448-mega`, `0492-sky`, ...); each folder is
+trimmed to the five sheets the game plays (Idle, Walk, Attack, Hurt,
+Faint). Fetch with `python3 scripts/fetch-sprites.py <dex>[:Form]` and then
+`node scripts/build-sprite-index.mjs /tmp/spritecollab/tracker.json
+src/data/spriteIndex.json`; `spriteFolders.json` entries for form folders
+carry `species`, `form` and `formName`, and every folder lists its
+`shinyPortraits`. Loader and index code read the folder name through
+`parseFolder` / `folderIconName` in `src/game/runtime.ts` and never assume
+it is a number.
+
+Shiny Pokémon use the shiny portrait (`portraits/<folder>/shiny/<Emotion>.png`,
+236 of 283 folders) in the dialogue box, Pokémon panel, PC summary and party
+page, and their box and party-strip icon is the shiny Normal portrait scaled
+to 32x32 with nearest filtering (the `scripts/make-fallback-icons.py`
+recipe), with a small sparkle badge. Normal Pokémon keep the icons below.
+
 Small Pokémon icons (party strip, Party / PC lists, starter choice, level
 summary) are the Gen 5 Black/White box icons from github.com/PokeAPI/sprites
 (`sprites/pokemon/versions/generation-v/icons/`, with the `animated/`
@@ -66,6 +84,39 @@ two-frame versions so they bob; `generation-viii/icons/` is the fallback for
 forms without a Gen 5 icon, such as Hisuian forms). `scripts/fetch-icons.sh`
 sparse-checks-out only the shipped species into `public/assets/icons/`. The
 SpriteCollab portraits stay for the large Pokémon panel.
+
+Platinum trainer art, badges and interface graphics (credits in
+`public/assets/trainers/CREDITS.txt`, from the pret/pokeplatinum
+decompilation via `scripts/build-platinum.py`):
+- `trainers/<id>.png` (80x80 standing pose) and `<id>-pose.png` (throwing),
+  `trainers/index.json` (id → name, class, poses, mugshot, banner,
+  overworld sheet, `alias_of` for generic ids). The standing pose is the
+  dialogue portrait; the throwing pose stands beside the path entrance
+  while the trainer's wave is being sent.
+- `trainers/mugshots/<id>.png` (96x64) for gym leaders, the Elite Four,
+  Cynthia and the Frontier Brains, `trainers/vs.png` (the VS mark, two
+  64x64 frames) and `trainers/banners/<id>.png` (128x32 class banners):
+  a one-second VS intro (mugshot slides in from the right, VS mark pops
+  in, banner under the mugshot when it exists) plays before such a
+  trainer's intro dialogue (`src/ui/vsIntro.ts`); click or Enter skips it.
+- `badges/<id>.png` and `<id>-off.png` (64x64): the eight Sinnoh badges
+  listed in `src/data/badges.json` (coal, forest, cobble, fen, relic, mine,
+  icicle, beacon). The trainer card, title screen and level select show all
+  eight, lit when earned; a level's `badge.id` must be one of them.
+- `ui/gen4/types/<type>.png` (32x16, the 17 types plus physical, special
+  and status): the type and move-category icons in the Pokémon panel, PC
+  summary, party page, move rows and the starter and move-learn dialogs.
+- `ui/gen4/popups/<kind>.png` (136x48; route, city, town, cave, forest,
+  lake, water, indoors, park): the location popup that slides in at the
+  top-left for two seconds when a level starts, with the level name over
+  it. Levels name their kind in `popup`; without one, `levelPopup` picks
+  lake, cave (mines, gates, caves) or forest from the area, else route.
+- `ui/gen4/sinnoh-map.png` (256x192, with the `-land` and `-routes` layers)
+  and `map-markers.png` (seven 16x16 marker frames): the town map behind
+  level select, drawn at 3x. `trainers/overworld/<name>.png` are 32x32
+  walking sheets in one column (four frames per facing: up, down, left,
+  right; the player sheets add a running set); `player_m.png` is the level
+  select cursor.
 
 Pokémon stats, moves, types, learnsets, and evolution data: bundle a static JSON
 dump (PokeAPI data, Gen 4 ruleset) into `src/data/`. Do not call PokeAPI at
@@ -126,9 +177,14 @@ runtime.
   assumption lives in `src/data/config.json` and is tested in
   `src/sim/stats.ts`). Damage always uses computed stats, never base stats.
 - Speed drives both movement and attack rate, with constants in
-  `src/data/config.json`:
-  enemy tiles/sec = clamp(speedBase + speedScale * Speed),
-  tower attacks/sec = moveRate * clamp(Speed / speedRef, clampMin, clampMax).
+  `src/data/config.json` ("speed"):
+  enemy tiles/sec = clamp(speedBase + speedScale * Speed) from the computed
+  stat; tower attacks/sec = moveRate * clamp(attackBase + base Speed /
+  attackScale, clampMin, clampMax) from the species' base Speed, so the
+  spread is the one players know whatever the level: Shuckle 0.6/s,
+  Geodude 0.7/s, Starly 1.05/s, Floatzel 1.5/s, Electrode 1.8/s (the
+  1.9/s cap needs base Speed 162). Move `cooldown` multipliers apply on
+  top. The Pokémon panel and PC summary show "Attack speed: x.x/s".
 
 ### Level objectives
 Each level definition (`src/data/levels.json`) has an `objective`:
@@ -206,8 +262,8 @@ range, from a seeded RNG so a level replays identically for the same seed.
   settings change; loaded on startup. Contents (format version 2): starter,
   party and PC boxes (name, wallpaper and 30 slots each; a Pokémon is
   species, level, EXP, HP, moves with PP, active move, shiny), level
-  progress, items, money, Pokédex record, badges, settings (game speed and
-  the speed constants). Version 1 saves and codes still load; their flat
+  progress, items, money, Pokédex record, badges, settings (game speed,
+  zoom and the speed constants). Version 1 saves and codes still load; their flat
   box list fills the boxes in order.
 - Save code: a `PTD2.` prefixed base64url string with a checksum. Import
   validates every field against the data tables and rejects corrupt codes
@@ -335,8 +391,15 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   general text, a system sans-serif for long text. Variables, components
   and the sheet cutter are documented in `docs/ui.md`.
 - Title screen: game name, Continue, New Game, Credits.
-- Level select map per act, styled after the Sinnoh region map (a plain list
-  with the unlock chain for now)
+- Level select on the Platinum town map at 3x (768x576, centred, nearest
+  filtering): every level is a marker at its `mapPos` (town-map pixels; a
+  dot for routes, lakes and caves, the square for towns), red when open,
+  gold when cleared, greyed when locked. Hovering shows the name and kind
+  in a Platinum frame (locked markers say what to clear first); the cursor
+  is the player's overworld sprite, which walks to the marker you click
+  (or step to with the arrow keys) before the level opens. The bag and the
+  badge case sit in the left column, the PC, Shop, Save, Credits and Demo
+  buttons in the right one.
 - In-level HUD: a top bar with wave counter, lives, money, the speed toggle
   (1x, 2x, 4x), a Menu button and the boss HP bar when a boss is on the
   path, and a bottom
@@ -378,7 +441,11 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Badge case on the title screen and level select; bag strip (balls,
   Potion, Rare Candy with counts) on level select.
 - Dialogue boxes with portraits
-- Settings: volume, sprite scale, colorblind-friendly type colors
+- Options page: game speed (1x, 2x, 4x) and zoom. Zoom is Fit (default:
+  the canvas scales to the window), 1x, 1.5x or 2x (the 960x600 canvas at
+  that CSS size, centred, scrolling when bigger than the window); `+` and
+  `-` step through it anywhere, and it is saved with the other settings.
+- Settings still to come: volume, colorblind-friendly type colors.
 
 ## Build plan (work one phase at a time, commit at the end of each)
 Phase 0 (done): Scaffold project, sprite loader, render one Pokémon playing
@@ -398,12 +465,17 @@ Phase 4 (done): Save/load with export codes, money, shop, Potions and Rare
 Cleanup (done): Credits screen, design doc update.
 UI pass (done): Pixel font, palette, consistent overlays, HUD bars, title
          screen, docs/ui.md.
-Phase 5 (in progress): per-level rosters with the one-featured-level
-         rule, trainer waves (Tristan, Barry, Roark), the Cranidos boss,
-         badges, boss-wave retry, the PC scene, 4x speed, Gen 5 item
-         sprites and the ball-throw animation, map editor and tilesets
-         (merged from the maps branch). Still to come: dialogue, the rest
-         of Act 1, region map level select.
+Phase 5 (done): per-level rosters with the one-featured-level rule,
+         trainer waves (Tristan, Barry, Roark), the Cranidos boss, badges,
+         boss-wave retry, the PC scene, 4x speed, Gen 5 item sprites and
+         the ball-throw animation, map editor and tilesets (merged from
+         the maps branch), the Platinum skin, Power Clear, the start menu,
+         dialogue box and demo mode (docs/plan-phase-5.md, -6.md).
+Phase 7 (done, docs/plan-phase-7.md): zoom option, attack rate from base
+         Speed, shiny portraits and icons, the Platinum trainer art (VS
+         intro, poses, badges, type icons, location popups) and the town
+         map level select, form sprite folders. Still to come for Act 1:
+         the rest of its levels.
 Phase 6: Challenge levels and the full shiny system.
 Phase 7: Hisui rifts and Unova.
 Phase 8: Polish: audio, settings, performance pass; strip the debug panel.

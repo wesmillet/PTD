@@ -30,11 +30,14 @@ Sprites are from the [PMDCollab SpriteCollab](https://github.com/PMDCollab/Sprit
 project and are fetched with a sparse checkout, never a full clone:
 
 ```
-npm run fetch-sprites -- 0387 0390
+python3 scripts/fetch-sprites.py 0387 0058:Hisui
+node scripts/build-sprite-index.mjs /tmp/spritecollab/tracker.json src/data/spriteIndex.json
 ```
 
-This copies `public/assets/sprites/<dexnum>/` (animation data, sheets and the
-artists' `credits.txt`) and regenerates `src/data/spriteIndex.json`.
+This copies `public/assets/sprites/<dexnum>[-form]/` (animation data, the
+five sheets the game plays and the artists' `credits.txt`) plus the
+portraits, then regenerates `src/data/spriteIndex.json` and
+`src/data/spriteFolders.json`.
 
 Every `credits.txt` is kept verbatim and will be shown in the in-game credits
 screen. Please keep them when adding or updating sprites.
@@ -55,6 +58,11 @@ cleared; defend levels when you win.
   Pokémon (Route 202's Tristan, Route 203's Barry, Roark in the mine)
   bounce the ball off; Roark's Cranidos is a boss with its own HP bar.
 - Speed toggle: 1x, 2x, 4x (extra fixed steps per frame, same results).
+  Options also has Zoom (Fit, 1x, 1.5x, 2x; `+` and `-` step it).
+- A Pokémon's attack rate follows its species' base Speed (Shuckle 0.6/s
+  up to 1.9/s); the Pokémon panel and PC summary show it.
+- Gym leaders and other mugshot trainers get a VS intro; the trainer's
+  throwing pose stands by the entrance while their wave is sent.
 - Menu (or Esc) opens the Platinum start menu: Pokédex, Pokémon, Bag,
   trainer card, Save, Options, Exit and Leave level (arrow keys, Enter, Esc
   or the mouse).
@@ -62,9 +70,11 @@ cleared; defend levels when you win.
   starts a new game with a showcase PC.
   A selected ball is thrown with the next click on a wild Pokémon; any
   other click drops it.
-- Between levels: PC (boxes, drag and drop, sort, filter, Rare Candy), Shop,
-  Save (save code export and import, New Game) and Credits. Badges show on
-  the title screen and level select.
+- Between levels: the Platinum town map is the level select (click a
+  marker, or arrow keys and Enter; the player sprite walks there), with the
+  PC (boxes, drag and drop, sort, filter, Rare Candy), Shop, Save (save
+  code export and import, New Game) and Credits beside it. The eight
+  badges show on the title screen, level select and trainer card.
 - The game saves itself after every level and change. URL flags:
   `?level=<id>` opens a level, `&seed=<n>` replays the same waves,
   `&shiny=1` makes every spawn shiny, `?party=debug` loads the test party.

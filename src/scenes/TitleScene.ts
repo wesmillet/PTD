@@ -30,7 +30,7 @@ export class TitleScene extends Phaser.Scene {
     for (const b of badges) {
       const earned = hasBadge(game, b.id);
       const key = badgeTextureKey(b.id, earned);
-      if (this.textures.exists(key)) this.add.image(bx, 290, key).setAlpha(earned ? 1 : 0.5);
+      if (this.textures.exists(key)) this.add.image(bx, 290, key).setScale(0.5).setAlpha(earned ? 1 : 0.5);
       bx += 40;
     }
     const y = height * 0.58;
