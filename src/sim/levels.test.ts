@@ -139,7 +139,7 @@ describe('level presentation', () => {
   it('has Platinum art for every trainer the levels name', () => {
     for (const id of levelIds()) {
       for (const trainer of levelTrainers(getLevel(id))) {
-        if (trainer.id.startsWith('noble-')) {
+        if (trainer.id.startsWith('noble-') || trainer.id.startsWith('event-')) {
           for (const p of trainer.party) expect(hasSprites(partySpecies(p.species, 387, id)), `${id}: ${p.species}`).toBe(true);
           continue;
         }

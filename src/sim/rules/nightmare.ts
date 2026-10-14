@@ -24,6 +24,12 @@ export const nightmare: RuleModule = {
         }
         sleeping = null;
       },
+      attackRate(ctx, tower) {
+        // Bad Dreams: a tower beside a sleeping one attacks at half speed.
+        if (!params.badDreams) return 1;
+        const near = ctx.state.towers.some((t) => t !== tower && t.mon.status.ailment === 'sleep' && Math.hypot(t.tile[0] - tower.tile[0], t.tile[1] - tower.tile[1]) <= 1.5);
+        return near ? 0.5 : 1;
+      },
       banner(ctx) {
         return ctx.state.flags.has(ward) ? 'Nightmares warded off' : 'Nightmare';
       },

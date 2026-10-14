@@ -41,8 +41,10 @@ export interface TrainerPokemonDef {
   species: string;
   level: number;
   boss?: boolean;
-  /** Boss only: moves used on a timer against placed Pokémon in range. */
-  moves?: { move: string; every: number }[];
+  /** Boss only: moves used on a timer against placed Pokémon in range (`range` overrides the move's reach, `flinchAll` always flinches). */
+  moves?: { move: string; every: number; range?: number; flinchAll?: boolean }[];
+  /** Spawns asleep (Cresselia under the moon: the Sleep catch bonus applies). */
+  asleep?: boolean;
   /** Boss HP multiplier instead of config.bosses.hpMultiplier (the Conference final's 5x). */
   hpMultiplier?: number;
   /** Legendary bosses: can be caught once under this HP fraction (0.1). */
@@ -133,8 +135,9 @@ export interface WaveDef {
   banner?: string;
   /** Every spawn is a Shadow Pokémon. */
   shadow?: boolean;
-  /** Trainer Pokémon that are Dynamaxed. */
   spawnInterval?: number;
+  /** The wave's trainers only come if a rule's meter is at least this fraction full (Shaymin and the Gratitude meter). */
+  condition?: { rule: string; min: number };
 }
 
 export interface RuleDef {
@@ -217,6 +220,8 @@ export interface LevelDef {
   rift?: boolean;
   /** Balls handed out when the level starts (the rifts' Hisuian balls). */
   giveBalls?: Record<string, number>;
+  /** Rewards for catching a species here (Shaymin's Gracidea), applied once. */
+  catchRewards?: Record<string, { flags?: string[]; items?: Record<string, number> }>;
   enemiesFirstWave: number;
   enemiesPerWave: number;
   /** Seconds between spawns within a wave. */
@@ -246,7 +251,8 @@ export interface SpawnDef {
   trainerId?: string;
   boss?: boolean;
   /** Boss moves (resolved ids) with their timers. */
-  bossMoves?: { moveId: number; every: number }[];
+  bossMoves?: { moveId: number; every: number; range?: number; flinchAll?: boolean }[];
+  asleep?: boolean;
   hpMultiplier?: number;
   catchableUnder?: number;
   immune?: number[];
@@ -422,8 +428,9 @@ export function partySpawns(trainer: TrainerDef, starter: number | undefined, mo
     const spawn: SpawnDef = { species, level: p.level, delay: offset + i * spawnInterval, trainer: true, trainerId: trainer.id };
     if (p.boss) {
       spawn.boss = true;
-      spawn.bossMoves = (p.moves ?? []).map((m) => ({ moveId: moveId(m.move), every: m.every }));
+      spawn.bossMoves = (p.moves ?? []).map((m) => ({ moveId: moveId(m.move), every: m.every, ...(m.range !== undefined ? { range: m.range } : {}), ...(m.flinchAll ? { flinchAll: true } : {}) }));
     }
+    if (p.asleep) spawn.asleep = true;
     if (p.hpMultiplier !== undefined) spawn.hpMultiplier = p.hpMultiplier;
     if (p.catchableUnder !== undefined) spawn.catchableUnder = p.catchableUnder;
     if (p.immune) spawn.immune = p.immune.map(typeId);

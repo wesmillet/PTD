@@ -107,6 +107,12 @@ export function rulesRange(state: LevelState, tower: Tower, range: number): numb
   for (const r of state.rules) if (r.range) out = r.range(c, tower, out);
   return Math.max(0.5, out);
 }
+export function rulesAttackRate(state: LevelState, tower: Tower): number {
+  const c = ctx(state, []);
+  let m = 1;
+  for (const r of state.rules) if (r.attackRate) m *= r.attackRate(c, tower);
+  return m;
+}
 export function rulesEnemySpeed(state: LevelState, enemy: Enemy): number {
   const c = ctx(state, []);
   let m = 1;

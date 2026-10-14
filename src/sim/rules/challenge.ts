@@ -7,8 +7,9 @@ import { lanesAreReversed, reverseLanes } from '../level';
 import type { RuleModule } from './types';
 import { num, str } from './types';
 
-export const CHALLENGE_MODES = ['solo', 'monotype', 'no-catch', 'level-cap', 'reverse', 'speedrun'] as const;
-export type ChallengeMode = (typeof CHALLENGE_MODES)[number];
+import { type ChallengeMode } from './challengeModes';
+
+export { CHALLENGE_MODES, type ChallengeMode } from './challengeModes';
 
 export const challenge: RuleModule = {
   id: 'challenge',

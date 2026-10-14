@@ -59,6 +59,9 @@ export interface SaveData {
   conferenceWins?: number;
   tickets?: number;
   conference?: unknown;
+  lotteryPending?: 'won' | 'lost';
+  lotteryDay?: string;
+  lotteryPlayed?: number;
   settings: SavedSettings;
 }
 
@@ -104,6 +107,9 @@ export function serializeGame(game: GameState, settings: SavedSettings, now = Da
     ...(game.conferenceWins ? { conferenceWins: game.conferenceWins } : {}),
     ...(game.tickets ? { tickets: game.tickets } : {}),
     ...(game.conference ? { conference: JSON.parse(JSON.stringify(game.conference)) as unknown } : {}),
+    ...(game.lotteryPending ? { lotteryPending: game.lotteryPending } : {}),
+    ...(game.lotteryDay ? { lotteryDay: game.lotteryDay } : {}),
+    ...(game.lotteryPlayed ? { lotteryPlayed: game.lotteryPlayed } : {}),
     settings: { gameSpeed: settings.gameSpeed, ...(settings.zoom !== undefined ? { zoom: settings.zoom } : {}), speed: { ...settings.speed } },
   };
 }
@@ -264,6 +270,9 @@ export function validateSave(raw: unknown): SaveData {
     ...(isInt(s.conferenceWins, 0, 10000) ? { conferenceWins: s.conferenceWins } : {}),
     ...(isInt(s.tickets, 0, 10000) ? { tickets: s.tickets } : {}),
     ...(s.conference && typeof s.conference === 'object' ? { conference: JSON.parse(JSON.stringify(s.conference)) as unknown } : {}),
+    ...(s.lotteryPending === 'won' || s.lotteryPending === 'lost' ? { lotteryPending: s.lotteryPending } : {}),
+    ...(typeof s.lotteryDay === 'string' && s.lotteryDay.length <= 10 ? { lotteryDay: s.lotteryDay } : {}),
+    ...(isInt(s.lotteryPlayed, 0, 100000) ? { lotteryPlayed: s.lotteryPlayed } : {}),
     settings: { gameSpeed: GAME_SPEEDS.includes(settings.gameSpeed) ? settings.gameSpeed : 1, ...(settings.zoom !== undefined ? { zoom: settings.zoom as SavedZoom } : {}), speed },
   };
 }
@@ -285,6 +294,9 @@ export function restoreGame(data: SaveData): GameState {
   if (data.conferenceWins) game.conferenceWins = data.conferenceWins;
   if (data.tickets) game.tickets = data.tickets;
   if (data.conference) game.conference = JSON.parse(JSON.stringify(data.conference)) as unknown;
+  if (data.lotteryPending) game.lotteryPending = data.lotteryPending;
+  if (data.lotteryDay) game.lotteryDay = data.lotteryDay;
+  if (data.lotteryPlayed) game.lotteryPlayed = data.lotteryPlayed;
   return game;
 }
 

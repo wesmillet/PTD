@@ -12,7 +12,8 @@ import { cloneModel, toMapDef, type MapModel } from '../map/tiled';
 import config from '../data/config.json';
 import { iconTextureKey, iconUrl, itemTextureKey, portraitUrl, runtime, runtimeConfig, spriteFolder, trainerTextureKey, urlParam } from '../game/runtime';
 import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
-import { addPokemon, markSeen, placementLimit, recordLevelResult } from '../sim/game';
+import { addPokemon, giveItems, hasFlag, markSeen, placementLimit, recordLevelResult, setFlag } from '../sim/game';
+import { purifyProgress } from '../sim/shadow';
 import { usePotion } from '../sim/items';
 import { BALLS } from '../sim/catch';
 import { advance, createClock, type Clock } from '../sim/clock';
@@ -1356,8 +1357,17 @@ export class LevelScene extends Phaser.Scene {
         }
         if (this.mode === 'lottery') game.lotteryPending = this.state.phase === 'won' ? 'won' : 'lost';
       } else {
-        recordLevelResult(game, this.levelId, this.state.phase as 'won' | 'lost' | 'left', this.state.wavesCleared, this.state.kos);
+        const cleared = recordLevelResult(game, this.levelId, this.state.phase as 'won' | 'lost' | 'left', this.state.wavesCleared, this.state.kos);
         this.moneyEarned = game.money - before;
+        if (cleared) {
+          for (const mon of purifyProgress(this.state.towers.filter((t) => !t.ally).map((t) => t.mon), this.levelId)) this.showToast(`${capitalize(mon.name)} was purified!`);
+        }
+        for (const [name, reward] of Object.entries(this.state.def.catchRewards ?? {})) {
+          const species = findPokemonId(name);
+          if (species === undefined || !this.state.caught.some((c) => c.mon.species === species)) continue;
+          for (const f of reward.flags ?? []) setFlag(game, f);
+          if (reward.items) giveItems(game, reward.items);
+        }
       }
     }
     saveGame();
@@ -1381,7 +1391,9 @@ export class LevelScene extends Phaser.Scene {
   // ---------------------------------------------------------------- views
 
   private createTowerView(tower: Tower): void {
-    const dex = spriteFolder(tower.mon.species, tower.mon.shiny);
+    // Shaymin with the Gracidea takes Sky Forme by day.
+    const sky = tower.mon.species === 492 && hasFlag(getGame(), 'gracidea') && this.state.time !== 'night' && isLoaded('0492-sky');
+    const dex = sky ? '0492-sky' : spriteFolder(tower.mon.species, tower.mon.shiny);
     if (!isLoaded(dex)) {
       // Not preloaded (a surprise evolution or debug change): fetch it now.
       ensureLoaded(this, dex, ALL_ACTIONS, { optional: OPTIONAL_ACTIONS })
@@ -1450,7 +1462,13 @@ export class LevelScene extends Phaser.Scene {
       sprite.setScale(2.5).setTint(0xff7070);
       syncShadow(sprite);
     }
-    if (enemy.shadow) sprite.setTint(0xb080e0);
+    if (enemy.shadow) {
+      sprite.setTint(0xb080e0);
+      const aura = this.add.ellipse(px, py + SPRITE_Y_OFFSET + 10, 44, 18, 0x8040c0, 0.35).setDepth(py - 1);
+      this.tweens.add({ targets: aura, scaleX: 1.25, alpha: 0.15, duration: 700, yoyo: true, repeat: -1 });
+      sprite.once(Phaser.GameObjects.Events.DESTROY, () => aura.destroy());
+      sprite.setData('aura', aura);
+    }
     const hpBar = this.add.graphics().setDepth(800);
     this.enemyViews.set(enemyId, { sprite, hpBar, busy: false, dying: false, shiny, captured: false, inBall: false });
     if (shiny) this.sparkle(px + 32, py + SPRITE_Y_OFFSET);
@@ -1606,6 +1624,7 @@ export class LevelScene extends Phaser.Scene {
       const point = enemyPoint(state, enemy);
       const { px, py } = this.tilePixel(point.x, point.y);
       view.sprite.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);
+      (view.sprite.getData('aura') as Phaser.GameObjects.Ellipse | undefined)?.setPosition(px, py + SPRITE_Y_OFFSET + 10).setDepth(py - 1);
       if (!view.busy) playAnim(view.sprite, 'Walk', directionFromVector(point.dx, point.dy, Direction.Right));
       syncShadow(view.sprite);
       if (view.inBall) {

@@ -52,6 +52,10 @@ export interface GameState {
   conference?: unknown;
   /** A lottery challenge just finished: the draw is owed ("won") or the ticket is kept ("lost"). */
   lotteryPending?: 'won' | 'lost';
+  /** The day (YYYY-MM-DD) the daily ticket was last claimed. */
+  lotteryDay?: string;
+  /** Lottery tickets played so far (the ticket number on a prize's memo). */
+  lotteryPlayed?: number;
 }
 
 export const MAX_PARTY = config.party.maxParty;

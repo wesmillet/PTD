@@ -1,0 +1,618 @@
+{
+  "flower-paradise": {
+    "name": "Flower Paradise",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "flower-paradise",
+    "mapPos": [
+      244,
+      150
+    ],
+    "popup": "route",
+    "lives": 10,
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.8,
+    "placements": 6,
+    "levelCap": 60,
+    "levels": [
+      40,
+      46
+    ],
+    "maxWildLevel": 100,
+    "requires": "distortion-world",
+    "unlock": {
+      "items": [
+        "oaks-letter"
+      ]
+    },
+    "rules": [
+      {
+        "id": "gratitude",
+        "max": 10
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "roselia",
+          "combee",
+          "cherubi",
+          "budew",
+          "sunflora"
+        ],
+        "count": 3,
+        "lines": [
+          {
+            "text": "Oak's Letter brought you down the Seabreak Path into a sea of flowers. Catch what walks the path: gratitude grows with every catch and fades with every KO. Keep it high and Shaymin will come."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "roselia",
+          "combee",
+          "cherubi",
+          "budew",
+          "sunflora"
+        ],
+        "count": 4
+      },
+      {
+        "wild": [
+          "roselia",
+          "combee",
+          "cherubi",
+          "budew",
+          "sunflora"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "roselia",
+          "combee",
+          "cherubi",
+          "budew",
+          "sunflora"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "roselia",
+          "combee",
+          "cherubi",
+          "budew",
+          "sunflora"
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "event-shaymin",
+          "name": "Shaymin",
+          "party": [
+            {
+              "species": "shaymin",
+              "level": 50,
+              "boss": true,
+              "catchableUnder": 1,
+              "fleeAfter": 60,
+              "moves": [
+                {
+                  "move": "seed-flare",
+                  "every": 10
+                }
+              ]
+            }
+          ]
+        },
+        "condition": {
+          "rule": "gratitude",
+          "min": 0.5
+        },
+        "banner": "Shaymin",
+        "lines": [
+          {
+            "text": "The flowers part. Shaymin walks out onto the path: it stays a minute, no more."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 3000,
+      "flags": [
+        "flower-paradise-cleared"
+      ]
+    },
+    "catchRewards": {
+      "shaymin": {
+        "flags": [
+          "gracidea"
+        ]
+      }
+    }
+  },
+  "fullmoon-island": {
+    "name": "Fullmoon Island",
+    "area": "sinnoh-route-201",
+    "time": "night",
+    "objective": "defend",
+    "map": "fullmoon-island",
+    "mapPos": [
+      30,
+      100
+    ],
+    "popup": "water",
+    "lives": 10,
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 55,
+    "levels": [
+      36,
+      42
+    ],
+    "maxWildLevel": 100,
+    "requires": "canalave-gym",
+    "unlock": {
+      "badges": [
+        "mine"
+      ]
+    },
+    "rules": [],
+    "waves": [
+      {
+        "wild": [
+          "clefairy",
+          "clefable",
+          "cleffa",
+          "chingling"
+        ],
+        "count": 3,
+        "lines": [
+          {
+            "text": "The sailor's boat lands on Fullmoon Island at night. His son will not wake; something here holds the dream."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "clefairy",
+          "clefable",
+          "cleffa",
+          "chingling"
+        ],
+        "count": 4
+      },
+      {
+        "wild": [
+          "clefairy",
+          "clefable",
+          "cleffa",
+          "chingling"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "clefairy",
+          "clefable",
+          "cleffa",
+          "chingling"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "clefairy",
+          "clefable",
+          "cleffa",
+          "chingling"
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "event-cresselia",
+          "name": "Cresselia",
+          "party": [
+            {
+              "species": "cresselia",
+              "level": 50,
+              "boss": true,
+              "catchOnly": true,
+              "asleep": true,
+              "catchableUnder": 1
+            }
+          ]
+        },
+        "banner": "Cresselia",
+        "lines": [
+          {
+            "text": "Cresselia floats down the path, asleep under the moon. It cannot be fought: throw while it dreams. When it leaves, a Lunar Feather stays behind."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 2000,
+      "flags": [
+        "lunar-wing"
+      ]
+    }
+  },
+  "newmoon-island": {
+    "name": "Newmoon Island",
+    "area": "sinnoh-route-201",
+    "time": "night",
+    "objective": "defend",
+    "map": "newmoon-island",
+    "mapPos": [
+      22,
+      112
+    ],
+    "popup": "water",
+    "lives": 10,
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 65,
+    "levels": [
+      44,
+      50
+    ],
+    "maxWildLevel": 100,
+    "requires": "fullmoon-island",
+    "unlock": {
+      "items": [
+        "member-card"
+      ]
+    },
+    "rules": [
+      {
+        "id": "nightmare",
+        "ward": "lunar-wing",
+        "badDreams": true
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "murkrow",
+          "honchkrow",
+          "misdreavus",
+          "duskull"
+        ],
+        "count": 3,
+        "lines": [
+          {
+            "text": "The Member Card opens the inn's locked room, and the dream inside leads to Newmoon Island. Each wave one of your Pokémon falls into a nightmare unless the Lunar Wing is with you."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "murkrow",
+          "honchkrow",
+          "misdreavus",
+          "duskull"
+        ],
+        "count": 4
+      },
+      {
+        "wild": [
+          "murkrow",
+          "honchkrow",
+          "misdreavus",
+          "duskull"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "murkrow",
+          "honchkrow",
+          "misdreavus",
+          "duskull"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "murkrow",
+          "honchkrow",
+          "misdreavus",
+          "duskull"
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "murkrow",
+          "honchkrow",
+          "misdreavus",
+          "duskull"
+        ],
+        "count": 8
+      },
+      {
+        "trainer": {
+          "id": "event-darkrai",
+          "name": "Darkrai",
+          "party": [
+            {
+              "species": "darkrai",
+              "level": 52,
+              "boss": true,
+              "catchableUnder": 0.1,
+              "moves": [
+                {
+                  "move": "dark-void",
+                  "every": 15,
+                  "range": 3
+                },
+                {
+                  "move": "dark-pulse",
+                  "every": 7
+                }
+              ]
+            }
+          ]
+        },
+        "banner": "Darkrai",
+        "lines": [
+          {
+            "text": "Darkrai. Every fifteen seconds Dark Void sleeps everything within three tiles, and Bad Dreams slows whoever stands beside a sleeper. Under a tenth of its HP it can be caught; Dusk Balls work here."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 4000,
+      "flags": [
+        "newmoon-cleared"
+      ]
+    }
+  },
+  "ss-libra": {
+    "name": "S.S. Libra",
+    "area": "sinnoh-route-201",
+    "time": "night",
+    "objective": "defend",
+    "map": "ss-libra",
+    "mapPos": [
+      238,
+      140
+    ],
+    "popup": "water",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 65,
+    "levels": [
+      45,
+      52
+    ],
+    "maxWildLevel": 100,
+    "requires": "distortion-world",
+    "unlock": {
+      "items": [
+        "looker-ticket"
+      ]
+    },
+    "lanes": [
+      "path",
+      "path-2"
+    ],
+    "rules": [
+      {
+        "id": "shadow-wave",
+        "every": 1
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "golbat",
+          "skuntank",
+          "houndoom",
+          "bronzong"
+        ],
+        "count": 4,
+        "lane": "both",
+        "lines": [
+          {
+            "text": "Looker's ticket: a stolen Cipher ship from Orre, the S.S. Libra, sits off Sunyshore. Its cargo is the Galactic machine's output sold on: Shadow Pokémon, deck and hold."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "golbat",
+          "skuntank",
+          "houndoom",
+          "bronzong"
+        ],
+        "count": 5,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "golbat",
+          "skuntank",
+          "houndoom",
+          "bronzong"
+        ],
+        "count": 6,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "golbat",
+          "skuntank",
+          "houndoom",
+          "bronzong"
+        ],
+        "count": 7,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "golbat",
+          "skuntank",
+          "houndoom",
+          "bronzong"
+        ],
+        "count": 8,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "golbat",
+          "skuntank",
+          "houndoom",
+          "bronzong"
+        ],
+        "count": 9,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "golbat",
+          "skuntank",
+          "houndoom",
+          "bronzong"
+        ],
+        "count": 10,
+        "lane": "both"
+      },
+      {
+        "trainer": {
+          "id": "event-shadow-lugia",
+          "name": "XD001",
+          "party": [
+            {
+              "species": "lugia-shadow",
+              "level": 55,
+              "boss": true,
+              "shadow": true,
+              "catchableUnder": 0.1,
+              "moves": [
+                {
+                  "move": "aeroblast",
+                  "every": 9
+                },
+                {
+                  "move": "shadow-ball",
+                  "every": 6
+                }
+              ]
+            }
+          ]
+        },
+        "banner": "Shadow Lugia",
+        "lane": "path",
+        "lines": [
+          {
+            "text": "XD001. Shadow Lugia, the one Cipher could not purify. Under a tenth of its HP it can be caught; only the altar on Spear Pillar can bring Lugia back."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 5000,
+      "flags": [
+        "libra-cleared"
+      ]
+    }
+  },
+  "shadow-mewtwo": {
+    "name": "The Synergy Stone",
+    "area": "sinnoh-route-201",
+    "time": "night",
+    "objective": "defend",
+    "map": "stadium-grass",
+    "mapPos": [
+      236,
+      64
+    ],
+    "popup": "city",
+    "lives": 5,
+    "enemiesFirstWave": 1,
+    "enemiesPerWave": 0,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 70,
+    "levels": [
+      60,
+      60
+    ],
+    "maxWildLevel": 100,
+    "requires": "distortion-world",
+    "unlock": {
+      "flags": [
+        "legend-ribbon"
+      ]
+    },
+    "rules": [],
+    "waves": [
+      {
+        "trainer": {
+          "id": "event-shadow-mewtwo",
+          "name": "???",
+          "party": [
+            {
+              "species": "mewtwo-shadow",
+              "level": 70,
+              "boss": true,
+              "shadow": true,
+              "catchableUnder": 0.1,
+              "moves": [
+                {
+                  "move": "psystrike",
+                  "every": 20,
+                  "range": 99,
+                  "flinchAll": true
+                },
+                {
+                  "move": "shadow-ball",
+                  "every": 8
+                }
+              ],
+              "phases": [
+                {
+                  "at": 1,
+                  "reverseEvery": 40
+                }
+              ]
+            }
+          ]
+        },
+        "banner": "Shadow Mewtwo",
+        "lines": [
+          {
+            "text": "The stadium at night, empty stands. A \"???\" entrant challenges the champion. Shadow Mewtwo: Psystrike down the whole path every twenty seconds, and every forty it teleports to the other end."
+          }
+        ],
+        "outro": [
+          {
+            "text": "Purify it at Lake Verity, three cleared levels placed there, and Mewtwo is yours. A Conference win with it on the team wakes its Mega form for the Key Stone."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 10000,
+      "flags": [
+        "synergy-cleared"
+      ]
+    }
+  }
+}

@@ -260,3 +260,18 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   the shop never sells them; Alphas and the noble's reward refill the set.
 - Petilil, Rufflet and Bergmite joined the data (their sprites were already
   in the repo) so the Mirelands and Icelands lists match the design.
+
+## Phase 8 item 7 (events and lottery)
+
+- Legendary events are `trainer` entries with `event-` ids (no art, no VS
+  intro) so the boss bar, banner and catch window all apply; `catchableUnder`
+  at 1 means catchable at any HP (Shaymin, Cresselia).
+- A `condition` on a scripted wave checks a rule's status meter (Shaymin
+  needs Gratitude at half); unmet, the wave's trainers are dropped and a
+  line explains it.
+- `catchRewards` on a level give flags or items for catching a species
+  there (the Gracidea), checked when the level ends.
+- Shadow Mewtwo's teleport is a boss phase at 100 % with `reverseEvery: 40`;
+  Psystrike is a boss move with `range: 99` and `flinchAll`.
+- The daily ticket is claimed when the level select opens (date in the
+  save); a lost challenge refunds the ticket as the design says.

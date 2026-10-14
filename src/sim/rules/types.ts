@@ -56,6 +56,8 @@ export interface RuleInstance {
   canPlace?(ctx: RuleContext, mon: Monster, tile: Tile): string | null;
   /** The tower's range in tiles after the rule (darkness caps it, hail shrinks it). */
   range?(ctx: RuleContext, tower: Tower, range: number): number;
+  /** Multiplier on a tower's attack rate (Bad Dreams halves it beside a sleeper). */
+  attackRate?(ctx: RuleContext, tower: Tower): number;
   /** Multiplier on an enemy's walking speed. */
   enemySpeed?(ctx: RuleContext, enemy: Enemy): number;
   /** Multiplier on a tower's damage with this move (sun boosts Fire). */

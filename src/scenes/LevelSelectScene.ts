@@ -20,6 +20,8 @@ import { Button, framePanel } from '../ui/button';
 import { SavePanel } from '../ui/savePanel';
 import { ShopScreen } from '../ui/shopScreen';
 import { CreditsScreen } from '../ui/creditsScreen';
+import { LotteryScreen } from '../ui/lotteryScreen';
+import { claimDailyTicket } from '../sim/lottery';
 import { showStarterDialog } from '../ui/starterDialog';
 import { COLORS, TEXT, TEXT_DIM, TEXT_LIGHT } from '../ui/styles';
 
@@ -56,6 +58,7 @@ export class LevelSelectScene extends Phaser.Scene {
   private shop?: ShopScreen;
   private savePanel?: SavePanel;
   private credits?: CreditsScreen;
+  private lottery?: LotteryScreen;
   private starterRoot?: HTMLDivElement;
   private markers: Marker[] = [];
   private player?: Phaser.GameObjects.Sprite;
@@ -90,6 +93,7 @@ export class LevelSelectScene extends Phaser.Scene {
     this.drawMenu(width - 8, 30);
     this.drawMarkers(game);
     this.drawConferenceMarker(game);
+    this.drawLotteryMarker(game);
     this.createPlayer();
 
     this.input.keyboard?.on('keydown-LEFT', () => this.stepCursor(-1));
@@ -104,6 +108,18 @@ export class LevelSelectScene extends Phaser.Scene {
       this.scene.restart();
     };
     this.shop = new ShopScreen(game, { onChange: () => saveGame(), onClose: refresh });
+    this.lottery = new LotteryScreen({
+      game,
+      onChange: () => saveGame(),
+      onPlay: (def) => {
+        saveGame();
+        this.scene.start('Level', { levelId: 'lottery', def, returnTo: 'LevelSelect', mode: 'lottery' });
+      },
+      onClose: () => {
+        saveGame();
+        this.scene.restart();
+      },
+    });
     this.credits = new CreditsScreen(() => undefined);
     this.savePanel = new SavePanel({
       getCode: () => currentSaveCode(),
@@ -118,6 +134,7 @@ export class LevelSelectScene extends Phaser.Scene {
       this.shop?.close();
       this.savePanel?.close();
       this.credits?.close();
+      this.lottery?.close();
       this.starterRoot?.remove();
       this.shop = undefined;
       this.savePanel = undefined;
@@ -166,6 +183,26 @@ export class LevelSelectScene extends Phaser.Scene {
       const open = this.markers.filter((m) => m.unlocked);
       cursorLevelId = (open[open.length - 1] ?? this.markers[0])?.id;
     }
+  }
+
+  /** Jubilife TV: the Lottery Corner, a tall marker on Jubilife with the ticket count. */
+  private drawLotteryMarker(game: ReturnType<typeof getGame>): void {
+    claimDailyTicket(game);
+    const { x, y } = this.mapPixel([72, 122]);
+    const image = this.textures.exists('map-markers') ? this.add.image(x, y, 'map-markers', 1).setScale(MAP_SCALE) : this.add.image(x, y, '__DEFAULT').setDisplaySize(24, 24);
+    image.setTintFill(0x40a0f0).setDepth(10).setInteractive({ useHandCursor: true });
+    const tickets = () => game.tickets ?? 0;
+    const label = () => {
+      this.hideHover();
+      const name = this.add.text(0, -8, 'Jubilife TV: Lottery Corner', TEXT).setOrigin(0.5);
+      const info = this.add.text(0, 8, `${tickets()} ticket${tickets() === 1 ? '' : 's'} · a shiny for a cleared challenge`, TEXT_DIM).setOrigin(0.5);
+      const w = Math.max(name.width, info.width) + 28;
+      this.hover = this.add.container(Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4), y - 62, [framePanel(this, 0, 0, w, 44, 'blue'), name, info]).setDepth(50);
+    };
+    image.on('pointerover', label);
+    image.on('pointerout', () => this.hideHover());
+    image.on('pointerdown', () => this.guard(() => this.lottery?.show()));
+    if (game.lotteryPending) this.time.delayedCall(300, () => this.lottery?.show());
   }
 
   /** Lily of the Valley island: the Conference, a tall gold marker east of Sunyshore. */

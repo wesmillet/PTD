@@ -72,6 +72,27 @@ which maps the maps session still needs to build. Updated per commit.
   Spire capstone with Primal Dialga after all four nobles. Rifts show as
   purple tears on the level select.
 
+- **Mystery events** (`src/data/levels/40-events.json`): Flower Paradise
+  (Gratitude meter, Shaymin only when it is half full, flees after 60 s,
+  the Gracidea on catch; Sky Forme by day on the field), Fullmoon Island
+  (Cresselia asleep and catch-only, the Lunar Wing when it leaves), Newmoon
+  Island (nightmare rule warded by the Lunar Wing, Darkrai with Dark Void
+  in three tiles and Bad Dreams, catchable under 10 %, Dusk Balls at
+  night), the S.S. Libra (Shadow waves on both lanes, Shadow Lugia
+  catchable under 10 %), Shadow Mewtwo (single boss on the stadium at
+  night, Psystrike down the whole path flinching everyone, a teleport every
+  40 s; opens with the Legend ribbon). Shadow Pokémon: purple tint and
+  aura, 1.3x boss damage, no EXP until purified at a lake (three cleared
+  levels placed there; Lugia needs Spear Pillar).
+- **Shiny lottery** (`src/sim/lottery.ts`, `src/ui/lotteryScreen.ts`): one
+  date-seeded ticket a day plus Conference tickets, the Jubilife TV marker,
+  a random challenge on a cleared route (Solo, Monotype, No catching, Level
+  cap, Reverse, Speedrun; a lost ticket is kept), the three-ball draw from
+  every base species with shiny sprites (favourites 3x, legendaries out),
+  one reroll (two with the Shiny Charm), the prize at level 20 in a
+  Premier Ball with the ticket number as its memo. Dynamax is a spawn flag
+  (2.5x sprite, red aura, 3x HP) with no raid levels yet.
+
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
@@ -100,9 +121,14 @@ which maps the maps session still needs to build. Updated per commit.
   works; the throw animation is the ball's). The dome is drawn as a glow
   centre on the map rather than a true third-of-the-map dome.
 - The distortion's "double chain" bonus is not implemented (no chain yet).
+- Shadow Lugia purifies at the finale's Spear Pillar level (the Origin
+  secret level is not built); the Mega Mewtwo Y unlock is a flag only.
+- Cresselia's "Sleep catch bonus" is the ordinary sleep bonus (2x).
+- The Lottery's nature is "neutral" (the game has no natures).
 
 ## Maps still needed
 
 | Level | Stand-in map in use | Needed |
 | --- | --- | --- |
 | `temporal-spire` | `spear-pillar` | The Temporal Spire (a spiral up the spire, PMD-style) |
+| `shadow-mewtwo` | `stadium-grass` (at night) | The stadium at night with empty stands, if a night variant is wanted |

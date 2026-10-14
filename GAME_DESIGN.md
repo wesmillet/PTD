@@ -223,6 +223,15 @@ Temporal Spire capstone (Primal Dialga) opens after all four nobles.
 Mechanics live in `src/sim/level.ts` (nobles, Alphas) and the `distortion`
 rule.
 
+### Mystery events and the Shiny lottery
+Five event levels (`src/data/levels/40-events.json`): Shaymin's Flower
+Paradise, Cresselia's Fullmoon Island, Darkrai's Newmoon Island, Shadow
+Lugia's S.S. Libra and Shadow Mewtwo at the stadium, each unlocked by a key
+item flag, each legendary a boss catchable under 10 % HP (Shaymin and
+Cresselia at any HP). Shadow Pokémon (`src/sim/shadow.ts`) gain no EXP
+until purified at a lake level. The Lottery Corner (`src/sim/lottery.ts`)
+sells one daily ticket's challenge for a shiny at level 20 with a reroll.
+
 ### Level objectives
 Each level definition (`src/data/levels.json`) has an `objective`:
 - `defend`: a fixed wave count and a number of lives. Each enemy that reaches

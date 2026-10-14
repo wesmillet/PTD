@@ -26,6 +26,7 @@ import {
   rulesCanPlace,
   rulesCanTarget,
   rulesCanThrow,
+  rulesAttackRate,
   rulesDamageMultiplier,
   rulesEnemySpeed,
   rulesLost,
@@ -130,6 +131,10 @@ export interface BossMoveTimer {
   every: number;
   /** Seconds until the move fires next. */
   timer: number;
+  /** Reach override in tiles (Psystrike down the whole path). */
+  range?: number;
+  /** Every tower hit flinches. */
+  flinchAll?: boolean;
 }
 
 export interface BossPhase {
@@ -179,6 +184,8 @@ export interface Enemy {
   catchOnly?: boolean;
   /** Hisui noble fight state. */
   noble?: NobleState;
+  /** Sleeps for the whole wave and floats on regardless (Cresselia under the moon). */
+  asleep?: boolean;
 }
 
 export interface NobleState {
@@ -498,7 +505,7 @@ export function towerMove(tower: Tower): MoveSpec | undefined {
 /** Seconds between two attacks of a tower with its active move and status. */
 export function towerInterval(state: LevelState, tower: Tower): number {
   const move = towerMove(tower);
-  const rate = attackRateMultiplier(tower.mon.status, state.config.status);
+  const rate = attackRateMultiplier(tower.mon.status, state.config.status) * rulesAttackRate(state, tower);
   const base = attackCooldown(getPokemon(tower.mon.species).base.spe, state.config.speed) * (move?.cooldownMultiplier ?? 1);
   return rate > 0 ? base / rate : Infinity;
 }
@@ -717,6 +724,16 @@ export function startWave(state: LevelState): LevelEvent[] {
   if (script) {
     trainers = waveTrainers(script);
     spawns = scriptedSpawns(state.def, waveIndex, state.starter, moveIdByName, state.rng, opts, (choice, i) => pickLaneFor(state, waveIndex, choice, i));
+    if (script.condition) {
+      const status = ruleStatuses(state).find((r) => r.id === script.condition!.rule);
+      const value = status && status.max ? (status.value ?? 0) / status.max : 0;
+      if (value < script.condition.min) {
+        const names = trainers.map((t) => t.name).join(', ');
+        trainers = [];
+        spawns = spawns.filter((sp) => !sp.trainerId);
+        events.push({ type: 'rule', rule: script.condition.rule, text: `${names || 'The visitor'} does not come: the ${status?.label ?? script.condition.rule} meter is too low.` });
+      }
+    }
   } else if (isTrainerWave(state, waveIndex) && state.def.trainer) {
     trainers = [state.def.trainer];
     spawns = trainerWave(state.def, state.starter, moveIdByName);
@@ -776,7 +793,8 @@ export function enemyById(state: LevelState, enemyId: number): Enemy | undefined
 /** A trainer's legendary that has dropped into its catch window. */
 export function isCatchable(enemy: Enemy): boolean {
   if (!enemy.trainer) return true;
-  return enemy.catchableUnder !== undefined && enemy.mon.hp / enemy.mon.stats.hp < enemy.catchableUnder;
+  if (enemy.catchableUnder === undefined) return false;
+  return enemy.catchableUnder >= 1 || enemy.mon.hp / enemy.mon.stats.hp < enemy.catchableUnder;
 }
 
 /**
@@ -1174,17 +1192,22 @@ function hurtTower(state: LevelState, enemy: Enemy, tower: Tower, move: MoveSpec
  * A boss uses one of its timed moves: every placed Pokémon within the move's
  * range takes Gen 4 damage (never below 1 HP) and may flinch or be afflicted.
  */
-function bossAttack(state: LevelState, enemy: Enemy, moveId: number, events: LevelEvent[]): void {
-  const move = resolveMove(moveId);
+function bossAttack(state: LevelState, enemy: Enemy, timer: BossMoveTimer, events: LevelEvent[]): void {
+  const move = resolveMove(timer.moveId);
   const p = enemyPoint(state, enemy);
-  events.push({ type: 'bossMove', enemyId: enemy.id, moveId });
+  const reach = timer.range ?? move.range;
+  events.push({ type: 'bossMove', enemyId: enemy.id, moveId: timer.moveId });
   for (const tower of state.towers) {
-    if (Math.hypot(p.x - tower.tile[0], p.y - tower.tile[1]) > move.range) continue;
+    if (Math.hypot(p.x - tower.tile[0], p.y - tower.tile[1]) > reach) continue;
     if (!hits(move.accuracy, state.rng)) {
       events.push({ type: 'miss', enemyId: enemy.id, towerId: tower.id });
       continue;
     }
     hurtTower(state, enemy, tower, move, events);
+    if (timer.flinchAll) {
+      applyFlinch(tower.mon.status, state.config.status);
+      events.push({ type: 'status', towerId: tower.id, ailment: 'none', block: 'flinch' });
+    }
   }
 }
 
@@ -1237,7 +1260,7 @@ function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
   if (def.boss) {
     hpMult *= def.hpMultiplier ?? state.config.bosses.hpMultiplier;
     enemy.boss = {
-      moves: (def.bossMoves ?? []).map((m) => ({ moveId: m.moveId, every: m.every, timer: m.every })),
+      moves: (def.bossMoves ?? []).map((m) => ({ moveId: m.moveId, every: m.every, timer: m.every, ...(m.range !== undefined ? { range: m.range } : {}), ...(m.flinchAll ? { flinchAll: true } : {}) })),
       phases: (def.phases ?? []).map((p) => ({ ...p })),
       phase: -1,
       reverseTimer: 0,
@@ -1257,6 +1280,11 @@ function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
   if (def.immune) enemy.immune = [...def.immune];
   if (def.fleeAfter !== undefined) enemy.fleeAfter = def.fleeAfter;
   if (def.catchOnly) enemy.catchOnly = true;
+  if (def.asleep) {
+    enemy.asleep = true;
+    mon.status.ailment = 'sleep';
+    mon.status.ailmentSeconds = 1e6;
+  }
   if (def.noble) {
     enemy.noble = { stagger: 0, staggerMax: Math.max(1, Math.round(mon.stats.hp * NOBLE_STAGGER_SHARE)), staggered: 0, staggers: 0, summons: [...(def.summons ?? [])], summonsOwed: 0 };
   }
@@ -1366,7 +1394,11 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
   for (const enemy of [...state.enemies]) {
     if (!state.enemies.includes(enemy)) continue;
     const r = tickStatus(enemy.mon.status, enemy.mon.stats.hp, dt, state.rng, state.config.status);
-    if (r.ended) events.push({ type: 'statusEnd', enemyId: enemy.id, ailment: r.ended });
+    if (enemy.asleep) {
+      enemy.mon.status.ailment = 'sleep';
+      enemy.mon.status.ailmentSeconds = 1e6;
+    }
+    if (r.ended && !enemy.asleep) events.push({ type: 'statusEnd', enemyId: enemy.id, ailment: r.ended });
     if (r.damage > 0 && !enemy.catchOnly) {
       enemy.mon.hp = Math.max(0, enemy.mon.hp - r.damage);
       events.push({ type: 'statusDamage', enemyId: enemy.id, amount: r.damage });
@@ -1395,7 +1427,7 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
       // Staggered: it stands still.
     } else {
       const speedMult =
-        speedMultiplier(enemy.mon.status, state.config.status) *
+        (enemy.asleep ? 1 : speedMultiplier(enemy.mon.status, state.config.status)) *
         stageMultiplier(enemy.mon.status.stages.spe) *
         rulesEnemySpeed(state, enemy) *
         (enemy.speedBoost > 0 ? 1.5 : 1) *
@@ -1427,7 +1459,7 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
         m.timer -= dt;
         if (m.timer <= 0) {
           m.timer += m.every;
-          bossAttack(state, enemy, m.moveId, events);
+          bossAttack(state, enemy, m, events);
         }
       }
     }
