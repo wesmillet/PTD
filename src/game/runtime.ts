@@ -30,6 +30,22 @@ export function dexFolder(species: number): string {
   return String(species).padStart(4, '0');
 }
 
+/**
+ * Splits a sprite folder name ("0058" or "0058-hisui") into its species and
+ * optional form, as scripts/sprite-list.txt and spriteFolders.json name them.
+ */
+export function parseFolder(folder: string): { species: number; form?: string } {
+  const [dex, form] = folder.split('-', 2);
+  const species = Number(dex);
+  return form ? { species, form } : { species };
+}
+
+/** Icon file stem for a sprite folder: "58" or "58-hisui" (see scripts/make-fallback-icons.py). */
+export function folderIconName(folder: string): string {
+  const { species, form } = parseFolder(folder);
+  return form ? `${species}-${form}` : String(species);
+}
+
 /** Sprite folder key for a monster: the shiny subfolder when loaded, else the base. */
 export function spriteFolder(species: number, shiny: boolean): string {
   const dex = dexFolder(species);

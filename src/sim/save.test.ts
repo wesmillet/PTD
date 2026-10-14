@@ -16,7 +16,7 @@ function sampleGame() {
   game.items.potions = 4;
   return game;
 }
-const settings = { gameSpeed: 2, speed: { speedBase: 0.9, speedScale: 0.015, enemyClampMin: 0.5, enemyClampMax: 2, speedRef: 60, clampMin: 0.5, clampMax: 2, moveRate: 1 } };
+const settings = { gameSpeed: 2, speed: { speedBase: 0.9, speedScale: 0.015, enemyClampMin: 0.5, enemyClampMax: 2, attackBase: 0.55, attackScale: 120, clampMin: 0.6, clampMax: 1.9, moveRate: 1 } };
 
 describe('save round trip', () => {
   it('serializes and restores the whole game state', () => {

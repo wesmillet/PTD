@@ -3,7 +3,9 @@
  * the selected Pokémon (icon, portrait, level, types, stats, moves, EXP) with
  * the Rare Candy and party / box shortcuts. DOM overlay.
  */
-import { expForLevel, getMove, typeName } from '../data/pokedata';
+import { expForLevel, getMove, getPokemon, typeName } from '../data/pokedata';
+import { runtimeConfig } from '../game/runtime';
+import { towerAttacksPerSec } from '../sim/speed';
 import typesJson from '../data/types.json';
 import { evolutionOptions, evolveMonster } from '../sim/evolution';
 import { replaceMove, useRareCandy } from '../sim/items';
@@ -197,6 +199,9 @@ export class PcSummary {
       d.textContent = `${label} ${mon.stats[k]}`;
       stats.appendChild(d);
     }
+    const rate = document.createElement('div');
+    rate.textContent = `Attack speed: ${towerAttacksPerSec(getPokemon(mon.species).base.spe, runtimeConfig.speed).toFixed(1)}/s`;
+    stats.appendChild(rate);
     body.appendChild(stats);
 
     const moves = document.createElement('ul');

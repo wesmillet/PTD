@@ -321,7 +321,7 @@ export function towerMove(tower: Tower): MoveSpec | undefined {
 export function towerInterval(state: LevelState, tower: Tower): number {
   const move = towerMove(tower);
   const rate = attackRateMultiplier(tower.mon.status, state.config.status);
-  const base = attackCooldown(tower.mon.stats.spe, state.config.speed) * (move?.cooldownMultiplier ?? 1);
+  const base = attackCooldown(getPokemon(tower.mon.species).base.spe, state.config.speed) * (move?.cooldownMultiplier ?? 1);
   return rate > 0 ? base / rate : Infinity;
 }
 

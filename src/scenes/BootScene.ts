@@ -3,7 +3,7 @@ import config from '../data/config.json';
 import levelsJson from '../data/levels.json';
 import spriteFolders from '../data/spriteFolders.json';
 import uiGen4 from '../data/ui-gen4.json';
-import { assetUrl, badgeTextureKey, itemTextureKey, itemUrl, trainerTextureKey, urlParam } from '../game/runtime';
+import { assetUrl, badgeTextureKey, folderIconName, itemTextureKey, itemUrl, trainerTextureKey, urlParam } from '../game/runtime';
 import { PC } from '../sim/pc';
 import { frameKey, TEXT_BIG } from '../ui/styles';
 
@@ -44,7 +44,7 @@ export class BootScene extends Phaser.Scene {
       if (info.portraits.includes('Normal')) {
         this.load.image(`portrait-${dex}`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/Normal.png`);
       }
-      const id = Number(dex);
+      const id = folderIconName(dex);
       if (info.animatedIcon) {
         this.load.image(`icon-${id}-0`, `${import.meta.env.BASE_URL}assets/icons/${id}-f0.png`);
         this.load.image(`icon-${id}-1`, `${import.meta.env.BASE_URL}assets/icons/${id}-f1.png`);

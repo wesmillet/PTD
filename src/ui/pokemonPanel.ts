@@ -4,7 +4,9 @@
  * battle-GUI HP box with HP and EXP, then the moves with type and PP.
  * DOM overlay (readable at phone width). Clicking a move makes it active.
  */
-import { expForLevel, getMove, typeName } from '../data/pokedata';
+import { expForLevel, getMove, getPokemon, typeName } from '../data/pokedata';
+import { runtimeConfig } from '../game/runtime';
+import { towerAttacksPerSec } from '../sim/speed';
 import type { Monster } from '../sim/monster';
 import { resolveMove } from '../sim/moves';
 import { evolutionOptions } from '../sim/evolution';
@@ -177,7 +179,8 @@ export class PokemonPanel {
     for (const t of mon.types) this.types.appendChild(typeBadge(typeName(t)));
     if (this.hpBoxEl) updateHpBox(this.hpBoxEl, mon);
     const next = mon.level >= 100 ? 0 : expForLevel(mon.growth, mon.level + 1) - mon.exp;
-    this.expText.textContent = mon.level >= 100 ? 'EXP: max level' : `EXP ${mon.exp}   To next Lv: ${next}`;
+    const rate = towerAttacksPerSec(getPokemon(mon.species).base.spe, runtimeConfig.speed);
+    this.expText.textContent = `${mon.level >= 100 ? 'EXP: max level' : `EXP ${mon.exp}   To next Lv: ${next}`}   ·   Attack speed: ${rate.toFixed(1)}/s`;
 
     const chips: string[] = [];
     if (mon.status.ailment !== 'none') chips.push(capitalize(mon.status.ailment));
