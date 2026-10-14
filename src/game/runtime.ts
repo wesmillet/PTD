@@ -71,17 +71,39 @@ export function iconInfo(species: number): IconInfo {
  * animate it in an <img>); otherwise the static icon. Undefined when the
  * species ships no icon.
  */
-export function iconUrl(species: number, animated = true): string | undefined {
+export function iconUrl(species: number, animated = true, shiny = false): string | undefined {
+  if (shiny && hasShinyPortrait(species)) return portraitUrl(species, 'Normal', true);
   const info = iconInfo(species);
   if (!info.icon) return undefined;
   const base = `${import.meta.env.BASE_URL}assets/icons/${species}`;
   return animated && info.animatedIcon ? `${base}-anim.png` : `${base}.png`;
 }
 
-/** Phaser texture key of an icon frame (0 or 1), loaded by BootScene. */
-export function iconTextureKey(species: number, frame: 0 | 1): string {
+/**
+ * Phaser texture key of an icon frame (0 or 1), loaded by BootScene. A shiny
+ * with a shiny portrait gets the 32x32 icon BootScene cuts from it
+ * ("icon-<dex>-shiny", one frame); otherwise the normal icon.
+ */
+export function iconTextureKey(species: number, frame: 0 | 1, shiny = false): string {
+  if (shiny && hasShinyPortrait(species)) return shinyIconTextureKey(species);
   const info = iconInfo(species);
   return info.animatedIcon ? `icon-${species}-${frame}` : `icon-${species}`;
+}
+
+/** Texture key of the shiny box icon BootScene builds from the shiny Normal portrait. */
+export function shinyIconTextureKey(species: number): string {
+  return `icon-${species}-shiny`;
+}
+
+/** Texture key of a loaded portrait: "portrait-<dex>" or "portrait-<dex>-shiny". */
+export function portraitTextureKey(species: number, shiny = false): string {
+  return shiny && hasShinyPortrait(species) ? `portrait-${dexFolder(species)}-shiny` : `portrait-${dexFolder(species)}`;
+}
+
+/** Whether the species ships a shiny Normal portrait (public/assets/portraits/<dex>/shiny/Normal.png). */
+export function hasShinyPortrait(species: number, emotion = 'Normal'): boolean {
+  const info = (spriteFolders as Record<string, { shinyPortraits?: string[] }>)[dexFolder(species)];
+  return info?.shinyPortraits?.includes(emotion) ?? false;
 }
 
 /** URL of a shipped asset by its path under public/ (as config files write it). */
@@ -109,10 +131,11 @@ export function badgeTextureKey(id: string, lit = true): string {
   return lit ? `badge-${id}` : `badge-${id}-off`;
 }
 
-/** URL of a portrait emotion PNG, if the folder has it. */
-export function portraitUrl(species: number, emotion = 'Normal'): string | undefined {
+/** URL of a portrait emotion PNG, if the folder has it; the shiny one when asked and shipped. */
+export function portraitUrl(species: number, emotion = 'Normal', shiny = false): string | undefined {
   const dex = dexFolder(species);
-  const info = (spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>)[dex];
+  const info = (spriteFolders as Record<string, { shiny: boolean; portraits: string[]; shinyPortraits?: string[] }>)[dex];
+  if (shiny && info?.shinyPortraits?.includes(emotion)) return `${import.meta.env.BASE_URL}assets/portraits/${dex}/shiny/${emotion}.png`;
   if (!info?.portraits.includes(emotion)) return undefined;
   return `${import.meta.env.BASE_URL}assets/portraits/${dex}/${emotion}.png`;
 }

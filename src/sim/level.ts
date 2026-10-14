@@ -880,7 +880,7 @@ export interface LevelSummary {
   wavesCleared: number;
   kos: number;
   leaks: number;
-  party: { name: string; species: number; levelFrom: number; levelTo: number; expGained: number }[];
+  party: { name: string; species: number; shiny: boolean; levelFrom: number; levelTo: number; expGained: number }[];
   caught: { name: string; species: number; level: number; shiny: boolean; ball: string }[];
   /** The trainer beaten this run, if any. */
   trainer?: string;
@@ -897,7 +897,7 @@ export function summarize(state: LevelState): LevelSummary {
     leaks: state.leaks,
     party: state.party
       .filter((p) => !caughtSet.has(p.mon))
-      .map((p) => ({ name: p.mon.name, species: p.mon.species, levelFrom: p.levelFrom, levelTo: p.mon.level, expGained: p.expGained })),
+      .map((p) => ({ name: p.mon.name, species: p.mon.species, shiny: p.mon.shiny, levelFrom: p.levelFrom, levelTo: p.mon.level, expGained: p.expGained })),
     caught: state.caught.map((c) => ({ name: c.mon.name, species: c.mon.species, level: c.mon.level, shiny: c.mon.shiny, ball: c.ball })),
     ...(state.trainerBeaten && state.def.trainer ? { trainer: state.def.trainer.name } : {}),
     ...(state.phase === 'won' && state.def.badge ? { badge: state.def.badge } : {}),

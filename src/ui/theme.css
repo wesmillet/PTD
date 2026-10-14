@@ -103,6 +103,9 @@ body { background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0
 .ptd-panel .ptd-portrait { width: 80px; height: 80px; image-rendering: pixelated; border: 2px solid var(--ptd-border-outer); border-radius: var(--ptd-radius-sm); background: var(--ptd-panel-2); flex: none; }
 .ptd-panel .ptd-portrait.small { width: 40px; height: 40px; }
 .ptd-icon { width: 32px; height: 32px; image-rendering: pixelated; flex: none; vertical-align: middle; }
+.ptd-icon-wrap { position: relative; display: inline-block; width: 32px; height: 32px; flex: none; vertical-align: middle; }
+.ptd-icon-wrap .ptd-icon { display: block; }
+.ptd-sparkle { position: absolute; right: -4px; top: -6px; font-size: 11px; line-height: 1; color: #f8d030; text-shadow: 1px 1px 0 #283028; pointer-events: none; }
 .ptd-item { width: 24px; height: 24px; image-rendering: pixelated; flex: none; vertical-align: middle; }
 .ptd-panel .ptd-dim { color: var(--ptd-text-dim); }
 .ptd-panel .ptd-label { font: 700 var(--ptd-size)/var(--ptd-line) var(--ptd-font-pixel); color: var(--ptd-text-dim); }

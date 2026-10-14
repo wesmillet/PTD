@@ -114,7 +114,7 @@ export class MenuPages {
       const li = document.createElement('li');
       li.className = 'ptd-move';
       li.style.gridTemplateColumns = 'auto 1fr auto';
-      const icon = iconImage(iconUrl(mon.species)) ?? document.createElement('span');
+      const icon = iconImage(iconUrl(mon.species, true, mon.shiny), mon.shiny) ?? document.createElement('span');
       const name = document.createElement('span');
       name.className = 'ptd-name';
       name.textContent = `${capitalize(mon.name)}${mon.shiny ? ' ★' : ''}  Lv ${mon.level}`;

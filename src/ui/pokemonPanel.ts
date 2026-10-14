@@ -14,8 +14,8 @@ import { capitalizeName } from '../sim/names';
 import { capitalize, ensureOverlayStyles, hpBox, iconImage, isolateFromGame, typeBadge, updateHpBox } from './domOverlay';
 
 export interface PokemonPanelHooks {
-  portraitUrl: (species: number) => string | undefined;
-  iconUrl?: (species: number) => string | undefined;
+  portraitUrl: (species: number, shiny: boolean) => string | undefined;
+  iconUrl?: (species: number, shiny: boolean) => string | undefined;
   setActiveMove: (mon: Monster, index: number) => void;
   /** Removes a placed Pokémon from the map (build phase); return false if it could not. */
   returnToParty: (mon: Monster) => boolean;
@@ -145,7 +145,7 @@ export class PokemonPanel {
     this.hpSlot.innerHTML = '';
     this.hpBoxEl = hpBox(mon, 'player-exp');
     this.hpSlot.appendChild(this.hpBoxEl);
-    const url = this.hooks.portraitUrl(mon.species);
+    const url = this.hooks.portraitUrl(mon.species, mon.shiny);
     if (url) {
       this.portrait.src = url;
       this.portrait.style.display = '';
@@ -153,7 +153,7 @@ export class PokemonPanel {
       this.portrait.style.display = 'none';
     }
     this.headIcon.innerHTML = '';
-    const icon = this.hooks.iconUrl ? iconImage(this.hooks.iconUrl(mon.species)) : null;
+    const icon = this.hooks.iconUrl ? iconImage(this.hooks.iconUrl(mon.species, mon.shiny), mon.shiny) : null;
     if (icon) this.headIcon.appendChild(icon);
     this.refresh();
   }

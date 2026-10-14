@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { BALL_IDS, BALLS } from '../sim/catch';
 import type { LevelState } from '../sim/level';
 import { getGame } from '../game/session';
-import { iconInfo, iconTextureKey, itemTextureKey } from '../game/runtime';
+import { iconInfo, iconTextureKey, itemTextureKey, portraitTextureKey } from '../game/runtime';
 import config from '../data/config.json';
 import uiGen4 from '../data/ui-gen4.json';
 import { Button, framePanel } from './button';
@@ -24,6 +24,8 @@ export interface HudCallbacks {
 
 interface Slot {
   species: number;
+  shiny: boolean;
+  star?: Phaser.GameObjects.Image;
   frame: Phaser.GameObjects.Rectangle;
   image?: Phaser.GameObjects.Image;
   animated: boolean;
@@ -150,6 +152,7 @@ export class Hud {
     for (const s of this.slots) {
       s.frame.destroy();
       s.image?.destroy();
+      s.star?.destroy();
       s.level.destroy();
       s.hp.destroy();
       s.placed.destroy();
@@ -166,8 +169,9 @@ export class Hud {
       });
       // Gen 5 box icon (PokeAPI sprites); falls back to the SpriteCollab portrait.
       const info = iconInfo(species);
-      const iconKey = iconTextureKey(species, this.iconFrame);
-      const portraitKey = `portrait-${String(species).padStart(4, '0')}`;
+      const shiny = entry.mon.shiny;
+      const iconKey = iconTextureKey(species, this.iconFrame, shiny);
+      const portraitKey = portraitTextureKey(species, shiny);
       const image = this.scene.textures.exists(iconKey)
         ? this.scene.add.image(x, y + 4, iconKey).setDepth(1002)
         : this.scene.textures.exists(portraitKey)
@@ -176,8 +180,9 @@ export class Hud {
       const level = this.scene.add.text(x + 22, y - 17, '', TEXT).setOrigin(1, 0).setDepth(1003);
       const placed = this.scene.add.text(x - 22, y - 17, '', { ...TEXT, color: '#3878e0' }).setOrigin(0, 0).setDepth(1003);
       const hp = this.scene.add.graphics().setDepth(1003);
-      const slot: Slot = { species, frame, level, hp, placed, animated: info.animatedIcon && this.scene.textures.exists(iconKey) };
+      const slot: Slot = { species, shiny, frame, level, hp, placed, animated: !shiny && info.animatedIcon && this.scene.textures.exists(iconKey) };
       if (image) slot.image = image;
+      if (shiny) slot.star = this.scene.add.image(x + 16, y - 10, 'star').setDepth(1003).setTint(0xf8d030);
       this.slots.push(slot);
     });
   }
@@ -252,13 +257,13 @@ export class Hud {
     this.hint.setVisible(!bossShown);
     this.leaveButton?.setEnabled(state.phase === 'build' || state.phase === 'wave');
 
-    if (this.slots.length !== state.party.length || this.slots.some((s, i) => s.species !== state.party[i]?.mon.species)) {
+    if (this.slots.length !== state.party.length || this.slots.some((s, i) => s.species !== state.party[i]?.mon.species || s.shiny !== state.party[i]?.mon.shiny)) {
       this.rebuildSlots(state);
     }
     state.party.forEach((entry, i) => {
       const slot = this.slots[i];
       if (!slot) return;
-      slot.level.setText(`${entry.mon.shiny ? '★' : ''}L${entry.mon.level}`);
+      slot.level.setText(`L${entry.mon.level}`);
       const isPlaced = state.towers.some((t) => t.mon === entry.mon);
       slot.frame.setStrokeStyle(2, i === selectedPartyIndex ? COLORS.selected : isPlaced ? COLORS.placeable : COLORS.borderOuter);
       slot.placed.setText(isPlaced ? '●' : '');

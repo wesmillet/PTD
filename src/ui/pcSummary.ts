@@ -18,8 +18,8 @@ import { EvolutionDialog } from './evolutionDialog';
 import { LearnDialog } from './learnDialog';
 
 export interface PcSummaryHooks {
-  portraitUrl: (species: number) => string | undefined;
-  iconUrl: (species: number) => string | undefined;
+  portraitUrl: (species: number, shiny?: boolean) => string | undefined;
+  iconUrl: (species: number, shiny?: boolean) => string | undefined;
   rareCandies: () => number;
   useRareCandy: () => void;
   /** Where the selected Pokémon sits; drives the shortcut button. */
@@ -165,11 +165,11 @@ export class PcSummary {
     const head = document.createElement('div');
     head.className = 'ptd-head';
     head.style.marginTop = '10px';
-    const icon = iconImage(this.hooks.iconUrl(mon.species));
+    const icon = iconImage(this.hooks.iconUrl(mon.species, mon.shiny), mon.shiny);
     const portrait = document.createElement('img');
     portrait.className = 'ptd-portrait';
     portrait.alt = '';
-    const url = this.hooks.portraitUrl(mon.species);
+    const url = this.hooks.portraitUrl(mon.species, mon.shiny);
     if (url) portrait.src = url;
     const text = document.createElement('div');
     const name = document.createElement('div');

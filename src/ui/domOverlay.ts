@@ -138,14 +138,25 @@ export function portraitImage(url: string | undefined, small = true): HTMLImageE
   return img;
 }
 
-/** A 32x32 box icon (animated APNG where available); null when the species has none. */
-export function iconImage(url: string | undefined): HTMLImageElement | null {
+/**
+ * A 32x32 box icon (animated APNG where available); null when the species has
+ * none. A shiny gets a small sparkle badge over the corner (its icon is the
+ * shiny portrait scaled down when one ships, see runtime.iconUrl).
+ */
+export function iconImage(url: string | undefined, shiny = false): HTMLElement | null {
   if (!url) return null;
   const img = document.createElement('img');
   img.className = 'ptd-icon';
   img.alt = '';
   img.src = url;
-  return img;
+  if (!shiny) return img;
+  const wrap = document.createElement('span');
+  wrap.className = 'ptd-icon-wrap';
+  const badge = document.createElement('span');
+  badge.className = 'ptd-sparkle';
+  badge.textContent = '★';
+  wrap.append(img, badge);
+  return wrap;
 }
 
 /** A type badge coloured by the CSS variable for that type. */

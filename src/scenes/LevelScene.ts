@@ -239,8 +239,8 @@ export class LevelScene extends Phaser.Scene {
       onBall: (id) => this.selectBall(id),
     });
     this.panel = new PokemonPanel({
-      portraitUrl: (species) => portraitUrl(species),
-      iconUrl: (species) => iconUrl(species),
+      portraitUrl: (species, shiny) => portraitUrl(species, 'Normal', shiny),
+      iconUrl: (species, shiny) => iconUrl(species, true, shiny),
       setActiveMove: (mon, index) => {
         const tower = this.state.towers.find((t) => t.mon === mon);
         if (tower) setActiveMove(this.state, tower.id, index);
@@ -702,7 +702,7 @@ export class LevelScene extends Phaser.Scene {
     if (!entry) return null;
     const dex = spriteFolder(entry.mon.species, entry.mon.shiny);
     if (isLoaded(dex)) return createPmdSprite(this, dex, x, y, 'Idle', Direction.Down).setDepth(5000).setAlpha(0.9);
-    const icon = iconTextureKey(entry.mon.species, 0);
+    const icon = iconTextureKey(entry.mon.species, 0, entry.mon.shiny);
     return this.textures.exists(icon) ? this.add.image(x, y, icon).setDepth(5000) : null;
   }
 

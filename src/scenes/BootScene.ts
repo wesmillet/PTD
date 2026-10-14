@@ -39,10 +39,13 @@ export class BootScene extends Phaser.Scene {
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       label.setText(`Failed to load ${file.src}`).setColor('#ff6b6b');
     });
-    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[]; icon?: boolean; animatedIcon?: boolean }>;
+    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[]; shinyPortraits?: string[]; icon?: boolean; animatedIcon?: boolean }>;
     for (const [dex, info] of Object.entries(folders)) {
       if (info.portraits.includes('Normal')) {
         this.load.image(`portrait-${dex}`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/Normal.png`);
+      }
+      if (info.shinyPortraits?.includes('Normal')) {
+        this.load.image(`portrait-${dex}-shiny`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/shiny/Normal.png`);
       }
       const id = folderIconName(dex);
       if (info.animatedIcon) {
@@ -86,6 +89,27 @@ export class BootScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Box icons for shinies: the shiny Normal portrait scaled to 32x32 with
+   * nearest filtering (what scripts/make-fallback-icons.py does for folders
+   * without a PokeAPI icon), keyed "icon-<species>[-form]-shiny".
+   */
+  private buildShinyIcons(): void {
+    const folders = spriteFolders as Record<string, { shinyPortraits?: string[] }>;
+    for (const [dex, info] of Object.entries(folders)) {
+      if (!info.shinyPortraits?.includes('Normal')) continue;
+      const src = `portrait-${dex}-shiny`;
+      const key = `icon-${folderIconName(dex)}-shiny`;
+      if (!this.textures.exists(src) || this.textures.exists(key)) continue;
+      const canvas = this.textures.createCanvas(key, 32, 32);
+      if (!canvas) continue;
+      const ctx = canvas.context;
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(this.textures.get(src).getSourceImage() as HTMLImageElement, 0, 0, 32, 32);
+      canvas.refresh();
+    }
+  }
+
   create(): void {
     // A small star for shiny sparkles.
     const star = this.add.graphics();
@@ -95,6 +119,7 @@ export class BootScene extends Phaser.Scene {
     ], true);
     star.generateTexture('star', 8, 8);
     star.destroy();
+    this.buildShinyIcons();
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
     else if (scene === 'select') this.scene.start('LevelSelect');

@@ -40,6 +40,7 @@ interface SlotView {
   size: number;
   hit: Phaser.GameObjects.Rectangle;
   icon?: Phaser.GameObjects.Image;
+  star?: Phaser.GameObjects.Image;
   mon: Monster | null;
 }
 
@@ -156,8 +157,8 @@ export class PCScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-RIGHT', () => this.switchBox(1));
 
     this.summary = new PcSummary({
-      portraitUrl: (s) => portraitUrl(s),
-      iconUrl: (s) => iconUrl(s),
+      portraitUrl: (s, shiny) => portraitUrl(s, 'Normal', shiny),
+      iconUrl: (s, shiny) => iconUrl(s, true, shiny),
       rareCandies: () => getGame().items.rareCandies,
       useRareCandy: () => {
         getGame().items.rareCandies--;
@@ -258,17 +259,21 @@ export class PCScene extends Phaser.Scene {
     for (const slot of this.slots) {
       slot.icon?.destroy();
       delete slot.icon;
+      slot.star?.destroy();
+      delete slot.star;
       const ref = this.currentRef(slot.ref);
       const mon = getAt(game, ref);
       slot.mon = mon;
       if (!mon || (this.drag && this.drag.mon === mon)) continue;
-      const key = iconTextureKey(mon.species, this.iconFrame);
+      const key = iconTextureKey(mon.species, this.iconFrame, mon.shiny);
       if (!this.textures.exists(key)) continue;
       const scale = slot.ref.kind === 'box' ? this.iconScale : 1.5;
       const icon = this.add.image(slot.x, slot.y - 2 * scale, key).setScale(scale).setDepth(10);
       const matches = matchesFilter(mon, this.filter);
       icon.setAlpha(matches ? 1 : 0.25);
-      if (mon.shiny) icon.setTint(0xfff5c0);
+      if (mon.shiny) {
+        slot.star = this.add.image(slot.x + 10 * scale, slot.y - 12 * scale, 'star').setDepth(11).setScale(scale * 0.75).setTint(0xf8d030);
+      }
       if (mon === this.summary?.selected) slot.hit.setStrokeStyle(2, COLORS.selected);
       else slot.hit.setStrokeStyle();
       slot.icon = icon;
@@ -289,7 +294,7 @@ export class PCScene extends Phaser.Scene {
       this.refresh();
       return;
     }
-    const key = iconTextureKey(mon.species, this.iconFrame);
+    const key = iconTextureKey(mon.species, this.iconFrame, mon.shiny);
     const icon = this.add.image(pointer.x, pointer.y - 6, key).setDepth(4000).setScale(this.iconScale * 1.15);
     this.drag = { from: real, mon, icon, startX: pointer.x, startY: pointer.y, moved: false, arrowTimer: 0, arrowDir: 0 };
     this.refresh();
@@ -355,9 +360,9 @@ export class PCScene extends Phaser.Scene {
       this.iconTimer -= ICON_FRAME_MS;
       this.iconFrame = this.iconFrame === 0 ? 1 : 0;
       for (const slot of this.slots) {
-        if (slot.icon && slot.mon && iconInfo(slot.mon.species).animatedIcon) slot.icon.setTexture(iconTextureKey(slot.mon.species, this.iconFrame));
+        if (slot.icon && slot.mon && !slot.mon.shiny && iconInfo(slot.mon.species).animatedIcon) slot.icon.setTexture(iconTextureKey(slot.mon.species, this.iconFrame));
       }
-      if (this.drag && iconInfo(this.drag.mon.species).animatedIcon) this.drag.icon.setTexture(iconTextureKey(this.drag.mon.species, this.iconFrame));
+      if (this.drag && !this.drag.mon.shiny && iconInfo(this.drag.mon.species).animatedIcon) this.drag.icon.setTexture(iconTextureKey(this.drag.mon.species, this.iconFrame));
     }
     // Holding a dragged Pokémon over an arrow turns the page.
     const drag = this.drag;

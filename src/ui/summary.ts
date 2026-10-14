@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import type { LevelSummary } from '../sim/level';
 import { BALLS } from '../sim/catch';
-import { badgeTextureKey, iconTextureKey, itemTextureKey } from '../game/runtime';
+import { badgeTextureKey, iconTextureKey, itemTextureKey, portraitTextureKey } from '../game/runtime';
 import { Button, framePanel } from './button';
 import { TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 
@@ -36,9 +36,9 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
   );
   let y = py - panelH / 2 + 90;
   const left = px - panelW / 2;
-  const portrait = (species: number, x: number, cy: number) => {
-    const icon = iconTextureKey(species, 0);
-    const key = scene.textures.exists(icon) ? icon : `portrait-${String(species).padStart(4, '0')}`;
+  const portrait = (species: number, x: number, cy: number, shiny = false) => {
+    const icon = iconTextureKey(species, 0, shiny);
+    const key = scene.textures.exists(icon) ? icon : portraitTextureKey(species, shiny);
     if (scene.textures.exists(key)) container.add(scene.add.image(x, cy, key).setScale(key === icon ? 1 : 0.6));
   };
   if (summary.trainer) {
@@ -54,7 +54,7 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
   for (const p of summary.party) {
     const name = p.name.charAt(0).toUpperCase() + p.name.slice(1);
     const levelText = p.levelTo > p.levelFrom ? `Lv ${p.levelFrom} -> ${p.levelTo}` : `Lv ${p.levelTo}`;
-    portrait(p.species, left + 30, y + 10);
+    portrait(p.species, left + 30, y + 10, p.shiny);
     container.add(scene.add.text(left + 50, y, `${name}   +${p.expGained} EXP   ${levelText}`, TEXT));
     y += 26;
   }
@@ -63,7 +63,7 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
     y += 22;
     for (const c of summary.caught) {
       const name = c.name.charAt(0).toUpperCase() + c.name.slice(1);
-      portrait(c.species, left + 30, y + 10);
+      portrait(c.species, left + 30, y + 10, c.shiny);
       const ballKey = itemTextureKey(BALLS[c.ball]?.sprite ?? 'poke-ball');
       if (scene.textures.exists(ballKey)) container.add(scene.add.image(left + 58, y + 10, ballKey).setScale(0.8));
       container.add(scene.add.text(left + 76, y, `${c.shiny ? '★ ' : ''}${name}   Lv ${c.level}`, TEXT));
