@@ -1,0 +1,7 @@
+Power Clear and Power Clear Bold (power-clear.ttf, power-clear-bold.ttf)
+DS-era (Gen 4/5) Pokémon-style text fonts distributed with Pokémon Essentials:
+https://github.com/Maruno17/pokemon-essentials/tree/master/Fonts
+Licensed with that repository under Creative Commons
+Attribution-NonCommercial-ShareAlike 4.0 International.
+Credit: Pokémon Essentials contributors. Non-commercial use only.
+The font maps "$" to the Pokédollar sign.
