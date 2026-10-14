@@ -655,6 +655,36 @@ def spear_pillar():
     return m
 
 
+# Temporal Spire: the Mystery Dungeon capstone. Spear Pillar's summit gone
+# grey and broken, floating in the dark, the path spiralling up to the top.
+def temporal_spire():
+    m = blank('temporal-spire', 2011, [(2, 13), (2, 9), (27, 9), (27, 4), (6, 4), (6, 1), (15, 1)], road=None)
+    m.extra_paths = [('path-2', [(27, 13), (27, 9), (27, 4), (6, 4), (6, 1), (15, 1)])]
+    lane(m, m.extra_paths[0][1], road=False)
+    m.theme = 'cave'
+    m.floor('bw-void', 0, 0, 29, 13)
+    m.floor('pt-spear-grey', 1, 0, 28, 12)
+    for (x, y) in m.path_cells | m.lane_cells:
+        if 1 <= x <= 28 and y <= 12:
+            m.ground[y][x] = 'pt-spear-carpet-' + str((x % 4) + (y % 4) * 4)
+    m.floor('pt-spear-altar', 14, 0, 15, 1)
+    m.floor('pt-spear-grey-steps', 1, 13, 4, 13)
+    m.floor('pt-spear-grey-steps', 25, 13, 28, 13)
+    for x in (4, 10, 19, 25):
+        for y in (1, 6):
+            if (x, y) not in m.path_cells:
+                m.stamp('pt-spear-pillar', x, y, must=False)
+    for x, y in ((8, 11), (21, 11), (13, 6), (16, 6), (24, 1)):
+        m.stamp('pt-spear-pillar-broken', x, y, must=False)
+    for x, y in ((0, 11), (28, 11), (0, 1), (28, 0)):
+        m.stamp('pt-spear-cloud', x, y, must=False, clip=True)
+    m.wall(0, 0, 0, 13)
+    m.wall(29, 0, 29, 13)
+    pick_spots(m, 10)
+    m.points = [('dialga', 'stage', 15, 0)]
+    return m
+
+
 # Distortion World on Platinum's own textures: platforms of pink cracked
 # rock on black nothing, blue-lit rock where the path runs, sideways
 # waterfalls of pale "water", the blue trees, boulders and dark plants.
@@ -1167,7 +1197,7 @@ def great_marsh():
     return m
 
 
-MAPS.update({'snowpoint-temple': snowpoint_temple, 'mt-coronet': mt_coronet, 'stark-mountain': stark_mountain,
+MAPS.update({'temporal-spire': temporal_spire, 'snowpoint-temple': snowpoint_temple, 'mt-coronet': mt_coronet, 'stark-mountain': stark_mountain,
              'oreburgh-gate': lambda: oreburgh_cave('oreburgh-gate', 414, [(0, 2), (9, 2), (9, 8), (19, 8), (19, 3), (29, 3)], False),
              'oreburgh-mine-1f': lambda: oreburgh_cave('oreburgh-mine-1f', 415, [(0, 10), (7, 10), (7, 3), (15, 3), (15, 9), (23, 9), (23, 4), (29, 4)], True),
              'lake-verity-island': lake_verity_island, 'lake-valor': lake_valor, 'lake-acuity': lake_acuity,
