@@ -1,11 +1,11 @@
 import Phaser from 'phaser';
 import config from '../data/config.json';
-import levelsJson from '../data/levels.json';
+import { getLevel, levelIds } from '../data/levels';
 import spriteFolders from '../data/spriteFolders.json';
 import uiGen4 from '../data/ui-gen4.json';
 import { assetUrl, badgeTextureKey, bannerTextureKey, folderIconName, itemTextureKey, itemUrl, mugshotTextureKey, popupTextureKey, trainerTextureKey, typeIconTextureKey, typeIconUrl, urlParam } from '../game/runtime';
 import { allBadges } from '../sim/game';
-import { POPUP_KINDS } from '../sim/waves';
+import { levelTrainers, POPUP_KINDS } from '../sim/waves';
 import { TRAINER_ART, trainerArtId } from '../data/trainers';
 import typesJson from '../data/types.json';
 import { PC } from '../sim/pc';
@@ -85,9 +85,9 @@ export class BootScene extends Phaser.Scene {
     }
     // Platinum trainer art for the trainers the levels name: standing and
     // throwing poses, plus the VS mugshot and class banner when they exist.
-    for (const def of Object.values(levelsJson as Record<string, { trainer?: { id: string } }>)) {
-      if (!def.trainer) continue;
-      const id = def.trainer.id;
+    const trainerIds = new Set<string>();
+    for (const levelId of levelIds()) for (const t of levelTrainers(getLevel(levelId))) trainerIds.add(t.id);
+    for (const id of trainerIds) {
       const art = TRAINER_ART[id];
       const file = trainerArtId(id);
       this.load.image(trainerTextureKey(id), assetUrl(`assets/trainers/${file}.png`));

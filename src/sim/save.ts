@@ -55,6 +55,7 @@ export interface SaveData {
   money: number;
   pokedex: Record<string, DexEntry>;
   badges: string[];
+  flags?: string[];
   settings: SavedSettings;
 }
 
@@ -96,6 +97,7 @@ export function serializeGame(game: GameState, settings: SavedSettings, now = Da
     money: game.money,
     pokedex: JSON.parse(JSON.stringify(game.pokedex)) as Record<string, DexEntry>,
     badges: [...game.badges],
+    flags: [...game.flags],
     settings: { gameSpeed: settings.gameSpeed, ...(settings.zoom !== undefined ? { zoom: settings.zoom } : {}), speed: { ...settings.speed } },
   };
 }
@@ -108,7 +110,7 @@ const isNum = (v: unknown): v is number => typeof v === 'number' && Number.isFin
 function validateMonster(raw: unknown, where: string): SavedMonster {
   if (!raw || typeof raw !== 'object') throw new SaveError(`${where}: not an object`);
   const m = raw as Record<string, unknown>;
-  if (!isInt(m.species, 1, 493)) throw new SaveError(`${where}: bad species`);
+  if (!isInt(m.species, 1, 99999)) throw new SaveError(`${where}: bad species`);
   try {
     getPokemon(m.species);
   } catch {
@@ -204,7 +206,12 @@ export function validateSave(raw: unknown): SaveData {
   const pokedex: Record<string, DexEntry> = {};
   if (!s.pokedex || typeof s.pokedex !== 'object') throw new SaveError('bad pokedex');
   for (const [id, e] of Object.entries(s.pokedex as Record<string, unknown>)) {
-    if (!isInt(Number(id), 1, 493)) continue;
+    if (!isInt(Number(id), 1, 99999)) continue;
+    try {
+      getPokemon(Number(id));
+    } catch {
+      continue;
+    }
     const d = e as Record<string, unknown>;
     if (!d || typeof d.seen !== 'boolean' || typeof d.caught !== 'boolean' || typeof d.shinyCaught !== 'boolean') throw new SaveError(`bad pokedex entry ${id}`);
     pokedex[id] = { seen: d.seen, caught: d.caught, shinyCaught: d.shinyCaught };
@@ -215,6 +222,14 @@ export function validateSave(raw: unknown): SaveData {
     for (const b of s.badges) {
       if (typeof b !== 'string' || b.length > 32) throw new SaveError('bad badge');
       if (!badges.includes(b)) badges.push(b);
+    }
+  }
+  const flags: string[] = [];
+  if (s.flags !== undefined) {
+    if (!Array.isArray(s.flags)) throw new SaveError('bad flags');
+    for (const f of s.flags) {
+      if (typeof f !== 'string' || f.length > 48) throw new SaveError('bad flag');
+      if (!flags.includes(f)) flags.push(f);
     }
   }
   const settings = s.settings as Record<string, unknown> | undefined;
@@ -239,6 +254,7 @@ export function validateSave(raw: unknown): SaveData {
     money: s.money as number,
     pokedex,
     badges,
+    flags,
     settings: { gameSpeed: GAME_SPEEDS.includes(settings.gameSpeed) ? settings.gameSpeed : 1, ...(settings.zoom !== undefined ? { zoom: settings.zoom as SavedZoom } : {}), speed },
   };
 }
@@ -256,6 +272,7 @@ export function restoreGame(data: SaveData): GameState {
   game.money = data.money;
   game.pokedex = data.pokedex;
   game.badges = [...data.badges];
+  game.flags = [...(data.flags ?? [])];
   return game;
 }
 

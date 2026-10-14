@@ -1,7 +1,7 @@
 /**
  * A concrete Pokémon instance (tower or enemy) with computed stats.
  */
-import { getMove, getPokemon, type GrowthRate } from '../data/pokedata';
+import { displayName, getMove, getPokemon, type GrowthRate } from '../data/pokedata';
 import { expForLevel } from '../data/pokedata';
 import { startingMoves } from './moves';
 import { computeStats, type Stats } from './stats';
@@ -29,6 +29,14 @@ export interface Monster {
   activeMove: number;
   status: StatusState;
   shiny: boolean;
+  /** Shadow Pokémon: cleared levels spent at a lake guardian level; gains no EXP until purified. */
+  shadow?: { purified: number; purifiedAt?: string };
+  /** Caught as an Alpha (Hisui rifts). */
+  alpha?: boolean;
+  /** The ball it was caught in (Premier Ball for lottery prizes). */
+  ball?: string;
+  /** Trainer memo (the lottery ticket number). */
+  memo?: string;
 }
 
 export interface MonsterOptions {
@@ -47,7 +55,7 @@ export function createMonster(species: number, level: number, moves?: readonly n
   const stats = computeStats(data.base, level);
   return {
     species,
-    name: data.name,
+    name: displayName(species),
     level,
     exp: expForLevel(data.growth, level),
     growth: data.growth,

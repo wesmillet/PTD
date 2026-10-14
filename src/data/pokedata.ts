@@ -34,6 +34,17 @@ export interface PokemonData {
   baseHappiness: number;
   evolvesFrom: number;
   chain: number;
+  /** Forms only: the base species' dex number (the id is PokeAPI's 10000+ form id or a synthetic one). */
+  species?: number;
+  /** Forms only: "hisui", "mega", "origin", "sky", "shadow", "primal". */
+  form?: string;
+  formName?: string;
+  /** Forms only: the sprite folder ("0058-hisui"). */
+  folder?: string;
+  /** Shadow Mewtwo and Shadow Lugia. */
+  shadow?: boolean;
+  /** Primal Dialga. */
+  primal?: boolean;
 }
 
 export type StageKey = StatKey | 'accuracy' | 'evasion';
@@ -115,11 +126,49 @@ export function getPokemon(id: number): PokemonData {
   return p;
 }
 
-/** Species id for a lowercase name such as "turtwig", or undefined. */
+/**
+ * Species id for a lowercase name such as "turtwig" or "growlithe-hisui",
+ * or undefined. "hisuian-growlithe", "mega-lucario", "shadow-mewtwo" and
+ * "primal-dialga" (the display spellings) resolve too.
+ */
 export function findPokemonId(name: string): number | undefined {
   const needle = name.toLowerCase();
   for (const [id, p] of Object.entries(pokemon)) if (p.name === needle) return Number(id);
+  for (const [id, p] of Object.entries(pokemon)) if (displayName(Number(id)) === needle || (p.form && `${p.name.replace(`-${p.form}`, '')}-${p.form}` === needle)) return Number(id);
   return undefined;
+}
+
+/** Every species id in the data, base species and forms. */
+export function allPokemonIds(): number[] {
+  return Object.keys(pokemon).map(Number);
+}
+
+/** The base species of a form (itself for a base species). */
+export function baseSpecies(id: number): number {
+  return getPokemon(id).species ?? id;
+}
+
+/**
+ * Hyphenated display spelling: "hisuian-growlithe", "mega-lucario",
+ * "giratina-origin", "shaymin-sky", "shadow-mewtwo", "primal-dialga";
+ * base species keep their name. capitalizeName turns it into words.
+ */
+export function displayName(id: number): string {
+  const p = getPokemon(id);
+  if (!p.form) return p.name;
+  const base = getPokemon(p.species ?? id).name;
+  switch (p.form) {
+    case 'hisui':
+      return `hisuian-${base}`;
+    case 'mega':
+      return `mega-${base}`;
+    case 'shadow':
+      return `shadow-${base}`;
+    case 'primal':
+      return `primal-${base}`;
+    default:
+      return `${base}-${p.form}`;
+  }
 }
 
 export function getMove(id: number): MoveData {

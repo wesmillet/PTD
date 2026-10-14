@@ -5,7 +5,7 @@
 import spriteFolders from '../data/spriteFolders.json';
 import { findPokemonId, getEvolutions, getEncounterArea, getPokemon, type EncounterArea } from '../data/pokedata';
 import type { GameState } from '../sim/game';
-import { counterStarter, rosterTable, type LevelDef } from '../sim/waves';
+import { counterStarter, finalStarter, isScripted, levelTrainers, rosterTable, scriptedSpeciesNames, type AllyDef, type LevelDef } from '../sim/waves';
 import { dexFolder } from './runtime';
 
 const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
@@ -32,14 +32,42 @@ export function evolutionLine(species: number): number[] {
 export function levelSpriteFolders(def: LevelDef, game: GameState): string[] {
   const species = new Set<number>();
   for (const mon of game.party) for (const id of evolutionLine(mon.species)) species.add(id);
-  if (def.roster) {
+  const named = (name: string): number | undefined => {
+    if (name === 'counter-starter') return counterStarter(game.starter);
+    if (name === 'counter-starter-final') return finalStarter(counterStarter(game.starter));
+    return findPokemonId(name);
+  };
+  if (isScripted(def)) {
+    for (const name of scriptedSpeciesNames(def)) {
+      const id = named(name);
+      if (id !== undefined) for (const line of evolutionLine(id)) species.add(line);
+    }
+  } else if (def.roster) {
     for (const e of rosterTable(def)) for (const id of evolutionLine(e.species)) species.add(id);
   } else {
     const area: EncounterArea = getEncounterArea(def.area);
     for (const e of area.walk ?? []) for (const id of evolutionLine(e.species)) species.add(id);
   }
-  for (const p of def.trainer?.party ?? []) {
-    const id = p.species === 'counter-starter' ? counterStarter(game.starter) : findPokemonId(p.species);
+  for (const t of levelTrainers(def)) {
+    for (const p of t.party) {
+      const id = named(p.species);
+      if (id !== undefined) species.add(id);
+    }
+  }
+  const allies: AllyDef[] = [...(def.allies ?? [])];
+  for (const r of def.rules ?? []) {
+    if (Array.isArray(r.allies)) allies.push(...(r.allies as AllyDef[]));
+    if (typeof r.species === 'string') {
+      const id = findPokemonId(r.species);
+      if (id !== undefined) species.add(id);
+    }
+    if (Array.isArray(r.rares)) for (const name of r.rares as string[]) {
+      const id = findPokemonId(name);
+      if (id !== undefined) species.add(id);
+    }
+  }
+  for (const a of allies) {
+    const id = named(a.species);
     if (id !== undefined) species.add(id);
   }
   const out: string[] = [];

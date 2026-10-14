@@ -12,7 +12,7 @@ import { cloneModel, toMapDef, type MapModel } from '../map/tiled';
 import config from '../data/config.json';
 import { iconTextureKey, iconUrl, itemTextureKey, portraitUrl, runtime, runtimeConfig, spriteFolder, trainerTextureKey, urlParam } from '../game/runtime';
 import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
-import { addPokemon, markSeen, recordLevelResult } from '../sim/game';
+import { addPokemon, markSeen, placementLimit, recordLevelResult } from '../sim/game';
 import { usePotion } from '../sim/items';
 import { BALLS } from '../sim/catch';
 import { advance, createClock, type Clock } from '../sim/clock';
@@ -44,6 +44,12 @@ import {
   summarize,
   towerAt,
   towerMove,
+  enemyPoint,
+  isCatchable,
+  placementBlock,
+  playerTowers,
+  ruleStatus,
+  useRule,
   type Enemy,
   type LevelEvent,
   type LevelState,
@@ -57,7 +63,7 @@ import { LearnDialog } from '../ui/learnDialog';
 import { PokemonPanel } from '../ui/pokemonPanel';
 import { capitalize } from '../ui/domOverlay';
 import { findPokemonId, getMove } from '../data/pokedata';
-import { counterStarter, levelPopup } from '../sim/waves';
+import { counterStarter, levelPopup, type DialogueLine } from '../sim/waves';
 import type { Monster } from '../sim/monster';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
 import { STATUS_BADGE } from '../ui/domOverlay';
@@ -132,6 +138,7 @@ export class LevelScene extends Phaser.Scene {
   private savePanel?: SavePanel;
   private dialogue?: DialogueBox;
   private vsIntro?: VsIntro;
+  private escortView?: Phaser.GameObjects.Sprite;
   /** The trainer's throwing pose beside the entrance while their wave is being sent. */
   private trainerSprite?: Phaser.GameObjects.Image;
   private paused = false;
@@ -228,7 +235,15 @@ export class LevelScene extends Phaser.Scene {
     this.children.removeAll(true);
     const { model, map, error } = this.resolveMap(def.map);
     this.mapModel = model;
-    this.state = createLevel(def, map, { seed: this.seed, party: game.party, config: runtimeConfig, items: game.items, ...(game.starter !== undefined ? { starter: game.starter } : {}) });
+    this.state = createLevel(def, map, {
+      seed: this.seed,
+      party: game.party,
+      config: runtimeConfig,
+      items: game.items,
+      placements: placementLimit(game, def),
+      flags: game.flags,
+      ...(game.starter !== undefined ? { starter: game.starter } : {}),
+    });
     // The renderer gets its own copy: the editor paints into it, and Discard restores from this.mapModel.
     this.mapRenderer = new MapRenderer(this, cloneModel(model), Hud.HEIGHT);
     this.drawMap();
@@ -242,6 +257,7 @@ export class LevelScene extends Phaser.Scene {
       onMenu: () => this.openMenu(),
       onPartySlotDown: (i, pointer) => this.onPartySlotDown(i, pointer),
       onBall: (id) => this.selectBall(id),
+      onRule: (id) => this.handleEvents(useRule(this.state, id)),
     });
     this.panel = new PokemonPanel({
       portraitUrl: (species, shiny) => portraitUrl(species, 'Normal', shiny),
@@ -615,6 +631,11 @@ export class LevelScene extends Phaser.Scene {
       if (!tile || !entry || this.ended) return;
       if (this.state.towers.some((t) => t.mon === entry.mon)) return;
       if (isPlaceable(this.state.map, tile[0], tile[1]) && !towerAt(this.state, tile[0], tile[1])) {
+        const reason = placementBlock(this.state, entry.mon, tile[0], tile[1]);
+        if (reason) {
+          this.showToast(reason);
+          return;
+        }
         try {
           const tower = placeTower(this.state, strip.partyIndex, tile[0], tile[1]);
           this.selectedPartyIndex = null;
@@ -673,11 +694,13 @@ export class LevelScene extends Phaser.Scene {
       } else {
         const placed = new Set(state.towers.map((t) => t.mon));
         const partyIndex = this.selectedPartyIndex ?? state.party.findIndex((p) => !placed.has(p.mon));
-        if (partyIndex < 0 || state.towers.length >= state.def.placements) {
+        if (partyIndex < 0 || playerTowers(state).length >= state.placements) {
           this.showToast(
-            state.def.placements === 1
+            state.placements === 1
               ? 'Only one Pokémon can be placed here; open the placed one and press Return to party'
-              : 'No more Pokémon to place; open one and press Move',
+              : playerTowers(state).length >= state.placements
+                ? `Only ${state.placements} Pokémon can be placed here`
+                : 'No more Pokémon to place; open one and press Move',
           );
           this.selectedPartyIndex = null;
           return;
@@ -855,7 +878,8 @@ export class LevelScene extends Phaser.Scene {
     this.syncViews();
     this.drawOverlay();
     const boss = activeBoss(this.state);
-    this.hud.setBoss(boss ? { name: capitalize(boss.mon.name), hp: boss.mon.hp, maxHp: boss.mon.stats.hp, level: boss.mon.level } : null);
+    this.hud.setBoss(boss ? { name: capitalize(boss.mon.name), hp: boss.mon.hp, maxHp: boss.mon.stats.hp, level: boss.mon.level, catchable: isCatchable(boss), phases: boss.boss?.phases.map((p) => p.at) ?? [] } : null);
+    this.hud.setRules(ruleStatus(this.state));
     this.dialogue?.update(delta);
     this.hud.setPaused(this.paused);
     this.hud.tick(delta);
@@ -978,6 +1002,27 @@ export class LevelScene extends Phaser.Scene {
           this.trainerSprite?.destroy();
           this.trainerSprite = undefined;
           break;
+        case 'cutscene':
+          if (e.lines?.length) this.showLines(e.lines);
+          break;
+        case 'rule':
+        case 'lanesReversed':
+        case 'drop':
+        case 'flee':
+        case 'bossPhase':
+          if (e.text) this.showToast(e.text);
+          if (e.type === 'flee' && e.enemyId !== undefined) this.removeEnemyView(e.enemyId);
+          break;
+        case 'banner':
+          if (e.text) this.showToast(e.text);
+          break;
+        case 'allyPlaced':
+          if (e.text) this.showToast(`${e.text} joins the fight!`);
+          break;
+        case 'allyLeft':
+          if (e.towerId !== undefined) this.destroyTowerView(e.towerId);
+          if (e.text) this.showToast(`${e.text} leaves.`);
+          break;
         case 'phase':
           if (e.phase === 'won' || e.phase === 'lost' || e.phase === 'left') this.endLevel();
           break;
@@ -1026,6 +1071,47 @@ export class LevelScene extends Phaser.Scene {
       });
     if (this.vsIntro?.canPlay(trainer.id)) this.vsIntro.play(trainer.id, trainer.name, talk);
     else talk();
+  }
+
+  /** Shows scripted dialogue lines in the bottom box; the sim pauses until the last one is dismissed. */
+  private showLines(lines: DialogueLine[]): void {
+    if (!this.dialogue) return;
+    this.paused = true;
+    this.selectedBall = null;
+    const pages = lines.map((line) => ({
+      text: line.text,
+      ...(line.speaker ? { portrait: trainerTextureKey(line.speaker) } : {}),
+      ...(line.options
+        ? {
+            choices: line.options,
+            onChoice: (i: number) => {
+              if (line.answer !== undefined && i === line.answer && line.onCorrect) this.handleEvents(useRule(this.state, line.onCorrect.rule, line.onCorrect.action));
+              else if (line.answer !== undefined) this.showToast('Not quite.');
+            },
+          }
+        : {}),
+    }));
+    this.dialogue.show(pages, () => {
+      if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen && !this.startMenu?.isOpen && !this.vsIntro?.isOpen) this.paused = false;
+    });
+  }
+
+  /** The escort (Cheryl's Chansey walks the path for her): one sprite following state.escort. */
+  private syncEscort(): void {
+    const escort = this.state.escort;
+    if (!escort) return;
+    const dex = spriteFolder(escort.species, false);
+    if (!this.escortView) {
+      if (!isLoaded(dex)) return;
+      const p = pointAlongPath(this.state.path, escort.distance);
+      const { px, py } = this.tilePixel(p.x, p.y);
+      this.escortView = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Walk', Direction.Right).setDepth(py);
+    }
+    const p = pointAlongPath(this.state.path, escort.distance);
+    const { px, py } = this.tilePixel(p.x, p.y);
+    this.escortView.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);
+    playAnim(this.escortView, this.state.phase === 'wave' && escort.hp > 0 ? 'Walk' : 'Idle', directionFromVector(p.dx, p.dy, Direction.Right));
+    syncShadow(this.escortView);
   }
 
   /** The trainer's throwing pose beside the path entrance for the length of their wave. */
@@ -1283,7 +1369,7 @@ export class LevelScene extends Phaser.Scene {
         .catch((err: Error) => this.showToast(err.message));
       return;
     }
-    const point = pointAlongPath(this.state.path, enemy.distance);
+    const point = enemyPoint(this.state, enemy);
     const { px, py } = this.tilePixel(point.x, point.y);
     const dir = directionFromVector(point.dx, point.dy, Direction.Right);
     const sprite = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Walk', dir);
@@ -1291,6 +1377,15 @@ export class LevelScene extends Phaser.Scene {
       sprite.setScale(runtimeConfig.bosses.spriteScale);
       syncShadow(sprite);
     }
+    if (enemy.alpha) {
+      sprite.setScale(1.5).setTint(0xffb0a0);
+      syncShadow(sprite);
+    }
+    if (enemy.dynamax) {
+      sprite.setScale(2.5).setTint(0xff7070);
+      syncShadow(sprite);
+    }
+    if (enemy.shadow) sprite.setTint(0xb080e0);
     const hpBar = this.add.graphics().setDepth(800);
     this.enemyViews.set(enemyId, { sprite, hpBar, busy: false, dying: false, shiny, captured: false, inBall: false });
     if (shiny) this.sparkle(px + 32, py + SPRITE_Y_OFFSET);
@@ -1327,7 +1422,7 @@ export class LevelScene extends Phaser.Scene {
     if (view) return { px: view.sprite.x, py: view.sprite.y };
     const enemy = this.state.enemies.find((e) => e.id === enemyId);
     if (!enemy) return { px: -100, py: -100 };
-    const p = pointAlongPath(this.state.path, enemy.distance);
+    const p = enemyPoint(this.state, enemy);
     return this.tilePixel(p.x, p.y);
   }
 
@@ -1432,12 +1527,17 @@ export class LevelScene extends Phaser.Scene {
       this.syncBadge(view, tower.mon.status.ailment, bx + w + 3, by + 1);
       view.badge?.setVisible(true);
     }
+    for (const [id] of this.towerViews) {
+      if (!state.towers.some((t) => t.id === id) && this.drag?.towerId !== id) this.destroyTowerView(id);
+    }
+    this.syncEscort();
     const alive = new Set<number>();
     for (const enemy of state.enemies) {
       alive.add(enemy.id);
       const view = this.enemyViews.get(enemy.id);
       if (!view) continue;
-      const point = pointAlongPath(state.path, enemy.distance);
+      view.sprite.setAlpha(enemy.vanish > 0 ? 0.15 : 1);
+      const point = enemyPoint(state, enemy);
       const { px, py } = this.tilePixel(point.x, point.y);
       view.sprite.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);
       if (!view.busy) playAnim(view.sprite, 'Walk', directionFromVector(point.dx, point.dy, Direction.Right));

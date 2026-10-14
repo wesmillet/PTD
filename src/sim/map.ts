@@ -4,6 +4,8 @@
  */
 export type Tile = readonly [number, number];
 
+export type SpotProps = Record<string, string | number | boolean>;
+
 export interface MapDef {
   theme: string;
   width: number;
@@ -12,6 +14,33 @@ export interface MapDef {
   path: Tile[];
   placeable: Tile[];
   blocked?: Tile[];
+  /** Extra enemy lanes by object name ("path-2", "path-water"), as waypoints. */
+  lanes?: Record<string, Tile[]>;
+  /** Named stage points ("altar", "meadow", ...). */
+  points?: Record<string, Tile>;
+  /** Tiled properties on placeable spots, keyed "x,y" ("tide", "island"). */
+  spotProps?: Record<string, SpotProps>;
+}
+
+/** The main lane's name; `lanes` never holds it. */
+export const MAIN_LANE = 'path';
+
+/** The waypoints of a lane: the main path or one of the extra lanes. */
+export function laneWaypoints(map: MapDef, lane: string): Tile[] {
+  if (lane === MAIN_LANE) return map.path;
+  const points = map.lanes?.[lane];
+  if (!points) throw new Error(`map: no lane "${lane}"`);
+  return points;
+}
+
+/** Lane names a map offers: the main path first. */
+export function laneNames(map: MapDef): string[] {
+  return [MAIN_LANE, ...Object.keys(map.lanes ?? {})];
+}
+
+/** Properties of a placeable spot (empty when it has none). */
+export function spotProps(map: MapDef, x: number, y: number): SpotProps {
+  return map.spotProps?.[`${x},${y}`] ?? {};
 }
 
 export interface PathSegment {
@@ -90,12 +119,30 @@ export function validateMap(map: MapDef): LevelPath {
   const path = buildPath(map.path);
   const inBounds = ([x, y]: Tile) => x >= 0 && y >= 0 && x < map.width && y < map.height;
   for (const t of map.path) if (!inBounds(t)) throw new Error(`map: waypoint ${t} out of bounds`);
+  const laneTiles = new Set(path.tiles);
+  for (const [name, points] of Object.entries(map.lanes ?? {})) {
+    const lane = buildPath(points);
+    for (const t of points) if (!inBounds(t)) throw new Error(`map: lane ${name} waypoint ${t} out of bounds`);
+    for (const key of lane.tiles) laneTiles.add(key);
+  }
   for (const t of map.placeable) {
     if (!inBounds(t)) throw new Error(`map: placeable ${t} out of bounds`);
-    if (path.tiles.has(tileKey(t[0], t[1]))) throw new Error(`map: placeable ${t} is on the path`);
+    if (laneTiles.has(tileKey(t[0], t[1]))) throw new Error(`map: placeable ${t} is on the path`);
   }
   for (const t of map.blocked ?? []) {
     if (path.tiles.has(tileKey(t[0], t[1]))) throw new Error(`map: blocked ${t} is on the path`);
   }
   return path;
+}
+
+/** Every lane of a map as built paths, the main one under MAIN_LANE. */
+export function buildLanes(map: MapDef): Record<string, LevelPath> {
+  const out: Record<string, LevelPath> = { [MAIN_LANE]: buildPath(map.path) };
+  for (const [name, points] of Object.entries(map.lanes ?? {})) out[name] = buildPath(points);
+  return out;
+}
+
+/** The same lane walked the other way (gravity shifts). */
+export function reversedWaypoints(points: readonly Tile[]): Tile[] {
+  return [...points].reverse();
 }

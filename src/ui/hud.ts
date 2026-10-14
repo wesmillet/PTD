@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BALL_IDS, BALLS } from '../sim/catch';
-import type { LevelState } from '../sim/level';
+import { totalWaves, type LevelState } from '../sim/level';
+import type { RuleStatus } from '../sim/rules';
 import { getGame } from '../game/session';
 import { iconInfo, iconTextureKey, itemTextureKey, portraitTextureKey } from '../game/runtime';
 import config from '../data/config.json';
@@ -20,6 +21,8 @@ export interface HudCallbacks {
   /** Press on a party slot: the scene starts a drag and treats a release without movement as a tap. */
   onPartySlotDown: (partyIndex: number, pointer: Phaser.Input.Pointer) => void;
   onBall: (ballId: string) => void;
+  /** A rule's button was pressed (the generator). */
+  onRule?: (ruleId: string) => void;
 }
 
 interface Slot {
@@ -45,6 +48,10 @@ export interface BossStatus {
   name: string;
   hp: number;
   maxHp: number;
+  /** Legendary in its catch window: a Poké Ball icon shows on the bar. */
+  catchable?: boolean;
+  /** Phase thresholds as HP fractions (ticks on the bar). */
+  phases?: number[];
 }
 
 /**
@@ -63,10 +70,14 @@ export class Hud {
   private readonly lives: Phaser.GameObjects.Text;
   private readonly money: Phaser.GameObjects.Text;
   private readonly hint: Phaser.GameObjects.Text;
+  private readonly ruleText: Phaser.GameObjects.Text;
+  private ruleButton?: Button;
+  private ruleButtonId = '';
   private readonly startButton: Button;
   private readonly speedButton: Button;
   private readonly leaveButton: Button | undefined;
   private readonly bossGfx: Phaser.GameObjects.Graphics;
+  private bossBall?: Phaser.GameObjects.Image;
   private readonly bossBox?: Phaser.GameObjects.Image;
   private readonly bossName: Phaser.GameObjects.Text;
   private readonly bossLevel?: Phaser.GameObjects.Text;
@@ -94,6 +105,7 @@ export class Hud {
     this.lives = scene.add.text(20, 62, '', TEXT).setDepth(1001);
     this.money = scene.add.text(250, 42, '', { ...TEXT, color: '#c87818' }).setDepth(1001);
     this.hint = scene.add.text(width / 2, 70, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
+    this.ruleText = scene.add.text(width - 16, 56, '', { ...TEXT, color: '#3878e0' }).setOrigin(1, 0.5).setDepth(1001);
     // Boss bar: the battle GUI enemy HP box at 2x with the name font, Lv number and HP fill drawn over it.
     this.bossGfx = scene.add.graphics().setDepth(1003);
     const box = HPBOX['enemy'];
@@ -198,11 +210,30 @@ export class Hud {
     }
   }
 
+  /** The rules in play: a short status line and, when a rule offers an action, its button. */
+  setRules(statuses: RuleStatus[]): void {
+    const parts = statuses.map((s) => (s.value !== undefined && s.max !== undefined ? `${s.label} ${Math.ceil(s.value)}/${Math.ceil(s.max)}` : s.label));
+    this.ruleText.setText(parts.join('  ·  '));
+    const withButton = statuses.find((s) => s.button);
+    if (!withButton) {
+      this.ruleButton?.destroy();
+      this.ruleButton = undefined;
+      this.ruleButtonId = '';
+      return;
+    }
+    if (this.ruleButtonId !== withButton.id) {
+      this.ruleButton?.destroy();
+      this.ruleButtonId = withButton.id;
+      this.ruleButton = new Button(this.scene, this.scene.scale.width - 80, 78, withButton.button ?? withButton.label, () => this.callbacks.onRule?.(withButton.id), 130, 26).setDepth(1001);
+    }
+  }
+
   /** Boss HP box across the top bar; null hides it. */
   setBoss(boss: BossStatus & { level?: number } | null): void {
     this.bossGfx.clear();
     this.bossShown = boss !== null;
     this.bossBox?.setVisible(boss !== null);
+    if (!boss) this.bossBall?.setVisible(false);
     this.bossName.setVisible(boss !== null);
     this.bossLevel?.setVisible(boss !== null);
     this.bossHp.setVisible(boss !== null);
@@ -213,7 +244,22 @@ export class Hud {
     if (this.bossBox && box?.hpFill) {
       const f = box.hpFill;
       const s = BOSS_BOX_SCALE;
-      this.bossGfx.fillStyle(colour, 1).fillRect(this.bossBox.x + f.x * s, this.bossBox.y + f.y * s, Math.round(f.width * s * frac), f.height * s);
+      const bx = this.bossBox.x + f.x * s;
+      const by = this.bossBox.y + f.y * s;
+      const bw = f.width * s;
+      this.bossGfx.fillStyle(colour, 1).fillRect(bx, by, Math.round(bw * frac), f.height * s);
+      // Phase ticks: a pale notch at each threshold.
+      for (const at of boss.phases ?? []) {
+        if (at >= 1 || at <= 0) continue;
+        this.bossGfx.fillStyle(0xf8f8f8, 1).fillRect(Math.round(bx + bw * at) - 1, by - 1, 2, f.height * s + 2);
+      }
+      if (boss.catchable) {
+        const key = this.scene.textures.exists('item-poke-ball') ? 'item-poke-ball' : undefined;
+        if (!this.bossBall && key) this.bossBall = this.scene.add.image(bx + bw + 14, by + (f.height * s) / 2, key).setDepth(1004);
+        this.bossBall?.setVisible(true).setPosition(bx + bw + 14, by + (f.height * s) / 2);
+      } else {
+        this.bossBall?.setVisible(false);
+      }
     } else {
       const width = this.scene.scale.width;
       const w = Math.min(520, width - 300);
@@ -230,7 +276,7 @@ export class Hud {
   update(state: LevelState, gameSpeed: number, selectedPartyIndex: number | null = null, selectedBall: string | null = null): void {
     const def = state.def;
     if (def.objective === 'defend') {
-      this.wave.setText(`Wave ${state.wave} / ${def.waves}`);
+      this.wave.setText(`Wave ${state.wave} / ${totalWaves(state)}`);
       this.lives.setText(`Lives ${state.lives}`);
     } else {
       this.wave.setText(state.wave === 0 ? 'Free roam' : `Free roam, wave ${state.wave}`);

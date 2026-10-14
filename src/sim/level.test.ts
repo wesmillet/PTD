@@ -341,7 +341,7 @@ describe('move learning', () => {
       const needed = expForLevel(tower.mon.growth, before + 1) - tower.mon.exp;
       // Internal helper is private; drive through gainExp-equivalent path by awarding a KO of a strong enemy.
       // Path distance 12 is tile (10,5), one tile from the tower at (9,5).
-      state.enemies.push({ id: 9999 + tower.mon.level, mon: createMonster(95, 100), distance: 12, tilesPerSec: 0, lastHitBy: tower.id, damagedBy: new Set(), trainer: false });
+      state.enemies.push({ id: 9999 + tower.mon.level, mon: createMonster(95, 100), distance: 12, tilesPerSec: 0, lastHitBy: tower.id, damagedBy: new Set(), trainer: false, lane: 'path', reversed: false, vanish: 0, stun: 0, speedBoost: 0 });
       state.enemies[state.enemies.length - 1]!.mon.hp = 1;
       state.enemies[state.enemies.length - 1]!.mon.baseExp = Math.ceil((needed * 7) / 100);
       tower.mon.moves = tower.mon.moves.length ? tower.mon.moves : [];
@@ -502,7 +502,7 @@ describe('EXP split and evolution', () => {
     const state = createLevel(route201, route201Map, { seed: 1, party: [turtwig(17)] });
     const tower = placeTower(state, 0, 9, 5);
     tower.mon.exp = expForLevel('medium-slow', 18) - 1;
-    state.enemies.push({ id: 5000, mon: createMonster(399, 2), distance: 12, tilesPerSec: 0, lastHitBy: null, damagedBy: new Set(), trainer: false });
+    state.enemies.push({ id: 5000, mon: createMonster(399, 2), distance: 12, tilesPerSec: 0, lastHitBy: null, damagedBy: new Set(), trainer: false, lane: 'path', reversed: false, vanish: 0, stun: 0, speedBoost: 0 });
     state.phase = 'wave';
     tower.cooldown = 0;
     const events = run(state, 0.1);

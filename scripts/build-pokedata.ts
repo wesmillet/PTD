@@ -4,7 +4,9 @@
  *
  * Run with plain Node 22+: `node scripts/build-pokedata.ts [csvDir] [outDir]`.
  * No dependencies. Output is limited to Gen 1 through 4 and the Gen 4
- * ruleset (Platinum learnsets and encounters, Gen 4 type chart).
+ * ruleset (Platinum learnsets and encounters, Gen 4 type chart), plus the
+ * later species and forms the content needs (EXTRA_SPECIES and FORMS below,
+ * the ones scripts/sprite-list.txt ships sprites for).
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -17,6 +19,57 @@ const outDir = resolve(process.argv[3] ?? resolve(here, '../src/data'));
 const MAX_GENERATION = 4;
 const MAX_SPECIES = 493;
 const MAX_TYPE = 17; // normal .. dark; no fairy, stellar, unknown, shadow
+/** Later-generation moves the content names (bosses); added on top of the Gen 1 to 4 table. */
+const EXTRA_MOVES = new Set(['psystrike']);
+/**
+ * Species past Gen 4: Hisui's new evolutions (sprites shipped) and the base
+ * species the Hisuian forms belong to (data only, no sprites of their own).
+ */
+const EXTRA_SPECIES = ['899', '900', '901', '902', '903', '904', '503', '549', '570', '571', '628', '713', '724'];
+/**
+ * Forms with sprite folders: the PokeAPI pokemon identifier (its 10000+ id
+ * becomes the species id in the game) or, for forms PokeAPI has no entry
+ * for, a synthetic id with the base species' stats and a flag.
+ */
+const FORMS: Record<string, { pokemon?: string; synthetic?: { id: number; base: string; name: string; flag: 'shadow' | 'primal' }; formName: string }> = {
+  '0058-hisui': { pokemon: 'growlithe-hisui', formName: 'Hisui' },
+  '0059-hisui': { pokemon: 'arcanine-hisui', formName: 'Hisui' },
+  '0570-hisui': { pokemon: 'zorua-hisui', formName: 'Hisui' },
+  '0571-hisui': { pokemon: 'zoroark-hisui', formName: 'Hisui' },
+  '0215-hisui': { pokemon: 'sneasel-hisui', formName: 'Hisui' },
+  '0211-hisui': { pokemon: 'qwilfish-hisui', formName: 'Hisui' },
+  '0100-hisui': { pokemon: 'voltorb-hisui', formName: 'Hisui' },
+  '0101-hisui': { pokemon: 'electrode-hisui', formName: 'Hisui' },
+  '0549-hisui': { pokemon: 'lilligant-hisui', formName: 'Hisui' },
+  '0628-hisui': { pokemon: 'braviary-hisui', formName: 'Hisui' },
+  '0713-hisui': { pokemon: 'avalugg-hisui', formName: 'Hisui' },
+  '0157-hisui': { pokemon: 'typhlosion-hisui', formName: 'Hisui' },
+  '0503-hisui': { pokemon: 'samurott-hisui', formName: 'Hisui' },
+  '0724-hisui': { pokemon: 'decidueye-hisui', formName: 'Hisui' },
+  '0448-mega': { pokemon: 'lucario-mega', formName: 'Mega' },
+  '0359-mega': { pokemon: 'absol-mega', formName: 'Mega' },
+  '0229-mega': { pokemon: 'houndoom-mega', formName: 'Mega' },
+  '0065-mega': { pokemon: 'alakazam-mega', formName: 'Mega' },
+  '0208-mega': { pokemon: 'steelix-mega', formName: 'Mega' },
+  '0362-mega': { pokemon: 'glalie-mega', formName: 'Mega' },
+  '0142-mega': { pokemon: 'aerodactyl-mega', formName: 'Mega' },
+  '0475-mega': { pokemon: 'gallade-mega', formName: 'Mega' },
+  '0428-mega': { pokemon: 'lopunny-mega', formName: 'Mega' },
+  '0308-mega': { pokemon: 'medicham-mega', formName: 'Mega' },
+  '0334-mega': { pokemon: 'altaria-mega', formName: 'Mega' },
+  '0381-mega': { pokemon: 'latios-mega', formName: 'Mega' },
+  '0282-mega': { pokemon: 'gardevoir-mega', formName: 'Mega' },
+  '0094-mega': { pokemon: 'gengar-mega', formName: 'Mega' },
+  '0115-mega': { pokemon: 'kangaskhan-mega', formName: 'Mega' },
+  '0227-mega': { pokemon: 'skarmory-mega', formName: 'Mega' },
+  '0487-origin': { pokemon: 'giratina-origin', formName: 'Origin' },
+  '0483-origin': { pokemon: 'dialga-origin', formName: 'Origin' },
+  '0484-origin': { pokemon: 'palkia-origin', formName: 'Origin' },
+  '0492-sky': { pokemon: 'shaymin-sky', formName: 'Sky' },
+  '0150-shadow': { synthetic: { id: 20150, base: 'mewtwo', name: 'mewtwo-shadow', flag: 'shadow' }, formName: 'Shadow' },
+  '0249-shadow': { synthetic: { id: 20249, base: 'lugia', name: 'lugia-shadow', flag: 'shadow' }, formName: 'Shadow' },
+  '0483-primal': { synthetic: { id: 20483, base: 'dialga', name: 'dialga-primal', flag: 'primal' }, formName: 'Primal' },
+};
 const PLATINUM_VERSION = 14;
 const PLATINUM_VERSION_GROUP = 9;
 const LEVEL_UP_METHOD = 1;
@@ -100,16 +153,28 @@ function writeJson(name: string, value: Record<string, unknown> | unknown[]): vo
 
 // ---------------------------------------------------------------- species
 
-const speciesRows = readCsv('pokemon_species.csv').filter((r) => int(r.generation_id) <= MAX_GENERATION);
+const allSpeciesRows = readCsv('pokemon_species.csv');
+const speciesRows = allSpeciesRows.filter((r) => int(r.generation_id) <= MAX_GENERATION || EXTRA_SPECIES.includes(r.id));
 const speciesIds = new Set(speciesRows.map((r) => r.id));
-if (speciesIds.size !== MAX_SPECIES) throw new Error(`expected ${MAX_SPECIES} species, got ${speciesIds.size}`);
+if (speciesIds.size !== MAX_SPECIES + EXTRA_SPECIES.length) throw new Error(`expected ${MAX_SPECIES + EXTRA_SPECIES.length} species, got ${speciesIds.size}`);
+const speciesRowById = new Map(allSpeciesRows.map((r) => [r.id, r]));
 
 const growthNames = new Map(readCsv('growth_rates.csv').map((r) => [r.id, r.identifier]));
 const statKeys: Record<string, string> = { '1': 'hp', '2': 'atk', '3': 'def', '4': 'spa', '5': 'spd', '6': 'spe' };
 
 const baseStats = new Map<string, Record<string, number>>();
+const allPokemonRows = readCsv('pokemon.csv');
+const pokemonByName = new Map(allPokemonRows.map((r) => [r.identifier, r]));
+const formPokemonIds = new Set<string>();
+for (const f of Object.values(FORMS)) {
+  if (!f.pokemon) continue;
+  const row = pokemonByName.get(f.pokemon);
+  if (!row) throw new Error(`form ${f.pokemon} is not in pokemon.csv`);
+  formPokemonIds.add(row.id);
+}
+const wantedPokemon = (id: string): boolean => speciesIds.has(id) || formPokemonIds.has(id);
 for (const r of readCsv('pokemon_stats.csv')) {
-  if (!speciesIds.has(r.pokemon_id)) continue; // default forms share the species id
+  if (!wantedPokemon(r.pokemon_id)) continue; // default forms share the species id
   const key = statKeys[r.stat_id];
   if (!key) continue;
   const entry = baseStats.get(r.pokemon_id) ?? {};
@@ -118,12 +183,12 @@ for (const r of readCsv('pokemon_stats.csv')) {
 }
 const typesByPokemon = new Map<string, number[]>();
 for (const r of readCsv('pokemon_types.csv')) {
-  if (!speciesIds.has(r.pokemon_id)) continue;
+  if (!wantedPokemon(r.pokemon_id)) continue;
   const list = typesByPokemon.get(r.pokemon_id) ?? [];
   list[int(r.slot) - 1] = int(r.type_id);
   typesByPokemon.set(r.pokemon_id, list);
 }
-const pokemonRows = new Map(readCsv('pokemon.csv').filter((r) => speciesIds.has(r.id)).map((r) => [r.id, r]));
+const pokemonRows = new Map(allPokemonRows.filter((r) => wantedPokemon(r.id)).map((r) => [r.id, r]));
 
 const pokemon: Record<string, unknown> = {};
 for (const s of speciesRows) {
@@ -145,19 +210,105 @@ for (const s of speciesRows) {
     chain: int(s.evolution_chain_id),
   };
 }
+
+// Forms: PokeAPI's 10000+ ids (or synthetic ones) with the base species'
+// catch rate and growth, their own stats and types (types past the Gen 4
+// chart fall back to the base species'), and the sprite folder.
+const spriteFolders = JSON.parse(readFileSync(resolve(here, '../src/data/spriteFolders.json'), 'utf8')) as Record<string, { species?: number; form?: string }>;
+const formIds = new Map<string, string>(); // game id -> pokemon.csv id for learnsets
+for (const [folder, f] of Object.entries(FORMS)) {
+  if (!spriteFolders[folder]) throw new Error(`form folder ${folder} is not in spriteFolders.json`);
+  const [dex, form] = folder.split('-') as [string, string];
+  const baseId = String(int(dex));
+  const base = pokemon[baseId] as Record<string, unknown> | undefined;
+  const baseSpecies = speciesRowById.get(baseId);
+  if (!base || !baseSpecies) throw new Error(`form ${folder}: base species ${baseId} missing`);
+  let id: string;
+  let name: string;
+  let stats: Record<string, number>;
+  let types: number[];
+  let flag: Record<string, boolean> = {};
+  if (f.synthetic) {
+    id = String(f.synthetic.id);
+    name = f.synthetic.name;
+    stats = (base.base as Record<string, number>);
+    types = base.types as number[];
+    flag = { [f.synthetic.flag]: true };
+  } else {
+    const row = pokemonByName.get(f.pokemon as string) as Row;
+    id = row.id;
+    name = row.identifier;
+    const own = baseStats.get(row.id);
+    const ownTypes = typesByPokemon.get(row.id);
+    if (!own || !ownTypes) throw new Error(`form ${folder}: incomplete stats or types`);
+    for (const k of Object.values(statKeys)) if (own[k] === undefined) throw new Error(`form ${folder}: missing ${k}`);
+    stats = own;
+    types = ownTypes.some((t) => t > MAX_TYPE) ? (base.types as number[]) : ownTypes;
+    formIds.set(id, row.id);
+  }
+  pokemon[id] = {
+    name,
+    gen: int(baseSpecies.generation_id),
+    types,
+    base: { hp: stats.hp, atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe },
+    growth: base.growth,
+    catchRate: base.catchRate,
+    baseExp: f.synthetic ? base.baseExp : (optInt((pokemonRows.get(id) as Row).base_experience) ?? (base.baseExp as number)),
+    baseHappiness: base.baseHappiness,
+    evolvesFrom: 0,
+    chain: base.chain,
+    species: int(baseId),
+    form,
+    formName: f.formName,
+    folder,
+    ...flag,
+  };
+}
 writeJson('pokemon.json', pokemon);
 
 // --------------------------------------------------------------- learnsets
 
 const learnsets: Record<string, [number, number][]> = {};
+// Later species and forms: every level-up row by version group, resolved below.
+const laterMoves = new Map<string, Map<number, [number, number][]>>();
+const movesCsv = readCsv('moves.csv');
+const knownMoveIds = new Set(movesCsv.filter((r) => (int(r.generation_id) <= MAX_GENERATION && int(r.id) < 10000 && int(r.type_id) <= MAX_TYPE) || EXTRA_MOVES.has(r.identifier)).map((r) => r.id));
 for (const r of readCsv('pokemon_moves.csv')) {
-  if (r.version_group_id !== String(PLATINUM_VERSION_GROUP) || r.pokemon_move_method_id !== String(LEVEL_UP_METHOD)) continue;
-  if (!speciesIds.has(r.pokemon_id)) continue;
-  (learnsets[r.pokemon_id] ??= []).push([int(r.level), int(r.move_id)]);
+  if (r.pokemon_move_method_id !== String(LEVEL_UP_METHOD)) continue;
+  if (r.version_group_id === String(PLATINUM_VERSION_GROUP) && speciesIds.has(r.pokemon_id)) {
+    (learnsets[r.pokemon_id] ??= []).push([int(r.level), int(r.move_id)]);
+  }
+  if (EXTRA_SPECIES.includes(r.pokemon_id) || formPokemonIds.has(r.pokemon_id)) {
+    const byGroup = laterMoves.get(r.pokemon_id) ?? laterMoves.set(r.pokemon_id, new Map()).get(r.pokemon_id)!;
+    const vg = int(r.version_group_id);
+    (byGroup.get(vg) ?? byGroup.set(vg, []).get(vg)!).push([int(r.level), int(r.move_id)]);
+  }
 }
-for (const id of speciesIds) {
+/** The newest version group's level-up moves that exist in the Gen 4 table, or none. */
+function newestKnownLearnset(pokemonId: string): [number, number][] {
+  const byGroup = laterMoves.get(pokemonId);
+  if (!byGroup) return [];
+  for (const vg of [...byGroup.keys()].sort((a, b) => b - a)) {
+    const list = (byGroup.get(vg) ?? []).filter(([, move]) => knownMoveIds.has(String(move)));
+    if (list.some(([, move]) => { const m = movesCsv.find((r) => r.id === String(move)); return m && optInt(m.power) !== null; })) return list;
+  }
+  return [];
+}
+for (const id of EXTRA_SPECIES) {
+  const list = newestKnownLearnset(id);
+  if (list.length === 0) throw new Error(`species ${id} has no usable level-up moves`);
+  learnsets[id] = list;
+}
+for (const [gameId, entry] of Object.entries(pokemon)) {
+  const e = entry as { species?: number };
+  if (e.species === undefined || learnsets[gameId]) continue; // base species, or done above
+  const csvId = formIds.get(gameId);
+  const own = csvId ? newestKnownLearnset(csvId) : [];
+  learnsets[gameId] = own.length > 0 ? own : [...(learnsets[String(e.species)] ?? [])];
+}
+for (const id of Object.keys(pokemon)) {
   const list = learnsets[id];
-  if (!list || list.length === 0) throw new Error(`species ${id} has no Platinum level-up moves`);
+  if (!list || list.length === 0) throw new Error(`species ${id} has no level-up moves`);
   list.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
 }
 writeJson('learnsets.json', Object.fromEntries(Object.entries(learnsets).sort((a, b) => int(a[0]) - int(b[0]))));
@@ -177,8 +328,8 @@ for (const r of readCsv('move_meta_stat_changes.csv')) {
   (statChanges.get(r.move_id) ?? statChanges.set(r.move_id, []).get(r.move_id)!).push({ stat, change: int(r.change) });
 }
 const moves: Record<string, unknown> = {};
-for (const r of readCsv('moves.csv')) {
-  if (int(r.generation_id) > MAX_GENERATION || int(r.id) >= 10000 || int(r.type_id) > MAX_TYPE) continue;
+for (const r of movesCsv) {
+  if (!knownMoveIds.has(r.id)) continue;
   const m = meta.get(r.id);
   const minHits = m ? optInt(m.min_hits) : null;
   const maxHits = m ? optInt(m.max_hits) : null;
@@ -256,6 +407,7 @@ writeJson('exp_curves.json', expCurves);
 const triggerNames = new Map(readCsv('evolution_triggers.csv').map((r) => [r.id, r.identifier]));
 const itemNames = new Map(readCsv('items.csv').map((r) => [r.id, r.identifier]));
 const speciesById = new Map(speciesRows.map((r) => [r.id, r]));
+// Hisui's evolutions (Stantler -> Wyrdeer and the rest) need PLA mechanics; leave the chains as Gen 4 has them.
 const evolutions: Record<string, unknown[]> = {};
 for (const r of readCsv('pokemon_evolution.csv')) {
   const to = speciesById.get(r.evolved_species_id);

@@ -35,6 +35,12 @@ export interface MapModel {
   terrain: string[];
   path: Tile[];
   placeable: Tile[];
+  /** Extra enemy lanes: other polylines in the path layer ("path-2", "path-water"). */
+  lanes: { name: string; points: Tile[] }[];
+  /** Named points in the path layer other than spawn and exit (stage points, the altar). */
+  points: { name: string; type: string; tile: Tile }[];
+  /** Tiled properties on placeable spots, keyed "x,y". */
+  spotProps: Record<string, TiledProperty[]>;
 }
 
 // ----------------------------------------------------------------- Tiled types
@@ -84,6 +90,7 @@ export interface TiledObject {
   visible: boolean;
   point?: boolean;
   polyline?: { x: number; y: number }[];
+  properties?: TiledProperty[];
 }
 
 export interface TiledObjectLayer {
@@ -134,6 +141,9 @@ export function createModel(name: string, width: number, height: number, tileset
     terrain: new Array<string>(cells).fill(''),
     path: [],
     placeable: [],
+    lanes: [],
+    points: [],
+    spotProps: {},
   };
 }
 
@@ -145,6 +155,9 @@ export function cloneModel(model: MapModel): MapModel {
     terrain: [...model.terrain],
     path: model.path.map((t) => [t[0], t[1]] as Tile),
     placeable: model.placeable.map((t) => [t[0], t[1]] as Tile),
+    lanes: model.lanes.map((l) => ({ name: l.name, points: l.points.map((t) => [t[0], t[1]] as Tile) })),
+    points: model.points.map((p) => ({ ...p, tile: [p.tile[0], p.tile[1]] as Tile })),
+    spotProps: Object.fromEntries(Object.entries(model.spotProps).map(([k, v]) => [k, v.map((q) => ({ ...q }))])),
   };
 }
 
@@ -166,6 +179,9 @@ export function resizeModel(model: MapModel, width: number, height: number): Map
   }
   out.path = model.path.filter(([x, y]) => x < width && y < height).map((t) => [t[0], t[1]] as Tile);
   out.placeable = model.placeable.filter(([x, y]) => x < width && y < height).map((t) => [t[0], t[1]] as Tile);
+  out.lanes = model.lanes.map((l) => ({ name: l.name, points: l.points.filter(([x, y]) => x < width && y < height).map((t) => [t[0], t[1]] as Tile) })).filter((l) => l.points.length >= 2);
+  out.points = model.points.filter((p) => p.tile[0] < width && p.tile[1] < height).map((p) => ({ ...p, tile: [p.tile[0], p.tile[1]] as Tile }));
+  out.spotProps = Object.fromEntries(Object.entries(model.spotProps).filter(([k]) => out.placeable.some(([x, y]) => `${x},${y}` === k)));
   return out;
 }
 
@@ -192,6 +208,11 @@ export function toMapDef(model: MapModel): MapDef {
     path: model.path.map((t) => [t[0], t[1]] as Tile),
     placeable: model.placeable.map((t) => [t[0], t[1]] as Tile),
     blocked: blockedTiles(model),
+    ...(model.lanes.length ? { lanes: Object.fromEntries(model.lanes.map((l) => [l.name, l.points.map((t) => [t[0], t[1]] as Tile)])) } : {}),
+    ...(model.points.length ? { points: Object.fromEntries(model.points.map((p) => [p.name, [p.tile[0], p.tile[1]] as Tile])) } : {}),
+    ...(Object.keys(model.spotProps).length
+      ? { spotProps: Object.fromEntries(Object.entries(model.spotProps).map(([k, props]) => [k, Object.fromEntries(props.map((q) => [q.name, q.value]))])) }
+      : {}),
   };
 }
 
@@ -277,17 +298,40 @@ export function toTiled(model: MapModel): TiledMap {
     const [ex, ey] = model.path[model.path.length - 1]!;
     pathObjects.push({ id: objectId++, name: 'exit', type: 'exit', x: centre(ex), y: centre(ey), width: 0, height: 0, rotation: 0, visible: true, point: true });
   }
-  const placeableObjects: TiledObject[] = model.placeable.map(([x, y]) => ({
-    id: objectId++,
-    name: 'placeable',
-    type: 'placeable',
-    x: px(x),
-    y: px(y),
-    width: TILE_SIZE,
-    height: TILE_SIZE,
-    rotation: 0,
-    visible: true,
-  }));
+  for (const lane of model.lanes) {
+    if (lane.points.length < 2) continue;
+    const [sx, sy] = lane.points[0]!;
+    pathObjects.push({
+      id: objectId++,
+      name: lane.name,
+      type: 'path',
+      x: centre(sx),
+      y: centre(sy),
+      width: 0,
+      height: 0,
+      rotation: 0,
+      visible: true,
+      polyline: lane.points.map(([x, y]) => ({ x: centre(x) - centre(sx), y: centre(y) - centre(sy) })),
+    });
+  }
+  for (const p of model.points) {
+    pathObjects.push({ id: objectId++, name: p.name, type: p.type, x: centre(p.tile[0]), y: centre(p.tile[1]), width: 0, height: 0, rotation: 0, visible: true, point: true });
+  }
+  const placeableObjects: TiledObject[] = model.placeable.map(([x, y]) => {
+    const props = model.spotProps[`${x},${y}`];
+    return {
+      id: objectId++,
+      name: 'placeable',
+      type: 'placeable',
+      x: px(x),
+      y: px(y),
+      width: TILE_SIZE,
+      height: TILE_SIZE,
+      rotation: 0,
+      visible: true,
+      ...(props && props.length ? { properties: props.map((q) => ({ ...q })) } : {}),
+    };
+  });
   const objectLayer = (id: number, name: string, objects: TiledObject[]): TiledObjectLayer => ({ id, name, type: 'objectgroup', x: 0, y: 0, opacity: 1, visible: true, draworder: 'topdown', objects });
   return {
     type: 'map',
@@ -408,7 +452,8 @@ export function fromTiled(json: unknown, fallbackName = 'map'): MapModel {
 
   const toTile = (x: number, y: number): Tile => [Math.floor(x / TILE_SIZE), Math.floor(y / TILE_SIZE)];
   const pathLayer = objectLayerOf(map, 'path');
-  const polyline = pathLayer?.objects.find((o) => Array.isArray(o.polyline));
+  const polylines = pathLayer?.objects.filter((o) => Array.isArray(o.polyline)) ?? [];
+  const polyline = polylines.find((o) => o.name === 'path' || o.name === '') ?? polylines[0];
   if (polyline?.polyline) {
     model.path = polyline.polyline.map((p) => toTile(polyline.x + p.x, polyline.y + p.y));
   } else if (pathLayer) {
@@ -417,14 +462,23 @@ export function fromTiled(json: unknown, fallbackName = 'map'): MapModel {
     if (spawn) model.path.push(toTile(spawn.x, spawn.y));
     if (exit) model.path.push(toTile(exit.x, exit.y));
   }
+  for (const o of polylines) {
+    if (o === polyline || !o.polyline) continue;
+    model.lanes.push({ name: o.name || `path-${model.lanes.length + 2}`, points: o.polyline.map((p) => toTile(o.x + p.x, o.y + p.y)) });
+  }
+  for (const o of pathLayer?.objects ?? []) {
+    if (!o.point || o.name === 'spawn' || o.name === 'exit') continue;
+    model.points.push({ name: o.name, type: o.type || 'stage', tile: toTile(o.x, o.y) });
+  }
   const placeableLayer = objectLayerOf(map, 'placeable');
   if (placeableLayer) {
     for (const o of placeableLayer.objects) {
       const t = toTile(o.x + (o.width ? o.width / 2 : 0), o.y + (o.height ? o.height / 2 : 0));
       if (!model.placeable.some(([x, y]) => x === t[0] && y === t[1])) model.placeable.push(t);
+      if (o.properties && o.properties.length) model.spotProps[`${t[0]},${t[1]}`] = o.properties.map((q) => ({ ...q }));
     }
   }
-  for (const [x, y] of [...model.path, ...model.placeable]) {
+  for (const [x, y] of [...model.path, ...model.placeable, ...model.lanes.flatMap((l) => l.points), ...model.points.map((p) => p.tile)]) {
     if (!inBounds(model, x, y)) throw new Error(`map: object at (${x},${y}) is outside the map`);
   }
   return model;

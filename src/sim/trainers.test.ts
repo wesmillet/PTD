@@ -7,6 +7,7 @@ import { getMap } from '../data/maps';
 import { findMoveId } from '../data/pokedata';
 import { activeBoss, createLevel, defaultRuntimeConfig, placeTower, startWave, step, summarize, throwBall, type LevelEvent, type LevelState } from './level';
 import { createMonster } from './monster';
+import { waveCount } from './waves';
 
 const mine = getLevel('oreburgh-mine-1f');
 const mineMap = getMap('oreburgh-mine-1f');
@@ -44,7 +45,7 @@ function run(state: LevelState, seconds: number, dt = 1 / 60): LevelEvent[] {
 
 /** Plays every wave up to the trainer wave with a strong tower; returns the trainer wave's start events. */
 function reachTrainerWave(state: LevelState): LevelEvent[] {
-  while (state.phase === 'build' && state.wave < (state.def.waves ?? 99)) {
+  while (state.phase === 'build' && state.wave < (waveCount(state.def) || 99)) {
     const next = state.wave;
     const started = startWave(state);
     if (state.pending.some((s) => s.trainer)) return started;

@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (f) => JSON.parse(readFileSync(resolve(root, 'src/data', f), 'utf8'));
-const levels = read('levels.json');
+const levels = read('levels/00-opening.json');
 const encounters = read('encounters.json');
 const pokemon = read('pokemon.json');
 const evolutions = read('evolutions.json');

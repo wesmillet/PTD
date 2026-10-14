@@ -10,7 +10,7 @@ import { createImage, encodePng, fillRect } from './png.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = (rel) => resolve(root, 'public', rel);
 const pc = JSON.parse(readFileSync(resolve(root, 'src/data/pc.json'), 'utf8'));
-const levels = JSON.parse(readFileSync(resolve(root, 'src/data/levels.json'), 'utf8'));
+const levels = JSON.parse(readFileSync(resolve(root, 'src/data/levels/00-opening.json'), 'utf8'));
 
 function save(rel, image) {
   mkdirSync(dirname(out(rel)), { recursive: true });

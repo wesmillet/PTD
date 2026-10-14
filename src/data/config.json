@@ -103,6 +103,41 @@
       "price": 0,
       "obtainable": false,
       "sprite": "master-ball"
+    },
+    "premier": {
+      "name": "Premier Ball",
+      "modifier": 1,
+      "price": 0,
+      "obtainable": false,
+      "sprite": "premier-ball"
+    },
+    "feather": {
+      "name": "Feather Ball",
+      "modifier": 1,
+      "price": 0,
+      "obtainable": false,
+      "sprite": "lafeather-ball"
+    },
+    "wing": {
+      "name": "Wing Ball",
+      "modifier": 1.5,
+      "price": 0,
+      "obtainable": false,
+      "sprite": "lawing-ball"
+    },
+    "jet": {
+      "name": "Jet Ball",
+      "modifier": 2,
+      "price": 0,
+      "obtainable": false,
+      "sprite": "lajet-ball"
+    },
+    "heavy": {
+      "name": "Heavy Ball",
+      "modifier": 1.5,
+      "price": 0,
+      "obtainable": false,
+      "sprite": "heavy-ball"
     }
   },
   "catch": {

@@ -9,7 +9,9 @@ import { getLevel, levelIds } from '../data/levels';
 import { findMoveId, findPokemonId, getPokemon } from '../data/pokedata';
 import { TRAINER_ART, trainerArtId } from '../data/trainers';
 import { allBadges } from './game';
-import { counterStarter, featuredSpecies, levelPopup, POPUP_KINDS, rareSpecies, RARE_SHARE, rosterTable, trainerWave, trainerWaveIndex } from './waves';
+import { dexFolder } from '../game/runtime';
+import { hasRule } from './rules';
+import { counterStarter, featuredSpecies, isScripted, levelPopup, levelTrainers, partySpecies, POPUP_KINDS, rareSpecies, RARE_SHARE, rosterTable, scriptedSpeciesNames, scriptedWildTable, trainerWave, trainerWaveIndex, waveCount, type LevelDef } from './waves';
 
 const folders = spriteFolders as Record<string, unknown>;
 // Shipped art, listed by Vite so the tests need no fs access.
@@ -23,12 +25,32 @@ const shipped = new Set(
   ].map((p) => p.replace(/^.*\/public\//, 'public/')),
 );
 const existsSync = (path: string) => shipped.has(path);
-const hasSprites = (species: number) => folders[String(species).padStart(4, '0')] !== undefined;
+const hasSprites = (species: number) => folders[dexFolder(species)] !== undefined;
+/** The opening routes keep the original content rules: wild levels up to 15 and each species featured once. */
+const OPENING = ['route-201', 'lake-verity', 'route-202', 'route-203', 'oreburgh-gate', 'oreburgh-mine-1f'];
+const wildCap = (id: string, def: LevelDef) => def.maxWildLevel ?? (OPENING.includes(id) ? 15 : 100);
 
 describe('level rosters', () => {
-  it('every level has a roster that resolves to real species within sensible level ranges', () => {
+  it('every level has a roster or a wave script that resolves to real species within its level range', () => {
     for (const id of levelIds()) {
       const def = getLevel(id);
+      const cap = wildCap(id, def);
+      if (isScripted(def)) {
+        expect(def.waves, `${id} needs waves`).not.toHaveLength(0);
+        for (const wave of def.waves as Exclude<LevelDef['waves'], number | undefined>) {
+          for (const entry of scriptedWildTable(def, wave)) {
+            expect(entry.min).toBeGreaterThanOrEqual(1);
+            expect(entry.max).toBeGreaterThanOrEqual(entry.min);
+            expect(entry.max, `${id}: ${getPokemon(entry.species).name} levels`).toBeLessThanOrEqual(cap);
+          }
+        }
+        for (const name of scriptedSpeciesNames(def)) {
+          const species = partySpecies(name, 387, id);
+          expect(hasSprites(species), `${id}: no sprites fetched for ${name}`).toBe(true);
+        }
+        for (const rule of def.rules ?? []) expect(hasRule(rule.id), `${id}: unknown rule ${rule.id}`).toBe(true);
+        continue;
+      }
       expect(def.roster, `${id} needs a roster`).toBeDefined();
       const table = rosterTable(def);
       expect(table.length).toBeGreaterThan(0);
@@ -36,15 +58,15 @@ describe('level rosters', () => {
         expect(getPokemon(entry.species).name).toBeTruthy();
         expect(entry.min).toBeGreaterThanOrEqual(1);
         expect(entry.max).toBeGreaterThanOrEqual(entry.min);
-        expect(entry.max, `${id}: ${getPokemon(entry.species).name} levels`).toBeLessThanOrEqual(15);
+        expect(entry.max, `${id}: ${getPokemon(entry.species).name} levels`).toBeLessThanOrEqual(cap);
         expect(hasSprites(entry.species), `${id}: no sprites fetched for ${getPokemon(entry.species).name}`).toBe(true);
       }
     }
   });
 
-  it('features each species in only one level across the story', () => {
+  it('features each species in only one opening route', () => {
     const featuredIn = new Map<string, string[]>();
-    for (const id of levelIds()) {
+    for (const id of OPENING) {
       const def = getLevel(id);
       for (const species of featuredSpecies(def)) featuredIn.set(species, [...(featuredIn.get(species) ?? []), id]);
     }
@@ -54,7 +76,7 @@ describe('level rosters', () => {
   });
 
   it('keeps rare entries at or below the rare share and uses the given rosters', () => {
-    for (const id of levelIds()) {
+    for (const id of OPENING) {
       const def = getLevel(id);
       const total = def.roster!.reduce((s, e) => s + e.rarity, 0);
       for (const name of rareSpecies(def)) {
@@ -116,15 +138,21 @@ describe('level presentation', () => {
 
   it('has Platinum art for every trainer the levels name', () => {
     for (const id of levelIds()) {
-      const trainer = getLevel(id).trainer;
-      if (!trainer) continue;
-      const art = TRAINER_ART[trainer.id];
-      expect(art, `${id}: ${trainer.id} is not in trainers/index.json`).toBeDefined();
-      const file = trainerArtId(trainer.id);
-      expect(existsSync(`public/assets/trainers/${file}.png`), file).toBe(true);
-      if (art!.poses >= 2) expect(existsSync(`public/assets/trainers/${file}-pose.png`), file).toBe(true);
-      if (art!.mugshot) expect(existsSync(`public/assets/trainers/mugshots/${file}.png`), file).toBe(true);
-      if (art!.banner) expect(existsSync(`public/assets/trainers/banners/${file}.png`), file).toBe(true);
+      for (const trainer of levelTrainers(getLevel(id))) {
+        const art = TRAINER_ART[trainer.id];
+        expect(art, `${id}: ${trainer.id} is not in trainers/index.json`).toBeDefined();
+        const file = trainerArtId(trainer.id);
+        expect(existsSync(`public/assets/trainers/${file}.png`), file).toBe(true);
+        if (art!.poses >= 2) expect(existsSync(`public/assets/trainers/${file}-pose.png`), file).toBe(true);
+        if (art!.mugshot) expect(existsSync(`public/assets/trainers/mugshots/${file}.png`), file).toBe(true);
+        if (art!.banner) expect(existsSync(`public/assets/trainers/banners/${file}.png`), file).toBe(true);
+        for (const p of trainer.party) {
+          const species = partySpecies(p.species, 387, id);
+          expect(hasSprites(species), `${id}: ${trainer.id}: no sprites for ${p.species}`).toBe(true);
+          for (const m of p.moves ?? []) expect(findMoveId(m.move), `${id}: ${trainer.id}: unknown move ${m.move}`).toBeDefined();
+          for (const ph of p.phases ?? []) for (const m of ph.moves ?? []) expect(findMoveId(m.move), `${id}: unknown move ${m.move}`).toBeDefined();
+        }
+      }
     }
   });
 });
@@ -135,7 +163,7 @@ describe('trainers', () => {
   it('resolves every trainer party, with sprites, on the right wave', () => {
     for (const id of levelIds()) {
       const def = getLevel(id);
-      if (!def.trainer) continue;
+      if (!def.trainer || isScripted(def)) continue;
       for (const starter of [387, 390, 393]) {
         const spawns = trainerWave(def, starter, moveId);
         expect(spawns).toHaveLength(def.trainer.party.length);
@@ -146,7 +174,7 @@ describe('trainers', () => {
       }
       const index = trainerWaveIndex(def);
       expect(index).toBeGreaterThanOrEqual(1);
-      if (def.objective === 'defend') expect(index).toBe(def.waves! - 1);
+      if (def.objective === 'defend') expect(index).toBe(waveCount(def) - 1);
     }
     expect(trainerWaveIndex(getLevel('route-201'))).toBe(-1);
   });

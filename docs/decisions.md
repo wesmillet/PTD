@@ -166,3 +166,31 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   move row (Pokémon panel, PC summary, learn dialog) and in the party
   page and starter choice; `typeBadge` stays for the type filter dropdown.
 
+
+## Phase 8 item 1 (data foundation)
+
+- Forms keep PokeAPI's numeric ids (10229 is Hisuian Growlithe) so every
+  species lookup stays a number; Shadow Mewtwo, Shadow Lugia and Primal
+  Dialga, which PokeAPI has no entry for, get synthetic ids 20150, 20249 and
+  20483 with the base species' stats and a flag. Monster names use the
+  display spelling ("hisuian-growlithe", "mega-lucario", "shadow-mewtwo"),
+  and `findPokemonId` accepts both spellings.
+- The seven Hisuian base species past Gen 4 (Zorua, Lilligant, ...) are in
+  the data for their catch rates and growth only; they have no sprites and
+  no level uses them.
+- Fairy typing (Mega Altaria, Mega Gardevoir) falls back to the base
+  species' types because the chart is Gen 4's; Psystrike is the one later
+  move added to the table (Shadow Mewtwo). Later-generation level-up moves
+  that do not exist in Gen 4 are filtered out of form learnsets.
+- `waves` is either a number (as before) or the scripted list, so the six
+  opening levels did not change. `badge` may live under `reward`; the
+  loader mirrors it.
+- Allies are towers with an `ally` field: they never gain EXP, do not count
+  toward the placement limit and leave at the end of their last wave.
+- The level cap is PTD's: a placed Pokémon stops gaining EXP at the cap in
+  that level (it can still be placed).
+- Lane reversal keeps a second built path per lane; live enemies turn round
+  where they stand (distance mirrored) so gravity can shift mid-wave.
+- The six opening routes keep the 15-level cap and the one-featured-level
+  rule; every other level declares its own range through `levels` /
+  `maxWildLevel`.

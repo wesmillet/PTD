@@ -5,6 +5,7 @@
 import badgesJson from '../data/badges.json';
 import config from '../data/config.json';
 import { getLevel, levelIds } from '../data/levels';
+import type { LevelDef } from './waves';
 import type { Monster } from './monster';
 import { createBoxes, depositToBox, type Box } from './pc';
 
@@ -41,6 +42,8 @@ export interface GameState {
   pokedex: Record<string, DexEntry>;
   /** Badge ids in the order they were won. */
   badges: string[];
+  /** Story flags, key items, TMs and HMs ("surf", "tm-grass-knot", "oaks-letter", "noble-kleavor"). */
+  flags: string[];
 }
 
 export const MAX_PARTY = config.party.maxParty;
@@ -54,7 +57,26 @@ export function createGameState(): GameState {
     money: config.money.starting,
     pokedex: {},
     badges: [],
+    flags: [],
   };
+}
+
+export function hasFlag(game: GameState, flag: string): boolean {
+  return game.flags.includes(flag);
+}
+
+export function setFlag(game: GameState, flag: string): void {
+  if (!game.flags.includes(flag)) game.flags.push(flag);
+}
+
+/** Adds items by id: ball ids, "potion", "rare-candy"; anything else becomes a flag (key items, TMs). */
+export function giveItems(game: GameState, items: Record<string, number>): void {
+  for (const [id, n] of Object.entries(items)) {
+    if (id in config.balls) game.items.balls[id] = (game.items.balls[id] ?? 0) + n;
+    else if (id === 'potion') game.items.potions += n;
+    else if (id === 'rare-candy') game.items.rareCandies += n;
+    else setFlag(game, id);
+  }
 }
 
 export function dexEntry(game: GameState, species: number): DexEntry {
@@ -130,9 +152,23 @@ export function recordLevelResult(game: GameState, levelId: string, outcome: 'wo
     cleared = true;
   }
   game.progress[levelId] = progress;
-  game.money += levelMoney(kos, cleared);
-  if (outcome === 'won' && def.badge && !game.badges.includes(def.badge.id)) game.badges.push(def.badge.id);
+  if (!def.noMoney) game.money += levelMoney(kos, cleared);
+  const badge = def.badge ?? def.reward?.badge;
+  if (outcome === 'won' && badge && !game.badges.includes(badge.id)) game.badges.push(badge.id);
+  if (outcome === 'won' && def.reward && !prev.won) {
+    const r = def.reward;
+    if (r.money) game.money += r.money;
+    if (r.items) giveItems(game, r.items);
+    if (r.tm) setFlag(game, `tm-${r.tm}`);
+    for (const f of r.flags ?? []) setFlag(game, f);
+  }
   return cleared;
+}
+
+/** Placement limit for a level: demo saves get the level's, others grow one per badge from two. */
+export function placementLimit(game: GameState, def: Pick<LevelDef, 'placements'>): number {
+  if (DEMO_MODE) return def.placements;
+  return Math.max(1, Math.min(def.placements, 2 + game.badges.length));
 }
 
 export function hasBadge(game: GameState, badgeId: string): boolean {
@@ -170,10 +206,20 @@ export const DEMO_MODE: boolean = (config as { demoMode?: boolean }).demoMode ??
 
 export function isLevelUnlocked(game: GameState, levelId: string): boolean {
   if (DEMO_MODE) return true;
+  return unlockBlockers(game, levelId).length === 0;
+}
+
+/** What still keeps a level locked, in words (empty when open). */
+export function unlockBlockers(game: GameState, levelId: string): string[] {
   const def = getLevel(levelId);
+  const out: string[] = [];
   const requires = (def as { requires?: string | null }).requires;
-  if (!requires) return true;
-  return isLevelCompleted(game, requires);
+  if (requires && !isLevelCompleted(game, requires)) out.push(`clear ${getLevel(requires).name}`);
+  const u = def.unlock;
+  for (const id of u?.levels ?? []) if (!isLevelCompleted(game, id)) out.push(`clear ${getLevel(id).name}`);
+  for (const b of u?.badges ?? []) if (!hasBadge(game, b)) out.push(`the ${b} badge`);
+  for (const f of [...(u?.items ?? []), ...(u?.flags ?? [])]) if (!hasFlag(game, f)) out.push(f.replace(/-/g, ' '));
+  return out;
 }
 
 /** Level ids in unlock order (as listed in levels.json). */

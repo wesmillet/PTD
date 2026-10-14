@@ -2,6 +2,13 @@
  * The level state machine. Pure and deterministic: same level definition,
  * seed, party and sequence of calls produce the same result. The Phaser
  * scene renders this state and animates the events `step` returns.
+ *
+ * Waves come from the level's roster (or area table), from the single
+ * trainer of the old format, or from a scripted wave list (`def.waves` as an
+ * array) with wild lists, trainers, allies and dialogue per wave. Named
+ * rules (src/sim/rules) hook into waves, ticks, spawns, hits, targeting and
+ * placement. Maps can carry extra lanes; enemies remember theirs and lanes
+ * can be reversed (gravity shifts).
  */
 import { expForLevel, findMoveId, getEncounterArea, getPokemon, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
 import { attemptCatch, ballModifier, BALLS } from './catch';
@@ -9,10 +16,35 @@ import { evolutionOptions, evolveMonster } from './evolution';
 import config from '../data/config.json';
 import { hits, rollDamage, type DamageResult } from './damage';
 import { gainExp, hitExp, koExp } from './exp';
-import { isPlaceable, pointAlongPath, validateMap, type LevelPath, type MapDef, type Tile } from './map';
+import { buildLanes, buildPath, isPlaceable, laneWaypoints, MAIN_LANE, pointAlongPath, reversedWaypoints, validateMap, type LevelPath, type MapDef, type Tile } from './map';
 import { activeMoveId, createMonster, makeMoveSlot, setMonsterLevel, type Monster } from './monster';
 import { learnableAt, resolveMove, type MoveSpec } from './moves';
 import { Rng } from './rng';
+import {
+  activateRule,
+  createRules,
+  rulesCanPlace,
+  rulesCanTarget,
+  rulesCanThrow,
+  rulesDamageMultiplier,
+  rulesEnemySpeed,
+  rulesLost,
+  rulesOnCaught,
+  rulesOnCreate,
+  rulesOnHit,
+  rulesOnKo,
+  rulesOnSpawn,
+  rulesOnTick,
+  rulesOnTowerPlaced,
+  rulesOnWaveEnd,
+  rulesOnWaveStart,
+  rulesPickLane,
+  rulesRange,
+  rulesBanner,
+  ruleStatuses,
+  type RuleInstance,
+  type RuleStatus,
+} from './rules';
 import { attackCooldown, enemyTilesPerSec, type SpeedConfig } from './speed';
 import {
   applyAilment,
@@ -31,7 +63,24 @@ import {
   type StatusConfig,
 } from './status';
 import { selectTarget, type TargetCandidate } from './targeting';
-import { generateWave, levelTable, trainerWave, trainerWaveIndex, type BadgeDef, type LevelDef, type SpawnDef, type TrainerDef } from './waves';
+import {
+  generateWave,
+  isScripted,
+  levelTable,
+  partySpecies,
+  scriptedSpawns,
+  scriptedWave,
+  trainerWave,
+  trainerWaveIndex,
+  waveCount,
+  waveTrainers,
+  type AllyDef,
+  type BadgeDef,
+  type DialogueLine,
+  type LevelDef,
+  type SpawnDef,
+  type TrainerDef,
+} from './waves';
 
 export type Phase = 'build' | 'wave' | 'won' | 'lost' | 'left';
 
@@ -72,6 +121,8 @@ export interface Tower {
   tile: Tile;
   /** Seconds until the next attack may fire. */
   cooldown: number;
+  /** A free allied tower (a partner's Pokémon): no EXP, not in the party, leaves after its last wave. */
+  ally?: { name: string; until: number; key: string };
 }
 
 export interface BossMoveTimer {
@@ -81,10 +132,18 @@ export interface BossMoveTimer {
   timer: number;
 }
 
+export interface BossPhase {
+  at: number;
+  moves: { moveId: number; every: number }[];
+  vanish?: number;
+  burnNearest?: number;
+  reverseEvery?: number;
+}
+
 export interface Enemy {
   id: number;
   mon: Monster;
-  /** Tiles travelled along the path. Spawns one tile before the start. */
+  /** Tiles travelled along the lane. Spawns one tile before the start. */
   distance: number;
   tilesPerSec: number;
   /** Tower that last damaged this enemy; receives EXP for status KOs. */
@@ -93,8 +152,40 @@ export interface Enemy {
   damagedBy: Set<number>;
   /** Trainer-owned enemies cannot be caught. */
   trainer: boolean;
+  trainerId?: string;
   /** Boss: boosted HP, bigger sprite, moves on timers. */
-  boss?: { moves: BossMoveTimer[] };
+  boss?: { moves: BossMoveTimer[]; phases: BossPhase[]; phase: number; reverseTimer: number };
+  /** Lane name (MAIN_LANE for the path) and whether it is being walked backwards. */
+  lane: string;
+  reversed: boolean;
+  /** Iron Defense: shield HP that only breaking hits remove. */
+  shield?: number;
+  shadow?: boolean;
+  alpha?: boolean;
+  dynamax?: boolean;
+  /** Legendary bosses: can be caught under this HP fraction. */
+  catchableUnder?: number;
+  /** Type ids it takes no damage from (it speeds up for 3 s when hit by one). */
+  immune?: number[];
+  /** Seconds left vanished (untargetable) after Shadow Force. */
+  vanish: number;
+  /** Seconds left stunned (Magnetic Flux). */
+  stun: number;
+  /** Seconds left of a speed boost (Motor Drive). */
+  speedBoost: number;
+  /** Seconds on the path before it flees; undefined never flees. */
+  fleeAfter?: number;
+  /** Only balls affect it; it flees at the end of the path instead of leaking. */
+  catchOnly?: boolean;
+}
+
+export interface Escort {
+  name: string;
+  species: number;
+  distance: number;
+  hp: number;
+  maxHp: number;
+  tilesPerSec: number;
 }
 
 export interface PendingEvolution {
@@ -147,7 +238,19 @@ export type LevelEventType =
   | 'towerHit'
   | 'bossRetry'
   | 'waveEnd'
-  | 'phase';
+  | 'phase'
+  /** A rule did something visible (`rule`, `text`, maybe a tile or enemy). */
+  | 'rule'
+  /** The wave banner text (trainer, lane, rule in play). */
+  | 'banner'
+  /** Dialogue lines to show (the sim pauses while the scene shows them). */
+  | 'cutscene'
+  | 'allyPlaced'
+  | 'allyLeft'
+  | 'flee'
+  | 'bossPhase'
+  | 'lanesReversed'
+  | 'drop';
 
 export interface LevelEvent {
   type: LevelEventType;
@@ -170,12 +273,25 @@ export interface LevelEvent {
   species?: number;
   trainer?: TrainerDef;
   boss?: boolean;
+  rule?: string;
+  text?: string;
+  tile?: Tile;
+  lines?: DialogueLine[];
+  /** Boss phase index (bossPhase). */
+  index?: number;
+  /** Item id dropped (drop). */
+  item?: string;
 }
 
 export interface LevelState {
   def: LevelDef;
   map: MapDef;
   path: LevelPath;
+  /** Every lane as a built path, MAIN_LANE first, plus each walked backwards. */
+  lanes: Record<string, LevelPath>;
+  lanesReversed: Record<string, LevelPath>;
+  /** Lanes currently walked backwards (gravity shifts). */
+  laneReversed: Record<string, boolean>;
   table: EncounterEntry[];
   time: TimeOfDay;
   seed: number;
@@ -207,11 +323,21 @@ export interface LevelState {
   /** Pokémon caught in this level, in order, with the ball used. */
   caught: CaughtEntry[];
   maxParty: number;
+  /** How many of the player's Pokémon may be placed (allies do not count). */
+  placements: number;
   kos: number;
   leaks: number;
   wavesCleared: number;
   /** Set once the trainer wave has been cleared. */
   trainerBeaten: boolean;
+  /** Names of trainers beaten this run, in order. */
+  trainersBeaten: string[];
+  rules: RuleInstance[];
+  escort?: Escort;
+  /** Save flags the rules may read (key items, HMs). */
+  flags: Set<string>;
+  /** Ball ids the level allows (Legends rules); undefined allows every ball. */
+  ballsOnly?: string[];
   nextId: number;
 }
 
@@ -224,10 +350,19 @@ export interface CreateLevelOptions {
   items?: { balls: Record<string, number> };
   maxParty?: number;
   starter?: number;
+  /** Placement limit (badge perks); defaults to the level's. */
+  placements?: number;
+  flags?: Iterable<string>;
 }
 
 /** Moves that confuse their user after use (Gen 4). */
 const SELF_CONFUSING = new Set(['thrash', 'outrage', 'petal-dance']);
+const FIRE = 10;
+const FIGHTING = 2;
+const GROUND = 5;
+const SHADOW_DAMAGE = 1.3;
+const DYNAMAX_HP = 3;
+const MOTOR_DRIVE_SECONDS = 3;
 
 function moveIdByName(name: string): number {
   const id = findMoveId(name);
@@ -239,11 +374,18 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
   const path = validateMap(map);
   const time = options.time ?? def.time;
   const cfg = options.config ?? defaultRuntimeConfig();
+  const lanes = buildLanes(map);
+  const lanesReversed: Record<string, LevelPath> = {};
+  for (const name of Object.keys(lanes)) lanesReversed[name] = buildPath(reversedWaypoints(laneWaypoints(map, name)));
+  for (const name of def.lanes ?? []) if (!lanes[name]) throw new Error(`createLevel: ${def.name} names lane "${name}" the map does not have`);
   const state: LevelState = {
     def,
     map,
     path,
-    table: levelTable(def, time),
+    lanes,
+    lanesReversed,
+    laneReversed: Object.fromEntries(Object.keys(lanes).map((n) => [n, false])),
+    table: isScripted(def) ? [] : levelTable(def, time),
     time,
     seed: options.seed,
     rng: new Rng(options.seed),
@@ -266,15 +408,24 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
     items: options.items ?? { balls: { ...config.startingItems.balls } },
     caught: [],
     maxParty: options.maxParty ?? config.party.maxParty,
+    placements: options.placements ?? def.placements,
     kos: 0,
     leaks: 0,
     wavesCleared: 0,
     trainerBeaten: false,
+    trainersBeaten: [],
+    rules: createRules(def.rules),
+    flags: new Set(options.flags ?? []),
+    ...(def.ballsOnly ? { ballsOnly: [...def.ballsOnly] } : {}),
     nextId: 1,
   };
-  if (state.table.length === 0) throw new Error(`createLevel: no spawn table for ${def.name} at ${time}`);
-  if (def.objective === 'defend' && (!def.waves || !def.lives)) throw new Error('createLevel: defend levels need waves and lives');
+  if (!isScripted(def) && state.table.length === 0) throw new Error(`createLevel: no spawn table for ${def.name} at ${time}`);
+  if (def.objective === 'defend' && (waveCount(def) === 0 || !def.lives)) throw new Error('createLevel: defend levels need waves and lives');
   if (def.trainer) trainerWave(def, state.starter, moveIdByName); // validate names early
+  if (isScripted(def)) {
+    for (let i = 0; i < waveCount(def); i++) scriptedSpawns(def, i, state.starter, moveIdByName, new Rng(0), { freeWaveMaxEnemies: 1 }, () => undefined); // validate names early
+  }
+  rulesOnCreate(state, []);
   return state;
 }
 
@@ -297,6 +448,7 @@ export function setPartyLevel(state: LevelState, partyIndex: number, level: numb
 /** Changes the time of day; the next wave uses the matching table (rosters ignore time). */
 export function setTimeOfDay(state: LevelState, time: TimeOfDay): void {
   state.time = time;
+  if (isScripted(state.def)) return;
   getEncounterArea(state.def.area);
   state.table = levelTable(state.def, time);
 }
@@ -325,6 +477,24 @@ export function towerInterval(state: LevelState, tower: Tower): number {
   return rate > 0 ? base / rate : Infinity;
 }
 
+/** A tower's reach in tiles with its active move, after the rules in play. */
+export function towerRange(state: LevelState, tower: Tower): number {
+  const move = towerMove(tower);
+  return rulesRange(state, tower, move?.range ?? state.config.combat.defaultRangeTiles);
+}
+
+/** The player's placed Pokémon (allies excluded). */
+export function playerTowers(state: LevelState): Tower[] {
+  return state.towers.filter((t) => !t.ally);
+}
+
+/** A reason the party member cannot be placed on the tile, or null. */
+export function placementBlock(state: LevelState, mon: Monster, x: number, y: number): string | null {
+  if (!isPlaceable(state.map, x, y)) return 'not a placeable spot';
+  if (towerAt(state, x, y)) return 'occupied';
+  return rulesCanPlace(state, mon, [x, y]);
+}
+
 /** Places a party member on a placeable tile. Allowed in any phase before the level ends. */
 export function placeTower(state: LevelState, partyIndex: number, x: number, y: number): Tower {
   if (isOver(state)) throw new Error('placeTower: level is over');
@@ -333,10 +503,13 @@ export function placeTower(state: LevelState, partyIndex: number, x: number, y: 
   if (!isPlaceable(state.map, x, y)) throw new Error(`placeTower: (${x},${y}) is not placeable`);
   if (towerAt(state, x, y)) throw new Error(`placeTower: (${x},${y}) is occupied`);
   if (state.towers.some((t) => t.mon === entry.mon)) throw new Error('placeTower: already placed');
-  if (state.towers.length >= state.def.placements) throw new Error('placeTower: placement limit reached');
+  if (playerTowers(state).length >= state.placements) throw new Error('placeTower: placement limit reached');
+  const reason = rulesCanPlace(state, entry.mon, [x, y]);
+  if (reason) throw new Error(`placeTower: ${reason}`);
   const tower: Tower = { id: state.nextId++, mon: entry.mon, tile: [x, y], cooldown: 0 };
   tower.cooldown = towerInterval(state, tower);
   state.towers.push(tower);
+  rulesOnTowerPlaced(state, tower, []);
   return tower;
 }
 
@@ -347,14 +520,24 @@ export function placeTower(state: LevelState, partyIndex: number, x: number, y: 
 export function moveTower(state: LevelState, towerId: number, x: number, y: number): void {
   if (isOver(state)) throw new Error('moveTower: level is over');
   const tower = towerById(state, towerId);
+  if (tower.ally) throw new Error('moveTower: allies stay where they are');
   if (!isPlaceable(state.map, x, y)) throw new Error(`moveTower: (${x},${y}) is not placeable`);
   if (towerAt(state, x, y)) throw new Error(`moveTower: (${x},${y}) is occupied`);
+  const reason = rulesCanPlace(state, tower.mon, [x, y]);
+  if (reason) throw new Error(`moveTower: ${reason}`);
   tower.tile = [x, y];
   tower.cooldown = towerInterval(state, tower);
 }
 
 export function removeTower(state: LevelState, towerId: number): void {
   if (state.phase !== 'build') throw new Error('removeTower: only during build phase');
+  const tower = towerById(state, towerId);
+  if (tower.ally) throw new Error('removeTower: allies cannot be returned');
+  state.towers = state.towers.filter((t) => t.id !== towerId);
+}
+
+/** Returns a player's tower to the party at any time (rules do this: the tide floods a spot). */
+export function unplaceTower(state: LevelState, towerId: number): void {
   state.towers = state.towers.filter((t) => t.id !== towerId);
 }
 
@@ -364,14 +547,132 @@ export function setActiveMove(state: LevelState, towerId: number, index: number)
   tower.mon.activeMove = index;
 }
 
+// ------------------------------------------------------------------- allies
+
+/** Nearest free placeable spot to a tile. */
+function nearestFreeSpot(state: LevelState, to: Tile): Tile | undefined {
+  let best: Tile | undefined;
+  let bestD = Infinity;
+  for (const spot of state.map.placeable) {
+    if (towerAt(state, spot[0], spot[1])) continue;
+    const d = Math.hypot(spot[0] - to[0], spot[1] - to[1]);
+    if (d < bestD) {
+      bestD = d;
+      best = spot;
+    }
+  }
+  return best;
+}
+
+function resolveAllySpot(state: LevelState, spot: AllyDef['spot']): Tile | undefined {
+  if (Array.isArray(spot)) return towerAt(state, spot[0], spot[1]) ? nearestFreeSpot(state, spot) : spot;
+  const path = state.map.path;
+  if (spot === 'nearest-exit') return nearestFreeSpot(state, path[path.length - 1]!);
+  if (spot === 'nearest-spawn') return nearestFreeSpot(state, path[0]!);
+  const pointName = spot.startsWith('nearest-') ? spot.slice('nearest-'.length) : spot;
+  const point = state.map.points?.[pointName];
+  if (point) return nearestFreeSpot(state, point);
+  return nearestFreeSpot(state, path[path.length - 1]!);
+}
+
+/**
+ * Places a free allied tower (not from the party) for the given 1-based
+ * wave range. `key` keeps the same ally from being placed twice.
+ */
+export function placeAlly(state: LevelState, ally: AllyDef, key: string, until: number, events: LevelEvent[]): Tower | undefined {
+  if (state.towers.some((t) => t.ally?.key === key)) return undefined;
+  const tile = resolveAllySpot(state, ally.spot);
+  if (!tile) return undefined;
+  const species = partySpecies(ally.species, state.starter, `ally ${key}`);
+  const moves = ally.moves?.map(moveIdByName);
+  const mon = createMonster(species, ally.level, moves);
+  const tower: Tower = { id: state.nextId++, mon, tile, cooldown: 0, ally: { name: ally.name ?? mon.name, until, key } };
+  tower.cooldown = towerInterval(state, tower);
+  state.towers.push(tower);
+  events.push({ type: 'allyPlaced', towerId: tower.id, species, text: ally.name ?? mon.name, tile });
+  return tower;
+}
+
+function allyRange(ally: AllyDef, fromWave: number): [number, number] {
+  return ally.waves ?? [fromWave, Number.MAX_SAFE_INTEGER];
+}
+
+/** Scripted and level-wide allies for the wave about to start (1-based). */
+function placeWaveAllies(state: LevelState, wave: number, events: LevelEvent[]): void {
+  const def = state.def;
+  const entries: { ally: AllyDef; key: string; from: number }[] = [];
+  (def.allies ?? []).forEach((ally, i) => entries.push({ ally, key: `level-${i}`, from: 1 }));
+  if (Array.isArray(def.waves)) {
+    def.waves.forEach((w, wi) => (w.allies ?? []).forEach((ally, i) => entries.push({ ally, key: `wave-${wi + 1}-${i}`, from: wi + 1 })));
+  }
+  for (const { ally, key, from } of entries) {
+    const [a, b] = allyRange(ally, from);
+    if (wave >= a && wave <= b) placeAlly(state, ally, key, b, events);
+  }
+}
+
+function dismissAllies(state: LevelState, waveDone: number, events: LevelEvent[]): void {
+  for (const tower of [...state.towers]) {
+    if (!tower.ally || tower.ally.until > waveDone) continue;
+    state.towers = state.towers.filter((t) => t !== tower);
+    events.push({ type: 'allyLeft', towerId: tower.id, text: tower.ally.name });
+  }
+}
+
+// -------------------------------------------------------------------- lanes
+
+/** The path an enemy walks (its lane, in its current direction). */
+export function enemyPath(state: LevelState, enemy: Enemy): LevelPath {
+  return (enemy.reversed ? state.lanesReversed : state.lanes)[enemy.lane] ?? state.path;
+}
+
+/** Flips every lane's direction; enemies on the path turn round where they are. */
+export function reverseLanes(state: LevelState, events: LevelEvent[]): void {
+  for (const name of Object.keys(state.laneReversed)) state.laneReversed[name] = !state.laneReversed[name];
+  for (const enemy of state.enemies) {
+    const len = enemyPath(state, enemy).length;
+    enemy.reversed = !enemy.reversed;
+    if (enemy.distance >= 0) enemy.distance = Math.max(0, len - enemy.distance);
+  }
+  if (state.escort) {
+    state.escort.distance = Math.max(0, state.path.length - state.escort.distance);
+  }
+  events.push({ type: 'lanesReversed', text: state.laneReversed[MAIN_LANE] ? 'Gravity shift! Enemies come from the far end.' : 'Gravity is back to normal.' });
+}
+
+/** Whether the main path is currently walked backwards. */
+export function lanesAreReversed(state: LevelState): boolean {
+  return state.laneReversed[MAIN_LANE] ?? false;
+}
+
+// -------------------------------------------------------------------- waves
+
 /** Whether wave `waveIndex` (0-based) is the trainer's. */
 export function isTrainerWave(state: LevelState, waveIndex: number): boolean {
+  if (isScripted(state.def)) return waveTrainers(scriptedWave(state.def, waveIndex)).length > 0;
   return state.def.trainer !== undefined && trainerWaveIndex(state.def) === waveIndex;
 }
 
 /** The trainer wave contains a boss. */
-export function trainerHasBoss(def: LevelDef): boolean {
+export function trainerHasBoss(def: LevelDef, waveIndex?: number): boolean {
+  if (Array.isArray(def.waves)) {
+    const wave = waveIndex === undefined ? undefined : def.waves[waveIndex];
+    return waveTrainers(wave).some((t) => t.party.some((p) => p.boss));
+  }
   return def.trainer?.party.some((p) => p.boss) ?? false;
+}
+
+/** Total waves of the level (defend levels; 0 for endless free levels). */
+export function totalWaves(state: LevelState): number {
+  return waveCount(state.def);
+}
+
+function pickLaneFor(state: LevelState, waveIndex: number, choice: string | undefined, spawnIndex: number): string | undefined {
+  const names = state.def.lanes ?? Object.keys(state.lanes);
+  if (choice === 'random') return state.rng.pick(names);
+  if (choice === 'both') return names[spawnIndex % names.length];
+  if (choice) return choice;
+  return rulesPickLane(state, waveIndex, spawnIndex);
 }
 
 /** Starts the next wave. Build phase only; needs at least one tower. */
@@ -379,20 +680,42 @@ export function startWave(state: LevelState): LevelEvent[] {
   if (state.phase !== 'build') throw new Error('startWave: only during build phase');
   if (state.towers.length === 0) throw new Error('startWave: place a Pokémon first');
   const waveIndex = state.wave;
-  const trainer = isTrainerWave(state, waveIndex);
-  const spawns = trainer
-    ? trainerWave(state.def, state.starter, moveIdByName)
-    : generateWave(state.table, state.def, waveIndex, state.rng, {
-        freeWaveMaxEnemies: state.config.waves.freeWaveMaxEnemies,
-        ...(state.config.enemyLevelOverride !== undefined ? { levelOverride: state.config.enemyLevelOverride } : {}),
-      });
+  const events: LevelEvent[] = [];
+  const opts = {
+    freeWaveMaxEnemies: state.config.waves.freeWaveMaxEnemies,
+    ...(state.config.enemyLevelOverride !== undefined ? { levelOverride: state.config.enemyLevelOverride } : {}),
+  };
+  let trainers: TrainerDef[] = [];
+  let spawns: SpawnDef[];
+  const script = scriptedWave(state.def, waveIndex);
+  if (script) {
+    trainers = waveTrainers(script);
+    spawns = scriptedSpawns(state.def, waveIndex, state.starter, moveIdByName, state.rng, opts, (choice, i) => pickLaneFor(state, waveIndex, choice, i));
+  } else if (isTrainerWave(state, waveIndex) && state.def.trainer) {
+    trainers = [state.def.trainer];
+    spawns = trainerWave(state.def, state.starter, moveIdByName);
+  } else {
+    spawns = generateWave(state.table, state.def, waveIndex, state.rng, opts);
+    spawns.forEach((s, i) => {
+      const lane = pickLaneFor(state, waveIndex, undefined, i);
+      if (lane) s.lane = lane;
+    });
+  }
   state.pending = spawns;
   state.wave = waveIndex + 1;
   state.waveTime = 0;
   state.waveStartLives = state.lives;
   state.phase = 'wave';
-  const events: LevelEvent[] = [{ type: 'waveStart', wave: state.wave, ...(trainer ? { trainer: state.def.trainer } : {}) }];
-  if (trainer && state.def.trainer) events.push({ type: 'trainerStart', wave: state.wave, trainer: state.def.trainer, boss: trainerHasBoss(state.def) });
+  const first = trainers[0];
+  events.push({ type: 'waveStart', wave: state.wave, ...(first ? { trainer: first } : {}) });
+  for (const trainer of trainers) {
+    events.push({ type: 'trainerStart', wave: state.wave, trainer, boss: trainer.party.some((p) => p.boss) });
+  }
+  if (script?.lines?.length) events.push({ type: 'cutscene', wave: state.wave, lines: script.lines });
+  placeWaveAllies(state, state.wave, events);
+  rulesOnWaveStart(state, waveIndex, events);
+  const banner = [...(script?.banner ? [script.banner] : []), ...rulesBanner(state, waveIndex)];
+  if (banner.length) events.push({ type: 'banner', wave: state.wave, text: banner.join(' · ') });
   events.push({ type: 'phase', phase: 'wave' });
   return events;
 }
@@ -407,10 +730,27 @@ export function leaveLevel(state: LevelState): LevelEvent[] {
   return [{ type: 'phase', phase: 'left' }];
 }
 
+/** Runs a rule's player action (the generator button, a riddle answer). */
+export function useRule(state: LevelState, ruleId: string, action?: string): LevelEvent[] {
+  if (isOver(state)) return [];
+  return activateRule(state, ruleId, action);
+}
+
+/** What the HUD shows for the rules in play. */
+export function ruleStatus(state: LevelState): RuleStatus[] {
+  return ruleStatuses(state);
+}
+
 // ------------------------------------------------------------------ catching
 
 export function enemyById(state: LevelState, enemyId: number): Enemy | undefined {
   return state.enemies.find((e) => e.id === enemyId);
+}
+
+/** A trainer's legendary that has dropped into its catch window. */
+export function isCatchable(enemy: Enemy): boolean {
+  if (!enemy.trainer) return true;
+  return enemy.catchableUnder !== undefined && enemy.mon.hp / enemy.mon.stats.hp < enemy.catchableUnder;
 }
 
 /**
@@ -421,25 +761,28 @@ export function enemyById(state: LevelState, enemyId: number): Enemy | undefined
 export function canThrow(state: LevelState, ballId: string, enemyId: number): string | null {
   if (state.phase !== 'wave') return 'no wave running';
   if (!BALLS[ballId]) return `unknown ball ${ballId}`;
+  if (state.ballsOnly && !state.ballsOnly.includes(ballId)) return `only ${state.ballsOnly.map((b) => BALLS[b]?.name ?? b).join(', ')} work here`;
   if ((state.items.balls[ballId] ?? 0) <= 0) return `no ${BALLS[ballId]?.name ?? ballId} left`;
   const enemy = enemyById(state, enemyId);
   if (!enemy) return 'no such enemy';
   if (enemy.distance < 0) return 'not on the path yet';
-  return null;
+  if (enemy.vanish > 0) return 'it vanished';
+  return rulesCanThrow(state, enemy);
 }
 
 export const TRAINER_BLOCK_MESSAGE = "You can't catch a trainer's Pokémon!";
 
 /**
  * Throws a ball. At a trainer's Pokémon the ball bounces off (`ballBlocked`,
- * nothing consumed). Otherwise one ball is used; on a catch the enemy leaves
- * the wave and joins the party or the catch list.
+ * nothing consumed), unless it is a legendary in its catch window.
+ * Otherwise one ball is used; on a catch the enemy leaves the wave and
+ * joins the party or the catch list.
  */
 export function throwBall(state: LevelState, ballId: string, enemyId: number): LevelEvent[] {
   const reason = canThrow(state, ballId, enemyId);
   if (reason) throw new Error(`throwBall: ${reason}`);
   const enemy = enemyById(state, enemyId) as Enemy;
-  if (enemy.trainer) return [{ type: 'ballBlocked', enemyId, ball: ballId }];
+  if (!isCatchable(enemy)) return [{ type: 'ballBlocked', enemyId, ball: ballId }];
   state.items.balls[ballId] = (state.items.balls[ballId] ?? 0) - 1;
   const mod = ballModifier(ballId, {
     types: enemy.mon.types,
@@ -450,13 +793,25 @@ export function throwBall(state: LevelState, ballId: string, enemyId: number): L
   const events: LevelEvent[] = [{ type: 'ballThrow', enemyId, ball: ballId, shakes: result.shakes, caught: result.caught }];
   if (!result.caught) return events;
   removeEnemy(state, enemy);
+  if (enemy.shadow) enemy.mon.shadow = { purified: 0 };
+  if (enemy.alpha) enemy.mon.alpha = true;
   state.caught.push({ mon: enemy.mon, ball: ballId });
   if (state.party.length < state.maxParty) {
     state.party.push({ index: state.party.length, mon: enemy.mon, expGained: 0, levelFrom: enemy.mon.level });
   }
   events.push({ type: 'caught', enemyId, species: enemy.mon.species, shiny: enemy.mon.shiny, ball: ballId });
+  if (enemy.alpha) dropBall(state, events);
+  rulesOnCaught(state, enemy, events);
   if (state.pending.length === 0 && state.enemies.length === 0) endWave(state, events);
   return events;
+}
+
+/** Alphas drop one of the level's Hisuian balls (the first allowed ball when the level restricts them). */
+function dropBall(state: LevelState, events: LevelEvent[]): void {
+  const pool = state.ballsOnly ?? ['poke'];
+  const ball = state.rng.pick(pool);
+  state.items.balls[ball] = (state.items.balls[ball] ?? 0) + 1;
+  events.push({ type: 'drop', item: ball, text: `${BALLS[ball]?.name ?? ball} dropped!` });
 }
 
 // ----------------------------------------------------------------- evolution
@@ -514,28 +869,40 @@ function learnAtLevel(state: LevelState, tower: Tower, level: number, events: Le
 
 function grantExp(state: LevelState, tower: Tower, amount: number, events: LevelEvent[]): void {
   const entry = state.party.find((p) => p.mon === tower.mon);
-  if (!entry) return;
+  if (!entry || tower.ally) return;
+  if (tower.mon.shadow && !tower.mon.shadow.purifiedAt) return; // Shadow Pokémon gain nothing until purified
+  const cap = state.def.levelCap;
+  if (cap !== undefined && tower.mon.level >= cap) return;
   const result = gainExp({ growth: tower.mon.growth, level: tower.mon.level, exp: tower.mon.exp }, amount);
   tower.mon.exp = result.exp;
   entry.expGained += amount;
   for (const level of result.levelsGained) {
+    if (cap !== undefined && level > cap) break;
     setMonsterLevel(tower.mon, level);
     events.push({ type: 'levelUp', towerId: tower.id, level });
     learnAtLevel(state, tower, level, events);
   }
+  if (cap !== undefined && tower.mon.level >= cap) tower.mon.exp = Math.min(tower.mon.exp, expForLevel(tower.mon.growth, cap + 1) - 1);
   if (result.levelsGained.length > 0) queueEvolution(state, tower, events);
 }
 
 // ------------------------------------------------------------------ combat
 
-function enemyPoint(state: LevelState, enemy: Enemy) {
-  return pointAlongPath(state.path, enemy.distance);
+/** Position of an enemy on its lane, in tile space. */
+export function enemyPoint(state: LevelState, enemy: Enemy) {
+  return pointAlongPath(enemyPath(state, enemy), enemy.distance);
+}
+
+/** Whether a tower can see and attack this enemy right now. */
+export function targetable(state: LevelState, tower: Tower, enemy: Enemy): boolean {
+  if (enemy.distance < 0 || enemy.vanish > 0 || enemy.catchOnly) return false;
+  return rulesCanTarget(state, tower, enemy);
 }
 
 function candidates(state: LevelState, tower: Tower): (TargetCandidate & { enemy: Enemy })[] {
   const list: (TargetCandidate & { enemy: Enemy })[] = [];
   for (const enemy of state.enemies) {
-    if (enemy.distance < 0) continue; // not on screen yet
+    if (!targetable(state, tower, enemy)) continue;
     const p = enemyPoint(state, enemy);
     list.push({
       id: enemy.id,
@@ -552,7 +919,7 @@ function candidates(state: LevelState, tower: Tower): (TargetCandidate & { enemy
 export function pickTarget(state: LevelState, tower: Tower): Enemy | undefined {
   const move = towerMove(tower);
   if (!move) return undefined;
-  return selectTarget(move.targeting, candidates(state, tower), move.range)?.enemy;
+  return selectTarget(move.targeting, candidates(state, tower), rulesRange(state, tower, move.range))?.enemy;
 }
 
 function removeEnemy(state: LevelState, enemy: Enemy): void {
@@ -566,9 +933,11 @@ function koEnemy(state: LevelState, enemy: Enemy, creditTowerId: number | null, 
   removeEnemy(state, enemy);
   const ids = new Set(enemy.damagedBy);
   if (creditTowerId !== null) ids.add(creditTowerId);
-  const participants = state.towers.filter((t) => ids.has(t.id));
+  const participants = state.towers.filter((t) => ids.has(t.id) && !t.ally);
   const credit = creditTowerId !== null ? state.towers.find((t) => t.id === creditTowerId) : undefined;
   events.push({ type: 'ko', enemyId: enemy.id, exp, ...(credit ? { towerId: credit.id } : {}), ...(enemy.boss ? { boss: true } : {}) });
+  if (enemy.alpha) dropBall(state, events);
+  rulesOnKo(state, enemy, events);
   if (participants.length === 0) return;
   const share = Math.max(1, Math.floor(exp / participants.length));
   for (const tower of participants) grantExp(state, tower, share, events);
@@ -656,16 +1025,58 @@ function attack(state: LevelState, tower: Tower, move: MoveSpec, enemy: Enemy | 
     state.rng,
     state.config.combat.critRate,
   );
-  enemy.mon.hp = Math.max(0, enemy.mon.hp - damage.damage);
+  let dealt = Math.round(damage.damage * rulesDamageMultiplier(state, tower, move));
+  if (enemy.immune?.includes(move.type)) {
+    dealt = 0;
+    enemy.speedBoost = MOTOR_DRIVE_SECONDS;
+  }
+  dealt = rulesOnHit(state, tower, enemy, move, dealt, events);
+  enemy.mon.hp = Math.max(0, enemy.mon.hp - dealt);
   enemy.lastHitBy = tower.id;
   enemy.damagedBy.add(tower.id);
-  events.push({ type: 'hit', towerId: tower.id, enemyId: enemy.id, damage });
+  events.push({ type: 'hit', towerId: tower.id, enemyId: enemy.id, damage: { ...damage, damage: dealt } });
   if (enemy.mon.hp <= 0) {
-    applyEffects(state, tower, move, undefined, damage.damage, events);
+    applyEffects(state, tower, move, undefined, dealt, events);
     koEnemy(state, enemy, tower.id, events);
   } else {
-    applyEffects(state, tower, move, enemy, damage.damage, events);
+    applyEffects(state, tower, move, enemy, dealt, events);
     grantExp(state, tower, hitExp(enemy.mon.baseExp, enemy.mon.level, state.config.exp.expPerHitFraction), events);
+  }
+}
+
+/** Damage a boss move does to one tower (never below 1 HP left). */
+function hurtTower(state: LevelState, enemy: Enemy, tower: Tower, move: MoveSpec, events: LevelEvent[]): void {
+  if (move.category !== 'status' && move.power !== null) {
+    const damage = rollDamage(
+      {
+        level: enemy.mon.level,
+        power: move.power,
+        moveType: move.type,
+        category: move.category,
+        attackerTypes: enemy.mon.types,
+        attackerStats: enemy.mon.stats,
+        defenderTypes: tower.mon.types,
+        defenderStats: tower.mon.stats,
+        attackStage: enemy.mon.status.stages[move.category === 'physical' ? 'atk' : 'spa'],
+        defenseStage: tower.mon.status.stages[move.category === 'physical' ? 'def' : 'spd'],
+        attackerBurned: enemy.mon.status.ailment === 'burn',
+        burnMultiplier: physicalDamageMultiplier({ ...enemy.mon.status, ailment: 'burn' }, state.config.status),
+      },
+      state.rng,
+      state.config.combat.critRate,
+    );
+    const raw = enemy.shadow ? Math.round(damage.damage * SHADOW_DAMAGE) : damage.damage;
+    const dealt = Math.min(raw, tower.mon.hp - 1); // towers cannot faint yet
+    tower.mon.hp = Math.max(1, tower.mon.hp - raw);
+    events.push({ type: 'towerHit', towerId: tower.id, enemyId: enemy.id, damage: { ...damage, damage: Math.max(0, dealt) } });
+  }
+  const e = move.effect;
+  if (isAilment(e.ailment) && (e.kind === 'ailment' || state.rng.chance(e.ailmentChance / 100))) {
+    if (applyAilment(tower.mon.status, e.ailment, state.rng, state.config.status)) events.push({ type: 'status', towerId: tower.id, ailment: e.ailment });
+  }
+  if (e.flinchChance > 0 && state.rng.chance(e.flinchChance / 100)) {
+    applyFlinch(tower.mon.status, state.config.status);
+    events.push({ type: 'status', towerId: tower.id, ailment: 'none', block: 'flinch' });
   }
 }
 
@@ -683,44 +1094,40 @@ function bossAttack(state: LevelState, enemy: Enemy, moveId: number, events: Lev
       events.push({ type: 'miss', enemyId: enemy.id, towerId: tower.id });
       continue;
     }
-    let dealt = 0;
-    if (move.category !== 'status' && move.power !== null) {
-      const damage = rollDamage(
-        {
-          level: enemy.mon.level,
-          power: move.power,
-          moveType: move.type,
-          category: move.category,
-          attackerTypes: enemy.mon.types,
-          attackerStats: enemy.mon.stats,
-          defenderTypes: tower.mon.types,
-          defenderStats: tower.mon.stats,
-          attackStage: enemy.mon.status.stages[move.category === 'physical' ? 'atk' : 'spa'],
-          defenseStage: tower.mon.status.stages[move.category === 'physical' ? 'def' : 'spd'],
-          attackerBurned: enemy.mon.status.ailment === 'burn',
-          burnMultiplier: physicalDamageMultiplier({ ...enemy.mon.status, ailment: 'burn' }, state.config.status),
-        },
-        state.rng,
-        state.config.combat.critRate,
-      );
-      dealt = Math.min(damage.damage, tower.mon.hp - 1); // towers cannot faint yet
-      tower.mon.hp = Math.max(1, tower.mon.hp - damage.damage);
-      events.push({ type: 'towerHit', towerId: tower.id, enemyId: enemy.id, damage: { ...damage, damage: Math.max(0, dealt) } });
-    }
-    const e = move.effect;
-    if (isAilment(e.ailment) && (e.kind === 'ailment' || state.rng.chance(e.ailmentChance / 100))) {
-      if (applyAilment(tower.mon.status, e.ailment, state.rng, state.config.status)) events.push({ type: 'status', towerId: tower.id, ailment: e.ailment });
-    }
-    if (e.flinchChance > 0 && state.rng.chance(e.flinchChance / 100)) {
-      applyFlinch(tower.mon.status, state.config.status);
-      events.push({ type: 'status', towerId: tower.id, ailment: 'none', block: 'flinch' });
-    }
+    hurtTower(state, enemy, tower, move, events);
   }
 }
 
+/** Towers sorted by distance to an enemy. */
+function nearestTowers(state: LevelState, enemy: Enemy, count: number): Tower[] {
+  const p = enemyPoint(state, enemy);
+  return [...state.towers].sort((a, b) => Math.hypot(p.x - a.tile[0], p.y - a.tile[1]) - Math.hypot(p.x - b.tile[0], p.y - b.tile[1])).slice(0, count);
+}
+
+/** Enters a boss phase: new timed moves, Shadow Force, Will-O-Wisp, gravity timer. */
+function enterPhase(state: LevelState, enemy: Enemy, index: number, events: LevelEvent[]): void {
+  const boss = enemy.boss;
+  const phase = boss?.phases[index];
+  if (!boss || !phase) return;
+  boss.phase = index;
+  for (const m of phase.moves) boss.moves.push({ moveId: m.moveId, every: m.every, timer: m.every });
+  events.push({ type: 'bossPhase', enemyId: enemy.id, index, text: `${enemy.mon.name} enters phase ${index + 1}` });
+  if (phase.vanish) {
+    enemy.vanish = phase.vanish;
+    events.push({ type: 'rule', rule: 'boss', enemyId: enemy.id, text: `${enemy.mon.name} vanished!` });
+  }
+  if (phase.burnNearest) {
+    for (const tower of nearestTowers(state, enemy, phase.burnNearest)) {
+      if (applyAilment(tower.mon.status, 'burn', state.rng, state.config.status)) events.push({ type: 'status', towerId: tower.id, ailment: 'burn' });
+    }
+  }
+  boss.reverseTimer = phase.reverseEvery ?? 0;
+}
+
 function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
-  const shiny = def.trainer ? false : state.rng.chance(state.config.shinyRate);
+  const shiny = def.shiny ?? (def.trainer ? false : state.rng.chance(state.config.shinyRate));
   const mon = createMonster(def.species, def.level, undefined, { shiny });
+  const lane = def.lane && state.lanes[def.lane] ? def.lane : MAIN_LANE;
   const enemy: Enemy = {
     id: state.nextId++,
     mon,
@@ -729,22 +1136,57 @@ function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
     lastHitBy: null,
     damagedBy: new Set(),
     trainer: def.trainer ?? false,
+    ...(def.trainerId ? { trainerId: def.trainerId } : {}),
+    lane,
+    reversed: state.laneReversed[lane] ?? false,
+    vanish: 0,
+    stun: 0,
+    speedBoost: 0,
   };
+  let hpMult = 1;
   if (def.boss) {
-    mon.stats = { ...mon.stats, hp: Math.max(1, Math.round(mon.stats.hp * state.config.bosses.hpMultiplier)) };
-    mon.hp = mon.stats.hp;
-    enemy.boss = { moves: (def.bossMoves ?? []).map((m) => ({ moveId: m.moveId, every: m.every, timer: m.every })) };
+    hpMult *= def.hpMultiplier ?? state.config.bosses.hpMultiplier;
+    enemy.boss = {
+      moves: (def.bossMoves ?? []).map((m) => ({ moveId: m.moveId, every: m.every, timer: m.every })),
+      phases: (def.phases ?? []).map((p) => ({ ...p })),
+      phase: -1,
+      reverseTimer: 0,
+    };
   }
+  if (def.dynamax) {
+    hpMult *= DYNAMAX_HP;
+    enemy.dynamax = true;
+  }
+  if (hpMult !== 1) {
+    mon.stats = { ...mon.stats, hp: Math.max(1, Math.round(mon.stats.hp * hpMult)) };
+    mon.hp = mon.stats.hp;
+  }
+  if (def.shadow) enemy.shadow = true;
+  if (def.alpha) enemy.alpha = true;
+  if (def.catchableUnder !== undefined) enemy.catchableUnder = def.catchableUnder;
+  if (def.immune) enemy.immune = [...def.immune];
+  if (def.fleeAfter !== undefined) enemy.fleeAfter = def.fleeAfter;
+  if (def.catchOnly) enemy.catchOnly = true;
   state.enemies.push(enemy);
   events.push({ type: 'spawn', enemyId: enemy.id, shiny, ...(def.boss ? { boss: true } : {}) });
+  rulesOnSpawn(state, enemy, def, events);
 }
 
 function endWave(state: LevelState, events: LevelEvent[]): void {
   state.wavesCleared++;
-  const trainerWaveDone = isTrainerWave(state, state.wave - 1);
-  if (trainerWaveDone) state.trainerBeaten = true;
+  const waveIndex = state.wave - 1;
+  const trainerWaveDone = isTrainerWave(state, waveIndex);
+  if (trainerWaveDone) {
+    state.trainerBeaten = true;
+    const script = scriptedWave(state.def, waveIndex);
+    for (const t of script ? waveTrainers(script) : state.def.trainer ? [state.def.trainer] : []) state.trainersBeaten.push(t.name);
+  }
   events.push({ type: 'waveEnd', wave: state.wave });
-  const won = state.def.objective === 'defend' ? state.wave >= (state.def.waves ?? 0) : trainerWaveDone;
+  const script = scriptedWave(state.def, waveIndex);
+  if (script?.outro?.length) events.push({ type: 'cutscene', wave: state.wave, lines: script.outro });
+  rulesOnWaveEnd(state, waveIndex, events);
+  dismissAllies(state, state.wave, events);
+  const won = state.def.objective === 'defend' ? state.wave >= waveCount(state.def) : trainerWaveDone;
   if (won) {
     state.phase = 'won';
     events.push({ type: 'phase', phase: 'won' });
@@ -757,7 +1199,7 @@ function endWave(state: LevelState, events: LevelEvent[]): void {
 
 /** Out of lives: lose, or restart the boss wave once per attempt. */
 function loseOrRetry(state: LevelState, events: LevelEvent[]): void {
-  const bossWave = isTrainerWave(state, state.wave - 1) && trainerHasBoss(state.def);
+  const bossWave = isTrainerWave(state, state.wave - 1) && trainerHasBoss(state.def, state.wave - 1);
   if (bossWave && state.config.bosses.retryBossWave && !state.bossRetryUsed) {
     state.bossRetryUsed = true;
     state.lives = state.waveStartLives;
@@ -786,6 +1228,25 @@ function tickTowerStatuses(state: LevelState, dt: number, events: LevelEvent[]):
   }
 }
 
+/** The end of an enemy's lane: a leak, or a flee for catch-only Pokémon. */
+function enemyReachedEnd(state: LevelState, enemy: Enemy, events: LevelEvent[]): boolean {
+  removeEnemy(state, enemy);
+  if (enemy.catchOnly) {
+    events.push({ type: 'flee', enemyId: enemy.id, species: enemy.mon.species, text: `${enemy.mon.name} fled!` });
+    return false;
+  }
+  state.leaks++;
+  events.push({ type: 'leak', enemyId: enemy.id });
+  if (state.def.objective === 'defend') {
+    state.lives = Math.max(0, state.lives - 1);
+    if (state.lives === 0) {
+      loseOrRetry(state, events);
+      return true;
+    }
+  }
+  return false;
+}
+
 /** Advances the simulation by `dt` seconds (already multiplied by game speed). */
 export function step(state: LevelState, dt: number): LevelEvent[] {
   const events: LevelEvent[] = [];
@@ -794,6 +1255,7 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
 
   if (state.phase === 'build') {
     tickTowerStatuses(state, dt, events);
+    rulesOnTick(state, dt, events, true);
     if (state.def.objective === 'free' && state.towers.length > 0) {
       state.buildTimer -= dt;
       if (state.buildTimer <= 0) events.push(...startWave(state));
@@ -809,9 +1271,10 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
 
   // Enemy statuses, movement and leaks.
   for (const enemy of [...state.enemies]) {
+    if (!state.enemies.includes(enemy)) continue;
     const r = tickStatus(enemy.mon.status, enemy.mon.stats.hp, dt, state.rng, state.config.status);
     if (r.ended) events.push({ type: 'statusEnd', enemyId: enemy.id, ailment: r.ended });
-    if (r.damage > 0) {
+    if (r.damage > 0 && !enemy.catchOnly) {
       enemy.mon.hp = Math.max(0, enemy.mon.hp - r.damage);
       events.push({ type: 'statusDamage', enemyId: enemy.id, amount: r.damage });
       if (enemy.mon.hp <= 0) {
@@ -819,23 +1282,43 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
         continue;
       }
     }
-    const speedMult = speedMultiplier(enemy.mon.status, state.config.status) * stageMultiplier(enemy.mon.status.stages.spe);
-    enemy.distance = Math.max(0, enemy.distance + enemy.tilesPerSec * speedMult * dt);
-    if (enemy.distance >= state.path.length + 1) {
-      removeEnemy(state, enemy);
-      state.leaks++;
-      events.push({ type: 'leak', enemyId: enemy.id });
-      if (state.def.objective === 'defend') {
-        state.lives = Math.max(0, state.lives - 1);
-        if (state.lives === 0) {
-          loseOrRetry(state, events);
-          return events;
-        }
+    if (enemy.vanish > 0) enemy.vanish = Math.max(0, enemy.vanish - dt);
+    if (enemy.speedBoost > 0) enemy.speedBoost = Math.max(0, enemy.speedBoost - dt);
+    if (enemy.fleeAfter !== undefined && enemy.distance >= 0) {
+      enemy.fleeAfter -= dt;
+      if (enemy.fleeAfter <= 0) {
+        removeEnemy(state, enemy);
+        events.push({ type: 'flee', enemyId: enemy.id, species: enemy.mon.species, text: `${enemy.mon.name} fled!` });
+        continue;
       }
+    }
+    if (enemy.stun > 0) {
+      enemy.stun = Math.max(0, enemy.stun - dt);
+    } else {
+      const speedMult =
+        speedMultiplier(enemy.mon.status, state.config.status) *
+        stageMultiplier(enemy.mon.status.stages.spe) *
+        rulesEnemySpeed(state, enemy) *
+        (enemy.speedBoost > 0 ? 1.5 : 1);
+      enemy.distance = Math.max(0, enemy.distance + enemy.tilesPerSec * speedMult * dt);
+    }
+    if (enemy.distance >= enemyPath(state, enemy).length + 1) {
+      if (enemyReachedEnd(state, enemy, events)) return events;
       continue;
     }
-    // Boss moves on their timers, once the boss is on the path.
+    // Boss phases and moves on their timers, once the boss is on the path.
     if (enemy.boss && enemy.distance > 0) {
+      const next = enemy.boss.phase + 1;
+      const phase = enemy.boss.phases[next];
+      if (phase && enemy.mon.hp <= phase.at * enemy.mon.stats.hp) enterPhase(state, enemy, next, events);
+      if (enemy.boss.reverseTimer > 0) {
+        enemy.boss.reverseTimer -= dt;
+        if (enemy.boss.reverseTimer <= 0) {
+          enemy.boss.reverseTimer = enemy.boss.phases[enemy.boss.phase]?.reverseEvery ?? 0;
+          reverseLanes(state, events);
+        }
+      }
+      if (enemy.vanish > 0) continue;
       for (const m of enemy.boss.moves) {
         m.timer -= dt;
         if (m.timer <= 0) {
@@ -847,6 +1330,14 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
   }
 
   tickTowerStatuses(state, dt, events);
+  rulesOnTick(state, dt, events, false);
+  if (rulesLost(state)) {
+    state.phase = 'lost';
+    state.enemies = [];
+    state.pending = [];
+    events.push({ type: 'phase', phase: 'lost' });
+    return events;
+  }
 
   // Attacks. The interval is recomputed per shot so level-ups and statuses apply at once.
   for (const tower of state.towers) {
@@ -866,7 +1357,7 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
     tower.cooldown = towerInterval(state, tower);
   }
 
-  if (state.pending.length === 0 && state.enemies.length === 0) endWave(state, events);
+  if (state.phase === 'wave' && state.pending.length === 0 && state.enemies.length === 0) endWave(state, events);
   return events;
 }
 
@@ -882,14 +1373,19 @@ export interface LevelSummary {
   leaks: number;
   party: { name: string; species: number; shiny: boolean; levelFrom: number; levelTo: number; expGained: number }[];
   caught: { name: string; species: number; level: number; shiny: boolean; ball: string }[];
-  /** The trainer beaten this run, if any. */
+  /** The trainer beaten this run, if any (the last one on scripted levels). */
   trainer?: string;
   /** Badge earned by winning (the game state decides whether it is new). */
   badge?: BadgeDef;
+  lives?: number;
+  maxLives?: number;
+  totalWaves?: number;
 }
 
 export function summarize(state: LevelState): LevelSummary {
   const caughtSet = new Set(state.caught.map((c) => c.mon));
+  const lastTrainer = state.trainersBeaten[state.trainersBeaten.length - 1] ?? (state.trainerBeaten && state.def.trainer ? state.def.trainer.name : undefined);
+  const badge = state.def.badge ?? state.def.reward?.badge;
   return {
     outcome: state.phase,
     wavesCleared: state.wavesCleared,
@@ -899,7 +1395,8 @@ export function summarize(state: LevelState): LevelSummary {
       .filter((p) => !caughtSet.has(p.mon))
       .map((p) => ({ name: p.mon.name, species: p.mon.species, shiny: p.mon.shiny, levelFrom: p.levelFrom, levelTo: p.mon.level, expGained: p.expGained })),
     caught: state.caught.map((c) => ({ name: c.mon.name, species: c.mon.species, level: c.mon.level, shiny: c.mon.shiny, ball: c.ball })),
-    ...(state.trainerBeaten && state.def.trainer ? { trainer: state.def.trainer.name } : {}),
-    ...(state.phase === 'won' && state.def.badge ? { badge: state.def.badge } : {}),
+    ...(lastTrainer ? { trainer: lastTrainer } : {}),
+    ...(state.phase === 'won' && badge ? { badge } : {}),
+    ...(state.def.objective === 'defend' ? { lives: state.lives, maxLives: state.def.lives ?? 0, totalWaves: waveCount(state.def) } : {}),
   };
 }

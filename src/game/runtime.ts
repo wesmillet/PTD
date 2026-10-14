@@ -3,6 +3,7 @@
  * a mutable copy of config.json that the simulation reads every step.
  */
 import { defaultRuntimeConfig, type RuntimeConfig } from '../sim/level';
+import pokemonJson from '../data/pokemon.json';
 import spriteFolders from '../data/spriteFolders.json';
 
 export const runtimeConfig: RuntimeConfig = defaultRuntimeConfig();
@@ -27,9 +28,10 @@ export function urlParam(name: string): string | undefined {
 }
 
 
-/** Dex folder (zero-padded) for a species id. */
+/** Sprite folder for a species id: zero-padded dex number, or the form's folder ("0058-hisui"). */
 export function dexFolder(species: number): string {
-  return String(species).padStart(4, '0');
+  const folder = (pokemonJson as Record<string, { folder?: string }>)[String(species)]?.folder;
+  return folder ?? String(species).padStart(4, '0');
 }
 
 /**
@@ -75,7 +77,7 @@ export function iconUrl(species: number, animated = true, shiny = false): string
   if (shiny && hasShinyPortrait(species)) return portraitUrl(species, 'Normal', true);
   const info = iconInfo(species);
   if (!info.icon) return undefined;
-  const base = `${import.meta.env.BASE_URL}assets/icons/${species}`;
+  const base = `${import.meta.env.BASE_URL}assets/icons/${folderIconName(dexFolder(species))}`;
   return animated && info.animatedIcon ? `${base}-anim.png` : `${base}.png`;
 }
 
@@ -87,12 +89,13 @@ export function iconUrl(species: number, animated = true, shiny = false): string
 export function iconTextureKey(species: number, frame: 0 | 1, shiny = false): string {
   if (shiny && hasShinyPortrait(species)) return shinyIconTextureKey(species);
   const info = iconInfo(species);
-  return info.animatedIcon ? `icon-${species}-${frame}` : `icon-${species}`;
+  const stem = folderIconName(dexFolder(species));
+  return info.animatedIcon ? `icon-${stem}-${frame}` : `icon-${stem}`;
 }
 
 /** Texture key of the shiny box icon BootScene builds from the shiny Normal portrait. */
 export function shinyIconTextureKey(species: number): string {
-  return `icon-${species}-shiny`;
+  return `icon-${folderIconName(dexFolder(species))}-shiny`;
 }
 
 /** Texture key of a loaded portrait: "portrait-<dex>" or "portrait-<dex>-shiny". */
