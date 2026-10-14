@@ -203,6 +203,20 @@ their arena maps (six gym-trainer waves, three leader waves, the ace as a
 `docs/design-content.md`. Badge perks: outside demo mode a save can place
 two Pokémon plus one per badge.
 
+The story set pieces live in `src/data/levels/05-story.json`, in the
+doc's order, each gated on the level before it and on the badge of the
+gym it follows: Valley Windworks (`wind`; Drifloon only on Fridays, a
+`weekday` on the wild entry, the sim's `weekday` option from the real
+clock), Eterna Forest (`escort` Cheryl with her Chansey as a `tag-ally`
+healer), Old Chateau (`darkness`, Rotom catchable under 10 %), Mt.
+Coronet, the Galactic Warehouse (Dawn's Piplup as a level-wide ally), the
+Great Marsh (`safari`: towers do no damage, wild Pokémon flee after 20 s,
+a Bait button slows them), Lake Valor (`timer`: 90 s to KO Saturn's bomb
+carrier), Iron Island (`two-lanes` and Riley's Lucario), Lake Acuity,
+Galactic HQ (`shadow-wave`, the Looker Ticket), Victory Road (opens the
+Conference) and Stark Mountain (post-game, Heatran catchable). A trainer
+id beginning `event-` is a legendary with no trainer art.
+
 ### The Sinnoh Conference
 The Lily of the Valley Conference replaces the Elite Four: a sixteen-trainer
 bracket drawn fresh per run from `src/data/conference.json` (Legend, Elite,
@@ -546,10 +560,11 @@ Phase 8 (done, docs/plan-phase-8.md): the content build of
          Hisui rifts; the mystery events and the Shiny lottery; the polish
          list (banners, Pokédex, stars, save slots, shortcuts). Progress
          and stand-ins: docs/progress.md.
-Phase 9: Story set pieces (Windworks, Eterna Forest, Old Chateau, Lake
-         Valor, Iron Island, Galactic HQ), secret HM levels, Max Raids,
-         the Regis, Arceus; audio and the performance pass; strip the
-         debug panel.
+Phase 9 (in progress, docs/plan-phase-9.md): 26 px text in play, the
+         story set pieces (Windworks to Stark Mountain), the secret HM
+         levels, shiny icons for forms. Still to come: Max Raids, the
+         Regis, Arceus; audio and the performance pass; strip the debug
+         panel.
 
 ## Working rules for Claude Code
 - Read this file at the start of every session.

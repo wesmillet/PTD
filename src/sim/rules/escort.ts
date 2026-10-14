@@ -1,6 +1,8 @@
 /**
  * Escort (Eterna Forest): a partner walks the path during waves; enemies
- * within a tile hurt her and the level is lost if her HP runs out.
+ * within a tile hurt her and the level is lost if her HP runs out. An
+ * allied tower of the `healer` species (Cheryl's Chansey) within
+ * `healReach` tiles of her restores one HP every `healEvery` seconds.
  */
 import { findPokemonId } from '../../data/pokedata';
 import type { RuleModule } from './types';
@@ -16,7 +18,11 @@ export const escort: RuleModule = {
     const speed = num(params, 'speed', 0.35);
     const reach = num(params, 'reach', 1);
     const dps = num(params, 'damagePerSecond', 1);
+    const healer = params.healer === undefined ? undefined : findPokemonId(str(params, 'healer', ''));
+    const healReach = num(params, 'healReach', 3);
+    const healEvery = num(params, 'healEvery', 2);
     let hurtTimer = 0;
+    let healTimer = 0;
     return {
       id: 'escort',
       onCreate(ctx) {
@@ -27,6 +33,16 @@ export const escort: RuleModule = {
         if (!e || e.hp <= 0) return;
         e.distance = Math.min(ctx.state.path.length, e.distance + e.tilesPerSec * dt);
         const p = pointOnMain(ctx.state, e.distance);
+        if (healer !== undefined && e.hp < e.maxHp && ctx.state.towers.some((t) => t.ally && t.mon.species === healer && Math.hypot(t.tile[0] - p.x, t.tile[1] - p.y) <= healReach)) {
+          healTimer += dt;
+          if (healTimer >= healEvery) {
+            healTimer -= healEvery;
+            e.hp = Math.min(e.maxHp, e.hp + 1);
+            ctx.events.push({ type: 'rule', rule: 'escort', amount: -1, text: `${name} is healed.` });
+          }
+        } else {
+          healTimer = 0;
+        }
         const attackers = ctx.state.enemies.filter((en) => en.distance >= 0 && Math.hypot(enemyPos(ctx.state, en).x - p.x, enemyPos(ctx.state, en).y - p.y) <= reach).length;
         if (attackers === 0) return;
         hurtTimer += dt * attackers * dps;

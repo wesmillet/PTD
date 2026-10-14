@@ -222,7 +222,7 @@ export class LevelSelectScene extends Phaser.Scene {
   /** Lily of the Valley island: the Conference, a tall gold marker east of Sunyshore. */
   private drawConferenceMarker(game: ReturnType<typeof getGame>): void {
     const { x, y } = this.mapPixel([238, 70]);
-    const open = isLevelUnlocked(game, 'distortion-world') && (DEMO_MODE || isLevelCompleted(game, 'distortion-world'));
+    const open = isLevelUnlocked(game, 'victory-road') && (DEMO_MODE || isLevelCompleted(game, 'victory-road'));
     const image = this.textures.exists('map-markers') ? this.add.image(x, y, 'map-markers', 1).setScale(MAP_SCALE) : this.add.image(x, y, '__DEFAULT').setDisplaySize(24, 24);
     if (open) image.setTintFill(0xf0b020);
     else image.setAlpha(0.5);
@@ -230,7 +230,7 @@ export class LevelSelectScene extends Phaser.Scene {
     const label = () => {
       this.hideHover();
       const name = this.add.text(0, -15, 'Sinnoh Conference', TEXT).setOrigin(0.5);
-      const info = this.add.text(0, 15, open ? 'Sixteen trainers, four rounds' : 'Locked: clear the Distortion World', TEXT_DIM).setOrigin(0.5);
+      const info = this.add.text(0, 15, open ? 'Sixteen trainers, four rounds' : 'Locked: clear Victory Road', TEXT_DIM).setOrigin(0.5);
       const w = Math.max(name.width, info.width) + 44;
       this.hover = this.add.container(Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4), y - 72, [framePanel(this, 0, 0, w, HOVER_H, 'blue'), name, info]).setDepth(50);
     };

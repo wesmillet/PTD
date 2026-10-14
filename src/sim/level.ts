@@ -363,6 +363,8 @@ export interface LevelState {
   flags: Set<string>;
   /** Ball ids the level allows (Legends rules); undefined allows every ball. */
   ballsOnly?: string[];
+  /** Day of the week for weekday-only wild entries. */
+  weekday?: number;
   nextId: number;
 }
 
@@ -378,6 +380,8 @@ export interface CreateLevelOptions {
   /** Placement limit (badge perks); defaults to the level's. */
   placements?: number;
   flags?: Iterable<string>;
+  /** Day of the week (0 = Sunday) for weekday-only wild entries; unset keeps them all. */
+  weekday?: number;
 }
 
 /** Moves that confuse their user after use (Gen 4). */
@@ -449,6 +453,7 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
     rules: createRules(def.rules),
     flags: new Set(options.flags ?? []),
     ...(def.ballsOnly ? { ballsOnly: [...def.ballsOnly] } : {}),
+    ...(options.weekday !== undefined ? { weekday: options.weekday } : {}),
     nextId: 1,
   };
   for (const [ball, n] of Object.entries(def.giveBalls ?? {})) state.items.balls[ball] = (state.items.balls[ball] ?? 0) + n;
@@ -717,6 +722,7 @@ export function startWave(state: LevelState): LevelEvent[] {
   const opts = {
     freeWaveMaxEnemies: state.config.waves.freeWaveMaxEnemies,
     ...(state.config.enemyLevelOverride !== undefined ? { levelOverride: state.config.enemyLevelOverride } : {}),
+    ...(state.weekday !== undefined ? { weekday: state.weekday } : {}),
   };
   let trainers: TrainerDef[] = [];
   let spawns: SpawnDef[];

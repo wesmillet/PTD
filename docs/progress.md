@@ -1,4 +1,4 @@
-# Content build progress (Phase 8)
+# Content build progress (Phases 8 and 9)
 
 What `docs/design-content.md` asks for, what exists, what is stubbed, and
 which maps the maps session still needs to build. Updated per commit.
@@ -140,21 +140,29 @@ which maps the maps session still needs to build. Updated per commit.
   slots as the design asks; the trainer card's play time and overworld
   sprite, and the "text speed" / colourblind settings are not built.
 
-## Not built yet (design order items 4 and 9)
+- **Story set pieces** (Phase 9, `src/data/levels/05-story.json`): Valley
+  Windworks (wind, Mars, Drifloon on Fridays), Eterna Forest (Cheryl
+  escort, her Chansey heals her), Old Chateau (darkness, Rotom catchable
+  on the last wave), Mt. Coronet (Cyrus, the rift flicker), the Galactic
+  Warehouse (Dawn's Piplup as a free tower), Great Marsh (`safari` rule:
+  no damage, bait, fleeing), Lake Valor (90 s bomb timer on Saturn's
+  wave), Iron Island (Riley's Lucario, two tunnels), Lake Acuity
+  (Jupiter), Galactic HQ (Shadow waves, Saturn, the lake trio freed, the
+  Looker Ticket), Victory Road and Stark Mountain (Buck's Claydol,
+  Heatran catchable). The unlock chain runs through them; the Conference
+  opens after Victory Road, Stark Mountain after the trophy.
 
-The story set pieces (Valley Windworks, Eterna Forest escort, Old Chateau,
-Galactic Eterna Building, Mt. Coronet, Solaceon Ruins, the Warehouse, Great
-Marsh, Lake Valor timer, Iron Island tag battle, Lake Acuity, Galactic HQ
-Shadow waves), the secret HM levels, Max Raids, the Regis and Arceus were
-not in this batch. Their rules (wind, escort, timer, tag-ally, shadow-wave,
-darkness) already exist in `src/sim/rules/`, and their maps (`valley-
-windworks`, `eterna-forest`, `old-chateau`, `iron-island`, `galactic-hq`,
-`great-marsh`, `lake-valor`, `lake-acuity`, `lake-verity-island`) are in
-the repo, so they are level data away.
+## Not built yet (design order item 9)
+
+The secret HM levels, Max Raids, the Regis and Arceus. Galactic Eterna
+Building and Solaceon Ruins (story rows 7 and 9) have no maps and no
+levels. Team Rocket's balloon and Hunter J have no art.
 
 ## Maps still needed
 
 | Level | Stand-in map in use | Needed |
 | --- | --- | --- |
+| `victory-road` | `mt-coronet` | Victory Road |
 | `temporal-spire` | `spear-pillar` | The Temporal Spire (a spiral up the spire, PMD-style) |
 | `shadow-mewtwo` | `stadium-grass` (at night) | The stadium at night with empty stands, if a night variant is wanted |
+| Galactic Eterna Building, Solaceon Ruins | none (levels not built) | The rooftop garden; the ruins |

@@ -21,7 +21,7 @@
       22
     ],
     "maxWildLevel": 100,
-    "requires": "oreburgh-mine-1f",
+    "requires": "eterna-forest",
     "unlock": {
       "badges": [
         "coal"
@@ -236,7 +236,7 @@
       26
     ],
     "maxWildLevel": 100,
-    "requires": "eterna-gym",
+    "requires": "mt-coronet",
     "unlock": {
       "badges": [
         "forest"
@@ -693,7 +693,7 @@
       37
     ],
     "maxWildLevel": 100,
-    "requires": "veilstone-gym",
+    "requires": "great-marsh",
     "unlock": {
       "badges": [
         "cobble"
@@ -918,7 +918,7 @@
       41
     ],
     "maxWildLevel": 100,
-    "requires": "pastoria-gym",
+    "requires": "lake-valor",
     "unlock": {
       "badges": [
         "fen"
@@ -1134,7 +1134,7 @@
       44
     ],
     "maxWildLevel": 100,
-    "requires": "canalave-gym",
+    "requires": "lake-acuity",
     "unlock": {
       "badges": [
         "mine"
@@ -1348,7 +1348,7 @@
       50
     ],
     "maxWildLevel": 100,
-    "requires": "snowpoint-gym",
+    "requires": "galactic-hq",
     "unlock": {
       "badges": [
         "icicle"

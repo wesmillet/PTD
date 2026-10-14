@@ -316,3 +316,30 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   the portrait on every part and the icons and riddle choices on the last.
 - The title's Continue button is always labelled "Continue" and greyed
   without a save (the old "(no save)" suffix no longer fits the frame).
+
+## Phase 9 item 2 (story set pieces)
+
+- The twelve levels sit in `05-story.json` so the level list keeps the
+  design table's order; the unlock chain (not file order) drives Next
+  level, so each gym now `requires` the set piece before it.
+- Drifloon's Friday rule is a `weekday` field on the wild entry and a
+  `weekday` option on `createLevel`; the scene passes the real day, tests
+  pin one. Content checks keep weekday entries so the sprites are checked.
+- The Great Marsh's "bait and mud" is one button: Bait slows every
+  Pokémon on the path by half for eight seconds with a fifteen-second
+  cooldown; `activate('mud')` stops them for a second instead. Zero-damage
+  hits raise no hit event, and fleeing Pokémon cost no lives.
+- Cheryl's Chansey "healer" is an `escort` option: an allied Chansey
+  within three tiles of her heals one HP every two seconds. Chansey's own
+  moves are whatever it knows at level 16.
+- Rotom and Heatran are `event-` trainers (no art, no VS intro), catchable
+  under 10 %, like the Phase 8 legendaries.
+- Lake Valor's bomb carrier is Saturn's Golbat as the boss of wave 8 with
+  the `timer` rule pinned to that wave; the outro still drains the lake
+  (the story needs Azelf taken).
+- Dawn, Barry (at Acuity) and Looker have no battle art for a wave; they
+  appear in narration, Looker through the `policeman` portrait.
+- Victory Road uses `mt-coronet` as its stand-in map; the Conference
+  marker now opens after Victory Road instead of the Distortion World.
+- Stark Mountain is gated on the Conference trophy flag (the design calls
+  it the post-game level); Buck's Claydol holds the exit.

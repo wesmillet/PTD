@@ -26,11 +26,12 @@ import { gratitude } from './gratitude';
 import { distortion } from './distortion';
 import { challenge } from './challenge';
 import { stadium } from './stadium';
+import { safari } from './safari';
 import type { RuleContext, RuleInstance, RuleModule, RuleStatus } from './types';
 
 export type { RuleContext, RuleInstance, RuleModule, RuleStatus } from './types';
 
-const MODULES: RuleModule[] = [rockfall, sunAndShade, darkness, twoLanes, tide, ironDefense, iceFloor, charge, gravityShift, tagAlly, timer, escort, shadowWave, wind, nightmare, gratitude, distortion, challenge, stadium];
+const MODULES: RuleModule[] = [rockfall, sunAndShade, darkness, twoLanes, tide, ironDefense, iceFloor, charge, gravityShift, tagAlly, timer, escort, shadowWave, wind, nightmare, gratitude, distortion, challenge, stadium, safari];
 const REGISTRY = new Map(MODULES.map((m) => [m.id, m]));
 
 export function ruleIds(): string[] {

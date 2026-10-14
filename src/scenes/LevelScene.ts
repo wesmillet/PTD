@@ -264,6 +264,7 @@ export class LevelScene extends Phaser.Scene {
       items: game.items,
       placements: placementLimit(game, def),
       flags: game.flags,
+      weekday: new Date().getDay(),
       ...(game.starter !== undefined ? { starter: game.starter } : {}),
     });
     // The renderer gets its own copy: the editor paints into it, and Discard restores from this.mapModel.

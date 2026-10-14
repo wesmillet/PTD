@@ -1,0 +1,2423 @@
+{
+  "valley-windworks": {
+    "name": "Valley Windworks",
+    "area": "valley-windworks",
+    "time": "day",
+    "objective": "defend",
+    "map": "valley-windworks",
+    "mapPos": [
+      96,
+      98
+    ],
+    "popup": "route",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 16,
+    "levels": [
+      10,
+      13
+    ],
+    "maxWildLevel": 100,
+    "requires": "oreburgh-mine-1f",
+    "unlock": {
+      "badges": [
+        "coal"
+      ]
+    },
+    "rules": [
+      {
+        "id": "wind",
+        "every": 8,
+        "push": 2
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "pachirisu",
+          "shinx",
+          "buizel",
+          {
+            "species": "drifloon",
+            "rarity": 6,
+            "weekday": 5
+          }
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "text": "Team Galactic has taken the Windworks. The fans are running flat out: every eight seconds a gust pushes everything on the path back two tiles, and the next one blows them forward."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "pachirisu",
+          "shinx",
+          "buizel",
+          {
+            "species": "drifloon",
+            "rarity": 6,
+            "weekday": 5
+          }
+        ],
+        "count": 5
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "shinx",
+              "level": 12
+            },
+            {
+              "species": "zubat",
+              "level": 12
+            },
+            {
+              "species": "glameow",
+              "level": 12
+            }
+          ],
+          "intro": "Commander Mars said no one gets in. That means you!"
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "pachirisu",
+          "shinx",
+          "buizel",
+          {
+            "species": "drifloon",
+            "rarity": 6,
+            "weekday": 5
+          }
+        ],
+        "count": 6
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "zubat",
+              "level": 13
+            },
+            {
+              "species": "stunky",
+              "level": 13
+            },
+            {
+              "species": "bronzor",
+              "level": 13
+            }
+          ],
+          "intro": "The plant is ours. Go home, kid."
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "pachirisu",
+          "shinx",
+          "buizel",
+          {
+            "species": "drifloon",
+            "rarity": 6,
+            "weekday": 5
+          }
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "glameow",
+              "level": 14
+            },
+            {
+              "species": "croagunk",
+              "level": 14
+            }
+          ]
+        },
+        "wild": [
+          "pachirisu",
+          "shinx",
+          "buizel",
+          {
+            "species": "drifloon",
+            "rarity": 6,
+            "weekday": 5
+          }
+        ],
+        "count": 3,
+        "banner": "Galactic Grunt"
+      },
+      {
+        "trainer": {
+          "id": "commander-mars",
+          "name": "Commander Mars",
+          "party": [
+            {
+              "species": "zubat",
+              "level": 14
+            },
+            {
+              "species": "purugly",
+              "level": 16,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "fury-swipes",
+                  "every": 6
+                },
+                {
+                  "move": "feint-attack",
+                  "every": 10
+                }
+              ]
+            }
+          ],
+          "intro": "I'm Mars, a Team Galactic Commander. We need this plant's power for a new world. You're in the way of that.",
+          "outro": "Fine. We've got what we came for anyway. We'll meet again."
+        },
+        "banner": "Commander Mars",
+        "outro": [
+          {
+            "speaker": "commander-mars",
+            "text": "Hmph. The energy we drew is already on its way to the boss. Enjoy your little victory."
+          },
+          {
+            "text": "The fans wind down. The Windworks is quiet again, and the road north to Eterna Forest is open."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 1500,
+      "items": {
+        "potion": 2
+      },
+      "flags": [
+        "windworks-cleared"
+      ]
+    }
+  },
+  "eterna-forest": {
+    "name": "Eterna Forest",
+    "area": "eterna-forest",
+    "time": "day",
+    "objective": "defend",
+    "map": "eterna-forest",
+    "mapPos": [
+      96,
+      86
+    ],
+    "popup": "forest",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 18,
+    "levels": [
+      12,
+      15
+    ],
+    "maxWildLevel": 100,
+    "requires": "valley-windworks",
+    "rules": [
+      {
+        "id": "escort",
+        "name": "Cheryl",
+        "species": "chansey",
+        "hp": 20,
+        "speed": 0.35,
+        "healer": "chansey",
+        "healReach": 3
+      },
+      {
+        "id": "tag-ally",
+        "allies": [
+          {
+            "species": "chansey",
+            "level": 16,
+            "name": "Cheryl's Chansey",
+            "spot": "nearest-spawn"
+          }
+        ]
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "speaker": "trainer-cheryl",
+            "text": "Excuse me... would you walk me through the forest? Team Galactic is about, and I keep getting lost. My Chansey will stay by the path and patch me up if anything gets close."
+          },
+          {
+            "text": "Cheryl walks the path during every wave. Pokémon within a tile of her hurt her; if her HP runs out the level is lost. Her Chansey heals her when she is near it."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 6,
+        "lines": [
+          {
+            "speaker": "trainer-cheryl",
+            "text": "The Old Chateau is just off this path. They say a Pokémon haunts the television in the back room..."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 8
+      },
+      {
+        "wild": [
+          "buneary",
+          "wurmple",
+          "budew",
+          {
+            "species": "gastly",
+            "rarity": 6
+          },
+          {
+            "species": "murkrow",
+            "rarity": 6
+          }
+        ],
+        "count": 8,
+        "outro": [
+          {
+            "speaker": "trainer-cheryl",
+            "text": "Eterna City! Thank you so much. Here, take this Soothe Bell... oh, I seem to have lost it. Take my thanks instead."
+          },
+          {
+            "text": "Behind you, the door of the Old Chateau creaks open on its own."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 1500,
+      "flags": [
+        "chateau-open"
+      ]
+    }
+  },
+  "old-chateau": {
+    "name": "Old Chateau",
+    "area": "old-chateau",
+    "time": "night",
+    "objective": "defend",
+    "map": "old-chateau",
+    "mapPos": [
+      92,
+      78
+    ],
+    "popup": "indoors",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 20,
+    "levels": [
+      14,
+      17
+    ],
+    "maxWildLevel": 100,
+    "requires": "eterna-forest",
+    "unlock": {
+      "flags": [
+        "chateau-open"
+      ]
+    },
+    "rules": [
+      {
+        "id": "darkness",
+        "range": 2,
+        "lit": 1,
+        "lanterns": 6,
+        "perWave": 1
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "speaker": "gentleman",
+            "text": "Welcome, welcome. I am the butler of this house... or I was. The master kept a television in the back room that changes channels by itself. Mind the dark: the lamps light one at a time."
+          },
+          {
+            "text": "Lights out: towers see only two tiles unless they stand in a lit lantern's glow. One more lantern lights each wave."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 5,
+        "lines": [
+          {
+            "speaker": "gentleman",
+            "text": "The girl in the painting? She watches the hallway. Pay her no mind."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "event-rotom",
+          "name": "Rotom",
+          "party": [
+            {
+              "species": "rotom",
+              "level": 20,
+              "boss": true,
+              "catchableUnder": 0.1,
+              "moves": [
+                {
+                  "move": "thunder-shock",
+                  "every": 5
+                },
+                {
+                  "move": "ominous-wind",
+                  "every": 9
+                }
+              ]
+            }
+          ]
+        },
+        "wild": [
+          "gastly",
+          {
+            "species": "haunter",
+            "rarity": 5
+          },
+          "duskull"
+        ],
+        "count": 3,
+        "banner": "Rotom",
+        "lines": [
+          {
+            "text": "The television in the back room flickers on by itself. Something hops out of the screen and races down the hall!"
+          }
+        ],
+        "outro": [
+          {
+            "speaker": "gentleman",
+            "text": "So that was the master's little friend all along. The house feels lighter already. Do come again."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 2000,
+      "flags": [
+        "chateau-cleared"
+      ]
+    }
+  },
+  "mt-coronet": {
+    "name": "Mt. Coronet",
+    "area": "mt-coronet",
+    "time": "day",
+    "objective": "defend",
+    "map": "mt-coronet",
+    "mapPos": [
+      120,
+      104
+    ],
+    "popup": "cave",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 27,
+    "levels": [
+      20,
+      24
+    ],
+    "maxWildLevel": 100,
+    "requires": "eterna-gym",
+    "unlock": {
+      "badges": [
+        "forest"
+      ]
+    },
+    "waves": [
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "speaker": "galactic-boss",
+            "text": "This world is incomplete. Strife and emotion are its flaws. I will create a new world, one without them. You cannot understand that yet."
+          },
+          {
+            "text": "The man walks on into the mountain without another word. The tunnel ahead is full of Pokémon."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 8
+      },
+      {
+        "wild": [
+          "geodude",
+          "bronzor",
+          "chingling",
+          {
+            "species": "cleffa",
+            "rarity": 5
+          },
+          "nosepass",
+          "meditite"
+        ],
+        "count": 8,
+        "outro": [
+          {
+            "text": "As the last Pokémon falls, the air behind the altar stone tears: a purple rift flickers for a heartbeat and closes. Something is wrong with space and time on this mountain."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 2000,
+      "flags": [
+        "coronet-cleared"
+      ]
+    }
+  },
+  "galactic-warehouse": {
+    "name": "Galactic Warehouse",
+    "area": "veilstone-city",
+    "time": "day",
+    "objective": "defend",
+    "map": "galactic-hq",
+    "mapPos": [
+      206,
+      98
+    ],
+    "popup": "city",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 36,
+    "levels": [
+      30,
+      33
+    ],
+    "maxWildLevel": 100,
+    "requires": "veilstone-gym",
+    "unlock": {
+      "badges": [
+        "cobble"
+      ]
+    },
+    "allies": [
+      {
+        "species": "piplup",
+        "level": 30,
+        "name": "Dawn's Piplup",
+        "spot": "nearest-exit",
+        "moves": [
+          "bubble-beam",
+          "peck"
+        ]
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "stunky",
+          "glameow",
+          "croagunk"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "text": "Dawn runs up, out of breath: two grunts snatched her Pokédex and ran into the warehouse. Her Piplup hops onto the crates by the door and refuses to leave."
+          }
+        ]
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "stunky",
+              "level": 30
+            },
+            {
+              "species": "glameow",
+              "level": 30
+            }
+          ],
+          "intro": "A Pokédex? Never seen one. Now get lost."
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "stunky",
+          "glameow",
+          "croagunk"
+        ],
+        "count": 5
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "croagunk",
+              "level": 31
+            },
+            {
+              "species": "glameow",
+              "level": 31
+            },
+            {
+              "species": "stunky",
+              "level": 31
+            }
+          ],
+          "intro": "You again? This warehouse is Team Galactic property."
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "stunky",
+          "glameow",
+          "croagunk"
+        ],
+        "count": 6
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "skuntank",
+              "level": 32
+            },
+            {
+              "species": "purugly",
+              "level": 32
+            }
+          ],
+          "intro": "Fine, we have the Pokédex. Come and take it."
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "stunky",
+          "skuntank",
+          "glameow",
+          "purugly",
+          "croagunk"
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "purugly",
+              "level": 33
+            },
+            {
+              "species": "skuntank",
+              "level": 33
+            },
+            {
+              "species": "croagunk",
+              "level": 33
+            }
+          ],
+          "intro": "Last chance. Walk away or lose your Pokémon too."
+        },
+        "banner": "Galactic Grunt",
+        "outro": [
+          {
+            "text": "The grunts drop the Pokédex and run for the back door. Dawn hugs Piplup, then you. \"Veilstone's gym next? Maylene is tough, but you've got this.\""
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 2500,
+      "items": {
+        "great": 5
+      },
+      "flags": [
+        "warehouse-cleared"
+      ]
+    }
+  },
+  "great-marsh": {
+    "name": "Great Marsh",
+    "area": "great-marsh",
+    "time": "day",
+    "objective": "defend",
+    "map": "great-marsh",
+    "mapPos": [
+      172,
+      150
+    ],
+    "popup": "park",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 38,
+    "levels": [
+      32,
+      36
+    ],
+    "maxWildLevel": 100,
+    "requires": "galactic-warehouse",
+    "rules": [
+      {
+        "id": "safari",
+        "flee": 20,
+        "baitSeconds": 8,
+        "baitCooldown": 15
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "speaker": "leader-wake",
+            "text": "Crasher Wake here! Safari rules in the Marsh: no attacking! Your Pokémon can look, but they can't touch. Throw bait to slow them down, then throw balls. Anything you don't catch wanders off."
+          },
+          {
+            "text": "Safari: towers do no damage. Every wild Pokémon flees after twenty seconds on the path; the Bait button slows them for eight seconds."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "wooper",
+          "quagsire",
+          "skorupi",
+          "carnivine",
+          "yanma",
+          {
+            "species": "tropius",
+            "rarity": 3
+          },
+          "croagunk"
+        ],
+        "count": 8,
+        "outro": [
+          {
+            "speaker": "leader-wake",
+            "text": "That's the warm-up! Come to the Pastoria Gym when you're ready to get wet. Ha ha ha!"
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 1500,
+      "items": {
+        "net": 3
+      },
+      "flags": [
+        "marsh-cleared"
+      ]
+    }
+  },
+  "lake-valor": {
+    "name": "Lake Valor",
+    "area": "lake-valor",
+    "time": "day",
+    "objective": "defend",
+    "map": "lake-valor",
+    "mapPos": [
+      196,
+      130
+    ],
+    "popup": "lake",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 42,
+    "levels": [
+      36,
+      40
+    ],
+    "maxWildLevel": 100,
+    "requires": "pastoria-gym",
+    "unlock": {
+      "badges": [
+        "fen"
+      ]
+    },
+    "rules": [
+      {
+        "id": "timer",
+        "seconds": 90,
+        "wave": 8,
+        "label": "Bomb"
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "psyduck",
+          "golduck",
+          "magikarp",
+          {
+            "species": "gyarados",
+            "rarity": 4
+          }
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "text": "A boom rolls across the water: Team Galactic has set a bomb at the lakeside. Grunts are everywhere, and the Pokémon of the lake are fleeing down the shore path."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "psyduck",
+          "golduck",
+          "magikarp",
+          {
+            "species": "gyarados",
+            "rarity": 4
+          }
+        ],
+        "count": 5
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "golbat",
+              "level": 37
+            },
+            {
+              "species": "bronzor",
+              "level": 37
+            }
+          ],
+          "intro": "Stay back! The Galactic Bomb is armed!"
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "psyduck",
+          "golduck",
+          "magikarp",
+          {
+            "species": "gyarados",
+            "rarity": 4
+          }
+        ],
+        "count": 6
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "stunky",
+              "level": 38
+            },
+            {
+              "species": "golbat",
+              "level": 38
+            },
+            {
+              "species": "glameow",
+              "level": 38
+            }
+          ],
+          "intro": "Commander Saturn is at the cave. Nobody gets through."
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "psyduck",
+          "golduck",
+          "magikarp",
+          {
+            "species": "gyarados",
+            "rarity": 4
+          }
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "psyduck",
+          "golduck",
+          "magikarp",
+          {
+            "species": "gyarados",
+            "rarity": 4
+          }
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "commander-saturn",
+          "name": "Commander Saturn",
+          "party": [
+            {
+              "species": "bronzor",
+              "level": 37
+            },
+            {
+              "species": "golbat",
+              "level": 38,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "air-cutter",
+                  "every": 6
+                },
+                {
+                  "move": "bite",
+                  "every": 10
+                }
+              ]
+            }
+          ],
+          "intro": "I am Saturn. My Golbat carries the second charge; in ninety seconds it reaches the cavern and the lake is gone. Stop it if you can."
+        },
+        "banner": "Stop the bomb carrier",
+        "outro": [
+          {
+            "speaker": "commander-saturn",
+            "text": "You stopped the carrier... but the first charge was enough. Look at the lake. And Azelf is already ours."
+          },
+          {
+            "text": "The water drains away through the broken bed, leaving mud and gasping Magikarp. The cavern on the island stands empty."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 3000,
+      "flags": [
+        "valor-cleared"
+      ]
+    }
+  },
+  "iron-island": {
+    "name": "Iron Island",
+    "area": "iron-island",
+    "time": "day",
+    "objective": "defend",
+    "map": "iron-island",
+    "mapPos": [
+      36,
+      88
+    ],
+    "popup": "cave",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 45,
+    "levels": [
+      38,
+      42
+    ],
+    "maxWildLevel": 100,
+    "requires": "canalave-gym",
+    "unlock": {
+      "badges": [
+        "mine"
+      ]
+    },
+    "lanes": [
+      "path",
+      "path-2"
+    ],
+    "rules": [
+      {
+        "id": "two-lanes",
+        "names": [
+          "Upper tunnel",
+          "Lower tunnel"
+        ]
+      },
+      {
+        "id": "tag-ally",
+        "allies": [
+          {
+            "species": "lucario",
+            "level": 41,
+            "name": "Riley's Lucario",
+            "spot": "nearest-exit",
+            "moves": [
+              "aura-sphere",
+              "bone-rush"
+            ]
+          }
+        ]
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "geodude",
+          "graveler",
+          "onix",
+          {
+            "species": "steelix",
+            "rarity": 3
+          },
+          "zubat",
+          "golbat"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "speaker": "trainer-riley",
+            "text": "I'm Riley. Team Galactic is in the lower tunnels, and the wild Pokémon are stirred up. Lucario and I will hold the exit; you take the tunnels. Watch the banner: each wave picks one."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "geodude",
+          "graveler",
+          "onix",
+          {
+            "species": "steelix",
+            "rarity": 3
+          },
+          "zubat",
+          "golbat"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "geodude",
+          "graveler",
+          "onix",
+          {
+            "species": "steelix",
+            "rarity": 3
+          },
+          "zubat",
+          "golbat"
+        ],
+        "count": 6
+      },
+      {
+        "trainers": [
+          {
+            "id": "galactic-grunt-male",
+            "name": "Galactic Grunt",
+            "party": [
+              {
+                "species": "golbat",
+                "level": 40
+              },
+              {
+                "species": "bronzor",
+                "level": 40
+              }
+            ],
+            "lane": "path",
+            "intro": "Two of you? Two tunnels, then!"
+          },
+          {
+            "id": "galactic-grunt-female",
+            "name": "Galactic Grunt",
+            "party": [
+              {
+                "species": "croagunk",
+                "level": 40
+              },
+              {
+                "species": "stunky",
+                "level": 40
+              }
+            ],
+            "lane": "path-2"
+          }
+        ],
+        "banner": "Grunts down both tunnels"
+      },
+      {
+        "wild": [
+          "geodude",
+          "graveler",
+          "onix",
+          {
+            "species": "steelix",
+            "rarity": 3
+          },
+          "zubat",
+          "golbat"
+        ],
+        "count": 7
+      },
+      {
+        "trainers": [
+          {
+            "id": "galactic-grunt-male",
+            "name": "Galactic Grunt",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 41
+              },
+              {
+                "species": "golbat",
+                "level": 41
+              },
+              {
+                "species": "glameow",
+                "level": 41
+              }
+            ],
+            "lane": "path"
+          },
+          {
+            "id": "galactic-grunt-female",
+            "name": "Galactic Grunt",
+            "party": [
+              {
+                "species": "stunky",
+                "level": 41
+              },
+              {
+                "species": "croagunk",
+                "level": 41
+              },
+              {
+                "species": "golbat",
+                "level": 41
+              }
+            ],
+            "lane": "path-2"
+          }
+        ],
+        "banner": "Grunts down both tunnels"
+      },
+      {
+        "wild": [
+          "geodude",
+          "graveler",
+          "onix",
+          {
+            "species": "steelix",
+            "rarity": 3
+          },
+          "zubat",
+          "golbat"
+        ],
+        "count": 8
+      },
+      {
+        "trainers": [
+          {
+            "id": "galactic-grunt-male",
+            "name": "Galactic Grunt",
+            "party": [
+              {
+                "species": "golbat",
+                "level": 42
+              },
+              {
+                "species": "skuntank",
+                "level": 42
+              }
+            ],
+            "lane": "path",
+            "intro": "The boss wants this island quiet. We will make it quiet!"
+          },
+          {
+            "id": "galactic-grunt-female",
+            "name": "Galactic Grunt",
+            "party": [
+              {
+                "species": "croagunk",
+                "level": 42
+              },
+              {
+                "species": "purugly",
+                "level": 42
+              }
+            ],
+            "lane": "path-2"
+          }
+        ],
+        "banner": "Grunts down both tunnels",
+        "outro": [
+          {
+            "speaker": "trainer-riley",
+            "text": "That's the last of them. You fight well. Take this Egg: it hatched for me once, and I think its child belongs with you. And this... a Key Stone, with the stone Lucario answers to."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 3000,
+      "flags": [
+        "riolu-egg",
+        "key-stone",
+        "lucarionite"
+      ]
+    }
+  },
+  "lake-acuity": {
+    "name": "Lake Acuity",
+    "area": "lake-acuity",
+    "time": "day",
+    "objective": "defend",
+    "map": "lake-acuity",
+    "mapPos": [
+      112,
+      40
+    ],
+    "popup": "lake",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 47,
+    "levels": [
+      40,
+      44
+    ],
+    "maxWildLevel": 100,
+    "requires": "iron-island",
+    "unlock": {
+      "badges": [
+        "mine"
+      ]
+    },
+    "waves": [
+      {
+        "wild": [
+          "snorunt",
+          "sneasel",
+          "swinub",
+          "psyduck"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "text": "Barry sits in the snow by the shore, his team fainted around him. \"She was too strong,\" he says, not looking up. Commander Jupiter stands at the cave mouth."
+          },
+          {
+            "speaker": "commander-jupiter",
+            "text": "Your friend was no challenge. Uxie is ours. Let's see whether you are any different."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "snorunt",
+          "sneasel",
+          "swinub",
+          "psyduck"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "snorunt",
+          "sneasel",
+          "swinub",
+          "psyduck"
+        ],
+        "count": 6
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "golbat",
+              "level": 41
+            },
+            {
+              "species": "bronzor",
+              "level": 41
+            }
+          ]
+        },
+        "wild": [
+          "snorunt",
+          "sneasel",
+          "swinub",
+          "psyduck"
+        ],
+        "count": 3,
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "snorunt",
+          "sneasel",
+          "swinub",
+          "psyduck"
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "stunky",
+              "level": 42
+            },
+            {
+              "species": "golbat",
+              "level": 42
+            },
+            {
+              "species": "glameow",
+              "level": 42
+            }
+          ]
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "snorunt",
+          "sneasel",
+          "swinub",
+          "psyduck"
+        ],
+        "count": 8
+      },
+      {
+        "trainer": {
+          "id": "commander-jupiter",
+          "name": "Commander Jupiter",
+          "party": [
+            {
+              "species": "bronzor",
+              "level": 42
+            },
+            {
+              "species": "golbat",
+              "level": 42
+            },
+            {
+              "species": "skuntank",
+              "level": 44,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "night-slash",
+                  "every": 6
+                },
+                {
+                  "move": "poison-gas",
+                  "every": 12
+                }
+              ]
+            }
+          ],
+          "intro": "So you did beat Mars and Saturn. It changes nothing. Skuntank, finish this."
+        },
+        "banner": "Commander Jupiter",
+        "outro": [
+          {
+            "speaker": "commander-jupiter",
+            "text": "...Not bad. But Uxie is already on its way to Veilstone. Come to our headquarters if you want it back. Cyrus will be waiting."
+          },
+          {
+            "text": "Barry gets up, brushes off the snow and runs for Snowpoint without a word."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 3000,
+      "flags": [
+        "acuity-cleared"
+      ]
+    }
+  },
+  "galactic-hq": {
+    "name": "Galactic HQ",
+    "area": "veilstone-city",
+    "time": "day",
+    "objective": "defend",
+    "map": "galactic-hq",
+    "mapPos": [
+      198,
+      86
+    ],
+    "popup": "indoors",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 50,
+    "levels": [
+      44,
+      48
+    ],
+    "maxWildLevel": 100,
+    "requires": "snowpoint-gym",
+    "unlock": {
+      "badges": [
+        "icicle"
+      ]
+    },
+    "rules": [
+      {
+        "id": "shadow-wave",
+        "every": 3
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "skuntank",
+          "purugly",
+          "toxicroak"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "text": "Team Galactic's headquarters. The lake trio hang in a machine at the far end, and the Pokémon it has been fed come down the corridor with no light in their eyes."
+          },
+          {
+            "text": "Every third wave is a Shadow wave: Shadow Pokémon hit harder and, if caught, gain no EXP until purified at a lake."
+          }
+        ]
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "golbat",
+              "level": 44
+            },
+            {
+              "species": "bronzong",
+              "level": 44
+            }
+          ],
+          "intro": "Intruder! Seal the corridor!"
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "skuntank",
+          "purugly",
+          "toxicroak"
+        ],
+        "count": 5
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "skuntank",
+              "level": 45
+            },
+            {
+              "species": "purugly",
+              "level": 45
+            },
+            {
+              "species": "golbat",
+              "level": 45
+            }
+          ],
+          "intro": "The machine is almost done. You're too late."
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "skuntank",
+          "purugly",
+          "toxicroak"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "skuntank",
+          "purugly",
+          "toxicroak"
+        ],
+        "count": 6
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "crobat",
+              "level": 46
+            },
+            {
+              "species": "bronzong",
+              "level": 46
+            },
+            {
+              "species": "toxicroak",
+              "level": 46
+            }
+          ],
+          "intro": "Commander Saturn! They got past us!"
+        },
+        "banner": "Galactic Grunt"
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "skuntank",
+          "purugly",
+          "toxicroak"
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "commander-saturn",
+          "name": "Commander Saturn",
+          "party": [
+            {
+              "species": "golbat",
+              "level": 45
+            },
+            {
+              "species": "bronzong",
+              "level": 45
+            },
+            {
+              "species": "toxicroak",
+              "level": 47,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "poison-jab",
+                  "every": 6
+                },
+                {
+                  "move": "x-scissor",
+                  "every": 10
+                }
+              ]
+            }
+          ],
+          "intro": "Saturn again. Cyrus has already gone to Mt. Coronet with the Red Chain. All I can do is stop you here... and I intend to."
+        },
+        "banner": "Saturn's last stand",
+        "outro": [
+          {
+            "speaker": "commander-saturn",
+            "text": "...Go on, then. Press the button. Let them out. I begin to wonder what we were doing here at all."
+          },
+          {
+            "text": "The machine opens. Uxie, Mesprit and Azelf rise, look at you for a moment, and vanish back toward their lakes.",
+            "show": [
+              "uxie",
+              "mesprit",
+              "azelf"
+            ]
+          },
+          {
+            "speaker": "policeman",
+            "text": "Looker, International Police. Fine work. One more thing: a Cipher ship from Orre was seen off Sunyshore carrying what this machine made. Take this ticket; you may want to pay it a visit."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 4000,
+      "items": {
+        "looker-ticket": 1
+      },
+      "flags": [
+        "hq-cleared"
+      ]
+    }
+  },
+  "victory-road": {
+    "name": "Victory Road",
+    "area": "victory-road",
+    "time": "day",
+    "objective": "defend",
+    "map": "mt-coronet",
+    "mapPos": [
+      236,
+      96
+    ],
+    "popup": "cave",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 58,
+    "levels": [
+      50,
+      56
+    ],
+    "maxWildLevel": 100,
+    "requires": "distortion-world",
+    "unlock": {
+      "flags": [
+        "distortion-world-cleared"
+      ]
+    },
+    "waves": [
+      {
+        "wild": [
+          "graveler",
+          "golbat",
+          "onix",
+          "machoke",
+          {
+            "species": "steelix",
+            "rarity": 4
+          },
+          {
+            "species": "gabite",
+            "rarity": 5
+          },
+          "floatzel"
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "text": "Victory Road: the last cave before the Lily of the Valley Conference. The trainers in here are the ones who made it this far too."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "graveler",
+          "golbat",
+          "onix",
+          "machoke",
+          {
+            "species": "steelix",
+            "rarity": 4
+          },
+          {
+            "species": "gabite",
+            "rarity": 5
+          },
+          "floatzel"
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "graveler",
+          "golbat",
+          "onix",
+          "machoke",
+          {
+            "species": "steelix",
+            "rarity": 4
+          },
+          {
+            "species": "gabite",
+            "rarity": 5
+          },
+          "floatzel"
+        ],
+        "count": 6
+      },
+      {
+        "trainer": {
+          "id": "ace-trainer-male",
+          "name": "Ace Trainer Omar",
+          "party": [
+            {
+              "species": "gabite",
+              "level": 52
+            },
+            {
+              "species": "machoke",
+              "level": 52
+            }
+          ],
+          "intro": "You're heading for the Conference too? Then let's see what you've got!"
+        },
+        "banner": "Ace Trainer"
+      },
+      {
+        "wild": [
+          "graveler",
+          "golbat",
+          "onix",
+          "machoke",
+          {
+            "species": "steelix",
+            "rarity": 4
+          },
+          {
+            "species": "gabite",
+            "rarity": 5
+          },
+          "floatzel"
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "graveler",
+          "golbat",
+          "onix",
+          "machoke",
+          {
+            "species": "steelix",
+            "rarity": 4
+          },
+          {
+            "species": "gabite",
+            "rarity": 5
+          },
+          "floatzel"
+        ],
+        "count": 7
+      },
+      {
+        "trainer": {
+          "id": "dragon-tamer",
+          "name": "Dragon Tamer Clinton",
+          "party": [
+            {
+              "species": "gabite",
+              "level": 54
+            },
+            {
+              "species": "altaria",
+              "level": 54
+            }
+          ],
+          "intro": "Dragons rule this cave. Prove me wrong."
+        },
+        "banner": "Dragon Tamer"
+      },
+      {
+        "wild": [
+          "graveler",
+          "golbat",
+          "onix",
+          "machoke",
+          {
+            "species": "steelix",
+            "rarity": 4
+          },
+          {
+            "species": "gabite",
+            "rarity": 5
+          },
+          "floatzel"
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "graveler",
+          "golbat",
+          "onix",
+          "machoke",
+          {
+            "species": "steelix",
+            "rarity": 4
+          },
+          {
+            "species": "gabite",
+            "rarity": 5
+          },
+          "floatzel"
+        ],
+        "count": 8
+      },
+      {
+        "trainer": {
+          "id": "veteran",
+          "name": "Veteran Edgar",
+          "party": [
+            {
+              "species": "steelix",
+              "level": 55
+            },
+            {
+              "species": "floatzel",
+              "level": 55
+            },
+            {
+              "species": "staraptor",
+              "level": 56,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "close-combat",
+                  "every": 6
+                },
+                {
+                  "move": "brave-bird",
+                  "every": 10
+                }
+              ]
+            }
+          ],
+          "intro": "I've walked this road more times than you've had battles. One last test before the island."
+        },
+        "banner": "Veteran Edgar",
+        "outro": [
+          {
+            "text": "Daylight at the far end of the tunnel: the Lily of the Valley island, and the Conference, lie ahead."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 5000,
+      "flags": [
+        "victory-road-cleared"
+      ]
+    }
+  },
+  "stark-mountain": {
+    "name": "Stark Mountain",
+    "area": "stark-mountain",
+    "time": "day",
+    "objective": "defend",
+    "map": "stark-mountain",
+    "mapPos": [
+      210,
+      40
+    ],
+    "popup": "cave",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 70,
+    "levels": [
+      55,
+      62
+    ],
+    "maxWildLevel": 100,
+    "requires": "victory-road",
+    "unlock": {
+      "flags": [
+        "trophy"
+      ]
+    },
+    "allies": [
+      {
+        "species": "claydol",
+        "level": 58,
+        "name": "Buck's Claydol",
+        "spot": "nearest-exit",
+        "moves": [
+          "earth-power",
+          "psychic"
+        ]
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 4,
+        "lines": [
+          {
+            "speaker": "trainer-buck",
+            "text": "Buck. I'm after the Magma Stone in here, and the volcano doesn't like it. Claydol will cover the exit; you keep the lava Pokémon off me."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 5
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 6
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 7
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 7,
+        "lines": [
+          {
+            "speaker": "trainer-buck",
+            "text": "Got it! The Magma Stone... wait. The ground is shaking."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 8
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 8
+      },
+      {
+        "wild": [
+          "magby",
+          "houndour",
+          "magcargo",
+          {
+            "species": "rhyperior",
+            "rarity": 4
+          }
+        ],
+        "count": 9
+      },
+      {
+        "trainer": {
+          "id": "event-heatran",
+          "name": "Heatran",
+          "party": [
+            {
+              "species": "heatran",
+              "level": 70,
+              "boss": true,
+              "catchableUnder": 0.1,
+              "moves": [
+                {
+                  "move": "magma-storm",
+                  "every": 8
+                },
+                {
+                  "move": "earth-power",
+                  "every": 12
+                }
+              ]
+            }
+          ]
+        },
+        "banner": "Heatran",
+        "lines": [
+          {
+            "text": "The lava rises and something climbs out of it. Heatran, the keeper of the mountain, comes down the tunnel."
+          }
+        ],
+        "outro": [
+          {
+            "speaker": "trainer-buck",
+            "text": "That was Heatran?! I'm putting the stone back. Here, you earned this: a Houndoominite I found by the vent. Don't tell my grandfather."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 6000,
+      "flags": [
+        "houndoominite",
+        "stark-cleared"
+      ]
+    }
+  }
+}

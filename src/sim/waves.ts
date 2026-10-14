@@ -89,6 +89,8 @@ export interface WildEntry {
   /** Alpha: 1.5x sprite, +10 levels, drops a Hisuian ball. */
   alpha?: boolean;
   shadow?: boolean;
+  /** Only spawns on this day of the week (0 = Sunday ... 5 = Friday), as Drifloon at the Windworks. */
+  weekday?: number;
 }
 
 export interface DialogueLine {
@@ -275,6 +277,8 @@ export interface WaveOptions {
   freeWaveMaxEnemies: number;
   /** Debug: force every spawn to this level. */
   levelOverride?: number;
+  /** Day of the week (0 = Sunday) for `weekday` wild entries; unset keeps every entry. */
+  weekday?: number;
 }
 
 /** Enemies in wave `waveIndex` (0-based). Free levels ramp the count only, up to a cap. */
@@ -465,10 +469,11 @@ export function trainerWave(def: LevelDef, starter: number | undefined, moveId: 
   return partySpawns(trainer, starter, moveId, def.spawnInterval);
 }
 
-/** Resolves a scripted wave's wild list to an encounter table. */
-export function scriptedWildTable(def: LevelDef, wave: WaveDef): (EncounterEntry & { alpha?: boolean; shadow?: boolean })[] {
-  return (wave.wild ?? []).map((raw) => {
-    const e: WildEntry = typeof raw === 'string' ? { species: raw } : raw;
+/** Resolves a scripted wave's wild list to an encounter table; with a `weekday`, entries pinned to another day drop out. */
+export function scriptedWildTable(def: LevelDef, wave: WaveDef, weekday?: number): (EncounterEntry & { alpha?: boolean; shadow?: boolean })[] {
+  const entries = (wave.wild ?? []).map((raw): WildEntry => (typeof raw === 'string' ? { species: raw } : raw));
+  const today = weekday === undefined ? entries : entries.filter((e) => e.weekday === undefined || e.weekday === weekday);
+  return today.map((e) => {
     const species = speciesId(e.species, `scriptedWildTable: ${def.name}`);
     const [min, max] = e.levels ?? wave.levels ?? def.levels ?? (() => {
       try {
@@ -498,7 +503,7 @@ export function scriptedSpawns(
   if (!wave) throw new Error(`scriptedSpawns: ${def.name} has no wave ${waveIndex + 1}`);
   const interval = wave.spawnInterval ?? def.spawnInterval;
   const spawns: SpawnDef[] = [];
-  const table = scriptedWildTable(def, wave);
+  const table = scriptedWildTable(def, wave, opts.weekday);
   if (table.length > 0) {
     const count = wave.count ?? waveEnemyCount(def, waveIndex, opts);
     for (let i = 0; i < count; i++) {
