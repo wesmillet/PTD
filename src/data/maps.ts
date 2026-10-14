@@ -5,21 +5,14 @@
  */
 import { cloneModel, fromTiled, toMapDef, type MapModel } from '../map/tiled';
 import type { MapDef } from '../sim/map';
-import lakeVerity from './maps/lake-verity.json';
-import oreburghGate from './maps/oreburgh-gate.json';
-import oreburghMine1f from './maps/oreburgh-mine-1f.json';
-import route201 from './maps/route-201.json';
-import route202 from './maps/route-202.json';
-import route203 from './maps/route-203.json';
-
-const sources: Record<string, unknown> = {
-  'route-201': route201,
-  'lake-verity': lakeVerity,
-  'route-202': route202,
-  'route-203': route203,
-  'oreburgh-gate': oreburghGate,
-  'oreburgh-mine-1f': oreburghMine1f,
-};
+// Every Tiled JSON under src/data/maps/ is a map, keyed by its file name
+// (route-201.json -> "route-201"); drop a file in and it is registered.
+const sources: Record<string, unknown> = Object.fromEntries(
+  Object.entries(import.meta.glob('./maps/*.json', { eager: true, import: 'default' })).map(([path, json]) => [
+    path.replace(/^.*\//, '').replace(/\.json$/, ''),
+    json,
+  ]),
+);
 
 const models = new Map<string, MapModel>();
 

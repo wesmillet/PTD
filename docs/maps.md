@@ -251,3 +251,51 @@ which fills layers from the catalogue indices and writes the Tiled JSON.
 Texture size: keep each shipped sheet under 4096 px tall (the packer prints
 the size). The source exterior sheet is 41504 px tall, which is why only
 catalogue entries are shipped, never a whole source sheet.
+
+## Arenas, set pieces and the title diorama
+
+`scripts/bw-maps.py` also builds the hand-designed maps (no Platinum trace,
+since the gyms are interiors in the games and Hisui has no map render):
+
+| Map | Used by |
+| --- | --- |
+| `eterna-gym`, `hearthome-gym`, `veilstone-gym`, `pastoria-gym`, `canalave-gym`, `snowpoint-gym`, `sunyshore-gym` | gyms 2 to 8 (gym 1 is `oreburgh-mine-1f`) |
+| `spear-pillar`, `distortion-world` | the Team Galactic finale |
+| `stadium-grass`, `stadium-rock`, `stadium-water`, `stadium-ice` | the Conference's field roulette |
+| `hisui-fieldlands`, `hisui-mirelands`, `hisui-coastlands`, `hisui-icelands` | the four Hisui rifts |
+| `title` | the title screen diorama |
+
+Every map registers itself: `src/data/maps.ts` globs `src/data/maps/*.json`,
+so a new file is a new map with no code change.
+
+What the builder adds for them (see the `Map` class):
+
+- `floor(id, x0, y0, x1, y1)` lays a ground texture from `GROUND`
+  (`bw-cobble`, `bw-steel`, `bw-cream`, `bw-darkrock`, `bw-bluetile`,
+  `bw-orangetile`, `bw-void`, `bw-snow`) under the grass layer's place.
+- `plateau(..., cliff='rock' | 'snow' | 'ice')` draws the brown, snow or ice
+  cliff rim sets; the path breaks through a rim where it crosses one;
+  `interior=False` leaves the ledge top usable for spots.
+- `tree(x, y, kind='pine-snow' | 'pine-dirt')` and `forest(..., kind)` use
+  the other BW conifers (composited into `generated-bw.png` like the rest).
+- Props: `bw-lantern`, `bw-streetlamp`, `bw-log`, `bw-logpile`,
+  `bw-container`, `bw-machine`, `bw-barrel`, `bw-cave-mouth`,
+  `bw-snow-rock-big`, `bw-snow-rock`, `bw-grey-rock-small`, `bw-ice-block`,
+  `bw-ice-rock`, `bw-snow-boulder`, `bw-snow-log`.
+- A second enemy lane: `m.extra_paths = [('path-2', points)]` writes another
+  `path` object (named `path-2` or `path-water`) in the object layer, and
+  `lane(m, points)` keeps its cells clear and optionally draws them as road.
+  Veilstone Gym (two lanes), Pastoria Gym (deck and moat) and Spear Pillar
+  (two stairways) use it. The simulation reads only `path` today; the second
+  lane is for the level code to pick up.
+- Spot properties: `m.spot_props[(x, y)] = {'tide': True}` lands on the
+  placeable object as Tiled properties (Pastoria's two flooding shore spots).
+- Stage points: `m.points = [('meadow', 'stage', x, y)]` writes named point
+  objects (the title scene's `meadow`, `beach`, `lake-shore`, `cliff`,
+  `ledge` and `sky` stages; Spear Pillar's `altar`).
+- `road=None` draws no path terrain; the designs then colour the path cells
+  with a floor texture so the enemy path stays visible.
+
+Preview any map without level data: add a temporary entry to
+`src/data/levels.json` whose `map` is the map name, build, and open
+`?level=<id>&party=debug`.
