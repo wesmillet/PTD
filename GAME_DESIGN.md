@@ -246,6 +246,20 @@ Cresselia at any HP). Shadow Pokémon (`src/sim/shadow.ts`) gain no EXP
 until purified at a lake level. The Lottery Corner (`src/sim/lottery.ts`)
 sells one daily ticket's challenge for a shiny at level 20 with a reroll.
 
+### Secret HM levels
+`src/data/levels/50-secret.json`: each HM flag from a badge reopens an
+earlier place with a legendary catchable under 10 %, gated on
+`unlock.flags`. The lake islands use the `water-lane` rule (the map's
+`path-water` lane for Water types, water spots for Water and Flying
+only, a `refill` count of dry waves, `ice` for slow shores); Turnback
+Cave the `rooms` rule (one lane per wave sends enemies back to the
+start via the `onReachEnd` hook); Regigigas carries `slowStart`
+(seconds at half speed with no boss moves) and Arceus `typeCycle`
+(seconds per plate; its type walks the 17 types). `extraSpots` on a
+level adds stage points (the altar) to the placeable tiles. The Hall of
+Origin needs the eighteen `shard-*` flags handed out by the gyms, the
+rifts, the finale and four story levels.
+
 ### Level objectives
 Each level definition (`src/data/levels.json`) has an `objective`:
 - `defend`: a fixed wave count and a number of lives. Each enemy that reaches

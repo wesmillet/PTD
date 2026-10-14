@@ -209,7 +209,8 @@
       },
       "tm": "grass-knot",
       "flags": [
-        "cut"
+        "cut",
+        "shard-forest"
       ],
       "money": 2400
     }
@@ -443,7 +444,8 @@
       },
       "tm": "shadow-claw",
       "flags": [
-        "defog"
+        "defog",
+        "shard-relic"
       ],
       "money": 2400
     }
@@ -662,7 +664,8 @@
       },
       "tm": "drain-punch",
       "flags": [
-        "fly"
+        "fly",
+        "shard-cobble"
       ],
       "money": 2400
     },
@@ -887,7 +890,8 @@
       },
       "tm": "brine",
       "flags": [
-        "surf"
+        "surf",
+        "shard-fen"
       ],
       "money": 2400
     },
@@ -1107,7 +1111,8 @@
       },
       "tm": "flash-cannon",
       "flags": [
-        "strength"
+        "strength",
+        "shard-mine"
       ],
       "money": 2400
     }
@@ -1321,7 +1326,8 @@
       },
       "tm": "avalanche",
       "flags": [
-        "rock-climb"
+        "rock-climb",
+        "shard-icicle"
       ],
       "money": 2400
     }
@@ -1537,7 +1543,8 @@
       },
       "tm": "charge-beam",
       "flags": [
-        "waterfall"
+        "waterfall",
+        "shard-beacon"
       ],
       "money": 2400
     }

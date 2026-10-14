@@ -437,7 +437,8 @@
         "lustrous-orb": 1
       },
       "flags": [
-        "spear-pillar-cleared"
+        "spear-pillar-cleared",
+        "shard-spear"
       ]
     }
   },
@@ -713,7 +714,8 @@
         "griseous-orb": 1
       },
       "flags": [
-        "distortion-world-cleared"
+        "distortion-world-cleared",
+        "shard-distortion"
       ]
     }
   }

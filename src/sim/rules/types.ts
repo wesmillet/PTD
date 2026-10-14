@@ -63,7 +63,9 @@ export interface RuleInstance {
   /** Multiplier on a tower's damage with this move (sun boosts Fire). */
   damageMultiplier?(ctx: RuleContext, tower: Tower, move: MoveSpec): number;
   /** Which lane the wave's wild spawns use when the wave does not say; undefined keeps the default. */
-  pickLane?(ctx: RuleContext, waveIndex: number, spawnIndex: number): string | undefined;
+  pickLane?(ctx: RuleContext, waveIndex: number, spawnIndex: number, species?: number): string | undefined;
+  /** An enemy reached the end of its lane; return true to handle it (sent back, let go) instead of a leak. */
+  onReachEnd?(ctx: RuleContext, enemy: Enemy): boolean;
   /** Text for the wave banner. */
   banner?(ctx: RuleContext, waveIndex: number): string | undefined;
   /** A player action (the generator button, a riddle answer); returns whether it did something. */

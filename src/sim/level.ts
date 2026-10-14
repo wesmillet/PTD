@@ -10,6 +10,7 @@
  * placement. Maps can carry extra lanes; enemies remember theirs and lanes
  * can be reversed (gravity shifts).
  */
+import typesJson from '../data/types.json';
 import { expForLevel, findMoveId, getEncounterArea, getPokemon, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
 import { attemptCatch, ballModifier, BALLS } from './catch';
 import { evolutionOptions, evolveMonster } from './evolution';
@@ -20,32 +21,7 @@ import { buildLanes, buildPath, isPlaceable, laneWaypoints, MAIN_LANE, pointAlon
 import { activeMoveId, createMonster, makeMoveSlot, setMonsterLevel, type Monster } from './monster';
 import { learnableAt, resolveMove, type MoveSpec } from './moves';
 import { Rng } from './rng';
-import {
-  activateRule,
-  createRules,
-  rulesCanPlace,
-  rulesCanTarget,
-  rulesCanThrow,
-  rulesAttackRate,
-  rulesDamageMultiplier,
-  rulesEnemySpeed,
-  rulesLost,
-  rulesOnCaught,
-  rulesOnCreate,
-  rulesOnHit,
-  rulesOnKo,
-  rulesOnSpawn,
-  rulesOnTick,
-  rulesOnTowerPlaced,
-  rulesOnWaveEnd,
-  rulesOnWaveStart,
-  rulesPickLane,
-  rulesRange,
-  rulesBanner,
-  ruleStatuses,
-  type RuleInstance,
-  type RuleStatus,
-} from './rules';
+import { activateRule, createRules, ruleStatuses, rulesAttackRate, rulesBanner, rulesCanPlace, rulesCanTarget, rulesCanThrow, rulesDamageMultiplier, rulesEnemySpeed, rulesLost, rulesOnCaught, rulesOnCreate, rulesOnHit, rulesOnKo, rulesOnReachEnd, rulesOnSpawn, rulesOnTick, rulesOnTowerPlaced, rulesOnWaveEnd, rulesOnWaveStart, rulesPickLane, rulesRange, type RuleInstance, type RuleStatus } from './rules';
 import { attackCooldown, enemyTilesPerSec, type SpeedConfig } from './speed';
 import {
   applyAilment,
@@ -186,6 +162,10 @@ export interface Enemy {
   noble?: NobleState;
   /** Sleeps for the whole wave and floats on regardless (Cresselia under the moon). */
   asleep?: boolean;
+  /** Slow Start: seconds left at half speed with no boss moves. */
+  slowStart?: number;
+  /** Arceus's plates: the type changes every `every` seconds. */
+  typeCycle?: { every: number; timer: number; index: number };
 }
 
 export interface NobleState {
@@ -397,8 +377,26 @@ const NOBLE_STAGGER_SECONDS = 6;
 const NOBLE_STAGGERS_TO_CALM = 3;
 const NOBLE_BALM_FRACTION = 0.15;
 const NOBLE_FRENZY_SPEED = 1.5;
+const SLOW_START_SPEED = 0.5;
+const TYPE_COUNT = 17;
+const TYPE_NAMES = (typesJson as { names: Record<string, string> }).names;
 const NOBLE_SUMMON_WAVES = 2;
 const NOBLE_SUMMON_SIZE = 3;
+
+/** The map with the level's `extraSpots` added as placeable tiles (stage points by name; tiles on a lane are skipped). */
+function withExtraSpots(def: LevelDef, map: MapDef): MapDef {
+  if (!def.extraSpots?.length) return map;
+  const laneTiles = new Set<string>();
+  for (const waypoints of [map.path, ...Object.values(map.lanes ?? {})]) for (const key of buildPath(waypoints).tiles) laneTiles.add(key);
+  const placeable = [...map.placeable];
+  for (const spot of def.extraSpots) {
+    const tile = Array.isArray(spot) ? spot : map.points?.[spot];
+    if (!tile) throw new Error(`createLevel: ${def.name}: extra spot "${String(spot)}" is not a stage point of the map`);
+    if (laneTiles.has(`${tile[0]},${tile[1]}`) || isPlaceable(map, tile[0], tile[1])) continue;
+    placeable.push([tile[0], tile[1]]);
+  }
+  return { ...map, placeable };
+}
 
 function moveIdByName(name: string): number {
   const id = findMoveId(name);
@@ -406,7 +404,8 @@ function moveIdByName(name: string): number {
   return id;
 }
 
-export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOptions): LevelState {
+export function createLevel(def: LevelDef, mapIn: MapDef, options: CreateLevelOptions): LevelState {
+  const map = withExtraSpots(def, mapIn);
   const path = validateMap(map);
   const time = options.time ?? def.time;
   const cfg = options.config ?? defaultRuntimeConfig();
@@ -705,12 +704,12 @@ export function totalWaves(state: LevelState): number {
   return waveCount(state.def);
 }
 
-function pickLaneFor(state: LevelState, waveIndex: number, choice: string | undefined, spawnIndex: number): string | undefined {
+function pickLaneFor(state: LevelState, waveIndex: number, choice: string | undefined, spawnIndex: number, species?: number): string | undefined {
   const names = state.def.lanes ?? Object.keys(state.lanes);
   if (choice === 'random') return state.rng.pick(names);
   if (choice === 'both') return names[spawnIndex % names.length];
   if (choice) return choice;
-  return rulesPickLane(state, waveIndex, spawnIndex);
+  return rulesPickLane(state, waveIndex, spawnIndex, species);
 }
 
 /** Starts the next wave. Build phase only; needs at least one tower. */
@@ -729,7 +728,7 @@ export function startWave(state: LevelState): LevelEvent[] {
   const script = scriptedWave(state.def, waveIndex);
   if (script) {
     trainers = waveTrainers(script);
-    spawns = scriptedSpawns(state.def, waveIndex, state.starter, moveIdByName, state.rng, opts, (choice, i) => pickLaneFor(state, waveIndex, choice, i));
+    spawns = scriptedSpawns(state.def, waveIndex, state.starter, moveIdByName, state.rng, opts, (choice, i, species) => pickLaneFor(state, waveIndex, choice, i, species));
     if (script.condition) {
       const status = ruleStatuses(state).find((r) => r.id === script.condition!.rule);
       const value = status && status.max ? (status.value ?? 0) / status.max : 0;
@@ -746,7 +745,7 @@ export function startWave(state: LevelState): LevelEvent[] {
   } else {
     spawns = generateWave(state.table, state.def, waveIndex, state.rng, opts);
     spawns.forEach((s, i) => {
-      const lane = pickLaneFor(state, waveIndex, undefined, i);
+      const lane = pickLaneFor(state, waveIndex, undefined, i, s.species);
       if (lane) s.lane = lane;
     });
   }
@@ -1294,6 +1293,8 @@ function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
   if (def.noble) {
     enemy.noble = { stagger: 0, staggerMax: Math.max(1, Math.round(mon.stats.hp * NOBLE_STAGGER_SHARE)), staggered: 0, staggers: 0, summons: [...(def.summons ?? [])], summonsOwed: 0 };
   }
+  if (def.slowStart !== undefined) enemy.slowStart = def.slowStart;
+  if (def.typeCycle !== undefined) enemy.typeCycle = { every: def.typeCycle, timer: def.typeCycle, index: 0 };
   state.enemies.push(enemy);
   events.push({ type: 'spawn', enemyId: enemy.id, shiny, ...(def.boss ? { boss: true } : {}) });
   rulesOnSpawn(state, enemy, def, events);
@@ -1355,8 +1356,9 @@ function tickTowerStatuses(state: LevelState, dt: number, events: LevelEvent[]):
   }
 }
 
-/** The end of an enemy's lane: a leak, or a flee for catch-only Pokémon. */
+/** The end of an enemy's lane: a leak, or a flee for catch-only Pokémon, unless a rule sends it elsewhere. */
 function enemyReachedEnd(state: LevelState, enemy: Enemy, events: LevelEvent[]): boolean {
+  if (rulesOnReachEnd(state, enemy, events)) return false;
   removeEnemy(state, enemy);
   if (enemy.catchOnly) {
     events.push({ type: 'flee', enemyId: enemy.id, species: enemy.mon.species, text: `${enemy.mon.name} fled!` });
@@ -1415,6 +1417,20 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
     }
     if (enemy.vanish > 0) enemy.vanish = Math.max(0, enemy.vanish - dt);
     if (enemy.speedBoost > 0) enemy.speedBoost = Math.max(0, enemy.speedBoost - dt);
+    if (enemy.slowStart !== undefined && enemy.slowStart > 0 && enemy.distance >= 0) {
+      enemy.slowStart = Math.max(0, enemy.slowStart - dt);
+      if (enemy.slowStart === 0) events.push({ type: 'rule', rule: 'slow-start', enemyId: enemy.id, text: `${enemy.mon.name}'s Slow Start wore off!` });
+    }
+    if (enemy.typeCycle && enemy.distance >= 0) {
+      enemy.typeCycle.timer -= dt;
+      if (enemy.typeCycle.timer <= 0) {
+        enemy.typeCycle.timer += enemy.typeCycle.every;
+        enemy.typeCycle.index = (enemy.typeCycle.index + 1) % TYPE_COUNT;
+        const type = enemy.typeCycle.index + 1;
+        enemy.mon.types = [type];
+        events.push({ type: 'rule', rule: 'plates', enemyId: enemy.id, text: `${enemy.mon.name} holds a new Plate: it is ${TYPE_NAMES[String(type)] ?? '???'} type now.` });
+      }
+    }
     if (enemy.fleeAfter !== undefined && enemy.distance >= 0) {
       enemy.fleeAfter -= dt;
       if (enemy.fleeAfter <= 0) {
@@ -1437,6 +1453,7 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
         stageMultiplier(enemy.mon.status.stages.spe) *
         rulesEnemySpeed(state, enemy) *
         (enemy.speedBoost > 0 ? 1.5 : 1) *
+        (enemy.slowStart !== undefined && enemy.slowStart > 0 ? SLOW_START_SPEED : 1) *
         (enemy.noble ? NOBLE_FRENZY_SPEED : 1);
       enemy.distance = Math.max(0, enemy.distance + enemy.tilesPerSec * speedMult * dt);
     }
@@ -1461,6 +1478,7 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
         }
       }
       if (enemy.vanish > 0) continue;
+      if (enemy.slowStart !== undefined && enemy.slowStart > 0) continue; // Slow Start: no boss moves yet
       for (const m of enemy.boss.moves) {
         m.timer -= dt;
         if (m.timer <= 0) {

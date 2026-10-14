@@ -27,11 +27,13 @@ import { distortion } from './distortion';
 import { challenge } from './challenge';
 import { stadium } from './stadium';
 import { safari } from './safari';
+import { waterLane } from './waterLane';
+import { rooms } from './rooms';
 import type { RuleContext, RuleInstance, RuleModule, RuleStatus } from './types';
 
 export type { RuleContext, RuleInstance, RuleModule, RuleStatus } from './types';
 
-const MODULES: RuleModule[] = [rockfall, sunAndShade, darkness, twoLanes, tide, ironDefense, iceFloor, charge, gravityShift, tagAlly, timer, escort, shadowWave, wind, nightmare, gratitude, distortion, challenge, stadium, safari];
+const MODULES: RuleModule[] = [rockfall, sunAndShade, darkness, twoLanes, tide, ironDefense, iceFloor, charge, gravityShift, tagAlly, timer, escort, shadowWave, wind, nightmare, gratitude, distortion, challenge, stadium, safari, waterLane, rooms];
 const REGISTRY = new Map(MODULES.map((m) => [m.id, m]));
 
 export function ruleIds(): string[] {
@@ -126,13 +128,18 @@ export function rulesDamageMultiplier(state: LevelState, tower: Tower, move: Mov
   for (const r of state.rules) if (r.damageMultiplier) m *= r.damageMultiplier(c, tower, move);
   return m;
 }
-export function rulesPickLane(state: LevelState, waveIndex: number, spawnIndex: number): string | undefined {
+export function rulesPickLane(state: LevelState, waveIndex: number, spawnIndex: number, species?: number): string | undefined {
   const c = ctx(state, []);
   for (const r of state.rules) {
-    const lane = r.pickLane?.(c, waveIndex, spawnIndex);
+    const lane = r.pickLane?.(c, waveIndex, spawnIndex, species);
     if (lane) return lane;
   }
   return undefined;
+}
+/** Whether a rule handled an enemy reaching the end of its lane (no leak). */
+export function rulesOnReachEnd(state: LevelState, enemy: Enemy, events: LevelEvent[]): boolean {
+  const c = ctx(state, events);
+  return state.rules.some((r) => r.onReachEnd?.(c, enemy) ?? false);
 }
 export function rulesBanner(state: LevelState, waveIndex: number): string[] {
   const c = ctx(state, []);

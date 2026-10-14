@@ -65,6 +65,10 @@ export interface TrainerPokemonDef {
   noble?: boolean;
   /** Noble only: wild species it calls between staggers. */
   summons?: string[];
+  /** Slow Start (Regigigas): half speed and no boss moves for this many seconds on the path. */
+  slowStart?: number;
+  /** Arceus's plates: its type changes every this many seconds, cycling through the 17 types. */
+  typeCycle?: number;
 }
 
 export interface TrainerDef {
@@ -91,6 +95,8 @@ export interface WildEntry {
   shadow?: boolean;
   /** Only spawns on this day of the week (0 = Sunday ... 5 = Friday), as Drifloon at the Windworks. */
   weekday?: number;
+  /** Always shiny (the red Gyarados). */
+  shiny?: boolean;
 }
 
 export interface DialogueLine {
@@ -224,6 +230,8 @@ export interface LevelDef {
   giveBalls?: Record<string, number>;
   /** Rewards for catching a species here (Shaymin's Gracidea), applied once. */
   catchRewards?: Record<string, { flags?: string[]; items?: Record<string, number> }>;
+  /** Extra placeable spots for this level: stage point names ("altar") or tiles; ones on a lane are skipped. */
+  extraSpots?: (string | [number, number])[];
   enemiesFirstWave: number;
   enemiesPerWave: number;
   /** Seconds between spawns within a wave. */
@@ -270,6 +278,8 @@ export interface SpawnDef {
   shiny?: boolean;
   noble?: boolean;
   summons?: number[];
+  slowStart?: number;
+  typeCycle?: number;
 }
 
 export interface WaveOptions {
@@ -455,6 +465,8 @@ export function partySpawns(trainer: TrainerDef, starter: number | undefined, mo
       spawn.noble = true;
       spawn.summons = (p.summons ?? []).map((n) => speciesId(n, `partySpawns: ${trainer.name}`));
     }
+    if (p.slowStart !== undefined) spawn.slowStart = p.slowStart;
+    if (p.typeCycle !== undefined) spawn.typeCycle = p.typeCycle;
     const laneName = lane ?? trainer.lane;
     if (laneName && laneName !== 'both') spawn.lane = laneName;
     else if (laneName === 'both') spawn.lane = i % 2 === 0 ? 'path' : 'path-2';
@@ -470,7 +482,7 @@ export function trainerWave(def: LevelDef, starter: number | undefined, moveId: 
 }
 
 /** Resolves a scripted wave's wild list to an encounter table; with a `weekday`, entries pinned to another day drop out. */
-export function scriptedWildTable(def: LevelDef, wave: WaveDef, weekday?: number): (EncounterEntry & { alpha?: boolean; shadow?: boolean })[] {
+export function scriptedWildTable(def: LevelDef, wave: WaveDef, weekday?: number): (EncounterEntry & { alpha?: boolean; shadow?: boolean; shiny?: boolean })[] {
   const entries = (wave.wild ?? []).map((raw): WildEntry => (typeof raw === 'string' ? { species: raw } : raw));
   const today = weekday === undefined ? entries : entries.filter((e) => e.weekday === undefined || e.weekday === weekday);
   return today.map((e) => {
@@ -482,7 +494,7 @@ export function scriptedWildTable(def: LevelDef, wave: WaveDef, weekday?: number
         return [5, 10] as [number, number];
       }
     })();
-    return { species, min, max, rarity: e.rarity ?? 10, ...(e.alpha ? { alpha: true } : {}), ...(e.shadow ? { shadow: true } : {}) };
+    return { species, min, max, rarity: e.rarity ?? 10, ...(e.alpha ? { alpha: true } : {}), ...(e.shadow ? { shadow: true } : {}), ...(e.shiny ? { shiny: true } : {}) };
   });
 }
 
@@ -497,7 +509,7 @@ export function scriptedSpawns(
   moveId: (name: string) => number,
   rng: Rng,
   opts: WaveOptions,
-  lanePicker: (choice: string | undefined, i: number) => string | undefined,
+  lanePicker: (choice: string | undefined, i: number, species?: number) => string | undefined,
 ): SpawnDef[] {
   const wave = scriptedWave(def, waveIndex);
   if (!wave) throw new Error(`scriptedSpawns: ${def.name} has no wave ${waveIndex + 1}`);
@@ -509,13 +521,14 @@ export function scriptedSpawns(
     for (let i = 0; i < count; i++) {
       const entry = pickEntry(table, rng) as (typeof table)[number];
       const level = (opts.levelOverride ?? rng.int(entry.min, entry.max)) + (entry.alpha ? 10 : 0);
-      const lane = lanePicker(wave.lane, i);
+      const lane = lanePicker(wave.lane, i, entry.species);
       spawns.push({
         species: entry.species,
         level: Math.min(100, level),
         delay: i * interval,
         ...(entry.alpha ? { alpha: true } : {}),
         ...(entry.shadow || wave.shadow ? { shadow: true } : {}),
+        ...(entry.shiny ? { shiny: true } : {}),
         ...(lane ? { lane } : {}),
       });
     }
@@ -525,7 +538,7 @@ export function scriptedSpawns(
     const party = partySpawns(trainer, starter, moveId, interval, offset, wave.lane === 'random' || wave.lane === 'both' ? undefined : wave.lane);
     for (const p of party) {
       if (!p.lane && !trainer.lane) {
-        const lane = lanePicker(wave.lane, spawns.length);
+        const lane = lanePicker(wave.lane, spawns.length, p.species);
         if (lane) p.lane = lane;
       }
       if (wave.shadow) p.shadow = true;

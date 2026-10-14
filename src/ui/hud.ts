@@ -118,7 +118,7 @@ export class Hud {
     this.bossGfx = scene.add.graphics().setDepth(1003);
     const box = HPBOX['enemy'];
     const boxX = width / 2 + 40 - (box ? (box.width * BOSS_BOX_SCALE) / 2 : 128);
-    const boxY = 38;
+    const boxY = 44;
     if (box && scene.textures.exists('ui-hpbox-enemy')) {
       this.bossBox = scene.add.image(boxX, boxY, 'ui-hpbox-enemy').setOrigin(0).setScale(BOSS_BOX_SCALE).setDepth(1002).setVisible(false);
     }

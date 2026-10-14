@@ -308,7 +308,8 @@
       },
       "tm": "stealth-rock",
       "flags": [
-        "rock-smash"
+        "rock-smash",
+        "shard-coal"
       ],
       "money": 1200
     }

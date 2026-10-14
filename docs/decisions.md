@@ -343,3 +343,29 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   marker now opens after Victory Road instead of the Distortion World.
 - Stark Mountain is gated on the Conference trophy flag (the design calls
   it the post-game level); Buck's Claydol holds the exit.
+
+## Phase 9 item 3 (secret HM levels)
+
+- Lake Valor and Lake Acuity have no water lane in their maps, so the
+  `water-lane` rule falls back to the four spots nearest the path's end
+  as the water spots; with `ice` and no water lane the whole shore is
+  slowed instead of the lane.
+- Water types take the water lane on every other spawn so the shore lane
+  still sees traffic at Lake Verity.
+- The red Gyarados is a forced-shiny wild entry (`shiny: true`) on a wave
+  of its own, so it always surfaces on wave 4.
+- The three Regis are their own small levels (sealed chambers on the
+  mine, Acuity and Iron Island maps) opened by the Conference trophy and
+  the HM, so clearing them sets the `regi-*` flags Snowpoint Temple needs.
+- Regigigas's "weak for the first five waves" became Slow Start for the
+  first thirty seconds of its wave: half speed and no boss moves, with a
+  toast when it wears off.
+- Arceus has no Plate items in the game, so its type simply cycles
+  through the seventeen types every twenty seconds (toast per change).
+- Eighteen shards: one per badge level (8), rift (4), finale level (2)
+  and four story set pieces (Windworks, Chateau, Iron Island, HQ);
+  gym tests now check the HM flag with `arrayContaining`.
+- Turnback Cave and the Hall of Origin use the Spear Pillar map until
+  their own exist; the rooms are its two stairways.
+- Dialga and Palkia Origin share one `event-origin` trainer entry with
+  `lane: both`, so one comes down each stairway.

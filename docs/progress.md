@@ -152,17 +152,37 @@ which maps the maps session still needs to build. Updated per commit.
   Heatran catchable). The unlock chain runs through them; the Conference
   opens after Victory Road, Stark Mountain after the trophy.
 
+- **Secret HM levels** (Phase 9, `src/data/levels/50-secret.json`), each
+  gated on its HM flag from the badges and the story flag the design
+  names: Lake Verity's island (`water-lane` rule: the `path-water` lane
+  for Water types, the `island` spots for Water and Flying only,
+  Mesprit), Lake Valor's island (dry bed for three waves, then the lake
+  refills and the red Gyarados surfaces; Azelf), Lake Acuity's island
+  (ice slows the shore; Uxie), the three Regi chambers (Regirock in the
+  mine after Rock Smash, Regice under Acuity, Registeel on Iron Island
+  after Strength; all post-trophy), Snowpoint Temple (Regigigas with
+  Slow Start: half speed and no attacks for 30 s), Spear Pillar Origin
+  (the altar spot placeable; Dialga and Palkia Origin down both
+  stairways, both catchable; Shadow Lugia purifies here), Turnback Cave
+  (`rooms` rule: the wrong room sends enemies back; Giratina Altered)
+  and the Hall of Origin (eighteen shard flags from the gyms, rifts,
+  finale and four story levels; Arceus with plates cycling its type).
+
 ## Not built yet (design order item 9)
 
-The secret HM levels, Max Raids, the Regis and Arceus. Galactic Eterna
-Building and Solaceon Ruins (story rows 7 and 9) have no maps and no
-levels. Team Rocket's balloon and Hunter J have no art.
+Max Raids. Oreburgh Mine B2, Route 210 Fog and Mt. Coronet Peak (the
+Rock Smash, Defog and Rock Climb levels) have no maps and no levels.
+Galactic Eterna Building and Solaceon Ruins (story rows 7 and 9) have no
+maps and no levels. Team Rocket's balloon and Hunter J have no art.
 
 ## Maps still needed
 
 | Level | Stand-in map in use | Needed |
 | --- | --- | --- |
 | `victory-road` | `mt-coronet` | Victory Road |
+| `turnback-cave` | `spear-pillar` (at night) | Turnback Cave (rooms that shuffle) |
+| `hall-of-origin` | `spear-pillar` | The Hall of Origin (a stair of light) |
+| `regirock-chamber`, `regice-chamber`, `registeel-chamber` | `oreburgh-mine-1f`, `lake-acuity`, `iron-island` | Sealed chambers, if wanted |
 | `temporal-spire` | `spear-pillar` | The Temporal Spire (a spiral up the spire, PMD-style) |
 | `shadow-mewtwo` | `stadium-grass` (at night) | The stadium at night with empty stands, if a night variant is wanted |
 | Galactic Eterna Building, Solaceon Ruins | none (levels not built) | The rooftop garden; the ruins |

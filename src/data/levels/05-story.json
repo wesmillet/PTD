@@ -210,7 +210,8 @@
         "potion": 2
       },
       "flags": [
-        "windworks-cleared"
+        "windworks-cleared",
+        "shard-windworks"
       ]
     }
   },
@@ -599,7 +600,8 @@
     "reward": {
       "money": 2000,
       "flags": [
-        "chateau-cleared"
+        "chateau-cleared",
+        "shard-chateau"
       ]
     }
   },
@@ -1568,7 +1570,8 @@
       "flags": [
         "riolu-egg",
         "key-stone",
-        "lucarionite"
+        "lucarionite",
+        "shard-iron"
       ]
     }
   },
@@ -1968,7 +1971,8 @@
         "looker-ticket": 1
       },
       "flags": [
-        "hq-cleared"
+        "hq-cleared",
+        "shard-hq"
       ]
     }
   },

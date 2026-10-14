@@ -49,7 +49,7 @@ describe('gyms 2 to 8', () => {
       expect(ace[0]).toMatchObject({ species: g.ace, boss: true });
       expect(findMoveId(ace[0]!.moves![0]!.move)).toBeDefined();
       expect(def.rules?.map((r) => r.id)).toContain(g.rule);
-      expect(def.reward).toMatchObject({ badge: { id: g.badge }, tm: g.tm, flags: [g.hm] });
+      expect(def.reward).toMatchObject({ badge: { id: g.badge }, tm: g.tm, flags: expect.arrayContaining([g.hm]) });
       expect(def.badge?.id).toBe(g.badge);
       expect(def.levelCap).toBeGreaterThanOrEqual(25);
       expect(def.mapPos).toBeDefined();
@@ -107,6 +107,6 @@ describe('gyms 2 to 8', () => {
     const mine = getLevel('oreburgh-mine-1f');
     expect(mine.rules?.[0]?.id).toBe('rockfall');
     expect(mine.badge?.id).toBe('coal');
-    expect(mine.reward).toMatchObject({ tm: 'stealth-rock', flags: ['rock-smash'] });
+    expect(mine.reward).toMatchObject({ tm: 'stealth-rock', flags: expect.arrayContaining(['rock-smash']) });
   });
 });
