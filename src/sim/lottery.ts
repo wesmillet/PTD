@@ -22,7 +22,6 @@ const FAVOURITES = new Set([
   1, 2, 3, 4, 5, 6, 7, 8, 9, 152, 153, 154, 155, 156, 157, 158, 159, 160, 252, 253, 254, 255, 256, 257, 258, 259, 260, 387, 388, 389, 390, 391, 392, 393, 394, 395,
   133, 134, 135, 136, 196, 197, 470, 471, 443, 444, 445, 448, 149, 131, 143, 248, 373, 376,
 ]);
-const LEGENDARY = new Set([144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493]);
 
 export interface LotteryDraw {
   ticketNo: number;
@@ -53,12 +52,13 @@ export function shinyPool(): number[] {
   for (const [folder, info] of Object.entries(FOLDERS)) {
     if (!info.shiny || folder.includes('-')) continue;
     const id = Number(folder);
-    if (LEGENDARY.has(id)) continue;
+    let data;
     try {
-      getPokemon(id);
+      data = getPokemon(id);
     } catch {
       continue;
     }
+    if (data.legendary) continue; // PokeAPI's legendary and mythical flag, every generation
     out.push(id);
   }
   return out.sort((a, b) => a - b);

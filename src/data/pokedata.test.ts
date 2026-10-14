@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
+import spriteFolders from './spriteFolders.json';
 import {
+  allPokemonIds,
   encounterAreaKeys,
   encounterTable,
   expForLevel,
@@ -26,10 +28,18 @@ describe('generated PokeAPI data', () => {
     expect(findPokemonId('Turtwig')).toBe(387);
   });
 
-  it('covers exactly Gen 1 through 4', () => {
-    expect(getPokemon(1).name).toBe('bulbasaur');
+  it('covers exactly the sprite folders: every folder has data and every entry has a folder', () => {
+    const folders = Object.keys(spriteFolders as Record<string, unknown>);
+    const entries = allPokemonIds();
+    const folderOf = (id: number) => getPokemon(id).folder ?? String(id).padStart(4, '0');
+    expect(new Set(entries.map(folderOf))).toEqual(new Set(folders));
+    expect(entries).toHaveLength(folders.length);
     expect(getPokemon(493).name).toBe('arceus');
-    expect(() => getPokemon(494)).toThrow();
+    expect(getPokemon(643).name).toBe('reshiram'); // Gen 5 legendary with a folder
+    expect(() => getPokemon(1)).toThrow(); // Bulbasaur ships no sprites
+    expect(getPokemon(findPokemonId('xerneas')!).types).toEqual([1]); // Fairy maps to Normal on the Gen 4 chart
+    expect(getPokemon(643).legendary).toBe(true);
+    expect(getPokemon(387).legendary).toBeUndefined();
   });
 
   it('has Tackle and the Platinum learnset for Turtwig', () => {
@@ -78,7 +88,8 @@ describe('generated PokeAPI data', () => {
 
   it('has evolutions keyed by the pre-evolution', () => {
     expect(getEvolutions(387)).toEqual([{ to: 388, trigger: 'level-up', level: 18 }]);
-    expect(getEvolutions(133)).toContainEqual({ to: 134, trigger: 'use-item', item: 'water-stone' });
+    expect(getEvolutions(133)).toContainEqual({ to: 135, trigger: 'use-item', item: 'thunder-stone' });
+    expect(getEvolutions(133).some((e) => e.to === 134)).toBe(false); // Vaporeon ships no sprites
     expect(getEvolutions(389)).toEqual([]);
   });
 

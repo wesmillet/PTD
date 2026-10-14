@@ -402,3 +402,20 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   the `-shiny.png` icon files, `make-shiny-icons.py` and the `shinyIcon`
   index field are gone; `iconUrl` / `iconTextureKey` keep their shiny
   argument for the callers but ignore it.
+
+## Phase 9 batch 2, item 5 (every generation in the data)
+
+- The data set is exactly the sprite folder set: Gen 1 to 4 species
+  without sprites (Bulbasaur, Vaporeon, ...) are gone too, so nothing can
+  evolve into or spawn a Pokémon the game cannot draw. Evolutions and
+  Platinum encounter tables are trimmed to shipped species.
+- Gen 1 to 4 species keep Platinum learnsets (the doc's rule); species
+  and forms past Gen 4 take the newest version group they appear in, by
+  generation then order, so the Japanese Red/Green and the newest spin-off
+  groups do not win by id.
+- The type chart stays Gen 4: a Fairy slot is dropped from a dual type and
+  a pure Fairy (Xerneas) counts as Normal; Fairy-type moves are Normal.
+- `displayName` derives the base name from the form's own name, since a
+  form's base species (Growlithe for 0058-hisui) may ship no entry.
+- PokeAPI's `is_legendary` / `is_mythical` become a `legendary` flag for
+  the lottery pool, the showcase and the title cast.

@@ -45,6 +45,8 @@ export interface PokemonData {
   shadow?: boolean;
   /** Primal Dialga. */
   primal?: boolean;
+  /** PokeAPI's legendary or mythical flag (forms inherit the base species'). */
+  legendary?: boolean;
 }
 
 export type StageKey = StatKey | 'accuracy' | 'evasion';
@@ -156,7 +158,8 @@ export function baseSpecies(id: number): number {
 export function displayName(id: number): string {
   const p = getPokemon(id);
   if (!p.form) return p.name;
-  const base = getPokemon(p.species ?? id).name;
+  // The form's own name is "<base>-<form>" (growlithe-hisui, mewtwo-shadow); the base species may ship no data of its own.
+  const base = p.name.endsWith(`-${p.form}`) ? p.name.slice(0, -(p.form.length + 1)) : p.name;
   switch (p.form) {
     case 'hisui':
       return `hisuian-${base}`;

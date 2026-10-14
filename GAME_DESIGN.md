@@ -125,7 +125,14 @@ decompilation via `scripts/build-platinum.py`):
 
 Pokémon stats, moves, types, learnsets, and evolution data: bundle a static JSON
 dump (PokeAPI data, Gen 4 ruleset) into `src/data/`. Do not call PokeAPI at
-runtime.
+runtime. `scripts/build-pokedata.ts` emits exactly the species and forms
+that have a folder in `spriteFolders.json` (342 today, every generation's
+legendaries among them): stats and types from PokeAPI, Platinum learnsets
+for Gen 1 to 4 species and the newest version group for later ones, with
+every move those learnsets use; evolutions only between shipped species;
+Platinum encounters trimmed to shipped species; a `legendary` flag from
+PokeAPI; Fairy maps to Normal because the chart stays Gen 4. A test keeps
+folders and data in step both ways.
 
 ## Core mechanics (match PTD feel, simplified where noted)
 

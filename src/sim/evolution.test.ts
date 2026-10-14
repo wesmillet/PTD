@@ -17,7 +17,7 @@ describe('evolutionOptions', () => {
     expect(golbat.blocked[0]?.reason).toMatch(/happiness 160 \(not yet\)/);
     const eevee = evolutionOptions(createMonster(133, 40));
     expect(eevee.ready).toEqual([]);
-    expect(eevee.blocked.find((b) => b.to === 134)?.reason).toBe('Water Stone (not yet)');
+    expect(eevee.blocked.find((b) => b.to === 135)?.reason).toBe('Thunder Stone (not yet)');
     expect(eevee.blocked.find((b) => b.to === 196)?.reason).toMatch(/happiness 160 at day/);
     const kadabra = evolutionOptions(createMonster(64, 40));
     expect(kadabra.blocked[0]?.reason).toBe('trade (not yet)');

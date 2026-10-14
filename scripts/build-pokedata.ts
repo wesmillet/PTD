@@ -3,10 +3,12 @@
  * scripts/fetch-pokeapi.sh) and emits compact JSON into src/data/.
  *
  * Run with plain Node 22+: `node scripts/build-pokedata.ts [csvDir] [outDir]`.
- * No dependencies. Output is limited to Gen 1 through 4 and the Gen 4
- * ruleset (Platinum learnsets and encounters, Gen 4 type chart), plus the
- * later species and forms the content needs (EXTRA_SPECIES and FORMS below,
- * the ones scripts/sprite-list.txt ships sprites for).
+ * No dependencies. The species set is exactly the sprite folders in
+ * src/data/spriteFolders.json (base species and forms of every
+ * generation); Gen 1 to 4 species keep their Platinum learnsets, later
+ * ones take the newest version group they appear in, and every move those
+ * learnsets use is emitted. The ruleset stays Gen 4: Platinum encounters
+ * and the Gen 4 type chart (Fairy maps to Normal).
  */
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -17,59 +19,20 @@ const csvDir = resolve(process.argv[2] ?? process.env.POKEAPI_DIR ?? '/tmp/pokea
 const outDir = resolve(process.argv[3] ?? resolve(here, '../src/data'));
 
 const MAX_GENERATION = 4;
-const MAX_SPECIES = 493;
 const MAX_TYPE = 17; // normal .. dark; no fairy, stellar, unknown, shadow
-/** Later-generation moves the content names (bosses); added on top of the Gen 1 to 4 table. */
+/** Moves the content names that no shipped learnset carries (bosses). */
 const EXTRA_MOVES = new Set(['psystrike']);
 /**
- * Species past Gen 4: Hisui's new evolutions (sprites shipped) and the base
- * species the Hisuian forms belong to (data only, no sprites of their own).
+ * Forms PokeAPI has no entry for: a synthetic id with the base species'
+ * stats and a flag. Every other form folder resolves to the PokeAPI pokemon
+ * "<species>-<form>" (growlithe-hisui, lucario-mega, giratina-origin).
  */
-const EXTRA_SPECIES = ['899', '900', '901', '902', '903', '904', '503', '549', '570', '571', '628', '713', '724', '548', '627', '712'];
-/**
- * Forms with sprite folders: the PokeAPI pokemon identifier (its 10000+ id
- * becomes the species id in the game) or, for forms PokeAPI has no entry
- * for, a synthetic id with the base species' stats and a flag.
- */
-const FORMS: Record<string, { pokemon?: string; synthetic?: { id: number; base: string; name: string; flag: 'shadow' | 'primal' }; formName: string }> = {
-  '0058-hisui': { pokemon: 'growlithe-hisui', formName: 'Hisui' },
-  '0059-hisui': { pokemon: 'arcanine-hisui', formName: 'Hisui' },
-  '0570-hisui': { pokemon: 'zorua-hisui', formName: 'Hisui' },
-  '0571-hisui': { pokemon: 'zoroark-hisui', formName: 'Hisui' },
-  '0215-hisui': { pokemon: 'sneasel-hisui', formName: 'Hisui' },
-  '0211-hisui': { pokemon: 'qwilfish-hisui', formName: 'Hisui' },
-  '0100-hisui': { pokemon: 'voltorb-hisui', formName: 'Hisui' },
-  '0101-hisui': { pokemon: 'electrode-hisui', formName: 'Hisui' },
-  '0549-hisui': { pokemon: 'lilligant-hisui', formName: 'Hisui' },
-  '0628-hisui': { pokemon: 'braviary-hisui', formName: 'Hisui' },
-  '0713-hisui': { pokemon: 'avalugg-hisui', formName: 'Hisui' },
-  '0157-hisui': { pokemon: 'typhlosion-hisui', formName: 'Hisui' },
-  '0503-hisui': { pokemon: 'samurott-hisui', formName: 'Hisui' },
-  '0724-hisui': { pokemon: 'decidueye-hisui', formName: 'Hisui' },
-  '0448-mega': { pokemon: 'lucario-mega', formName: 'Mega' },
-  '0359-mega': { pokemon: 'absol-mega', formName: 'Mega' },
-  '0229-mega': { pokemon: 'houndoom-mega', formName: 'Mega' },
-  '0065-mega': { pokemon: 'alakazam-mega', formName: 'Mega' },
-  '0208-mega': { pokemon: 'steelix-mega', formName: 'Mega' },
-  '0362-mega': { pokemon: 'glalie-mega', formName: 'Mega' },
-  '0142-mega': { pokemon: 'aerodactyl-mega', formName: 'Mega' },
-  '0475-mega': { pokemon: 'gallade-mega', formName: 'Mega' },
-  '0428-mega': { pokemon: 'lopunny-mega', formName: 'Mega' },
-  '0308-mega': { pokemon: 'medicham-mega', formName: 'Mega' },
-  '0334-mega': { pokemon: 'altaria-mega', formName: 'Mega' },
-  '0381-mega': { pokemon: 'latios-mega', formName: 'Mega' },
-  '0282-mega': { pokemon: 'gardevoir-mega', formName: 'Mega' },
-  '0094-mega': { pokemon: 'gengar-mega', formName: 'Mega' },
-  '0115-mega': { pokemon: 'kangaskhan-mega', formName: 'Mega' },
-  '0227-mega': { pokemon: 'skarmory-mega', formName: 'Mega' },
-  '0487-origin': { pokemon: 'giratina-origin', formName: 'Origin' },
-  '0483-origin': { pokemon: 'dialga-origin', formName: 'Origin' },
-  '0484-origin': { pokemon: 'palkia-origin', formName: 'Origin' },
-  '0492-sky': { pokemon: 'shaymin-sky', formName: 'Sky' },
-  '0150-shadow': { synthetic: { id: 20150, base: 'mewtwo', name: 'mewtwo-shadow', flag: 'shadow' }, formName: 'Shadow' },
-  '0249-shadow': { synthetic: { id: 20249, base: 'lugia', name: 'lugia-shadow', flag: 'shadow' }, formName: 'Shadow' },
-  '0483-primal': { synthetic: { id: 20483, base: 'dialga', name: 'dialga-primal', flag: 'primal' }, formName: 'Primal' },
+const SYNTHETIC_FORMS: Record<string, { id: number; name: string; flag: 'shadow' | 'primal' }> = {
+  '0150-shadow': { id: 20150, name: 'mewtwo-shadow', flag: 'shadow' },
+  '0249-shadow': { id: 20249, name: 'lugia-shadow', flag: 'shadow' },
+  '0483-primal': { id: 20483, name: 'dialga-primal', flag: 'primal' },
 };
+const FORM_NAMES: Record<string, string> = { hisui: 'Hisui', mega: 'Mega', origin: 'Origin', sky: 'Sky', shadow: 'Shadow', primal: 'Primal' };
 const PLATINUM_VERSION = 14;
 const PLATINUM_VERSION_GROUP = 9;
 const LEVEL_UP_METHOD = 1;
@@ -153,28 +116,42 @@ function writeJson(name: string, value: Record<string, unknown> | unknown[]): vo
 
 // ---------------------------------------------------------------- species
 
+const spriteFolders = JSON.parse(readFileSync(resolve(here, '../src/data/spriteFolders.json'), 'utf8')) as Record<string, { species?: number; form?: string }>;
+const folderNames = Object.keys(spriteFolders).sort();
 const allSpeciesRows = readCsv('pokemon_species.csv');
-const speciesRows = allSpeciesRows.filter((r) => int(r.generation_id) <= MAX_GENERATION || EXTRA_SPECIES.includes(r.id));
-const speciesIds = new Set(speciesRows.map((r) => r.id));
-if (speciesIds.size !== MAX_SPECIES + EXTRA_SPECIES.length) throw new Error(`expected ${MAX_SPECIES + EXTRA_SPECIES.length} species, got ${speciesIds.size}`);
 const speciesRowById = new Map(allSpeciesRows.map((r) => [r.id, r]));
-
 const growthNames = new Map(readCsv('growth_rates.csv').map((r) => [r.id, r.identifier]));
 const statKeys: Record<string, string> = { '1': 'hp', '2': 'atk', '3': 'def', '4': 'spa', '5': 'spd', '6': 'spe' };
-
-const baseStats = new Map<string, Record<string, number>>();
 const allPokemonRows = readCsv('pokemon.csv');
 const pokemonByName = new Map(allPokemonRows.map((r) => [r.identifier, r]));
-const formPokemonIds = new Set<string>();
-for (const f of Object.values(FORMS)) {
-  if (!f.pokemon) continue;
-  const row = pokemonByName.get(f.pokemon);
-  if (!row) throw new Error(`form ${f.pokemon} is not in pokemon.csv`);
-  formPokemonIds.add(row.id);
+const pokemonRowById = new Map(allPokemonRows.map((r) => [r.id, r]));
+
+/** Base species folders ("0387") and form folders ("0058-hisui") resolved to PokeAPI rows. */
+const baseFolders = folderNames.filter((f) => !f.includes('-'));
+const formFolders = folderNames.filter((f) => f.includes('-'));
+const speciesIds = new Set(baseFolders.map((f) => String(int(f))));
+for (const id of speciesIds) if (!speciesRowById.has(id)) throw new Error(`folder ${id} is not a species in pokemon_species.csv`);
+/** pokemon.csv ids whose stats, types and moves are needed: base species and the PokeAPI forms. */
+const formPokemonRow = new Map<string, Row>(); // folder -> pokemon.csv row
+for (const folder of formFolders) {
+  if (SYNTHETIC_FORMS[folder]) continue;
+  const [dex, form] = folder.split('-') as [string, string];
+  const species = speciesRowById.get(String(int(dex)));
+  if (!species) throw new Error(`form folder ${folder}: no species ${int(dex)}`);
+  const row = pokemonByName.get(`${species.identifier}-${form}`);
+  if (!row) throw new Error(`form folder ${folder}: ${species.identifier}-${form} is not in pokemon.csv`);
+  formPokemonRow.set(folder, row);
 }
-const wantedPokemon = (id: string): boolean => speciesIds.has(id) || formPokemonIds.has(id);
+const wantedPokemon = new Set<string>([...speciesIds, ...[...formPokemonRow.values()].map((r) => r.id)]);
+// Base species of form folders whose own folder is missing (Zorua for 0570-hisui): data for the form only.
+for (const folder of formFolders) {
+  const [dex] = folder.split('-') as [string];
+  wantedPokemon.add(String(int(dex)));
+}
+
+const baseStats = new Map<string, Record<string, number>>();
 for (const r of readCsv('pokemon_stats.csv')) {
-  if (!wantedPokemon(r.pokemon_id)) continue; // default forms share the species id
+  if (!wantedPokemon.has(r.pokemon_id)) continue; // default forms share the species id
   const key = statKeys[r.stat_id];
   if (!key) continue;
   const entry = baseStats.get(r.pokemon_id) ?? {};
@@ -183,84 +160,97 @@ for (const r of readCsv('pokemon_stats.csv')) {
 }
 const typesByPokemon = new Map<string, number[]>();
 for (const r of readCsv('pokemon_types.csv')) {
-  if (!wantedPokemon(r.pokemon_id)) continue;
+  if (!wantedPokemon.has(r.pokemon_id)) continue;
   const list = typesByPokemon.get(r.pokemon_id) ?? [];
   list[int(r.slot) - 1] = int(r.type_id);
   typesByPokemon.set(r.pokemon_id, list);
 }
-const pokemonRows = new Map(allPokemonRows.filter((r) => wantedPokemon(r.id)).map((r) => [r.id, r]));
+/** Types past the Gen 4 chart: a Fairy slot is dropped from a dual type and becomes Normal on a pure Fairy. */
+const gen4Types = (types: number[]): number[] => {
+  const kept = types.filter((t) => t <= MAX_TYPE);
+  return kept.length > 0 ? kept : [1];
+};
+const stats6 = (id: string, where: string): Record<string, number> => {
+  const own = baseStats.get(id);
+  if (!own) throw new Error(`${where}: no stats`);
+  for (const k of Object.values(statKeys)) if (own[k] === undefined) throw new Error(`${where}: missing ${k}`);
+  return { hp: own.hp!, atk: own.atk!, def: own.def!, spa: own.spa!, spd: own.spd!, spe: own.spe! };
+};
+const isLegendary = (s: Row): boolean => s.is_legendary === '1' || s.is_mythical === '1';
 
 const pokemon: Record<string, unknown> = {};
-for (const s of speciesRows) {
-  const p = pokemonRows.get(s.id);
-  const base = baseStats.get(s.id);
-  const types = typesByPokemon.get(s.id);
-  if (!p || !base || !types) throw new Error(`incomplete data for species ${s.id}`);
-  for (const k of Object.values(statKeys)) if (base[k] === undefined) throw new Error(`missing ${k} for ${s.id}`);
-  pokemon[s.id] = {
+for (const id of [...speciesIds].sort((a, b) => int(a) - int(b))) {
+  const s = speciesRowById.get(id)!;
+  const p = pokemonRowById.get(id);
+  const types = typesByPokemon.get(id);
+  if (!p || !types) throw new Error(`incomplete data for species ${id}`);
+  const from = optInt(s.evolves_from_species_id) ?? 0;
+  pokemon[id] = {
     name: s.identifier,
     gen: int(s.generation_id),
-    types,
-    base: { hp: base.hp, atk: base.atk, def: base.def, spa: base.spa, spd: base.spd, spe: base.spe },
+    types: gen4Types(types),
+    base: stats6(id, `species ${id}`),
     growth: growthNames.get(s.growth_rate_id) ?? `unknown-${s.growth_rate_id}`,
     catchRate: int(s.capture_rate),
-    baseExp: int(p.base_experience),
+    baseExp: optInt(p.base_experience) ?? 150,
     baseHappiness: optInt(s.base_happiness) ?? 70,
-    evolvesFrom: optInt(s.evolves_from_species_id) ?? 0,
+    evolvesFrom: speciesIds.has(String(from)) ? from : 0,
     chain: int(s.evolution_chain_id),
+    ...(isLegendary(s) ? { legendary: true } : {}),
   };
 }
 
 // Forms: PokeAPI's 10000+ ids (or synthetic ones) with the base species'
-// catch rate and growth, their own stats and types (types past the Gen 4
-// chart fall back to the base species'), and the sprite folder.
-const spriteFolders = JSON.parse(readFileSync(resolve(here, '../src/data/spriteFolders.json'), 'utf8')) as Record<string, { species?: number; form?: string }>;
+// catch rate and growth, their own stats and types, and the sprite folder.
 const formIds = new Map<string, string>(); // game id -> pokemon.csv id for learnsets
-for (const [folder, f] of Object.entries(FORMS)) {
-  if (!spriteFolders[folder]) throw new Error(`form folder ${folder} is not in spriteFolders.json`);
+for (const folder of formFolders) {
   const [dex, form] = folder.split('-') as [string, string];
   const baseId = String(int(dex));
-  const base = pokemon[baseId] as Record<string, unknown> | undefined;
   const baseSpecies = speciesRowById.get(baseId);
-  if (!base || !baseSpecies) throw new Error(`form ${folder}: base species ${baseId} missing`);
+  const basePokemon = pokemonRowById.get(baseId);
+  if (!baseSpecies || !basePokemon) throw new Error(`form ${folder}: base species ${baseId} missing`);
+  const synthetic = SYNTHETIC_FORMS[folder];
   let id: string;
   let name: string;
   let stats: Record<string, number>;
   let types: number[];
+  let baseExp: number;
   let flag: Record<string, boolean> = {};
-  if (f.synthetic) {
-    id = String(f.synthetic.id);
-    name = f.synthetic.name;
-    stats = (base.base as Record<string, number>);
-    types = base.types as number[];
-    flag = { [f.synthetic.flag]: true };
+  if (synthetic) {
+    id = String(synthetic.id);
+    name = synthetic.name;
+    stats = stats6(baseId, `form ${folder}`);
+    types = gen4Types(typesByPokemon.get(baseId) ?? [1]);
+    baseExp = optInt(basePokemon.base_experience) ?? 150;
+    flag = { [synthetic.flag]: true };
   } else {
-    const row = pokemonByName.get(f.pokemon as string) as Row;
+    const row = formPokemonRow.get(folder)!;
     id = row.id;
     name = row.identifier;
-    const own = baseStats.get(row.id);
-    const ownTypes = typesByPokemon.get(row.id);
-    if (!own || !ownTypes) throw new Error(`form ${folder}: incomplete stats or types`);
-    for (const k of Object.values(statKeys)) if (own[k] === undefined) throw new Error(`form ${folder}: missing ${k}`);
-    stats = own;
-    types = ownTypes.some((t) => t > MAX_TYPE) ? (base.types as number[]) : ownTypes;
+    stats = stats6(row.id, `form ${folder}`);
+    const own = typesByPokemon.get(row.id);
+    if (!own) throw new Error(`form ${folder}: no types`);
+    types = gen4Types(own);
+    baseExp = optInt(row.base_experience) ?? optInt(basePokemon.base_experience) ?? 150;
     formIds.set(id, row.id);
   }
+  if (pokemon[id]) throw new Error(`form ${folder}: id ${id} is taken`);
   pokemon[id] = {
     name,
     gen: int(baseSpecies.generation_id),
     types,
-    base: { hp: stats.hp, atk: stats.atk, def: stats.def, spa: stats.spa, spd: stats.spd, spe: stats.spe },
-    growth: base.growth,
-    catchRate: base.catchRate,
-    baseExp: f.synthetic ? base.baseExp : (optInt((pokemonRows.get(id) as Row).base_experience) ?? (base.baseExp as number)),
-    baseHappiness: base.baseHappiness,
+    base: stats,
+    growth: growthNames.get(baseSpecies.growth_rate_id) ?? `unknown-${baseSpecies.growth_rate_id}`,
+    catchRate: int(baseSpecies.capture_rate),
+    baseExp,
+    baseHappiness: optInt(baseSpecies.base_happiness) ?? 70,
     evolvesFrom: 0,
-    chain: base.chain,
+    chain: int(baseSpecies.evolution_chain_id),
     species: int(baseId),
     form,
-    formName: f.formName,
+    formName: FORM_NAMES[form] ?? form.charAt(0).toUpperCase() + form.slice(1),
     folder,
+    ...(isLegendary(baseSpecies) ? { legendary: true } : {}),
     ...flag,
   };
 }
@@ -268,52 +258,44 @@ writeJson('pokemon.json', pokemon);
 
 // --------------------------------------------------------------- learnsets
 
+// Version groups ranked newest first by generation, then by their order.
+const versionGroupRank = new Map<number, number>();
+for (const r of readCsv('version_groups.csv')) versionGroupRank.set(int(r.id), int(r.generation_id) * 1000 + int(r.order));
 const learnsets: Record<string, [number, number][]> = {};
-// Later species and forms: every level-up row by version group, resolved below.
-const laterMoves = new Map<string, Map<number, [number, number][]>>();
-const movesCsv = readCsv('moves.csv');
-// Moves that became Fairy-type later (Sweet Kiss, Charm, Moonlight) were Normal in Gen 4.
-const gen4Type = (r: Row): number => (int(r.type_id) > MAX_TYPE ? 1 : int(r.type_id));
-const knownMoveIds = new Set(movesCsv.filter((r) => (int(r.generation_id) <= MAX_GENERATION && int(r.id) < 10000) || EXTRA_MOVES.has(r.identifier)).map((r) => r.id));
+const levelUpRows = new Map<string, Map<number, [number, number][]>>(); // pokemon.csv id -> version group -> rows
 for (const r of readCsv('pokemon_moves.csv')) {
   if (r.pokemon_move_method_id !== String(LEVEL_UP_METHOD)) continue;
-  if (r.version_group_id === String(PLATINUM_VERSION_GROUP) && speciesIds.has(r.pokemon_id)) {
-    (learnsets[r.pokemon_id] ??= []).push([int(r.level), int(r.move_id)]);
-  }
-  if (EXTRA_SPECIES.includes(r.pokemon_id) || formPokemonIds.has(r.pokemon_id)) {
-    const byGroup = laterMoves.get(r.pokemon_id) ?? laterMoves.set(r.pokemon_id, new Map()).get(r.pokemon_id)!;
-    const vg = int(r.version_group_id);
-    (byGroup.get(vg) ?? byGroup.set(vg, []).get(vg)!).push([int(r.level), int(r.move_id)]);
-  }
+  if (!wantedPokemon.has(r.pokemon_id)) continue;
+  const byGroup = levelUpRows.get(r.pokemon_id) ?? levelUpRows.set(r.pokemon_id, new Map()).get(r.pokemon_id)!;
+  const vg = int(r.version_group_id);
+  (byGroup.get(vg) ?? byGroup.set(vg, []).get(vg)!).push([int(r.level), int(r.move_id)]);
 }
-/** The newest version group's level-up moves that exist in the Gen 4 table, or none. */
-function newestKnownLearnset(pokemonId: string): [number, number][] {
-  const byGroup = laterMoves.get(pokemonId);
+/** Platinum's level-up moves for a Gen 1 to 4 Pokémon, else the newest version group it appears in. */
+function learnsetFor(pokemonId: string, generation: number): [number, number][] {
+  const byGroup = levelUpRows.get(pokemonId);
   if (!byGroup) return [];
-  for (const vg of [...byGroup.keys()].sort((a, b) => b - a)) {
-    const list = (byGroup.get(vg) ?? []).filter(([, move]) => knownMoveIds.has(String(move)));
-    if (list.some(([, move]) => { const m = movesCsv.find((r) => r.id === String(move)); return m && optInt(m.power) !== null; })) return list;
-  }
-  return [];
-}
-for (const id of EXTRA_SPECIES) {
-  const list = newestKnownLearnset(id);
-  if (list.length === 0) throw new Error(`species ${id} has no usable level-up moves`);
-  learnsets[id] = list;
+  if (generation <= MAX_GENERATION && byGroup.has(PLATINUM_VERSION_GROUP)) return byGroup.get(PLATINUM_VERSION_GROUP)!;
+  const newest = [...byGroup.keys()].sort((a, b) => (versionGroupRank.get(b) ?? 0) - (versionGroupRank.get(a) ?? 0))[0];
+  return newest === undefined ? [] : byGroup.get(newest)!;
 }
 for (const [gameId, entry] of Object.entries(pokemon)) {
-  const e = entry as { species?: number };
-  if (e.species === undefined || learnsets[gameId]) continue; // base species, or done above
-  const csvId = formIds.get(gameId);
-  const own = csvId ? newestKnownLearnset(csvId) : [];
-  learnsets[gameId] = own.length > 0 ? own : [...(learnsets[String(e.species)] ?? [])];
-}
-for (const id of Object.keys(pokemon)) {
-  const list = learnsets[id];
-  if (!list || list.length === 0) throw new Error(`species ${id} has no level-up moves`);
-  list.sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const e = entry as { species?: number; gen: number };
+  const csvId = e.species === undefined ? gameId : formIds.get(gameId);
+  let list = csvId ? learnsetFor(csvId, e.gen) : [];
+  if (list.length === 0 && e.species !== undefined) list = learnsetFor(String(e.species), e.gen); // synthetic forms: the base species' moves
+  if (list.length === 0) throw new Error(`species ${gameId} has no level-up moves`);
+  learnsets[gameId] = [...list].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
 }
 writeJson('learnsets.json', Object.fromEntries(Object.entries(learnsets).sort((a, b) => int(a[0]) - int(b[0]))));
+
+// Moves: the Gen 1 to 4 table plus every move a shipped learnset uses (and the content's extras).
+const movesCsv = readCsv('moves.csv');
+// Moves of a type past the Gen 4 chart (Fairy) count as Normal.
+const gen4Type = (r: Row): number => (int(r.type_id) > MAX_TYPE ? 1 : int(r.type_id));
+const usedMoveIds = new Set<string>();
+for (const list of Object.values(learnsets)) for (const [, move] of list) usedMoveIds.add(String(move));
+const knownMoveIds = new Set(movesCsv.filter((r) => int(r.id) < 10000 && (int(r.generation_id) <= MAX_GENERATION || usedMoveIds.has(r.id) || EXTRA_MOVES.has(r.identifier))).map((r) => r.id));
+for (const id of usedMoveIds) if (!knownMoveIds.has(id)) throw new Error(`learnset move ${id} is not in moves.csv`);
 
 // ------------------------------------------------------------------- moves
 
@@ -408,14 +390,14 @@ writeJson('exp_curves.json', expCurves);
 
 const triggerNames = new Map(readCsv('evolution_triggers.csv').map((r) => [r.id, r.identifier]));
 const itemNames = new Map(readCsv('items.csv').map((r) => [r.id, r.identifier]));
-const speciesById = new Map(speciesRows.map((r) => [r.id, r]));
-// Hisui's evolutions (Stantler -> Wyrdeer and the rest) need PLA mechanics; leave the chains as Gen 4 has them.
+// Only pairs where both species ship (a Vaporeon without sprites is not offered to Eevee).
 const evolutions: Record<string, unknown[]> = {};
 for (const r of readCsv('pokemon_evolution.csv')) {
-  const to = speciesById.get(r.evolved_species_id);
-  if (!to) continue;
+  if (!speciesIds.has(r.evolved_species_id)) continue;
+  const to = speciesRowById.get(r.evolved_species_id)!;
   const from = to.evolves_from_species_id;
   if (!from) throw new Error(`${to.identifier} evolves from nothing`);
+  if (!speciesIds.has(from)) continue;
   const evo: Record<string, unknown> = { to: int(to.id), trigger: triggerNames.get(r.evolution_trigger_id) ?? 'unknown' };
   const level = optInt(r.minimum_level);
   if (level !== null) evo.level = level;
@@ -436,7 +418,10 @@ for (const r of readCsv('pokemon_evolution.csv')) {
   (evolutions[from] ??= []).push(evo);
 }
 const chains: Record<string, number[]> = {};
-for (const s of speciesRows) (chains[s.evolution_chain_id] ??= []).push(int(s.id));
+for (const id of [...speciesIds].sort((a, b) => int(a) - int(b))) {
+  const row = speciesRowById.get(id)!;
+  (chains[row.evolution_chain_id] ??= []).push(int(id));
+}
 writeJson('evolutions.json', { ...Object.fromEntries(Object.entries(evolutions).sort((a, b) => int(a[0]) - int(b[0]))), chains });
 
 // -------------------------------------------------------------- encounters

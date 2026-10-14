@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { getPokemon } from '../data/pokedata';
+import { findPokemonId, getPokemon } from '../data/pokedata';
 import { getLevel } from '../data/levels';
 import route201Fixture from './fixtures/route-201-legacy.json';
 import { createLevel, placeTower, towerInterval, towerMove } from './level';
@@ -36,7 +36,7 @@ describe('speed', () => {
     expect(towerAttacksPerSec(getPokemon(74).base.spe, cfg)).toBeCloseTo(0.7, 1); // Geodude (20 -> 0.717)
     expect(towerAttacksPerSec(getPokemon(396).base.spe, cfg)).toBeCloseTo(1.05, 2); // Starly (60)
     expect(towerAttacksPerSec(getPokemon(419).base.spe, cfg)).toBeCloseTo(1.5, 1); // Floatzel (115 -> 1.508)
-    expect(towerAttacksPerSec(getPokemon(101).base.spe, cfg)).toBeCloseTo(1.8, 2); // Electrode (150; the 1.9 cap needs base Speed 162+)
+    expect(towerAttacksPerSec(getPokemon(findPokemonId('electrode-hisui')!).base.spe, cfg)).toBeCloseTo(1.8, 2); // Hisuian Electrode (150; the 1.9 cap needs base Speed 162+)
     expect(towerAttacksPerSec(200, cfg)).toBeCloseTo(1.9, 2); // clamped high
     expect(towerAttacksPerSec(60, { ...cfg, moveRate: 1.5 })).toBeCloseTo(1.575);
     expect(attackCooldown(60, cfg)).toBeCloseTo(1 / 1.05);
