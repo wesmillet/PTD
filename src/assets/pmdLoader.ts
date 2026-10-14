@@ -51,6 +51,26 @@ export interface QueueOptions {
 
 const loadedSets = new Map<string, LoadedSet>();
 const pendingActions = new Map<string, { actions: Set<string>; optional: Set<string>; shadows: boolean }>();
+/** Texture keys of sheets whose download may fail without failing the Pokémon: optional actions and every shadow sheet. */
+const optionalKeys = new Map<string, { dex: string; action: string; shadow: boolean }>();
+const warned = new Set<string>();
+
+/** Whether a loader file key belongs to an optional sheet (a failed download drops the action, nothing else). */
+export function isOptionalSheetKey(key: string): boolean {
+  return optionalKeys.has(key);
+}
+
+/** Forgets an optional action whose sheet failed to download, so playAnim callers fall back; returns whether it was one. */
+export function dropFailedSheet(key: string): boolean {
+  const info = optionalKeys.get(key);
+  if (!info) return false;
+  if (!info.shadow) loadedSets.get(info.dex)?.actions.delete(info.action);
+  if (!warned.has(key)) {
+    warned.add(key);
+    console.warn(`pmdLoader: ${key} did not download; ${info.shadow ? 'shadow' : `action ${info.action}`} skipped for ${info.dex}`);
+  }
+  return true;
+}
 
 export function animDataKey(dex: string): string {
   return `pmd-${dex}-animdata`;
@@ -203,6 +223,7 @@ function queueSheets(
     }
     set.actions.add(action);
     const texKey = sheetKey(set.dex, entry.sheet);
+    if (optional.has(action)) optionalKeys.set(texKey, { dex: set.dex, action, shadow: false });
     if (!scene.textures.exists(texKey)) {
       scene.load.spritesheet(texKey, `${SPRITE_ROOT}/${set.dex}/${entry.sheet}-Anim.png`, {
         frameWidth: entry.frameWidth,
@@ -210,6 +231,7 @@ function queueSheets(
       });
     }
     const rawShadowKey = rawShadowSheetKey(set.dex, entry.sheet);
+    optionalKeys.set(rawShadowKey, { dex: set.dex, action, shadow: true });
     if (shadows && !scene.textures.exists(rawShadowKey) && !scene.textures.exists(shadowSheetKey(set.dex, entry.sheet))) {
       scene.load.spritesheet(rawShadowKey, `${SPRITE_ROOT}/${set.dex}/${entry.sheet}-Shadow.png`, {
         frameWidth: entry.frameWidth,
@@ -246,6 +268,7 @@ export function ensureLoaded(scene: Phaser.Scene, dex: string, actions: readonly
       }
     };
     const failed = (file: Phaser.Loader.File) => {
+      if (dropFailedSheet(file.key)) return; // an optional sheet: the action is skipped, the load goes on
       if (file.key.includes(dex)) {
         scene.load.off(Phaser.Loader.Events.COMPLETE, done);
         reject(new Error(`failed to load ${file.src}`));
@@ -277,6 +300,11 @@ export function registerAnims(scene: Phaser.Scene, dex: string): void {
   for (const action of set.actions) {
     const entry = entryFor(dex, action);
     const texKey = sheetKey(dex, entry.sheet);
+    if (!scene.textures.exists(texKey)) {
+      // The sheet never arrived (a failed optional download): drop the action quietly.
+      set.actions.delete(action);
+      continue;
+    }
     const texture = scene.textures.get(texKey);
     const columns = entry.durations.length;
     const expectedFrames = columns * DIRECTION_ROWS;

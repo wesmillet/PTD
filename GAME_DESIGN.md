@@ -49,8 +49,12 @@ and gender variants. Use it to resolve names to paths.
 
 Write a loader (`src/assets/pmdLoader.ts`) that parses AnimData.xml, registers
 Phaser animations per action per direction, and exposes `playAnim(sprite, action,
-direction)`. Towers mostly use Idle, Attack, and Hurt. Enemies use Walk, Hurt,
-and Faint.
+direction)`. Towers use Idle, Attack (physical moves: the sheet's own lunge)
+and Shoot (special and status moves, fired in place; Attack when a folder
+has no Shoot sheet). Enemies use Walk, Hurt and Faint. Idle and Walk are
+the core sheets; Attack, Shoot, Hurt, Faint and every shadow sheet are
+optional: a missing or failed one drops that animation (one console
+warning) and the level still opens.
 
 Portraits come from `portrait/<dexnum>/` as one 40x40 PNG per emotion
 (`Normal.png`, `Happy.png`, ...; the emotion list is in `sprite_config.json`).

@@ -381,3 +381,15 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
 - The Temporal Spire already sits on its own map (the maps session
   switched it); the stand-in table keeps Shadow Mewtwo, Victory Road,
   Turnback Cave, the Hall of Origin and the Regi chambers.
+
+## Phase 9 batch 2, item 1 (Shoot animations)
+
+- The game never tweened a lunge: the PMD Attack sheet carries it in its
+  frames. Special and status moves now play the Shoot sheet in place;
+  a folder without Shoot plays Attack, lunge and all, since the motion is
+  in the pixels.
+- The move category comes from the attack event's move id (boss moves
+  too), resolved through `resolveMove`.
+- Optional sheets (Attack, Shoot, Hurt, Faint, shadows) that fail to
+  download drop the action (`dropFailedSheet`) instead of failing the
+  level; only AnimData, Idle, Walk and the map trigger the retry loop.

@@ -10,8 +10,11 @@ import { dexFolder } from './runtime';
 
 const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
 
-export const ALL_ACTIONS = ['Idle', 'Walk', 'Attack', 'Hurt', 'Faint'] as const;
-export const OPTIONAL_ACTIONS = ['Attack', 'Hurt', 'Faint'] as const;
+/** Actions a level loads: Idle and Walk are core; the rest are optional and skipped when a folder or a download lacks them. */
+export const ALL_ACTIONS = ['Idle', 'Walk', 'Attack', 'Shoot', 'Hurt', 'Faint'] as const;
+export const OPTIONAL_ACTIONS = ['Attack', 'Shoot', 'Hurt', 'Faint'] as const;
+/** Actions whose sheets must load for a Pokémon to be usable at all. */
+export const CORE_ACTIONS = ['Idle', 'Walk'] as const;
 
 /** A species plus everything it can evolve into (recursively). */
 export function evolutionLine(species: number): number[] {

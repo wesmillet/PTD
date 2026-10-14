@@ -114,3 +114,47 @@ reward (`shard-<level>`), the noble rewards already give four.
   `docs/progress.md` is refreshed with the new entries (Victory Road,
   Turnback Cave, the Hall of Origin, Shadow Mewtwo).
 - `GAME_DESIGN.md`, `docs/progress.md` and `docs/decisions.md` updated.
+
+## Batch 2 (after the maps session's review)
+
+Order of work: 1, 2, 5, 3 (needs 5), 4, 6, 7. One commit each.
+
+1. **Special moves don't lunge.** `Shoot` joins the loaded actions as an
+   optional sheet. `animateAttack` reads the move's category: physical
+   plays `Attack` (the sheet's own lunge), special and status play
+   `Shoot` in place, falling back to `Attack` when the folder has none.
+   A failed optional sheet (Attack, Hurt, Faint, Shoot, any shadow) drops
+   that action instead of failing the level; only AnimData, Idle, Walk
+   and the map count as core files for the retry loop.
+2. **Shiny box icons.** The party strip, box grid, Party / PC lists and
+   summaries use the normal box icon plus the sparkle badge for shinies;
+   the shiny portrait stays in the Pokémon panel, PC summary and the
+   dialogue box. The boot-time portrait cut and the shiny icon files
+   stay for the Pokédex and anything that wants the headshot.
+5. **Every generation in the data.** `build-pokedata.ts` takes the
+   species list from `spriteFolders.json`: every base species and form
+   with a folder, stats and types from PokeAPI, learnsets from the newest
+   version group each appears in, and every move those learnsets use (type
+   chart stays Gen 4: Fairy maps to Normal). The species-count assertion
+   becomes a two-way check between folders and data.
+3. **Legends box.** `build-showcase.mjs` adds a "Legends" box: every
+   legendary and mythical with a folder (the sprite list's last section
+   plus Mewtwo, Lugia, Ho-Oh, Rayquaza, Dialga, Palkia, Giratina, Arceus
+   and Shaymin Sky), shiny, levels 50 to 70, one per species.
+4. **Title screen.** Walks are routed over the map's non-solid cells
+   (A* on the Tiled layers' solid tiles: trees, cliffs, rocks, water);
+   the chase stays on the route polyline; casting draws without
+   replacement and re-casts pick someone off screen; overworld trainers
+   at 2x; flyers move on a straight line at constant height with `Walk`
+   and a drifting ground shadow; the spar, fishing and picnic stay on
+   their stages and nothing spawns on water.
+6. **Bug and performance pass.** Loading never errors (missing assets
+   log once and fall back), levels load only their own folders, boot
+   loads UI, icons and the party, the PC / Pokédex / title load on
+   demand; shadow canvases cached per sheet, text measured once, hit
+   flashes and damage numbers pooled, no per-frame allocation in the sim
+   loop, DOM overlays updated only on change; a scene-switch loop proves
+   nothing leaks; the rough edges in `docs/progress.md` are fixed.
+   Numbers before and after go in `docs/decisions.md`.
+7. **Range only when selected.** The attack radius shows only for the
+   selected or dragged Pokémon; enemies never show one.

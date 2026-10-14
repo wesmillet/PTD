@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { SPOT_ELLIPSE, spotTexture } from '../ui/spotMarker';
 import { Direction, directionFromVector } from '../assets/direction';
-import { createPmdSprite, ensureLoaded, isLoaded, pickAction, playAnim, queuePokemon, registerAnims, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
+import { createPmdSprite, dropFailedSheet, ensureLoaded, isLoaded, pickAction, playAnim, queuePokemon, registerAnims, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
 import { ALL_ACTIONS, OPTIONAL_ACTIONS, levelSpriteFolders } from '../game/assets';
 import { getLevel } from '../data/levels';
 import { getMapModel } from '../data/maps';
@@ -17,6 +17,7 @@ import { WaveBanner } from '../ui/waveBanner';
 import { showCaughtBanner } from '../ui/caughtBanner';
 import { purifyProgress } from '../sim/shadow';
 import { usePotion } from '../sim/items';
+import { resolveMove } from '../sim/moves';
 import { BALLS } from '../sim/catch';
 import { advance, createClock, type Clock } from '../sim/clock';
 import { EvolutionDialog } from '../ui/evolutionDialog';
@@ -214,6 +215,8 @@ export class LevelScene extends Phaser.Scene {
       bar.fillStyle(COLORS.exp, 1).fillRoundedRect(width / 2 - 150, height / 2, Math.max(12, 300 * value), 12, 6);
     });
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
+      // Optional sheets (Attack, Shoot, Hurt, Faint, shadows) just lose their animation; core files fail the load.
+      if (dropFailedSheet(file.key)) return;
       this.loadFailed = true;
       this.failedFiles.push(file.src);
       label.setText(`Could not load ${file.src}`).setColor('#ff7b7b');
@@ -1016,7 +1019,7 @@ export class LevelScene extends Phaser.Scene {
           if (e.trainer) this.showTrainer(e.trainer, e.boss ?? false);
           break;
         case 'bossMove':
-          this.animateBossMove(e.enemyId as number);
+          this.animateBossMove(e.enemyId as number, e.moveId);
           break;
         case 'towerHit':
           if (e.towerId !== undefined) {
@@ -1042,7 +1045,7 @@ export class LevelScene extends Phaser.Scene {
           break;
         }
         case 'attack':
-          this.animateAttack(e.towerId as number, e.enemyId);
+          this.animateAttack(e.towerId as number, e.enemyId, e.moveId);
           break;
         case 'hit':
           this.animateHit(e.enemyId as number, e.damage?.damage ?? 0, e.damage?.crit ?? false, e.damage?.effectiveness ?? 1);
@@ -1228,11 +1231,21 @@ export class LevelScene extends Phaser.Scene {
     this.tweens.add({ targets: this.trainerSprite, alpha: 1, duration: 200 });
   }
 
-  private animateBossMove(enemyId: number): void {
+  /**
+   * The animation a move plays: physical moves lunge with the PMD Attack
+   * sheet; special and status moves fire in place with Shoot, falling back
+   * to Attack when the folder has no Shoot sheet.
+   */
+  private attackAction(dex: string, moveId: number | undefined): string | undefined {
+    const category = moveId === undefined ? 'physical' : resolveMove(moveId).category;
+    return pickAction(dex, category === 'physical' ? ['Attack', 'Shoot'] : ['Shoot', 'Attack']);
+  }
+
+  private animateBossMove(enemyId: number, moveId?: number): void {
     const view = this.enemyViews.get(enemyId);
     if (!view || view.dying) return;
     const dex = spriteDex(view.sprite);
-    const action = pickAction(dex, ['Attack']);
+    const action = this.attackAction(dex, moveId);
     const dir = spriteDirection(view.sprite) ?? Direction.Down;
     this.floatText(this.enemyPixel(enemyId), 'Boss attack!', '#ffb3b3');
     if (!action || view.busy) return;
@@ -1570,14 +1583,14 @@ export class LevelScene extends Phaser.Scene {
     return tower ? this.tilePixel(tower.tile[0], tower.tile[1]) : { px: -100, py: -100 };
   }
 
-  private animateAttack(towerId: number, enemyId: number | undefined): void {
+  private animateAttack(towerId: number, enemyId: number | undefined, moveId?: number): void {
     const view = this.towerViews.get(towerId);
     if (!view) return;
     const from = this.towerPixel(towerId);
     const to = enemyId === undefined ? from : this.enemyPixel(enemyId);
     const dir = directionFromVector(to.px - from.px, to.py - from.py, spriteDirection(view.sprite) ?? Direction.Down);
     const dex = spriteDex(view.sprite);
-    const action = pickAction(dex, ['Attack']);
+    const action = this.attackAction(dex, moveId);
     if (!action || view.busy) {
       if (!view.busy) playAnim(view.sprite, 'Idle', dir);
       return;
