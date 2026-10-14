@@ -148,6 +148,20 @@ to the editor. Everything the editor changes is drawn live.
 Nothing is saved to the game's save data or localStorage; the export file is
 the deliverable.
 
+## Black/White route maps
+
+The outdoor routes (Route 201, Lake Verity, Route 202, Route 203) are built by
+`scripts/bw-maps.py` from UltimoSpriter's Gen 5 exterior sheet, the authentic
+Black/White style: the 4x4 seamless BW grass texture, the sandy BW footpath
+(terrain `bw-path`), BW tall-grass tufts, grassy cliff ledges with rock faces,
+and BW conifers. Maps have one decoration layer, so the script composites
+every tree (forest walls in staggered overlapping rows, plus lone trees) onto
+one canvas, cuts the covered cells into tiles, dedupes them into
+`assets-src/tilesets/gen5/generated-bw.png`, registers everything under the
+`bw-outdoor` tileset and runs the tileset build before writing the maps. Run
+`python3 scripts/bw-maps.py`; it always designs every BW map so the generated
+sheet covers all of them. Spots are range-checked the same way as below.
+
 ## The Sinnoh maps script
 
 The six opening maps (Route 201, Lake Verity, Route 202, Route 203, Oreburgh

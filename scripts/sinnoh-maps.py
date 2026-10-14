@@ -517,8 +517,10 @@ def oreburgh_mine():
     m.write()
 
 
-MAPS = {'route-201': route_201, 'lake-verity': lake_verity, 'route-202': route_202, 'route-203': route_203,
-        'oreburgh-gate': oreburgh_gate, 'oreburgh-mine-1f': oreburgh_mine}
+# The outdoor routes moved to scripts/bw-maps.py (Black/White tiles); this
+# script now only builds the caves. The old outdoor designs stay above for
+# reference but are not run.
+MAPS = {'oreburgh-gate': oreburgh_gate, 'oreburgh-mine-1f': oreburgh_mine}
 
 if __name__ == '__main__':
     for name in sys.argv[1:] or MAPS:

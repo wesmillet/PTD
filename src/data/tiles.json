@@ -10,6 +10,11 @@
    "file": "assets-src/tilesets/gen5/gen5-exterior.png",
    "artist": "UltimoSpriter (signed on the sheet); listed as cmm6jjn in the source pack",
    "description": "Buildings, fences, signs, town and route decoration"
+  },
+  "generated-bw": {
+   "file": "assets-src/tilesets/gen5/generated-bw.png",
+   "artist": "UltimoSpriter (trees composited by scripts/bw-maps.py)",
+   "description": "BW conifers composited into overlapping forest tiles"
   }
  },
  "credits": {
@@ -17,7 +22,7 @@
   "lines": [
    "Compiled in \"Tiles - Ready to use Tilesets\" by Aki, https://eeveeexpo.com/resources/15/",
    "Outside tileset (terrain, grass, trees, cliffs, water): Kyle-Dove",
-   "Gen 5 exterior tileset (fences, signs, flowers, rocks): UltimoSpriter (sheet signature), pack entry cmm6jjn",
+   "Gen 5 exterior tileset (route grass, paths, trees, tall grass, cliffs, signs): UltimoSpriter (sheet signature), pack entry cmm6jjn",
    "Full notes in assets-src/tilesets/gen5/CREDITS.txt"
   ]
  },
@@ -31,6 +36,11 @@
    "name": "Placeholder (flat colours)",
    "columns": 8,
    "theme": "cave"
+  },
+  "bw-outdoor": {
+   "name": "Gen 5 BW outdoor",
+   "columns": 8,
+   "theme": "grass"
   }
  },
  "tiles": [
@@ -1885,6 +1895,850 @@
    "color": "#2d5a2a",
    "placeholder": true,
    "solid": true
+  },
+  {
+   "id": "bw-grass-0",
+   "name": "BW grass 0",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 13
+  },
+  {
+   "id": "bw-grass-1",
+   "name": "BW grass 1",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 13
+  },
+  {
+   "id": "bw-grass-2",
+   "name": "BW grass 2",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 13
+  },
+  {
+   "id": "bw-grass-3",
+   "name": "BW grass 3",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 13
+  },
+  {
+   "id": "bw-grass-4",
+   "name": "BW grass 4",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 14
+  },
+  {
+   "id": "bw-grass-5",
+   "name": "BW grass 5",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 14
+  },
+  {
+   "id": "bw-grass-6",
+   "name": "BW grass 6",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 14
+  },
+  {
+   "id": "bw-grass-7",
+   "name": "BW grass 7",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 14
+  },
+  {
+   "id": "bw-grass-8",
+   "name": "BW grass 8",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 15
+  },
+  {
+   "id": "bw-grass-9",
+   "name": "BW grass 9",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 15
+  },
+  {
+   "id": "bw-grass-10",
+   "name": "BW grass 10",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 15
+  },
+  {
+   "id": "bw-grass-11",
+   "name": "BW grass 11",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 15
+  },
+  {
+   "id": "bw-grass-12",
+   "name": "BW grass 12",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 16
+  },
+  {
+   "id": "bw-grass-13",
+   "name": "BW grass 13",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 16
+  },
+  {
+   "id": "bw-grass-14",
+   "name": "BW grass 14",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 16
+  },
+  {
+   "id": "bw-grass-15",
+   "name": "BW grass 15",
+   "group": "BW",
+   "layer": "ground",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 7,
+   "row": 16
+  },
+  {
+   "id": "bw-tall",
+   "name": "BW tall",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 6
+  },
+  {
+   "id": "bw-reeds",
+   "name": "BW reeds",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 3
+  },
+  {
+   "id": "bw-flowers-white",
+   "name": "BW flowers white",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 6
+  },
+  {
+   "id": "bw-flowers-white-2",
+   "name": "BW flowers white 2",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 6
+  },
+  {
+   "id": "bw-sprig",
+   "name": "BW sprig",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 8
+  },
+  {
+   "id": "bw-sprig-2",
+   "name": "BW sprig 2",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 2,
+   "row": 8
+  },
+  {
+   "id": "bw-sprig-3",
+   "name": "BW sprig 3",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 8
+  },
+  {
+   "id": "bw-flower-bush-red",
+   "name": "BW flower bush red",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 11,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "bw-flower-bush-mix",
+   "name": "BW flower bush mix",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 11,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "bw-flower-patch-pink",
+   "name": "BW flower patch pink",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 5,
+   "row": 9,
+   "w": 2,
+   "h": 2
+  },
+  {
+   "id": "bw-sign",
+   "name": "BW sign",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 1220,
+   "w": 1,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-tl",
+   "name": "BW cliff tl",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 182,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-t",
+   "name": "BW cliff t",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 182,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-tr",
+   "name": "BW cliff tr",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 182,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-l",
+   "name": "BW cliff l",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 183,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-r",
+   "name": "BW cliff r",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 183,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-fl",
+   "name": "BW cliff fl",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 185,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-f",
+   "name": "BW cliff f",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 185,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-fr",
+   "name": "BW cliff fr",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 185,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-fl2",
+   "name": "BW cliff fl2",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 186,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-f2",
+   "name": "BW cliff f2",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 1,
+   "row": 186,
+   "solid": true
+  },
+  {
+   "id": "bw-cliff-fr2",
+   "name": "BW cliff fr2",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 3,
+   "row": 186,
+   "solid": true
+  },
+  {
+   "id": "bw-rock-big",
+   "name": "BW rock big",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 0,
+   "row": 197,
+   "w": 4,
+   "h": 5,
+   "solid": true
+  },
+  {
+   "id": "bw-rock",
+   "name": "BW rock",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 4,
+   "row": 198,
+   "w": 2,
+   "h": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-rock-small",
+   "name": "BW rock small",
+   "group": "BW",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "exterior",
+   "col": 6,
+   "row": 200,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-0",
+   "name": "BW forest 0",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 0,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-1",
+   "name": "BW forest 1",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 1,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-2",
+   "name": "BW forest 2",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 2,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-3",
+   "name": "BW forest 3",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 3,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-4",
+   "name": "BW forest 4",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 4,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-5",
+   "name": "BW forest 5",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 5,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-6",
+   "name": "BW forest 6",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 6,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-7",
+   "name": "BW forest 7",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 7,
+   "row": 0,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-8",
+   "name": "BW forest 8",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 0,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-9",
+   "name": "BW forest 9",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 1,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-10",
+   "name": "BW forest 10",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 2,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-11",
+   "name": "BW forest 11",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 3,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-12",
+   "name": "BW forest 12",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 4,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-13",
+   "name": "BW forest 13",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 5,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-14",
+   "name": "BW forest 14",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 6,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-15",
+   "name": "BW forest 15",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 7,
+   "row": 1,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-16",
+   "name": "BW forest 16",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 0,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-17",
+   "name": "BW forest 17",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 1,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-18",
+   "name": "BW forest 18",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 2,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-19",
+   "name": "BW forest 19",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 3,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-20",
+   "name": "BW forest 20",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 4,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-21",
+   "name": "BW forest 21",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 5,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-22",
+   "name": "BW forest 22",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 6,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-23",
+   "name": "BW forest 23",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 7,
+   "row": 2,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-24",
+   "name": "BW forest 24",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 0,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-25",
+   "name": "BW forest 25",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 1,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-26",
+   "name": "BW forest 26",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 2,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-27",
+   "name": "BW forest 27",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 3,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-28",
+   "name": "BW forest 28",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 4,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-29",
+   "name": "BW forest 29",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 5,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-30",
+   "name": "BW forest 30",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 6,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-31",
+   "name": "BW forest 31",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 7,
+   "row": 3,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-32",
+   "name": "BW forest 32",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 0,
+   "row": 4,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-33",
+   "name": "BW forest 33",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 1,
+   "row": 4,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-34",
+   "name": "BW forest 34",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 2,
+   "row": 4,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-35",
+   "name": "BW forest 35",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 3,
+   "row": 4,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-36",
+   "name": "BW forest 36",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 4,
+   "row": 4,
+   "solid": true
   }
  ],
  "terrains": [
@@ -2044,6 +2898,17 @@
    ],
    "group": "Beach",
    "base": "grass"
+  },
+  {
+   "id": "bw-path",
+   "name": "BW path",
+   "source": "exterior",
+   "block": [
+    0,
+    76
+   ],
+   "group": "Paths",
+   "base": "bw-grass-0"
   }
  ]
 }
