@@ -94,6 +94,7 @@ export class BootScene extends Phaser.Scene {
     this.load.image(trainerTextureKey('ace-trainer-male', true), assetUrl('assets/trainers/ace-trainer-male-pose.png'));
     for (const id of trainerIds) {
       const art = TRAINER_ART[id];
+      if (!art) continue; // nobles and other non-trainer "trainers" have no art
       const file = trainerArtId(id);
       this.load.image(trainerTextureKey(id), assetUrl(`assets/trainers/${file}.png`));
       if ((art?.poses ?? 1) >= 2) this.load.image(trainerTextureKey(id, true), assetUrl(`assets/trainers/${file}-pose.png`));

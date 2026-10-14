@@ -52,6 +52,9 @@ export interface BossStatus {
   catchable?: boolean;
   /** Phase thresholds as HP fractions (ticks on the bar). */
   phases?: number[];
+  /** A noble's stagger meter (0..1) and whether it is staggered right now. */
+  stagger?: number;
+  staggered?: boolean;
 }
 
 /**
@@ -129,7 +132,7 @@ export class Hud {
     this.rebuildSlots(state);
 
     // Ball bar, right side of the bottom bar, with the Gen 5 item sprites.
-    const obtainable = BALL_IDS.filter((id) => BALLS[id]?.obtainable !== false);
+    const obtainable = state.ballsOnly ?? BALL_IDS.filter((id) => BALLS[id]?.obtainable !== false);
     const startX = width - 16 - obtainable.length * 46 + 22;
     scene.add.text(startX - 30, this.bottomY + 30, 'Balls', TEXT_DIM).setOrigin(1, 0.5).setDepth(1001);
     obtainable.forEach((id, i) => {
@@ -268,9 +271,9 @@ export class Hud {
       this.bossGfx.fillStyle(0x000000, 1).fillRect(x, 62, w, 12);
       this.bossGfx.fillStyle(colour, 1).fillRect(x, 62, Math.round(w * frac), 12);
     }
-    this.bossName.setText(boss.name);
+    this.bossName.setText(boss.staggered ? `${boss.name}  STAGGERED` : boss.name);
     this.bossLevel?.setText(String(boss.level ?? ''));
-    this.bossHp.setText(`${boss.hp} / ${boss.maxHp}`);
+    this.bossHp.setText(boss.stagger !== undefined && !boss.staggered ? `${boss.hp} / ${boss.maxHp}   stagger ${Math.round(boss.stagger * 100)}%` : `${boss.hp} / ${boss.maxHp}`);
   }
 
   update(state: LevelState, gameSpeed: number, selectedPartyIndex: number | null = null, selectedBall: string | null = null): void {

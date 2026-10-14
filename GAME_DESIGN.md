@@ -212,6 +212,17 @@ Pokémon, the final ace at 5x HP), a locker room between rounds (heal, PC,
 vendor, the simulated board), and the rewards of `docs/design-content.md`.
 `src/sim/conference.ts` is the pure logic; `ConferenceScene` the flow.
 
+### Hisui rifts
+After Spear Pillar, four rift levels (`src/data/levels/30-hisui.json`)
+open on the level select as purple tears: the Obsidian Fieldlands, Crimson
+Mirelands, Cobalt Coastlands and Alabaster Icelands on the rift maps, with
+Legends rules (no money, Hisuian balls only, every wild catchable), Alphas,
+the three-phase noble fight (stagger meter, balms in the stagger window,
+summons between staggers) and one space-time distortion per level; the
+Temporal Spire capstone (Primal Dialga) opens after all four nobles.
+Mechanics live in `src/sim/level.ts` (nobles, Alphas) and the `distortion`
+rule.
+
 ### Level objectives
 Each level definition (`src/data/levels.json`) has an `objective`:
 - `defend`: a fixed wave count and a number of lives. Each enemy that reaches

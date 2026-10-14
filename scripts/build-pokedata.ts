@@ -25,7 +25,7 @@ const EXTRA_MOVES = new Set(['psystrike']);
  * Species past Gen 4: Hisui's new evolutions (sprites shipped) and the base
  * species the Hisuian forms belong to (data only, no sprites of their own).
  */
-const EXTRA_SPECIES = ['899', '900', '901', '902', '903', '904', '503', '549', '570', '571', '628', '713', '724'];
+const EXTRA_SPECIES = ['899', '900', '901', '902', '903', '904', '503', '549', '570', '571', '628', '713', '724', '548', '627', '712'];
 /**
  * Forms with sprite folders: the PokeAPI pokemon identifier (its 10000+ id
  * becomes the species id in the game) or, for forms PokeAPI has no entry

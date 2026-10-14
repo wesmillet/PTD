@@ -177,6 +177,22 @@ export interface Enemy {
   fleeAfter?: number;
   /** Only balls affect it; it flees at the end of the path instead of leaking. */
   catchOnly?: boolean;
+  /** Hisui noble fight state. */
+  noble?: NobleState;
+}
+
+export interface NobleState {
+  /** Stagger meter and its size (a share of the noble's max HP). */
+  stagger: number;
+  staggerMax: number;
+  /** Seconds left in the current stagger window (0 = frenzied). */
+  staggered: number;
+  /** Stagger windows finished so far; three calm the noble. */
+  staggers: number;
+  /** Species it calls between staggers. */
+  summons: number[];
+  /** Summon groups still owed after the current stagger ends. */
+  summonsOwed: number;
 }
 
 export interface Escort {
@@ -250,7 +266,9 @@ export type LevelEventType =
   | 'flee'
   | 'bossPhase'
   | 'lanesReversed'
-  | 'drop';
+  | 'drop'
+  /** A noble staggered (text) or was calmed (species). */
+  | 'noble';
 
 export interface LevelEvent {
   type: LevelEventType;
@@ -363,6 +381,13 @@ const GROUND = 5;
 const SHADOW_DAMAGE = 1.3;
 const DYNAMAX_HP = 3;
 const MOTOR_DRIVE_SECONDS = 3;
+const NOBLE_STAGGER_SHARE = 0.25;
+const NOBLE_STAGGER_SECONDS = 6;
+const NOBLE_STAGGERS_TO_CALM = 3;
+const NOBLE_BALM_FRACTION = 0.15;
+const NOBLE_FRENZY_SPEED = 1.5;
+const NOBLE_SUMMON_WAVES = 2;
+const NOBLE_SUMMON_SIZE = 3;
 
 function moveIdByName(name: string): number {
   const id = findMoveId(name);
@@ -419,6 +444,7 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
     ...(def.ballsOnly ? { ballsOnly: [...def.ballsOnly] } : {}),
     nextId: 1,
   };
+  for (const [ball, n] of Object.entries(def.giveBalls ?? {})) state.items.balls[ball] = (state.items.balls[ball] ?? 0) + n;
   if (!isScripted(def) && state.table.length === 0) throw new Error(`createLevel: no spawn table for ${def.name} at ${time}`);
   if (def.objective === 'defend' && (waveCount(def) === 0 || !def.lives)) throw new Error('createLevel: defend levels need waves and lives');
   if (def.trainer) trainerWave(def, state.starter, moveIdByName); // validate names early
@@ -782,6 +808,7 @@ export function throwBall(state: LevelState, ballId: string, enemyId: number): L
   const reason = canThrow(state, ballId, enemyId);
   if (reason) throw new Error(`throwBall: ${reason}`);
   const enemy = enemyById(state, enemyId) as Enemy;
+  if (enemy.noble) return throwBalm(state, ballId, enemy);
   if (!isCatchable(enemy)) return [{ type: 'ballBlocked', enemyId, ball: ballId }];
   state.items.balls[ballId] = (state.items.balls[ballId] ?? 0) - 1;
   const mod = ballModifier(ballId, {
@@ -804,6 +831,26 @@ export function throwBall(state: LevelState, ballId: string, enemyId: number): L
   rulesOnCaught(state, enemy, events);
   if (state.pending.length === 0 && state.enemies.length === 0) endWave(state, events);
   return events;
+}
+
+/** A ball at a noble is a balm: it lands only while the noble is staggered and takes a share of its HP. */
+function throwBalm(state: LevelState, ballId: string, enemy: Enemy): LevelEvent[] {
+  const noble = enemy.noble as NobleState;
+  if (noble.staggered <= 0) return [{ type: 'ballBlocked', enemyId: enemy.id, ball: ballId }];
+  state.items.balls[ballId] = (state.items.balls[ballId] ?? 0) - 1;
+  const amount = Math.max(1, Math.round(enemy.mon.stats.hp * NOBLE_BALM_FRACTION));
+  enemy.mon.hp = Math.max(0, enemy.mon.hp - amount);
+  const events: LevelEvent[] = [{ type: 'ballThrow', enemyId: enemy.id, ball: ballId, shakes: 0, caught: false }, { type: 'hit', enemyId: enemy.id, damage: { damage: amount, crit: false, effectiveness: 1, stab: false } as DamageResult }];
+  if (enemy.mon.hp <= 0) calmNoble(state, enemy, events);
+  return events;
+}
+
+/** The noble is calmed: it leaves the field uncaught and the wave can end. */
+function calmNoble(state: LevelState, enemy: Enemy, events: LevelEvent[]): void {
+  removeEnemy(state, enemy);
+  state.kos++;
+  events.push({ type: 'noble', enemyId: enemy.id, species: enemy.mon.species, text: `${enemy.mon.name} is calmed!` });
+  if (state.pending.length === 0 && state.enemies.length === 0) endWave(state, events);
 }
 
 /** Alphas drop one of the level's Hisuian balls (the first allowed ball when the level restricts them). */
@@ -1031,6 +1078,13 @@ function attack(state: LevelState, tower: Tower, move: MoveSpec, enemy: Enemy | 
     enemy.speedBoost = MOTOR_DRIVE_SECONDS;
   }
   dealt = rulesOnHit(state, tower, enemy, move, dealt, events);
+  if (enemy.noble) {
+    nobleHit(state, enemy, dealt, events);
+    enemy.lastHitBy = tower.id;
+    enemy.damagedBy.add(tower.id);
+    events.push({ type: 'hit', towerId: tower.id, enemyId: enemy.id, damage: { ...damage, damage: 0 } });
+    return;
+  }
   enemy.mon.hp = Math.max(0, enemy.mon.hp - dealt);
   enemy.lastHitBy = tower.id;
   enemy.damagedBy.add(tower.id);
@@ -1042,6 +1096,42 @@ function attack(state: LevelState, tower: Tower, move: MoveSpec, enemy: Enemy | 
     applyEffects(state, tower, move, enemy, dealt, events);
     grantExp(state, tower, hitExp(enemy.mon.baseExp, enemy.mon.level, state.config.exp.expPerHitFraction), events);
   }
+}
+
+/** A frenzied noble takes no damage: the hit fills the stagger meter; a full meter opens a stagger window. */
+function nobleHit(state: LevelState, enemy: Enemy, dealt: number, events: LevelEvent[]): void {
+  const noble = enemy.noble as NobleState;
+  if (noble.staggered > 0) return;
+  noble.stagger = Math.min(noble.staggerMax, noble.stagger + dealt);
+  if (noble.stagger < noble.staggerMax) return;
+  noble.stagger = 0;
+  noble.staggered = NOBLE_STAGGER_SECONDS;
+  events.push({ type: 'noble', enemyId: enemy.id, text: `${enemy.mon.name} staggers! Throw the balms!` });
+}
+
+/** The noble's stagger timer; when the window closes it calls its summons, and the third window calms it. */
+function tickNoble(state: LevelState, enemy: Enemy, dt: number, events: LevelEvent[]): void {
+  const noble = enemy.noble as NobleState;
+  if (noble.staggered <= 0) return;
+  noble.staggered = Math.max(0, noble.staggered - dt);
+  if (noble.staggered > 0) return;
+  noble.staggers += 1;
+  if (noble.staggers >= NOBLE_STAGGERS_TO_CALM) {
+    calmNoble(state, enemy, events);
+    return;
+  }
+  if (noble.summons.length > 0) {
+    const levels = state.def.levels ?? [enemy.mon.level - 12, enemy.mon.level - 6];
+    const base = state.waveTime + 1;
+    for (let w = 0; w < NOBLE_SUMMON_WAVES; w++) {
+      for (let i = 0; i < NOBLE_SUMMON_SIZE; i++) {
+        state.pending.push({ species: state.rng.pick(noble.summons), level: Math.max(1, state.rng.int(levels[0], levels[1])), delay: base + w * 6 + i * state.def.spawnInterval, lane: enemy.lane });
+      }
+    }
+    state.pending.sort((a, b) => a.delay - b.delay);
+    events.push({ type: 'noble', enemyId: enemy.id, text: `${enemy.mon.name} calls for help!` });
+  }
+  events.push({ type: 'rule', rule: 'noble', enemyId: enemy.id, text: `${enemy.mon.name} is frenzied again.` });
 }
 
 /** Damage a boss move does to one tower (never below 1 HP left). */
@@ -1167,6 +1257,9 @@ function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
   if (def.immune) enemy.immune = [...def.immune];
   if (def.fleeAfter !== undefined) enemy.fleeAfter = def.fleeAfter;
   if (def.catchOnly) enemy.catchOnly = true;
+  if (def.noble) {
+    enemy.noble = { stagger: 0, staggerMax: Math.max(1, Math.round(mon.stats.hp * NOBLE_STAGGER_SHARE)), staggered: 0, staggers: 0, summons: [...(def.summons ?? [])], summonsOwed: 0 };
+  }
   state.enemies.push(enemy);
   events.push({ type: 'spawn', enemyId: enemy.id, shiny, ...(def.boss ? { boss: true } : {}) });
   rulesOnSpawn(state, enemy, def, events);
@@ -1292,17 +1385,28 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
         continue;
       }
     }
+    if (enemy.noble) {
+      tickNoble(state, enemy, dt, events);
+      if (!state.enemies.includes(enemy)) continue;
+    }
     if (enemy.stun > 0) {
       enemy.stun = Math.max(0, enemy.stun - dt);
+    } else if (enemy.noble && enemy.noble.staggered > 0) {
+      // Staggered: it stands still.
     } else {
       const speedMult =
         speedMultiplier(enemy.mon.status, state.config.status) *
         stageMultiplier(enemy.mon.status.stages.spe) *
         rulesEnemySpeed(state, enemy) *
-        (enemy.speedBoost > 0 ? 1.5 : 1);
+        (enemy.speedBoost > 0 ? 1.5 : 1) *
+        (enemy.noble ? NOBLE_FRENZY_SPEED : 1);
       enemy.distance = Math.max(0, enemy.distance + enemy.tilesPerSec * speedMult * dt);
     }
     if (enemy.distance >= enemyPath(state, enemy).length + 1) {
+      if (enemy.noble) {
+        enemy.distance = 0; // a noble charges the path again and again
+        continue;
+      }
       if (enemyReachedEnd(state, enemy, events)) return events;
       continue;
     }

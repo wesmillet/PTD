@@ -244,3 +244,19 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   sleep effect puts towers in range to sleep); Latios is a second boss.
 - Rewards alternate at random between a Mega Stone the save does not hold
   and a Lottery ticket; once every stone is owned, tickets only.
+
+## Phase 8 item 6 (Hisui rifts)
+
+- Nobles are `trainer` entries with ids `noble-<name>` and no art, so the
+  existing trainer-wave flow (banner, boss bar, uncatchable) carries them;
+  Boot and the content tests skip art for `noble-` ids.
+- A frenzied noble charges the whole path at 1.5x speed and starts over at
+  the end instead of leaking (the fight is about the stagger, not lives).
+- The stagger meter holds a quarter of the noble's max HP in damage; the
+  window is six seconds; balms take 15 % of max HP; three windows calm it
+  (as does reaching 0 HP from balms). Summons: two groups of three of its
+  area's species, six seconds apart, on the noble's lane.
+- Rifts hand out a Hisuian ball set at level start (`giveBalls`) because
+  the shop never sells them; Alphas and the noble's reward refill the set.
+- Petilil, Rufflet and Bergmite joined the data (their sprites were already
+  in the repo) so the Mirelands and Icelands lists match the design.

@@ -893,7 +893,19 @@ export class LevelScene extends Phaser.Scene {
     this.syncViews();
     this.drawOverlay();
     const boss = activeBoss(this.state);
-    this.hud.setBoss(boss ? { name: capitalize(boss.mon.name), hp: boss.mon.hp, maxHp: boss.mon.stats.hp, level: boss.mon.level, catchable: isCatchable(boss), phases: boss.boss?.phases.map((p) => p.at) ?? [] } : null);
+    this.hud.setBoss(
+      boss
+        ? {
+            name: capitalize(boss.mon.name),
+            hp: boss.mon.hp,
+            maxHp: boss.mon.stats.hp,
+            level: boss.mon.level,
+            catchable: isCatchable(boss),
+            phases: boss.boss?.phases.map((p) => p.at) ?? [],
+            ...(boss.noble ? { stagger: boss.noble.stagger / boss.noble.staggerMax, staggered: boss.noble.staggered > 0 } : {}),
+          }
+        : null,
+    );
     this.hud.setRules(ruleStatus(this.state));
     this.dialogue?.update(delta);
     this.hud.setPaused(this.paused);
@@ -1020,6 +1032,7 @@ export class LevelScene extends Phaser.Scene {
         case 'cutscene':
           if (e.lines?.length) this.showLines(e.lines);
           break;
+        case 'noble':
         case 'rule':
         case 'lanesReversed':
         case 'drop':
@@ -1589,6 +1602,7 @@ export class LevelScene extends Phaser.Scene {
       const view = this.enemyViews.get(enemy.id);
       if (!view) continue;
       view.sprite.setAlpha(enemy.vanish > 0 ? 0.15 : 1);
+      if (enemy.noble) view.sprite.setTint(enemy.noble.staggered > 0 ? 0xffffff : 0xffd040);
       const point = enemyPoint(state, enemy);
       const { px, py } = this.tilePixel(point.x, point.y);
       view.sprite.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);

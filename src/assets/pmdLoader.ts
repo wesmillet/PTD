@@ -282,9 +282,11 @@ export function registerAnims(scene: Phaser.Scene, dex: string): void {
     const expectedFrames = columns * DIRECTION_ROWS;
     // frameTotal counts the special __BASE frame as well.
     if (texture.frameTotal - 1 !== expectedFrames) {
-      throw new Error(
-        `pmdLoader: ${dex}/${entry.sheet}-Anim.png has ${texture.frameTotal - 1} frames, expected ${expectedFrames}`,
-      );
+      // A malformed sheet (Primal Dialga's Faint has 28 frames for a 224-frame AnimData entry):
+      // drop the action instead of failing the whole Pokémon; callers fall back to Idle or Hurt.
+      console.warn(`pmdLoader: ${dex}/${entry.sheet}-Anim.png has ${texture.frameTotal - 1} frames, expected ${expectedFrames}; action ${action} skipped`);
+      set.actions.delete(action);
+      continue;
     }
     const shadowKey = shadowSheetKey(dex, entry.sheet);
     const rawShadowKey = rawShadowSheetKey(dex, entry.sheet);

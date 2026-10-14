@@ -59,6 +59,19 @@ which maps the maps session still needs to build. Updated per commit.
   saved mid-way (`game.conference`). Reached from the gold marker east of
   Sunyshore on the level select (after the Distortion World outside demo).
 
+- **Hisui rifts** (`src/data/levels/30-hisui.json`): four rift levels on the
+  rift maps with Legends rules (no money, Feather/Wing/Jet/Heavy Balls only,
+  a ball set handed out at the start), the wild lists and Alphas (+10
+  levels, 1.5x sprite with a red tint, catchable, drop a ball), the noble
+  three-phase fight (gold frenzy tint, no damage while frenzied, hits fill a
+  stagger meter worth a quarter of its HP, six-second stagger window where
+  Feather Balls land as balms for 15 % each, two summoned waves of its
+  area's Pokémon between staggers, calmed on the third stagger or at 0 HP,
+  never caught), the space-time distortion dome once per level (`distortion`
+  rule: 60 s, rare Hisuian spawns, a 1-in-20 shiny Alpha), and the Temporal
+  Spire capstone with Primal Dialga after all four nobles. Rifts show as
+  purple tears on the level select.
+
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
@@ -83,7 +96,13 @@ which maps the maps session still needs to build. Updated per commit.
 - The Snowpoint hail pulse fires at every wave start (the design ties it to
   Abomasnow; the rule has no way to know who is on the field yet).
 
+- Balms are Feather Balls thrown at a staggered noble (any Hisuian ball
+  works; the throw animation is the ball's). The dome is drawn as a glow
+  centre on the map rather than a true third-of-the-map dome.
+- The distortion's "double chain" bonus is not implemented (no chain yet).
+
 ## Maps still needed
 
-None yet for the items built so far. Stand-ins used by later items are
-listed here as they are added.
+| Level | Stand-in map in use | Needed |
+| --- | --- | --- |
+| `temporal-spire` | `spear-pillar` | The Temporal Spire (a spiral up the spire, PMD-style) |

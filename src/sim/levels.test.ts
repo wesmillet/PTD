@@ -139,6 +139,10 @@ describe('level presentation', () => {
   it('has Platinum art for every trainer the levels name', () => {
     for (const id of levelIds()) {
       for (const trainer of levelTrainers(getLevel(id))) {
+        if (trainer.id.startsWith('noble-')) {
+          for (const p of trainer.party) expect(hasSprites(partySpecies(p.species, 387, id)), `${id}: ${p.species}`).toBe(true);
+          continue;
+        }
         const art = TRAINER_ART[trainer.id];
         expect(art, `${id}: ${trainer.id} is not in trainers/index.json`).toBeDefined();
         const file = trainerArtId(trainer.id);

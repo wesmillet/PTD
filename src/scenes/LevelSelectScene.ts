@@ -150,9 +150,11 @@ export class LevelSelectScene extends Phaser.Scene {
       const image = this.textures.exists('map-markers')
         ? this.add.image(x, y, 'map-markers', frame).setScale(MAP_SCALE)
         : this.add.image(x, y, '__DEFAULT').setDisplaySize(24, 24);
-      // Platinum colours the places you can go red; cleared ones gold; locked ones stay the plain grey marker, dimmed.
+      // Platinum colours the places you can go red; cleared ones gold; rifts are purple tears; locked ones stay the plain grey marker, dimmed.
       if (!unlocked) image.setAlpha(0.5);
+      else if (def.rift) image.setTintFill(done ? 0xd0a0ff : 0xa040e0);
       else image.setTintFill(done ? 0xf0b020 : 0xf05050);
+      if (def.rift) image.setFrame(1).setScale(MAP_SCALE * 0.8);
       image.setDepth(10).setInteractive({ useHandCursor: unlocked });
       image.on('pointerover', () => this.showHover(id, x, y));
       image.on('pointerout', () => this.hideHover());

@@ -1,0 +1,2236 @@
+{
+  "rift-fieldlands": {
+    "name": "Obsidian Fieldlands: Grandtree Arena",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "hisui-fieldlands",
+    "mapPos": [
+      92,
+      92
+    ],
+    "popup": "forest",
+    "rift": true,
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 60,
+    "levels": [
+      30,
+      38
+    ],
+    "maxWildLevel": 100,
+    "requires": "spear-pillar",
+    "unlock": {
+      "flags": [
+        "spear-pillar-cleared"
+      ]
+    },
+    "noMoney": true,
+    "ballsOnly": [
+      "feather",
+      "wing",
+      "jet",
+      "heavy"
+    ],
+    "giveBalls": {
+      "feather": 8,
+      "wing": 3,
+      "jet": 2,
+      "heavy": 2
+    },
+    "rules": [
+      {
+        "id": "distortion",
+        "seconds": 60,
+        "count": 3
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          }
+        ],
+        "count": 4,
+        "levels": [
+          30,
+          38
+        ],
+        "lines": [
+          {
+            "text": "A space-time rift has dropped you into Hisui. Eterna Forest is the Obsidian Fieldlands now: no roads, no shops, only the balls you find. Everything here can be caught."
+          }
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          }
+        ],
+        "count": 5,
+        "levels": [
+          30,
+          38
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          },
+          {
+            "species": "rapidash",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "wyrdeer",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 6,
+        "levels": [
+          30,
+          38
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          },
+          {
+            "species": "rapidash",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "wyrdeer",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 7,
+        "levels": [
+          30,
+          38
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          },
+          {
+            "species": "rapidash",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "wyrdeer",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 8,
+        "levels": [
+          30,
+          38
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          },
+          {
+            "species": "rapidash",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "wyrdeer",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 9,
+        "levels": [
+          30,
+          38
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          },
+          {
+            "species": "rapidash",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "wyrdeer",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 10,
+        "levels": [
+          30,
+          38
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "bidoof",
+            "rarity": 10
+          },
+          {
+            "species": "starly",
+            "rarity": 10
+          },
+          {
+            "species": "shinx",
+            "rarity": 10
+          },
+          {
+            "species": "wurmple",
+            "rarity": 10
+          },
+          {
+            "species": "kricketot",
+            "rarity": 10
+          },
+          {
+            "species": "buizel",
+            "rarity": 10
+          },
+          {
+            "species": "ponyta",
+            "rarity": 10
+          },
+          {
+            "species": "stantler",
+            "rarity": 10
+          },
+          {
+            "species": "scyther",
+            "rarity": 10
+          },
+          {
+            "species": "paras",
+            "rarity": 10
+          },
+          {
+            "species": "rapidash",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "wyrdeer",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 11,
+        "levels": [
+          30,
+          38
+        ]
+      },
+      {
+        "trainer": {
+          "id": "noble-kleavor",
+          "name": "Kleavor",
+          "party": [
+            {
+              "species": "kleavor",
+              "level": 45,
+              "boss": true,
+              "noble": true,
+              "summons": [
+                "scyther"
+              ],
+              "moves": [
+                {
+                  "move": "take-down",
+                  "every": 8
+                }
+              ]
+            }
+          ]
+        },
+        "lines": [
+          {
+            "text": "The noble Kleavor is frenzied! Its hits cannot be stopped; fill the stagger meter, then throw balms in the six-second window. Three staggers calm it."
+          }
+        ],
+        "banner": "Noble Kleavor",
+        "outro": [
+          {
+            "text": "Kleavor is calm again. It leaves a set of Hisuian balls, an Azure Flute shard and a gift."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "items": {
+        "feather": 6,
+        "wing": 4,
+        "jet": 2,
+        "heavy": 2,
+        "dusk-stone": 1
+      },
+      "flags": [
+        "noble-kleavor",
+        "shard-fieldlands"
+      ]
+    }
+  },
+  "rift-mirelands": {
+    "name": "Crimson Mirelands: Brava Arena",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "hisui-mirelands",
+    "mapPos": [
+      162,
+      150
+    ],
+    "popup": "route",
+    "rift": true,
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 60,
+    "levels": [
+      32,
+      40
+    ],
+    "maxWildLevel": 100,
+    "requires": "spear-pillar",
+    "unlock": {
+      "flags": [
+        "spear-pillar-cleared"
+      ]
+    },
+    "noMoney": true,
+    "ballsOnly": [
+      "feather",
+      "wing",
+      "jet",
+      "heavy"
+    ],
+    "giveBalls": {
+      "feather": 8,
+      "wing": 3,
+      "jet": 2,
+      "heavy": 2
+    },
+    "rules": [
+      {
+        "id": "distortion",
+        "seconds": 60,
+        "count": 3
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          }
+        ],
+        "count": 4,
+        "levels": [
+          32,
+          40
+        ],
+        "lines": [
+          {
+            "text": "The Great Marsh, a few hundred years early: the Crimson Mirelands. Watch for the Alpha Ursaluna."
+          }
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          }
+        ],
+        "count": 5,
+        "levels": [
+          32,
+          40
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          },
+          {
+            "species": "ursaluna",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 6,
+        "levels": [
+          32,
+          40
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          },
+          {
+            "species": "ursaluna",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 7,
+        "levels": [
+          32,
+          40
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          },
+          {
+            "species": "ursaluna",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 8,
+        "levels": [
+          32,
+          40
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          },
+          {
+            "species": "ursaluna",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 9,
+        "levels": [
+          32,
+          40
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          },
+          {
+            "species": "ursaluna",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 10,
+        "levels": [
+          32,
+          40
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "petilil",
+            "rarity": 10
+          },
+          {
+            "species": "tangela",
+            "rarity": 10
+          },
+          {
+            "species": "yanma",
+            "rarity": 10
+          },
+          {
+            "species": "croagunk",
+            "rarity": 10
+          },
+          {
+            "species": "carnivine",
+            "rarity": 10
+          },
+          {
+            "species": "barboach",
+            "rarity": 10
+          },
+          {
+            "species": "psyduck",
+            "rarity": 10
+          },
+          {
+            "species": "teddiursa",
+            "rarity": 10
+          },
+          {
+            "species": "ursaring",
+            "rarity": 10
+          },
+          {
+            "species": "ursaluna",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 11,
+        "levels": [
+          32,
+          40
+        ]
+      },
+      {
+        "trainer": {
+          "id": "noble-lilligant",
+          "name": "Hisuian Lilligant",
+          "party": [
+            {
+              "species": "lilligant-hisui",
+              "level": 46,
+              "boss": true,
+              "noble": true,
+              "summons": [
+                "petilil",
+                "tangela"
+              ],
+              "moves": [
+                {
+                  "move": "take-down",
+                  "every": 8
+                }
+              ]
+            }
+          ]
+        },
+        "lines": [
+          {
+            "text": "The noble Hisuian Lilligant is frenzied! Its hits cannot be stopped; fill the stagger meter, then throw balms in the six-second window. Three staggers calm it."
+          }
+        ],
+        "banner": "Noble Hisuian Lilligant",
+        "outro": [
+          {
+            "text": "Hisuian Lilligant is calm again. It leaves a set of Hisuian balls, an Azure Flute shard and a gift."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "items": {
+        "feather": 6,
+        "wing": 4,
+        "jet": 2,
+        "heavy": 2,
+        "sun-stone": 1
+      },
+      "flags": [
+        "noble-lilligant",
+        "shard-mirelands"
+      ]
+    }
+  },
+  "rift-coastlands": {
+    "name": "Cobalt Coastlands: Firespit Island",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "hisui-coastlands",
+    "mapPos": [
+      176,
+      166
+    ],
+    "popup": "water",
+    "rift": true,
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 60,
+    "levels": [
+      34,
+      42
+    ],
+    "maxWildLevel": 100,
+    "requires": "spear-pillar",
+    "unlock": {
+      "flags": [
+        "spear-pillar-cleared"
+      ]
+    },
+    "noMoney": true,
+    "ballsOnly": [
+      "feather",
+      "wing",
+      "jet",
+      "heavy"
+    ],
+    "giveBalls": {
+      "feather": 8,
+      "wing": 3,
+      "jet": 2,
+      "heavy": 2
+    },
+    "rules": [
+      {
+        "id": "distortion",
+        "seconds": 60,
+        "count": 3
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          }
+        ],
+        "count": 4,
+        "levels": [
+          34,
+          42
+        ],
+        "lines": [
+          {
+            "text": "Pastoria’s shore becomes the Cobalt Coastlands. Firespit Island smokes in the distance; its lord is waiting."
+          }
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          }
+        ],
+        "count": 5,
+        "levels": [
+          34,
+          42
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          },
+          {
+            "species": "gyarados",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "basculegion",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 6,
+        "levels": [
+          34,
+          42
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          },
+          {
+            "species": "gyarados",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "basculegion",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 7,
+        "levels": [
+          34,
+          42
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          },
+          {
+            "species": "gyarados",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "basculegion",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 8,
+        "levels": [
+          34,
+          42
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          },
+          {
+            "species": "gyarados",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "basculegion",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 9,
+        "levels": [
+          34,
+          42
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          },
+          {
+            "species": "gyarados",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "basculegion",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 10,
+        "levels": [
+          34,
+          42
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "growlithe-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "qwilfish-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "tentacool",
+            "rarity": 10
+          },
+          {
+            "species": "mantyke",
+            "rarity": 10
+          },
+          {
+            "species": "remoraid",
+            "rarity": 10
+          },
+          {
+            "species": "octillery",
+            "rarity": 10
+          },
+          {
+            "species": "magikarp",
+            "rarity": 10
+          },
+          {
+            "species": "chatot",
+            "rarity": 10
+          },
+          {
+            "species": "murkrow",
+            "rarity": 10
+          },
+          {
+            "species": "gyarados",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "basculegion",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 11,
+        "levels": [
+          34,
+          42
+        ]
+      },
+      {
+        "trainer": {
+          "id": "noble-arcanine",
+          "name": "Hisuian Arcanine",
+          "party": [
+            {
+              "species": "arcanine-hisui",
+              "level": 48,
+              "boss": true,
+              "noble": true,
+              "summons": [
+                "growlithe-hisui"
+              ],
+              "moves": [
+                {
+                  "move": "take-down",
+                  "every": 8
+                }
+              ]
+            }
+          ]
+        },
+        "lines": [
+          {
+            "text": "The noble Hisuian Arcanine is frenzied! Its hits cannot be stopped; fill the stagger meter, then throw balms in the six-second window. Three staggers calm it."
+          }
+        ],
+        "banner": "Noble Hisuian Arcanine",
+        "outro": [
+          {
+            "text": "Hisuian Arcanine is calm again. It leaves a set of Hisuian balls, an Azure Flute shard and a gift."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "items": {
+        "feather": 6,
+        "wing": 4,
+        "jet": 2,
+        "heavy": 2,
+        "fire-stone": 1
+      },
+      "flags": [
+        "noble-arcanine",
+        "shard-coastlands"
+      ]
+    }
+  },
+  "rift-icelands": {
+    "name": "Alabaster Icelands: Icepeak Arena",
+    "area": "sinnoh-route-201",
+    "time": "day",
+    "objective": "defend",
+    "map": "hisui-icelands",
+    "mapPos": [
+      124,
+      40
+    ],
+    "popup": "lake",
+    "rift": true,
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 60,
+    "levels": [
+      36,
+      44
+    ],
+    "maxWildLevel": 100,
+    "requires": "spear-pillar",
+    "unlock": {
+      "flags": [
+        "spear-pillar-cleared"
+      ]
+    },
+    "noMoney": true,
+    "ballsOnly": [
+      "feather",
+      "wing",
+      "jet",
+      "heavy"
+    ],
+    "giveBalls": {
+      "feather": 8,
+      "wing": 3,
+      "jet": 2,
+      "heavy": 2
+    },
+    "rules": [
+      {
+        "id": "distortion",
+        "seconds": 60,
+        "count": 3
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          }
+        ],
+        "count": 4,
+        "levels": [
+          36,
+          44
+        ],
+        "lines": [
+          {
+            "text": "Lake Acuity, frozen under Hisui’s sky: the Alabaster Icelands. The lord of the peak is the last noble."
+          }
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          }
+        ],
+        "count": 5,
+        "levels": [
+          36,
+          44
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          },
+          {
+            "species": "zoroark-hisui",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "braviary-hisui",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 6,
+        "levels": [
+          36,
+          44
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          },
+          {
+            "species": "zoroark-hisui",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "braviary-hisui",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 7,
+        "levels": [
+          36,
+          44
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          },
+          {
+            "species": "zoroark-hisui",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "braviary-hisui",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 8,
+        "levels": [
+          36,
+          44
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          },
+          {
+            "species": "zoroark-hisui",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "braviary-hisui",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 9,
+        "levels": [
+          36,
+          44
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          },
+          {
+            "species": "zoroark-hisui",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "braviary-hisui",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 10,
+        "levels": [
+          36,
+          44
+        ]
+      },
+      {
+        "wild": [
+          {
+            "species": "zorua-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "sneasel-hisui",
+            "rarity": 10
+          },
+          {
+            "species": "snorunt",
+            "rarity": 10
+          },
+          {
+            "species": "swinub",
+            "rarity": 10
+          },
+          {
+            "species": "piloswine",
+            "rarity": 10
+          },
+          {
+            "species": "bergmite",
+            "rarity": 10
+          },
+          {
+            "species": "rufflet",
+            "rarity": 10
+          },
+          {
+            "species": "glalie",
+            "rarity": 10
+          },
+          {
+            "species": "zoroark-hisui",
+            "rarity": 2,
+            "alpha": true
+          },
+          {
+            "species": "braviary-hisui",
+            "rarity": 2,
+            "alpha": true
+          }
+        ],
+        "count": 11,
+        "levels": [
+          36,
+          44
+        ]
+      },
+      {
+        "trainer": {
+          "id": "noble-avalugg",
+          "name": "Hisuian Avalugg",
+          "party": [
+            {
+              "species": "avalugg-hisui",
+              "level": 50,
+              "boss": true,
+              "noble": true,
+              "summons": [
+                "bergmite"
+              ],
+              "moves": [
+                {
+                  "move": "take-down",
+                  "every": 8
+                }
+              ]
+            }
+          ]
+        },
+        "lines": [
+          {
+            "text": "The noble Hisuian Avalugg is frenzied! Its hits cannot be stopped; fill the stagger meter, then throw balms in the six-second window. Three staggers calm it."
+          }
+        ],
+        "banner": "Noble Hisuian Avalugg",
+        "outro": [
+          {
+            "text": "Hisuian Avalugg is calm again. It leaves a set of Hisuian balls, an Azure Flute shard and a gift."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "items": {
+        "feather": 6,
+        "wing": 4,
+        "jet": 2,
+        "heavy": 2,
+        "tm-ice": 1
+      },
+      "flags": [
+        "noble-avalugg",
+        "shard-icelands"
+      ]
+    }
+  },
+  "temporal-spire": {
+    "name": "Temporal Spire",
+    "area": "sinnoh-route-201",
+    "time": "night",
+    "objective": "defend",
+    "map": "spear-pillar",
+    "mapPos": [
+      136,
+      92
+    ],
+    "popup": "cave",
+    "rift": true,
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 65,
+    "levels": [
+      40,
+      48
+    ],
+    "maxWildLevel": 100,
+    "requires": "rift-icelands",
+    "unlock": {
+      "flags": [
+        "noble-kleavor",
+        "noble-lilligant",
+        "noble-arcanine",
+        "noble-avalugg"
+      ]
+    },
+    "noMoney": true,
+    "ballsOnly": [
+      "feather",
+      "wing",
+      "jet",
+      "heavy"
+    ],
+    "giveBalls": {
+      "feather": 6,
+      "wing": 3,
+      "jet": 3,
+      "heavy": 3
+    },
+    "lanes": [
+      "path",
+      "path-2"
+    ],
+    "rules": [],
+    "waves": [
+      {
+        "wild": [
+          "bronzor",
+          "bronzong",
+          "chingling",
+          "golbat",
+          "zorua-hisui"
+        ],
+        "count": 5,
+        "lane": "both",
+        "lines": [
+          {
+            "text": "With all four nobles calmed, a fifth rift opens on Spear Pillar: the Temporal Spire. The path spirals up. Something at the top is keeping time from flowing."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "bronzor",
+          "bronzong",
+          "chingling",
+          "golbat",
+          "zorua-hisui"
+        ],
+        "count": 6,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "bronzong",
+          "golbat",
+          "crobat",
+          "zoroark-hisui"
+        ],
+        "count": 6,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "bronzong",
+          "crobat",
+          "zoroark-hisui",
+          "braviary-hisui"
+        ],
+        "count": 7,
+        "lane": "both"
+      },
+      {
+        "wild": [
+          "bronzong",
+          "crobat",
+          "braviary-hisui",
+          "typhlosion-hisui"
+        ],
+        "count": 7,
+        "lane": "both"
+      },
+      {
+        "trainer": {
+          "id": "noble-dialga",
+          "name": "Primal Dialga",
+          "party": [
+            {
+              "species": "dialga-primal",
+              "level": 60,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "roar-of-time",
+                  "every": 9
+                },
+                {
+                  "move": "dragon-claw",
+                  "every": 5
+                }
+              ],
+              "phases": [
+                {
+                  "at": 1
+                },
+                {
+                  "at": 0.5,
+                  "moves": [
+                    {
+                      "move": "earth-power",
+                      "every": 7
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "lines": [
+          {
+            "text": "Primal Dialga. Time itself has gone wild in it. There is no calming this one: beat it."
+          }
+        ],
+        "banner": "Primal Dialga",
+        "outro": [
+          {
+            "text": "Time flows again. The spire fades, and the altar on Spear Pillar hums: Dialga and Palkia will return there in their Origin Formes."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "items": {
+        "wing": 5,
+        "jet": 5
+      },
+      "flags": [
+        "temporal-spire-cleared"
+      ]
+    }
+  }
+}

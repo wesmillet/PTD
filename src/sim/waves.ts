@@ -59,6 +59,10 @@ export interface TrainerPokemonDef {
   catchOnly?: boolean;
   /** Dynamax: 2.5x sprite, red aura, 3x HP. */
   dynamax?: boolean;
+  /** A Hisui noble: frenzied (no damage, hits fill the stagger meter), calmed with balms over three staggers. */
+  noble?: boolean;
+  /** Noble only: wild species it calls between staggers. */
+  summons?: string[];
 }
 
 export interface TrainerDef {
@@ -209,6 +213,10 @@ export interface LevelDef {
   ballsOnly?: string[];
   /** Hisui rifts and events: the level does not pay money. */
   noMoney?: boolean;
+  /** A Hisui rift: a purple tear on the level select beside its modern spot. */
+  rift?: boolean;
+  /** Balls handed out when the level starts (the rifts' Hisuian balls). */
+  giveBalls?: Record<string, number>;
   enemiesFirstWave: number;
   enemiesPerWave: number;
   /** Seconds between spawns within a wave. */
@@ -252,6 +260,8 @@ export interface SpawnDef {
   lane?: string;
   /** Forced shiny (space-time distortions). */
   shiny?: boolean;
+  noble?: boolean;
+  summons?: number[];
 }
 
 export interface WaveOptions {
@@ -430,6 +440,10 @@ export function partySpawns(trainer: TrainerDef, starter: number | undefined, mo
     if (p.fleeAfter !== undefined) spawn.fleeAfter = p.fleeAfter;
     if (p.catchOnly) spawn.catchOnly = true;
     if (p.dynamax) spawn.dynamax = true;
+    if (p.noble) {
+      spawn.noble = true;
+      spawn.summons = (p.summons ?? []).map((n) => speciesId(n, `partySpawns: ${trainer.name}`));
+    }
     const laneName = lane ?? trainer.lane;
     if (laneName && laneName !== 'both') spawn.lane = laneName;
     else if (laneName === 'both') spawn.lane = i % 2 === 0 ? 'path' : 'path-2';
