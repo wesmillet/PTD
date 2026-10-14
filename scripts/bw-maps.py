@@ -25,6 +25,12 @@ import sys
 from pathlib import Path
 
 from PIL import Image
+import importlib.util
+from pathlib import Path as _P
+
+_spec = importlib.util.spec_from_file_location('gen4_traces', Path(__file__).resolve().parent / 'gen4-traces' / 'downsample.py')
+TRACES = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(TRACES)
 
 Image.MAX_IMAGE_PIXELS = None
 ROOT = Path(__file__).resolve().parent.parent
@@ -216,99 +222,134 @@ class Map:
         return placed
 
 
+def from_trace(name, seed, path, overrides=None, skip_trees=()):
+    """Build a map from the traced Platinum layout (scripts/gen4-traces):
+    T forest, ~ water, = road, g tall grass, # rock, . grass. The enemy path
+    is laid along the real road and clears whatever it crosses."""
+    grid = TRACES.resample(name)
+    if overrides:
+        grid = [''.join(overrides.get((x, y), ch) for x, ch in enumerate(row)) for y, row in enumerate(grid)]
+    m = Map(name, 30, 14, seed=seed)
+    m.set_path(path)
+    m.grid = grid
+    water = {(x, y) for y, r in enumerate(grid) for x, ch in enumerate(r) if ch == '~' and (x, y) not in m.path_cells}
+    m.terrain_cells('water', water)
+    m.reserved |= water
+    # Only the enemy path is drawn as road (it follows the real road), so
+    # players can always see where enemies walk.
+    m.water = water
+    return m
+
+
+def finish_trace(m, n_spots=10, flowers=8):
+    """Spots, trees, tall grass and flowers from the trace."""
+    grid = m.grid
+    pick_spots(m, n_spots)
+    forest_cells = {(x, y) for y, r in enumerate(grid) for x, ch in enumerate(r) if ch == 'T'}
+    # Trees on the forest lattice wherever the whole 2x4 footprint is forest
+    # (cells past the map edge count as forest, so walls run off-screen).
+    for y in range(-4, m.h + 1):
+        if y % 2:
+            continue
+        off = (y // 2) % 2
+        for x in range(-2 - off, m.w + 1, 2):
+            cells = [(x + dx, y + dy) for dy in range(4) for dx in range(2)]
+            if all((c in forest_cells) or not m.inb(*c) for c in cells) and any(m.inb(*c) for c in cells):
+                m.tree(x, y)
+    # Second pass: fill irregular forest edges with trees that are mostly over
+    # forest and never touch water, rock, the path or a spot.
+    def ok(x, y):
+        cells = [(x + dx, y + dy) for dy in range(4) for dx in range(2)]
+        inside = [c for c in cells if m.inb(*c)]
+        if not inside or any(c in m.water or c in m.reserved or (m.inb(*c) and grid[c[1]][c[0]] == '#') for c in inside):
+            return False
+        return sum(1 for c in cells if c in forest_cells or not m.inb(*c)) >= 6
+    for y in range(-3, m.h):
+        for x in range(-1, m.w):
+            if (x, y) in forest_cells and (x, y) not in m.tree_cells:
+                for tx, ty in ((x, y - 3), (x - 1, y - 3), (x, y - 2), (x - 1, y - 2), (x, y - 1), (x - 1, y - 1), (x, y), (x - 1, y)):
+                    if ok(tx, ty) and m.tree(tx, ty):
+                        break
+    # Tall grass: smooth the noisy trace into solid patches (fill holes,
+    # drop lone tufts), the way the routes group their grass.
+    G = {(x, y) for y, r in enumerate(grid) for x, ch in enumerate(r) if ch == 'g'}
+    nb = lambda c, S: sum((c[0] + dx, c[1] + dy) in S for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+    for _ in range(2):
+        G |= {(x, y) for y in range(m.h) for x in range(m.w) if grid[y][x] == '.' and nb((x, y), G) >= 3}
+        G = {c for c in G if nb(c, G) >= 1}
+    for (x, y) in sorted(G):
+        m.tall_grass(x, y, x, y)
+    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig', 'bw-sprig-2'], flowers, (0, 0, m.w - 1, m.h - 1))
+    return m
+
+
+def pick_spots(m, n):
+    """Choose placement spots: cells within melee range of the path, not on
+    the path, water or rock, scored by how many path tiles they cover (inside
+    corners cover the most), spread at least 3 tiles apart."""
+    cand = []
+    for y in range(m.h):
+        for x in range(m.w):
+            p = (x, y)
+            if p in m.path_cells or p in m.water or m.grid[y][x] == '#' or p in m.reserved:
+                continue
+            if m.reach(p) > MELEE:
+                continue
+            cover = sum(1 for (px, py) in m.path_cells if (px - x) ** 2 + (py - y) ** 2 <= MELEE ** 2)
+            cand.append((cover, m.rng.random(), p))
+    cand.sort(reverse=True)
+    chosen = []
+    for cover, _, p in cand:
+        if all(abs(p[0] - q[0]) + abs(p[1] - q[1]) >= 3 for q in chosen):
+            chosen.append(p)
+        if len(chosen) == n:
+            break
+    m.add_spots(chosen)
+
+
 # --------------------------------------------------------------------------
-# Route 201 (Platinum: Twinleaf to the south-west, the road climbs north then
-# runs east with right-angle jogs, forest many rows deep on both sides, tall
-# grass in blocks, lone trees in the clearing, a side path north to Lake
-# Verity, a route sign at the start).
+# All four outdoor maps are traced from the Platinum map renders (see
+# scripts/gen4-traces/) and resampled to 30x14; the enemy path follows each
+# route's real road.
+
+# Route 201: the road climbs north out of Twinleaf (bottom left), runs east
+# through the grass between two forest walls and leaves for Sandgem (right).
 def route_201():
-    m = Map('route-201', 30, 14, seed=201)
-    m.set_path([(3, 13), (3, 8), (12, 8), (12, 5), (22, 5), (22, 8), (29, 8)])
-    m.terrain_cells('bw-path', {(17, y) for y in range(0, 5)})
-    m.reserved |= {(x, y) for x in range(16, 19) for y in range(0, 5)}
-    m.add_spots([(4, 7), (11, 7), (13, 6), (21, 6), (23, 7), (2, 11), (7, 9), (16, 4), (27, 7), (18, 4)])
-    m.stamp('bw-sign', 1, 6)
-    m.forest(-2, -2, 31, 0)
-    m.forest(-2, 11, 31, 14)
-    for x, y in [(5, 3), (8, 3), (25, 2)]:
-        m.tree(x, y, must=True)
-    m.tall_grass(14, 7, 20, 9)
-    m.tall_grass(24, 10, 29, 10)
-    m.tall_grass(5, 10, 10, 10)
-    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig', 'bw-sprig-2'], 12, (0, 2, 29, 10))
-    return m
+    m = from_trace('route-201', 201, [(7, 13), (7, 9), (21, 9), (21, 10), (26, 10), (26, 5), (29, 5)])
+    m.stamp('bw-sign', 5, 10, must=False)
+    return finish_trace(m)
 
 
-
-# --------------------------------------------------------------------------
-# Lake Verity (Platinum: a great lake fills the clearing, a rocky island with
-# a cave in the middle, a thin grass shore under dense forest, tall grass on
-# the south-west bank). Enemies walk the shore around the water.
+# Lake Verity: the great octagonal lake with its rocky island and cave in the
+# middle, forest all around, the way in from the south-east. Enemies follow a
+# trail through the trees around the shore.
 def lake_verity():
-    m = Map('lake-verity', 30, 14, seed=301)
-    m.set_path([(29, 11), (24, 11), (24, 2), (5, 2), (5, 11), (0, 11)])
-    lake = {(x, y) for x in range(7, 23) for y in range(4, 10)} | {(x, 3) for x in range(8, 22)} | {(x, 10) for x in range(8, 22)}
-    island = {(x, y) for x in (14, 15) for y in (6, 7)}
-    m.terrain_cells('water', lake - island)
-    m.stamp('bw-rock-small', 15, 6)
-    m.stamp('bw-flowers-white', 14, 7)
-    m.reserved |= lake
-    m.add_spots([(6, 4), (6, 6), (6, 8), (7, 3), (22, 3), (23, 5), (23, 8), (4, 10), (25, 10), (6, 11)])
-    m.forest(-2, -4, 31, -1)
-    m.forest(-2, 12, 31, 15)
-    m.forest(-3, 2, 3, 10)
-    m.forest(26, 2, 32, 10)
-    m.tall_grass(7, 11, 12, 12)
-    m.scatter(['bw-flowers-white', 'bw-sprig', 'bw-sprig-2'], 6, (5, 1, 25, 12))
-    return m
+    island = {(x, y): '#' for x in range(13, 17) for y in range(6, 8)}
+    m = from_trace('lake-verity', 301, [(0, 11), (3, 11), (3, 0), (26, 0), (26, 11), (23, 11), (23, 13)], overrides=island)
+    # The island in the middle (Mesprit's cave in Platinum): a grassy islet
+    # with rocks. Its secret level opens once the player has Surf.
+    m.stamp('bw-rock-small', 14, 6)
+    m.stamp('bw-rock-small', 15, 7)
+    m.stamp('bw-flowers-white', 15, 6)
+    return finish_trace(m)
 
 
-# --------------------------------------------------------------------------
-# Route 202 (Platinum: north from Sandgem to the Jubilife gate, forest walls
-# on both sides, a column of trees down the middle, big tall-grass fields
-# where Dawn teaches catching).
+# Route 202: north from Sandgem (bottom) to the Jubilife gate (top), through
+# the tall-grass fields around the central stand of trees.
 def route_202():
-    m = Map('route-202', 30, 14, seed=202)
-    m.set_path([(5, 13), (5, 8), (12, 8), (12, 3), (20, 3), (20, 9), (25, 9), (25, 0)])
-    m.add_spots([(6, 7), (11, 7), (13, 4), (19, 4), (21, 8), (24, 8), (4, 11), (9, 9), (16, 2), (26, 5)])
-    m.stamp('bw-sign', 6, 11)
-    m.forest(-3, -2, 2, 14)
-    m.forest(27, -2, 32, 14)
-    m.forest(3, -3, 26, 0)
-    m.forest(3, 11, 26, 14)
-    for x, y in [(15, 4), (15, 6), (16, 5)]:   # the tree column splitting the route
-        m.tree(x, y)
-    m.tall_grass(6, 3, 10, 6)
-    m.tall_grass(21, 2, 23, 7)
-    m.tall_grass(8, 10, 18, 10)
-    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig', 'bw-sprig-3'], 10, (2, 1, 26, 10))
-    return m
+    m = from_trace('route-202', 202, [(22, 13), (22, 12), (18, 12), (18, 9), (10, 9), (10, 4), (14, 4), (14, 0)])
+    m.stamp('bw-sign', 20, 13, must=False, clip=True)
+    return finish_trace(m)
 
 
-# --------------------------------------------------------------------------
-# Route 203 (Platinum: a pond in the middle section, a wide tall-grass field,
-# the stepped brown rock of Mt. Coronet to the north-east, Oreburgh Gate's
-# cave at its foot).
+# Route 203: west from Jubilife across the grass and past the pond, through
+# the gap in the rock divide, along the foot of Mt. Coronet to Oreburgh Gate.
 def route_203():
-    m = Map('route-203', 30, 14, seed=203)
-    m.set_path([(0, 5), (8, 5), (8, 9), (17, 9), (17, 6), (23, 6), (23, 9), (29, 9)])
-    pond = {(x, y) for x in range(10, 15) for y in range(2, 5)}
-    m.terrain_cells('water', pond)
-    m.reserved |= pond
-    m.add_spots([(7, 6), (9, 8), (16, 8), (18, 7), (22, 7), (24, 8), (3, 4), (12, 10), (20, 5), (27, 10)])
-    m.stamp('bw-sign', 1, 3)
-    # Mt. Coronet's foothills to the north-east: a raised grassy ledge.
-    m.plateau(24, 0, 30, 6, open_top=True)
-    m.stamp('bw-rock', 27, 2, must=False)
-    m.forest(-2, -3, 23, 0)
-    m.forest(-2, 11, 31, 14)
-    m.tree(15, 0)
-    m.tall_grass(1, 7, 5, 10)
-    m.tall_grass(18, 2, 22, 4)
-    m.tall_grass(19, 10, 22, 10)
-    m.scatter(['bw-flowers-white', 'bw-sprig', 'bw-sprig-2'], 8, (0, 1, 25, 10))
-    return m
-
+    over = {(x, y): 'T' for x in (18,) for y in range(14) if y != 10}
+    over.update({(x, y): '~' for x in range(15, 18) for y in (6, 7)})   # the pond, squared off
+    m = from_trace('route-203', 203, [(0, 10), (19, 10), (19, 8), (25, 8), (25, 10), (29, 10)], overrides=over)
+    m.plateau(22, 0, 30, 4, open_top=True)
+    return finish_trace(m)
 
 MAPS = {'route-201': route_201, 'lake-verity': lake_verity, 'route-202': route_202, 'route-203': route_203}
 

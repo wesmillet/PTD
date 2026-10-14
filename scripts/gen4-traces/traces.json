@@ -1,0 +1,19 @@
+{
+ "$comment": "Tile-class traces of the Platinum map renders on Bulbagarden Archives (16px tiles). Classes: T tree, g tall grass/foliage, . grass, = sand path, # rock, ~ water, ? other. Run-length encoded rows separated by |. Produced by sampling each 16px tile's average colour in the browser.",
+ "lake-verity": {
+  "src": "Lake_Verity_Pt.png",
+  "rle": "54T|27Tg9Tg16T|54T|15TgTg36T|16T20g18T|16Tg18~g18T|11Tg2T2g20~2g3Tg12T|12T2g24~2g14T|12Tg26~g14T|10T2g28~2g12T|8T2g32~g11T|8Tg34~g10T|7Tg36~9Tg|8T36~10T|8T15~2#4=#?13~9Tg|7Tg14~.7#?13~10T|8T14~.3#?3#?13~10T|7Tg14~.3#?3#?13~3Tg6T|8T14~.7=?13~7Tg2T|8T15~?5=?14~10T|8T36~4.6T|8T36~4.2g4T|8T36~6.4T|8Tg35~g5.4T|10T33~3g4.4T|10T2g30~g3T2.2g4T|5T5g2T28~3g3T2g6T|5Tg4.3g26~g.5g8T|4T6g4.2g22~3.3g2.8T|13Tg2T20~2g6.2g8T|5T8g.g23T6.10T|TgT11g2.Tg20T6.10T|15T7g3Tg11T3g2.2g7Tg2T|40T2.12T|4T16g19T3g12T|19TgTg11Tg11TgTg6T|54T|5Tg7Tg11Tg7TgTg18T|54T|54T"
+ },
+ "route-201": {
+  "src": "Sinnoh_Route_201_Pt.png",
+  "rle": "65T|TgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgT|51TgTg11T|27Tg3Tg17Tg15T|TgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTg23T|44T3gTgTgT13g|41Tg3T9g.2g8.|5TgTg11TgTgTg3Tg5Tg3TgTg2T12g11.|5g3T11g5T3gT5gT3g4T2g10Tg.6=2.g.|gTg.g3Tg.g3Tg3.g5Tg.gTg3.gTg.g3Tg.g10Tg.2=g7T|gTg2.g.g2.g3Tg24.g2.9gT6gTgTgTgT|3g.5g.5g14.10=.11g2Tg4.g6T|5g3T25g4.2=.3g10Tg.2=.2gTgTgT|5gTgT13g9T2g5.2=4.8g.g2.2=.g6T|20.11g6.2=5.2g9.2=.g6T|9g2.8=.2gTgTgTgT2g.25=.2gTgTgT|7T8g3=3g8T18g11.g2TgTgT|14Tg3=g28T11g7T|TgTgTgTgTgTgT2g3=2gTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgT|13T2g3=g2Tg43T|11TgT2g3=g30Tg3Tg11T|TgTgTg8Tg3.g8TgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgTgT"
+ },
+ "route-202": {
+  "src": "Sinnoh_Route_202_Pt.png",
+  "rle": "10TgT3.#.=2.g17T|10T10g18T|12T8.18T|12Tg7.13Tg4T|12T8.18T|12T4.=3g18T|5T7g4.=.g.7g.4g6T|4T6g5.3=3.5g5.g6T|4Tg5T.g8=g5T.4=.6T|10T.g#.g11T4.=g6T|10T2.g.g8T3g4.=.6T|10T5g8T7g2.g5T|9Tg5.23T|8Tg6.4g19T|4T8.=6.5T10g4T|4Tg7.=3.T2.11Tg7T|4T4.2g2.=3.g2.19T|4T3.g2T2.=6.gTgT#9g5T|5T2g3T2.2=9.=.8g5T|10T2.14=.3g8T|10T4.g8T7.2g6T|4T3g3T5g8T9g6T|8T2g5.8g2.g6.6T|9Tg2.=3.5Tg9.g6T|4T6g2.3=.6g.6=2.g6T|10T6g6T6.=3.6T|22T4g2.=2.g6T|26T6.6T"
+ },
+ "route-203": {
+  "src": "Sinnoh_Route_203_Pt.png",
+  "rle": "36T.#6T.2=#13=|23T.12T.#6T.2=5#9=|23T.12T.#6T.6=2#8=|23T.12T.#6T.7=6#3=|23T.12T.#6T.12=#3=|23T.7T.T.T.T#gTgTgTg9#3=#3=|23T.6T3gTg2T#g12T5g.#3=|5Tg13.g3T.6T4gT2g#g11T2g.2g.g#3=|5Tg4.g4.g.g.5g6T7g#4T7gTg5.g#3=|5Tg3.gTg2.g3Tg4.8g5~?#12g2.3=.g#3=|6T3g2Tg2.g3Tg4.2g.2g2.g5~?#11Tg2.2=2.g#3=|6T3g2Tg.g4Tg4.2g.2g2.g5~?#g8T8g.g#3=|11Tg.2g3Tg.2g.2g4.7g.#10g.g2T3g.g#3=|11Tg2.g3Tg4.2g2.2g8T#g.2g.3g2.2g.3Tg.g3#=|6T6g2.gTgT7g3.g6TgT#13g3Tg.g3#=|.T.T.T3g14.2g3.8gT#g.9=2gT3g.g2=#=|6g.2g6.2g6.2g2.2g2T4gTg.12g4T2gT2=#=|2.g12.2g5.3g2.gT2g3.g2T#18T.2=#=|2.g19.6gT7gT#18T.2=#=|2.3g.g.g.g.g.g.g.g.4g12T.#19Tg2#=|2g21T.12T.#20T.2#|g22T.12T.#20T.2#|.22T.12T.#20T.2="
+ }
+}

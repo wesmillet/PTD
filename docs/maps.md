@@ -158,7 +158,16 @@ and BW conifers. Maps have one decoration layer, so the script composites
 every tree (forest walls in staggered overlapping rows, plus lone trees) onto
 one canvas, cuts the covered cells into tiles, dedupes them into
 `assets-src/tilesets/gen5/generated-bw.png`, registers everything under the
-`bw-outdoor` tileset and runs the tileset build before writing the maps. Run
+`bw-outdoor` tileset and runs the tileset build before writing the maps.
+
+Layouts are traced from the Platinum map renders: `scripts/gen4-traces/`
+holds each map's 16px tile classes (forest, water, road, tall grass, rock,
+grass), sampled from the Bulbagarden Archives images in a browser, and
+`downsample.py` resamples them to 30x14. Forest becomes composited BW trees,
+water the pond terrain, tall grass is smoothed into patches, and the enemy
+path is laid along the real road. Spots are picked automatically: cells in
+melee range of the path, ranked by how much path they cover, at least three
+tiles apart. Run
 `python3 scripts/bw-maps.py`; it always designs every BW map so the generated
 sheet covers all of them. Spots are range-checked the same way as below.
 
