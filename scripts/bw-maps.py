@@ -102,6 +102,20 @@ for gid, spec in GROUND.items():
         STATIC[f'{gid}-{i}'] = (col + i % w, row + i // w, 1, 1, False) + tuple(spec[4:])
 STATIC['bw-snow-boulder'] = (0, 131, 2, 3, True, 'outside')
 STATIC['bw-snow-log'] = (2, 122, 2, 1, True, 'outside')
+# Platinum's own textures for its unique locations (scripts/build-platinum-tiles.py):
+# ground patterns and decoration stamps from assets-src/tilesets/gen4/pt-*.png.
+PT_MANIFEST = ROOT / 'assets-src/tilesets/gen4/platinum-tiles.json'
+PT_SOURCES = {}
+if PT_MANIFEST.exists():
+    _pt = json.loads(PT_MANIFEST.read_text())
+    PT_SOURCES = _pt['sources']
+    for _t in _pt['tiles']:
+        if _t['kind'] == 'ground':
+            GROUND[_t['id']] = (_t['col'], _t['row'], _t['w'], _t['h'], _t['source'])
+            for _i in range(_t['w'] * _t['h']):
+                STATIC[f"{_t['id']}-{_i}"] = (_t['col'] + _i % _t['w'], _t['row'] + _i // _t['w'], 1, 1, False, _t['source'])
+        else:
+            STATIC[_t['id']] = (_t['col'], _t['row'], _t['w'], _t['h'], _t['solid'], _t['source'])
 # Cliff rims other than the teal-grass one: the same eleven pieces
 # (tl t tr l r fl f fr fl2 f2 fr2) from the brown rock, snow and ice sets.
 CLIFF_SETS = {
@@ -606,42 +620,69 @@ def sunyshore_gym():
     return m
 
 
-# Spear Pillar: the summit. Pale stone platform with broken pillars down both
-# sides, two stairways (two lanes) that meet in the middle and climb to the
-# altar at the top.
+# Spear Pillar: the summit, on Platinum's own textures. A stone platform
+# with the carved floor and the altar emblem at the top, broken pillars down
+# both sides, the two stairways (lanes) climbing from the bottom corners to
+# meet in front of the altar. Pink mountain rock and cloud around it.
 def spear_pillar():
-    m = blank('spear-pillar', 2008, [(0, 12), (5, 12), (5, 7), (15, 7), (15, 0)], road=None)
-    m.extra_paths = [('path-2', [(29, 12), (24, 12), (24, 7), (15, 7), (15, 0)])]
-    m.floor('bw-darkrock', 0, 0, 29, 13)
-    m.floor('bw-cream', 3, 0, 26, 13)
+    m = blank('spear-pillar', 2008, [(4, 13), (4, 9), (15, 9), (15, 1)], road=None)
+    m.extra_paths = [('path-2', [(25, 13), (25, 9), (15, 9), (15, 1)])]
     lane(m, m.extra_paths[0][1], road=False)
+    m.floor('pt-spear-cliff', 0, 0, 29, 13)
+    m.floor('pt-spear-carpet', 3, 0, 26, 11)
     for (x, y) in m.path_cells | m.lane_cells:
-        m.ground[y][x] = 'bw-cobble-0'
-    for x, y in ((7, 1), (21, 1), (7, 9), (21, 9), (11, 3), (17, 3)):
-        m.stamp('bw-snow-rock', x, y, must=False)
-    m.stamp('bw-snow-rock-big', 0, 2, must=False)
-    m.stamp('bw-snow-rock-big', 26, 2, must=False)
-    m.plateau(2, 12, 27, 13, open_top=True, cliff='rock')
+        if 3 <= x <= 26 and y <= 11:
+            m.ground[y][x] = 'pt-spear-grey-0'
+    m.floor('pt-spear-altar', 14, 0, 15, 1)
+    m.floor('pt-spear-ledge', 3, 12, 26, 12)
+    m.floor('pt-spear-steps', 3, 13, 6, 13)
+    m.floor('pt-spear-steps', 23, 13, 26, 13)
+    for x in (6, 9, 20, 23):
+        for y in (1, 5):
+            m.stamp('pt-spear-pillar', x, y, must=False)
+    for x, y in ((6, 10), (23, 10), (9, 9), (20, 9)):
+        m.stamp('pt-spear-pillar-broken', x, y, must=False)
+    m.stamp('pt-spear-panel', 4, 0, must=False)
+    m.stamp('pt-spear-panel', 24, 0, must=False)
+    for x, y in ((0, 11), (28, 11), (0, 0), (28, 0)):
+        m.stamp('pt-spear-cloud', x, y, must=False)
+    for x, y in ((1, 5), (28, 6), (2, 8), (27, 3)):
+        m.stamp('pt-spear-rock', x, y, must=False)
+    m.wall(0, 0, 2, 13)
+    m.wall(27, 0, 29, 13)
     pick_spots(m, 10)
     m.points = [('altar', 'stage', 15, 0)]
     return m
 
 
-# Distortion World: floating platforms of cracked rock on black nothing,
-# joined by pale stone bridges that the path follows; a waterfall runs
-# sideways across the bottom.
+# Distortion World on Platinum's own textures: platforms of pink cracked
+# rock on black nothing, blue-lit rock where the path runs, sideways
+# waterfalls of pale "water", the blue trees, boulders and dark plants.
 def distortion_world():
     m = blank('distortion-world', 2009, [(0, 2), (6, 2), (6, 7), (13, 7), (13, 3), (20, 3), (20, 10), (27, 10), (27, 13)], road=None)
     m.theme = 'cave'
     m.floor('bw-void', 0, 0, 29, 13)
     platforms = [(0, 0, 8, 4), (4, 5, 15, 9), (11, 1, 22, 5), (18, 8, 29, 12)]
     for x0, y0, x1, y1 in platforms:
-        m.floor('bw-darkrock', x0, y0, x1, y1)
-        m.plateau(x0, y0, x1, y1 + 1, cliff='rock', interior=False)
+        m.floor('pt-dw-floor', x0, y0, x1, y1)
     for (x, y) in m.path_cells:
-        m.ground[y][x] = 'bw-cream-' + str((x % 2) + (y % 2) * 2)
-    water(m, rect(1, 12, 12, 13))
-    m.wall(0, 11, 0, 11)
+        m.ground[y][x] = 'pt-dw-blue-0'
+    # platform undersides
+    for x0, y0, x1, y1 in platforms:
+        for x in range(x0, x1 + 1, 2):
+            if m.inb(x, y1 + 1) and (x, y1 + 1) not in m.path_cells and (x + 1, y1 + 1) not in m.path_cells:
+                m.stamp('pt-dw-cliff-b', x, y1 + 1, must=False, clip=True)
+    # sideways waterfalls
+    m.floor('pt-dw-sky', 1, 11, 10, 12)
+    m.floor('pt-dw-sky-edge', 1, 10, 10, 10)
+    m.floor('pt-dw-sky', 24, 0, 29, 1)
+    for x, y in ((2, 0), (14, 1), (26, 8), (9, 5)):
+        m.stamp('pt-dw-tree', x, y, must=False)
+    for x, y in ((6, 0), (18, 3), (21, 10), (12, 8)):
+        m.stamp('pt-dw-boulder', x, y, must=False)
+    for x, y in ((1, 3), (16, 5), (23, 11)):
+        m.stamp('pt-dw-plant', x, y, must=False)
+    m.wall(0, 13, 29, 13)
     pick_spots(m, 10)
     return m
 
@@ -922,24 +963,129 @@ def iron_island():
     return m
 
 
-# Galactic HQ: the Veilstone rooftop. Steel plates, containers, machines, the
-# spirit extractor at the top, two lanes of grunts.
+# Galactic HQ on its own textures: the starry walls, the grey floor, the
+# warp pads along the route, consoles and the spirit extractor at the top.
 def galactic_hq():
     m = blank('galactic-hq', 405, [(0, 10), (8, 10), (8, 4), (16, 4), (16, 10), (24, 10), (24, 2), (29, 2)], road=None)
-    m.floor('bw-steel', 0, 0, 29, 13)
+    m.theme = 'cave'
+    m.floor('pt-hq-floor', 0, 0, 29, 13)
+    m.floor('pt-hq-grid', 2, 2, 27, 11)
     for (x, y) in m.path_cells:
-        m.ground[y][x] = 'bw-cobble-0'
-    m.floor('bw-darkrock', 0, 0, 29, 0)
-    for x in (2, 11, 20):
-        m.stamp('bw-container', x, 6, must=False)
-    for x, y in ((12, 1), (19, 1), (27, 6)):
-        m.stamp('bw-machine', x, y, must=False)
-    for x, y in ((4, 2), (27, 12), (1, 12), (13, 12)):
-        m.stamp('bw-barrel', x, y, must=False)
-    m.stamp('bw-streetlamp', 5, 11, must=False)
-    m.stamp('bw-streetlamp', 22, 11, must=False)
+        m.ground[y][x] = 'pt-hq-floor-light-0'
+    m.floor('pt-hq-logo', 11, 7, 12, 8)
+    for x, y, k in ((2, 10, 1), (8, 7, 2), (16, 7, 3), (24, 6, 1), (27, 2, 2)):
+        if (x, y) in m.path_cells:
+            m.ground[y][x] = f'pt-hq-pad-{k}-0'
+    for x in range(0, 30, 2):
+        m.stamp('pt-hq-wall' if x % 4 == 0 else 'pt-hq-wall-b', x, -2, must=False, clip=True)
+    m.stamp('pt-hq-orb', 13, 1, must=False)
+    m.stamp('pt-hq-orb-b', 10, 2, must=False)
+    m.stamp('pt-hq-console', 19, 1, must=False)
+    m.stamp('pt-hq-machine', 4, 1, must=False)
+    m.stamp('pt-hq-machine-b', 26, 4, must=False)
+    for x, y in ((1, 5), (28, 8), (12, 12), (20, 12)):
+        m.stamp('pt-hq-terminal', x, y, must=False)
+    for x, y in ((5, 12), (22, 0)):
+        m.stamp('pt-hq-table', x, y, must=False)
+    for x, y in ((10, 11), (18, 11)):
+        m.stamp('pt-hq-barrier', x, y, must=False)
     pick_spots(m, 10)
-    m.points = [('machine', 'stage', 15, 1)]
+    m.points = [('machine', 'stage', 14, 2)]
+    return m
+
+
+# Snowpoint Temple: blue stone halls, the ice floor puzzle, Regigigas's
+# chamber at the far end.
+def snowpoint_temple():
+    m = blank('snowpoint-temple', 411, [(0, 11), (6, 11), (6, 3), (14, 3), (14, 10), (22, 10), (22, 4), (29, 4)], road=None)
+    m.theme = 'cave'
+    m.floor('pt-temple-floor', 0, 0, 29, 13)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'pt-temple-floor-light-0'
+    m.floor('pt-temple-ice-a', 8, 5, 12, 8)
+    m.floor('pt-temple-ice-b', 16, 5, 20, 8)
+    m.floor('pt-temple-ice-c', 24, 7, 27, 10)
+    for x in range(0, 30):
+        m.stamp('pt-temple-wall-s', x, 0, must=False)
+    for x in range(0, 30):
+        m.stamp('pt-temple-wall', x, 13, must=False)
+    m.stamp('pt-temple-door', 14, 0, must=False)
+    for x, y in ((2, 2), (26, 1), (10, 11), (18, 12)):
+        m.stamp('pt-temple-boulder', x, y, must=False)
+    m.scatter(['pt-temple-rocks'], 6, (0, 1, 29, 12))
+    pick_spots(m, 10)
+    m.points = [('regigigas', 'stage', 28, 3)]
+    return m
+
+
+# Mt. Coronet: the purple cave, an underground stream, the glowing pads on
+# the way up to the summit.
+def mt_coronet():
+    m = blank('mt-coronet', 412, [(0, 3), (7, 3), (7, 9), (15, 9), (15, 2), (23, 2), (23, 11), (29, 11)], road=None)
+    m.theme = 'cave'
+    m.floor('pt-coronet-floor', 0, 0, 29, 13)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'pt-coronet-floor-b-0'
+    m.floor('pt-coronet-water', 9, 11, 14, 13)
+    m.floor('pt-coronet-water', 25, 0, 29, 1)
+    m.wall(9, 11, 14, 13)
+    m.wall(25, 0, 29, 1)
+    for x, y in ((11, 5), (19, 6), (3, 10)):
+        m.ground[y][x] = 'pt-coronet-pad-a-0'
+    for x in range(0, 30):
+        m.stamp('pt-coronet-wall-s', x, 0, must=False)
+        m.stamp('pt-coronet-wall', x, 13, must=False)
+    m.stamp('pt-coronet-door', 23, 0, must=False)
+    for x, y in ((2, 6), (18, 11), (26, 6), (10, 1)):
+        m.stamp('pt-coronet-boulder', x, y, must=False)
+    pick_spots(m, 10)
+    return m
+
+
+# Oreburgh Gate and Mine on the mine's own textures: brown cave, coal
+# conveyors and the lift in the mine.
+def oreburgh_cave(name, seed, path, mine):
+    m = blank(name, seed, path, road=None)
+    m.theme = 'cave'
+    m.floor('pt-mine-floor', 0, 0, 29, 13)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'pt-mine-floor-b-0'
+    for x in range(0, 30):
+        m.stamp('pt-mine-wall-s', x, 0, must=False)
+        m.stamp('pt-mine-wall', x, 13, must=False)
+    if mine:
+        for x, y in ((3, 2), (20, 2)):
+            m.stamp('pt-mine-belt', x, y, must=False)
+        m.stamp('pt-mine-lift', 26, 1, must=False)
+        m.stamp('pt-mine-panel', 12, 11, must=False)
+    else:
+        m.stamp('pt-mine-door', 2, 0, must=False)
+        m.stamp('pt-mine-door', 26, 11, must=False)
+    for x, y in ((5, 8), (15, 1), (24, 7), (10, 11)):
+        m.stamp('pt-mine-boulder', x, y, must=False)
+    m.scatter(['pt-mine-rocks'], 8, (0, 1, 29, 12))
+    pick_spots(m, 10)
+    return m
+
+
+# Stark Mountain, outside: volcanic ground, dark cliffs with magma seams,
+# the cave mouth to Heatran's chamber.
+def stark_mountain():
+    m = blank('stark-mountain', 413, [(0, 9), (6, 9), (6, 4), (14, 4), (14, 10), (22, 10), (22, 5), (29, 5)], road=None)
+    m.floor('pt-stark-floor', 0, 0, 29, 13)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'pt-mine-floor-b-0'
+    m.floor('pt-stark-magma', 9, 11, 13, 13)
+    m.floor('pt-stark-magma', 24, 0, 29, 2)
+    m.wall(9, 11, 13, 13)
+    m.wall(24, 0, 29, 2)
+    for x in range(0, 30, 2):
+        m.stamp('pt-stark-cliff-magma' if x % 6 == 0 else 'pt-stark-cliff', x, 0, must=False)
+    m.stamp('pt-stark-cave', 16, 0, must=False)
+    for x, y in ((2, 11), (17, 7), (26, 8)):
+        m.stamp('pt-stark-rock', x, y, must=False)
+    m.scatter(['pt-stark-rocks'], 6, (0, 2, 29, 12))
+    pick_spots(m, 10)
     return m
 
 
@@ -1021,7 +1167,10 @@ def great_marsh():
     return m
 
 
-MAPS.update({'lake-verity-island': lake_verity_island, 'lake-valor': lake_valor, 'lake-acuity': lake_acuity,
+MAPS.update({'snowpoint-temple': snowpoint_temple, 'mt-coronet': mt_coronet, 'stark-mountain': stark_mountain,
+             'oreburgh-gate': lambda: oreburgh_cave('oreburgh-gate', 414, [(0, 2), (9, 2), (9, 8), (19, 8), (19, 3), (29, 3)], False),
+             'oreburgh-mine-1f': lambda: oreburgh_cave('oreburgh-mine-1f', 415, [(0, 10), (7, 10), (7, 3), (15, 3), (15, 9), (23, 9), (23, 4), (29, 4)], True),
+             'lake-verity-island': lake_verity_island, 'lake-valor': lake_valor, 'lake-acuity': lake_acuity,
              'valley-windworks': valley_windworks, 'eterna-forest': eterna_forest, 'old-chateau': old_chateau,
              'iron-island': iron_island, 'galactic-hq': galactic_hq, 'ss-libra': ss_libra,
              'flower-paradise': flower_paradise, 'fullmoon-island': lambda: moon_island('fullmoon-island', False),
@@ -1071,6 +1220,8 @@ def register(n_tree_tiles):
         'artist': 'UltimoSpriter (trees composited by scripts/bw-maps.py)',
         'description': 'BW conifers composited into overlapping forest tiles',
     }
+    for name, src in PT_SOURCES.items():
+        c['sources'][name] = dict(src)
     c['tiles'] = [t for t in c['tiles'] if t.get('tileset') != TS]
     for tid, spec in STATIC.items():
         col, row, w, h, solid = spec[:5]

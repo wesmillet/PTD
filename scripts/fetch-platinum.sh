@@ -22,6 +22,9 @@ git sparse-checkout set --no-cone \
   '/res/graphics/windows/*' \
   '/res/graphics/map_popups/*' \
   '/res/graphics/trainer_case/*' \
-  '/res/graphics/battle/type_icons/*'
+  '/res/graphics/battle/type_icons/*' \
+  '/res/field/maps/texture_sets/*' \
+  '/res/field/area_data/*' \
+  '/include/data/map_headers.h'
 git checkout
 echo "Platinum graphics in $WORK/res"

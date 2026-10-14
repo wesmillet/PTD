@@ -303,3 +303,30 @@ What the builder adds for them (see the `Map` class):
 Preview any map without level data: add a temporary entry to
 `src/data/levels.json` whose `map` is the map name, build, and open
 `?level=<id>&party=debug`.
+
+## Platinum's own textures for its unique places
+
+The decomp keeps Platinum's field maps as 3D models with NSBTX texture sets
+(`res/field/maps/texture_sets/`), so there are no 2D map tiles to lift, but
+the textures themselves can be. `scripts/nsbtx.py` decodes a texture set
+(all seven Nitro texture formats) and `scripts/build-platinum-tiles.py`
+cuts the textures the maps need into source sheets under
+`assets-src/tilesets/gen4/pt-<location>.png` plus the manifest
+`platinum-tiles.json`. `scripts/bw-maps.py` reads the manifest and
+registers every entry in the `bw-outdoor` tileset: `kind: ground` entries
+become floor patterns for `Map.floor()` (`pt-spear-carpet`,
+`pt-dw-floor`, ...), `kind: deco` entries become stamps
+(`pt-spear-pillar`, `pt-hq-console`, ...). DS tiles are 16 px, so textures
+are scaled 2x; column textures are used at 1x and composited into outlined
+pillar sprites.
+
+Which texture set a place uses comes from `include/data/map_headers.h`
+(`areaDataArchiveID`) and `res/field/area_data/area_data_NNN.json`
+(`mapTextureSet`). Built so far: Spear Pillar (set 059), the Distortion
+World (073), Galactic HQ (057), Snowpoint Temple (064), Mt. Coronet (068),
+the Oreburgh caves (054) and Stark Mountain (017). Gym interiors stay as
+BW outdoor yards on purpose.
+
+To add a place: find its set, run `python3 -I scripts/nsbtx.py <set.nsbtx>
+<dir>` to look at the textures, add the ones you want to `LOCATIONS` in
+`build-platinum-tiles.py`, rebuild, then use the ids in a map design.

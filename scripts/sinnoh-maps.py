@@ -520,7 +520,11 @@ def oreburgh_mine():
 # The outdoor routes moved to scripts/bw-maps.py (Black/White tiles); this
 # script now only builds the caves. The old outdoor designs stay above for
 # reference but are not run.
-MAPS = {'oreburgh-gate': oreburgh_gate, 'oreburgh-mine-1f': oreburgh_mine}
+# The Oreburgh caves moved to scripts/bw-maps.py (on Platinum's own mine
+# textures); this script keeps the placeholder-tile versions for reference
+# but builds nothing by default.
+MAPS = {}
+LEGACY_MAPS = {'oreburgh-gate': oreburgh_gate, 'oreburgh-mine-1f': oreburgh_mine}
 
 if __name__ == '__main__':
     for name in sys.argv[1:] or MAPS:

@@ -1,0 +1,1111 @@
+{
+ "sources": {
+  "pt-spear": {
+   "file": "assets-src/tilesets/gen4/pt-spear.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 059, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
+  "pt-dw": {
+   "file": "assets-src/tilesets/gen4/pt-dw.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 073, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
+  "pt-hq": {
+   "file": "assets-src/tilesets/gen4/pt-hq.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 057, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
+  "pt-temple": {
+   "file": "assets-src/tilesets/gen4/pt-temple.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 064, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
+  "pt-mine": {
+   "file": "assets-src/tilesets/gen4/pt-mine.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 054, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
+  "pt-stark": {
+   "file": "assets-src/tilesets/gen4/pt-stark.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 017, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
+  "pt-coronet": {
+   "file": "assets-src/tilesets/gen4/pt-coronet.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 068, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  }
+ },
+ "tiles": [
+  {
+   "id": "pt-spear-floor",
+   "source": "pt-spear",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-carpet",
+   "source": "pt-spear",
+   "col": 0,
+   "row": 1,
+   "w": 4,
+   "h": 4,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-altar",
+   "source": "pt-spear",
+   "col": 0,
+   "row": 5,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-ledge",
+   "source": "pt-spear",
+   "col": 1,
+   "row": 0,
+   "w": 4,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-steps",
+   "source": "pt-spear",
+   "col": 5,
+   "row": 0,
+   "w": 2,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-grey",
+   "source": "pt-spear",
+   "col": 7,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-grey-steps",
+   "source": "pt-spear",
+   "col": 0,
+   "row": 7,
+   "w": 2,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-pillar",
+   "source": "pt-spear",
+   "col": 0,
+   "row": 8,
+   "w": 1,
+   "h": 3,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-spear-pillar-broken",
+   "source": "pt-spear",
+   "col": 2,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-spear-panel",
+   "source": "pt-spear",
+   "col": 2,
+   "row": 5,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-spear-rock",
+   "source": "pt-spear",
+   "col": 3,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-spear-cliff",
+   "source": "pt-spear",
+   "col": 4,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-spear-cloud",
+   "source": "pt-spear",
+   "col": 4,
+   "row": 5,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-dw-floor",
+   "source": "pt-dw",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-dw-dark",
+   "source": "pt-dw",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-dw-blue",
+   "source": "pt-dw",
+   "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-dw-edge",
+   "source": "pt-dw",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-dw-sky",
+   "source": "pt-dw",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-dw-sky-edge",
+   "source": "pt-dw",
+   "col": 4,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-dw-boulder",
+   "source": "pt-dw",
+   "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-dw-plant",
+   "source": "pt-dw",
+   "col": 4,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-dw-tree",
+   "source": "pt-dw",
+   "col": 6,
+   "row": 1,
+   "w": 1,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-dw-cliff",
+   "source": "pt-dw",
+   "col": 0,
+   "row": 3,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-dw-cliff-b",
+   "source": "pt-dw",
+   "col": 2,
+   "row": 3,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-dw-rim",
+   "source": "pt-dw",
+   "col": 5,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-floor",
+   "source": "pt-hq",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-floor-light",
+   "source": "pt-hq",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-grid",
+   "source": "pt-hq",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-stripes",
+   "source": "pt-hq",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-red",
+   "source": "pt-hq",
+   "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-pad-1",
+   "source": "pt-hq",
+   "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-pad-2",
+   "source": "pt-hq",
+   "col": 4,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-pad-3",
+   "source": "pt-hq",
+   "col": 5,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-logo",
+   "source": "pt-hq",
+   "col": 4,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-hq-wall",
+   "source": "pt-hq",
+   "col": 0,
+   "row": 3,
+   "w": 2,
+   "h": 4,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-wall-b",
+   "source": "pt-hq",
+   "col": 2,
+   "row": 3,
+   "w": 2,
+   "h": 4,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-window",
+   "source": "pt-hq",
+   "col": 6,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-machine",
+   "source": "pt-hq",
+   "col": 0,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-machine-b",
+   "source": "pt-hq",
+   "col": 2,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-console",
+   "source": "pt-hq",
+   "col": 4,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-terminal",
+   "source": "pt-hq",
+   "col": 6,
+   "row": 7,
+   "w": 1,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-terminal-b",
+   "source": "pt-hq",
+   "col": 6,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-orb",
+   "source": "pt-hq",
+   "col": 0,
+   "row": 9,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-orb-b",
+   "source": "pt-hq",
+   "col": 2,
+   "row": 9,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-table",
+   "source": "pt-hq",
+   "col": 7,
+   "row": 7,
+   "w": 1,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-barrier",
+   "source": "pt-hq",
+   "col": 0,
+   "row": 11,
+   "w": 2,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-hq-mic",
+   "source": "pt-hq",
+   "col": 7,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-temple-floor",
+   "source": "pt-temple",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-floor-light",
+   "source": "pt-temple",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-ice-a",
+   "source": "pt-temple",
+   "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-ice-b",
+   "source": "pt-temple",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-ice-c",
+   "source": "pt-temple",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-ice-d",
+   "source": "pt-temple",
+   "col": 4,
+   "row": 1,
+   "w": 1,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-steps",
+   "source": "pt-temple",
+   "col": 5,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-bridge",
+   "source": "pt-temple",
+   "col": 0,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-temple-wall",
+   "source": "pt-temple",
+   "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-temple-wall-s",
+   "source": "pt-temple",
+   "col": 4,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-temple-wall-e",
+   "source": "pt-temple",
+   "col": 5,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-temple-wall-w",
+   "source": "pt-temple",
+   "col": 6,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-temple-door",
+   "source": "pt-temple",
+   "col": 0,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-temple-rocks",
+   "source": "pt-temple",
+   "col": 7,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-temple-boulder",
+   "source": "pt-temple",
+   "col": 2,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-floor",
+   "source": "pt-mine",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-mine-floor-b",
+   "source": "pt-mine",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-mine-steps",
+   "source": "pt-mine",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-mine-bridge",
+   "source": "pt-mine",
+   "col": 0,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-mine-slope",
+   "source": "pt-mine",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-mine-wall",
+   "source": "pt-mine",
+   "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-wall-s",
+   "source": "pt-mine",
+   "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-wall-e",
+   "source": "pt-mine",
+   "col": 4,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-wall-w",
+   "source": "pt-mine",
+   "col": 5,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-wall-c",
+   "source": "pt-mine",
+   "col": 6,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-door",
+   "source": "pt-mine",
+   "col": 4,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-rocks",
+   "source": "pt-mine",
+   "col": 7,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-boulder",
+   "source": "pt-mine",
+   "col": 6,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-rubble",
+   "source": "pt-mine",
+   "col": 4,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-belt",
+   "source": "pt-mine",
+   "col": 0,
+   "row": 7,
+   "w": 1,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-panel",
+   "source": "pt-mine",
+   "col": 1,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-mine-lift",
+   "source": "pt-mine",
+   "col": 3,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-stark-floor",
+   "source": "pt-stark",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-stark-floor-b",
+   "source": "pt-stark",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-stark-magma",
+   "source": "pt-stark",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-stark-cliff",
+   "source": "pt-stark",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-stark-cliff-b",
+   "source": "pt-stark",
+   "col": 4,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-stark-cliff-magma",
+   "source": "pt-stark",
+   "col": 6,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-stark-cave",
+   "source": "pt-stark",
+   "col": 0,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-stark-rock",
+   "source": "pt-stark",
+   "col": 0,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-stark-rocks",
+   "source": "pt-stark",
+   "col": 2,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-stark-palm",
+   "source": "pt-stark",
+   "col": 4,
+   "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-floor",
+   "source": "pt-coronet",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-floor-b",
+   "source": "pt-coronet",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-floor-c",
+   "source": "pt-coronet",
+   "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-floor-d",
+   "source": "pt-coronet",
+   "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-steps",
+   "source": "pt-coronet",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-bridge",
+   "source": "pt-coronet",
+   "col": 0,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-water",
+   "source": "pt-coronet",
+   "col": 4,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-pad-a",
+   "source": "pt-coronet",
+   "col": 5,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-pad-b",
+   "source": "pt-coronet",
+   "col": 6,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-coronet-wall",
+   "source": "pt-coronet",
+   "col": 7,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-wall-s",
+   "source": "pt-coronet",
+   "col": 0,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-wall-e",
+   "source": "pt-coronet",
+   "col": 1,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-wall-w",
+   "source": "pt-coronet",
+   "col": 2,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-wall-c",
+   "source": "pt-coronet",
+   "col": 3,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-door",
+   "source": "pt-coronet",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-rocks",
+   "source": "pt-coronet",
+   "col": 4,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-boulder",
+   "source": "pt-coronet",
+   "col": 4,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-coronet-rubble",
+   "source": "pt-coronet",
+   "col": 4,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "deco",
+   "solid": true
+  }
+ ]
+}
