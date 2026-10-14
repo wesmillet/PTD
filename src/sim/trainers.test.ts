@@ -34,7 +34,7 @@ function reachTrainerWave(state: LevelState): LevelEvent[] {
 describe('trainer waves', () => {
   it('replaces the last defend wave with the trainer party, uncatchable, worth 1.5x EXP', () => {
     const state = createLevel(mine, mineMap, { seed: 5, party: [createMonster(387, 60)], starter: 387 });
-    placeTower(state, 0, 14, 6);
+    placeTower(state, 0, 14, 8);
     const started = reachTrainerWave(state);
     expect(state.wave).toBe(8);
     expect(state.pending.map((s) => s.species)).toEqual([74, 95, 408]);
@@ -61,7 +61,7 @@ describe('trainer waves', () => {
   it('spawns the boss with multiplied HP and fires its moves on timers at towers in range', () => {
     const cfg = defaultRuntimeConfig();
     const state = createLevel(mine, mineMap, { seed: 9, party: [createMonster(387, 20)], config: cfg, starter: 387 });
-    const tower = placeTower(state, 0, 14, 6);
+    const tower = placeTower(state, 0, 14, 8);
     tower.mon.moves = []; // never attacks, so the boss walks the whole path
     state.wave = 7; // jump to the trainer wave
     startWave(state);
@@ -77,7 +77,7 @@ describe('trainer waves', () => {
     let moves = 0;
     const hpBefore = tower.mon.hp;
     for (let t = 0; t < 13; t += 1 / 60) {
-      boss.distance = 20; // path point (14,7), one tile below the tower at (14,6)
+      boss.distance = 21; // path point (14,9), one tile below the tower at (14,8)
       for (const e of step(state, 1 / 60)) {
         if (e.type === 'bossMove') moves++;
         if (e.type === 'towerHit') towerHits.push(e);
@@ -95,7 +95,7 @@ describe('trainer waves', () => {
   it('restarts the boss wave once per attempt when lives run out, then loses', () => {
     const cfg = defaultRuntimeConfig();
     const state = createLevel({ ...mine, lives: 2 }, mineMap, { seed: 3, party: [createMonster(387, 5)], config: cfg, starter: 387 });
-    const tower = placeTower(state, 0, 14, 6);
+    const tower = placeTower(state, 0, 14, 8);
     tower.mon.moves = [];
     state.wave = 7;
     state.lives = 2;
@@ -117,7 +117,7 @@ describe('trainer waves', () => {
     const off = defaultRuntimeConfig();
     off.bosses.retryBossWave = false;
     const s2 = createLevel({ ...mine, lives: 1 }, mineMap, { seed: 3, party: [createMonster(387, 5)], config: off, starter: 387 });
-    const t2 = placeTower(s2, 0, 14, 6);
+    const t2 = placeTower(s2, 0, 14, 8);
     t2.mon.moves = [];
     s2.wave = 7;
     s2.lives = 1;
@@ -128,7 +128,7 @@ describe('trainer waves', () => {
 
   it('ends a free level with a win once its trainer wave is cleared', () => {
     const state = createLevel(route202, route202Map, { seed: 2, party: [createMonster(387, 60)], starter: 387 });
-    placeTower(state, 0, 13, 3);
+    placeTower(state, 0, 9, 8);
     let safety = 0;
     while (state.phase !== 'won' && safety++ < 12) {
       if (state.phase === 'build') startWave(state);
