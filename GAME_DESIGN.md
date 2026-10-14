@@ -279,7 +279,15 @@ Cilan from the anime. Unova encounter tables come from the same PokeAPI
 pipeline (Black 2 and White 2 version ids), and Gen 5 sprites exist in
 SpriteCollab.
 
-### Challenge levels and shiny hunting
+### Demo mode
+`config.json` `demoMode` (currently **true**; turn it off for release):
+every level is unlocked from the start (badges and progress still save as
+normal), and a new game's PC starts with the showcase collection in
+`src/data/showcase.json` (built by `scripts/build-showcase.mjs`: 44 Gen 1
+to 4 Pokémon at levels 20 to 60, 12 of them shiny filling Box 1, movesets
+from their Platinum learnsets). The starter is still chosen normally.
+
+## Challenge levels and shiny hunting
 Unchanged from the sections below.
 
 ## Challenge levels
@@ -308,6 +316,13 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Pokédex shows shiny counts. A "shiny living dex" completion reward exists.
 
 ## UI
+- Font: Power Clear and Power Clear Bold (the DS-era Pokémon fonts from
+  Pokémon Essentials, CC BY-NC-SA 4.0, `public/assets/fonts/`) everywhere,
+  DOM and canvas: body text and numbers in Power Clear, titles and headings
+  in the Bold. The font sits on a 13 px grid, so only 13 px and 26 px are
+  used, with no smoothing; text is dark grey (#484848) with a light shadow
+  one pixel down and right on light panels, white with a dark shadow on
+  dark backgrounds. `$` renders as the Pokédollar sign.
 - Theme: Pokémon Platinum. Light panels with dark text inside the
   blue-edged text-box frame (a 9-slice cut from the Platinum sheets in
   `assets-src/ui/gen4/`, coloured frames for trainer and boss cards), the
@@ -323,22 +338,38 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Level select map per act, styled after the Sinnoh region map (a plain list
   with the unlock chain for now)
 - In-level HUD: a top bar with wave counter, lives, money, the speed toggle
-  (1x, 2x, 4x), a Menu button (pause menu with Resume, Settings and Exit;
-  Esc opens it too) and the boss HP bar when a boss is on the path, and a bottom
+  (1x, 2x, 4x), a Menu button and the boss HP bar when a boss is on the
+  path, and a bottom
   bar with the party strip and the Poké Ball bar (item sprites); nothing
   overlaps the playfield. Game speed runs extra fixed 1/60 s steps per
   frame (`src/sim/clock.ts`), never a bigger step, so 4x replays exactly
   like 1x for the same seed (`clock.test.ts` proves it).
-- Pokémon panel: portrait, level, HP and EXP bars with numbers, status and
-  stat stages, all four moves with type and power, the active move
-  highlighted (click a move to make it active), a Move button, and later an
-  evolution button when eligible. Opened by clicking a placed Pokémon or its
-  slot in the party strip along the bottom of the HUD. It is a DOM overlay so
-  it stays readable at phone width.
-- PC (`PCScene`, full screen, reached from level select): laid out like the
-  DS games with the party column on the left, the box grid (6x5) on the
-  right over the box's wallpaper inside a frame image, arrows and a name
-  to switch boxes (8 boxes), a cursor image, drag and drop between any
+- Pokémon panel laid out like Platinum's summary page: a header band with
+  icon, name and level, the portrait beside the type badges and status, the
+  battle-GUI HP box (HP bar and numbers, EXP bar, status badge), the EXP to
+  the next level, then the moves with type badge, PP and power, the active
+  move marked (click a move to make it active), and Return to party /
+  Potion. Opened by tapping a placed Pokémon or its party slot. DOM overlay
+  so it stays readable at phone width.
+- Start menu (Menu button or Esc) like Platinum's: a column on the right
+  with the start-menu icons (Pokédex, Pokémon, Bag, trainer card, Save,
+  Options, Exit, plus Leave level), a red arrow cursor, Up/Down/Enter/Esc
+  and mouse. Each entry opens a framed page; the sim pauses while the menu
+  is open.
+- Dialogue: the bottom text box (blue frame, across the width above the
+  party strip) types text letter by letter; a click or Enter completes the
+  page, then advances. Trainer intros use it ("<name> wants to battle!",
+  the intro line) with the trainer portrait at the left and the party
+  icons under the text.
+- Placed Pokémon and enemies show HP bars and status badges only; levels
+  stay in the panel, the PC and the party strip.
+- Placing from the party strip is drag and drop: press a slot and drag,
+  the sprite follows the pointer, free spots light up, releasing over one
+  places it (anywhere else cancels). Tap-slot-then-tap-spot still works.
+- PC (`PCScene`, reached from level select) fills the whole canvas edge to
+  edge like the DS PC screen: the party column on the left edge, the box
+  grid (6x5) over the box's wallpaper at 3x in the middle, arrows and a
+  name to switch boxes (8 boxes), a cursor image, drag and drop between any
   slots (holding a drag over an arrow turns the page), and a side panel
   with the summary (icon, portrait, level, types, stats, moves, EXP, Rare
   Candy) plus sort and filter. The frame, cursor and wallpapers are images

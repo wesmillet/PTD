@@ -1,17 +1,19 @@
 /**
- * In-level Pokémon panel: a DOM overlay (readable at phone width) showing
- * portrait, level, HP, EXP, status and the four moves. Clicking a move makes
- * it active; "Move" hands control back to the scene to pick a new tile.
+ * In-level Pokémon panel laid out like Platinum's summary page: a header
+ * strip with name and level, the portrait beside the types and status, the
+ * battle-GUI HP box with HP and EXP, then the moves with type and PP.
+ * DOM overlay (readable at phone width). Clicking a move makes it active.
  */
 import { expForLevel, getMove, typeName } from '../data/pokedata';
 import type { Monster } from '../sim/monster';
 import { resolveMove } from '../sim/moves';
 import { evolutionOptions } from '../sim/evolution';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, hpBox, isolateFromGame, updateHpBox } from './domOverlay';
+import { capitalize, ensureOverlayStyles, hpBox, iconImage, isolateFromGame, typeBadge, updateHpBox } from './domOverlay';
 
 export interface PokemonPanelHooks {
   portraitUrl: (species: number) => string | undefined;
+  iconUrl?: (species: number) => string | undefined;
   setActiveMove: (mon: Monster, index: number) => void;
   /** Removes a placed Pokémon from the map (build phase); return false if it could not. */
   returnToParty: (mon: Monster) => boolean;
@@ -25,13 +27,15 @@ export class PokemonPanel {
   private readonly root: HTMLDivElement;
   private mon: Monster | null = null;
   private placed = false;
-  private readonly portrait: HTMLImageElement;
+  private readonly headIcon: HTMLSpanElement;
   private readonly title: HTMLElement;
-  private readonly subtitle: HTMLElement;
+  private readonly level: HTMLElement;
+  private readonly portrait: HTMLImageElement;
+  private readonly types: HTMLDivElement;
+  private readonly statusLine: HTMLElement;
   private readonly hpSlot: HTMLDivElement;
   private hpBoxEl: HTMLDivElement | null = null;
   private readonly expText: HTMLElement;
-  private readonly statusLine: HTMLElement;
   private readonly moveList: HTMLUListElement;
   private readonly moveButton: HTMLSpanElement;
   private readonly returnButton: HTMLButtonElement;
@@ -41,7 +45,7 @@ export class PokemonPanel {
   constructor(private readonly hooks: PokemonPanelHooks) {
     ensureOverlayStyles();
     this.root = document.createElement('div');
-    this.root.className = 'ptd-panel ptd-side';
+    this.root.className = 'ptd-panel ptd-side ptd-summary';
     this.root.style.display = 'none';
     isolateFromGame(this.root);
 
@@ -51,30 +55,50 @@ export class PokemonPanel {
     close.addEventListener('click', () => this.hide());
     this.root.appendChild(close);
 
+    // Header strip: icon, name, level (the summary page's top band).
     const head = document.createElement('div');
-    head.className = 'ptd-head';
+    head.className = 'ptd-sum-head';
+    this.headIcon = document.createElement('span');
+    this.title = document.createElement('span');
+    this.title.className = 'ptd-sum-name';
+    this.level = document.createElement('span');
+    this.level.className = 'ptd-sum-level';
+    head.append(this.headIcon, this.title, this.level);
+    this.root.appendChild(head);
+
+    // Portrait beside the types and status.
+    const info = document.createElement('div');
+    info.className = 'ptd-sum-info';
     this.portrait = document.createElement('img');
     this.portrait.className = 'ptd-portrait';
     this.portrait.alt = '';
-    const titles = document.createElement('div');
-    this.title = document.createElement('h2');
-    this.subtitle = document.createElement('div');
-    this.subtitle.className = 'ptd-dim';
-    titles.append(this.title, this.subtitle);
-    head.append(this.portrait, titles);
-    this.root.appendChild(head);
+    const right = document.createElement('div');
+    const typeLabel = document.createElement('div');
+    typeLabel.className = 'ptd-label';
+    typeLabel.textContent = 'Type';
+    this.types = document.createElement('div');
+    this.types.className = 'ptd-sum-types';
+    const statusLabel = document.createElement('div');
+    statusLabel.className = 'ptd-label';
+    statusLabel.textContent = 'Status';
+    this.statusLine = document.createElement('div');
+    this.statusLine.className = 'ptd-status';
+    right.append(typeLabel, this.types, statusLabel, this.statusLine);
+    info.append(this.portrait, right);
+    this.root.appendChild(info);
 
-    // The battle-GUI HP box (name, Lv, HP bar and numbers, EXP bar, status badge).
+    // The battle-GUI HP box (HP bar and numbers, EXP bar, status badge) and the EXP line.
     this.hpSlot = document.createElement('div');
     this.expText = document.createElement('div');
     this.expText.className = 'ptd-dim';
-    this.statusLine = document.createElement('div');
-    this.statusLine.className = 'ptd-status';
-    this.root.append(this.hpSlot, this.expText, this.statusLine);
+    this.root.append(this.hpSlot, this.expText);
 
+    const movesHead = document.createElement('div');
+    movesHead.className = 'ptd-heading';
+    movesHead.textContent = 'Moves';
     this.moveList = document.createElement('ul');
     this.moveList.className = 'ptd-moves';
-    this.root.appendChild(this.moveList);
+    this.root.append(movesHead, this.moveList);
 
     const actions = document.createElement('div');
     actions.className = 'ptd-actions';
@@ -126,6 +150,9 @@ export class PokemonPanel {
     } else {
       this.portrait.style.display = 'none';
     }
+    this.headIcon.innerHTML = '';
+    const icon = this.hooks.iconUrl ? iconImage(this.hooks.iconUrl(mon.species)) : null;
+    if (icon) this.headIcon.appendChild(icon);
     this.refresh();
   }
 
@@ -145,10 +172,12 @@ export class PokemonPanel {
     this.lastKey = key;
 
     this.title.textContent = `${capitalize(mon.name)}${mon.shiny ? ' ★' : ''}`;
-    this.subtitle.textContent = `Lv ${mon.level}  ${mon.types.map((t) => capitalize(typeName(t))).join(' / ')}  ${this.placed ? 'placed' : 'in party'}`;
+    this.level.textContent = `Lv ${mon.level}`;
+    this.types.innerHTML = '';
+    for (const t of mon.types) this.types.appendChild(typeBadge(typeName(t)));
     if (this.hpBoxEl) updateHpBox(this.hpBoxEl, mon);
     const next = mon.level >= 100 ? 0 : expForLevel(mon.growth, mon.level + 1) - mon.exp;
-    this.expText.textContent = mon.level >= 100 ? 'EXP: max level' : `EXP ${mon.exp}  (${next} to Lv ${mon.level + 1})`;
+    this.expText.textContent = mon.level >= 100 ? 'EXP: max level' : `EXP ${mon.exp}   To next Lv: ${next}`;
 
     const chips: string[] = [];
     if (mon.status.ailment !== 'none') chips.push(capitalize(mon.status.ailment));
@@ -157,7 +186,7 @@ export class PokemonPanel {
     this.statusLine.innerHTML = '';
     if (chips.length === 0) {
       const ok = document.createElement('span');
-      ok.textContent = 'No status';
+      ok.textContent = this.placed ? 'OK · on the field' : 'OK · in party';
       this.statusLine.appendChild(ok);
     }
     for (const c of chips) {
@@ -165,7 +194,6 @@ export class PokemonPanel {
       span.textContent = c;
       this.statusLine.appendChild(span);
     }
-
     const evo = evolutionOptions(mon);
     const evoSpan = document.createElement('span');
     if (evo.ready.length) evoSpan.textContent = `Evolves into ${capitalizeName(evo.ready[0]!.toName)} at the next level-up`;
@@ -179,17 +207,16 @@ export class PokemonPanel {
       const data = getMove(slot.id);
       const li = document.createElement('li');
       li.className = `ptd-move${index === mon.activeMove ? ' active' : ''}`;
+      li.style.gridTemplateColumns = '1fr auto auto';
       const name = document.createElement('span');
       name.className = 'ptd-name';
-      name.textContent = `${index === mon.activeMove ? '> ' : ''}${capitalize(data.name)}`;
-      const type = document.createElement('span');
-      type.className = 'ptd-type';
-      type.textContent = typeName(data.type);
-      type.style.background = `var(--type-${typeName(data.type)}, #444)`;
+      name.textContent = `${index === mon.activeMove ? '▶ ' : ''}${capitalize(data.name)}`;
+      const pp = document.createElement('span');
+      pp.textContent = `PP ${slot.pp}/${slot.maxPp}`;
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
-      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${data.category}  PP ${slot.pp}/${slot.maxPp}  range ${spec.range}  ${spec.targeting}`;
-      li.append(name, type, meta);
+      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${capitalize(data.category)}  Range ${spec.range}  ${capitalize(spec.targeting)}`;
+      li.append(name, typeBadge(typeName(data.type)), pp, meta);
       li.addEventListener('click', () => {
         this.hooks.setActiveMove(mon, index);
         this.refresh();

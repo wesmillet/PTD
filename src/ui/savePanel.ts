@@ -41,7 +41,7 @@ export class SavePanel {
     const codeBox = document.createElement('textarea');
     codeBox.id = 'ptd-save-code';
     codeBox.readOnly = true;
-    codeBox.style.cssText = 'width:100%;height:70px;font:11px monospace;box-sizing:border-box';
+    codeBox.style.cssText = 'width:100%;height:70px;font:13px "Power Clear",monospace;box-sizing:border-box';
     codeBox.value = this.hooks.getCode();
     const copy = document.createElement('button');
     copy.textContent = 'Copy code';
@@ -63,7 +63,7 @@ export class SavePanel {
     const importBox = document.createElement('textarea');
     importBox.id = 'ptd-import-code';
     importBox.placeholder = 'Paste a code starting with PTD1.';
-    importBox.style.cssText = 'width:100%;height:60px;font:11px monospace;box-sizing:border-box';
+    importBox.style.cssText = 'width:100%;height:60px;font:13px "Power Clear",monospace;box-sizing:border-box';
     const importButton = document.createElement('button');
     importButton.textContent = 'Import (replaces the current save)';
     const status = document.createElement('div');

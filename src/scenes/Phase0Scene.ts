@@ -6,7 +6,7 @@ import { createPmdSprite, playAnim, queuePokemon, registerAnims, syncShadow } fr
 const PRIMARY = 'turtwig';
 const ROW_ACTIONS = ['Idle', 'Walk'] as const;
 const SCALES = [1, 2, 3, 4] as const;
-const TEXT_STYLE = { fontFamily: 'monospace', fontSize: '13px', color: '#d8d8e8' };
+const TEXT_STYLE = { fontFamily: '"Power Clear", monospace', fontSize: '13px', color: '#484848', resolution: 1 };
 
 /**
  * Phase 0 acceptance scene: one Pokémon playing Idle and Walk in all 8

@@ -3,7 +3,8 @@
  * localStorage on startup and saved after every change.
  */
 import partyDebug from '../data/party-debug.json';
-import { addPokemon, chooseStarter, createGameState, type GameState } from '../sim/game';
+import { addPokemon, chooseStarter, createGameState, DEMO_MODE, type GameState } from '../sim/game';
+import { seedShowcase } from '../sim/showcase';
 import { createMonster } from '../sim/monster';
 import { SaveError } from '../sim/save';
 import { urlParam } from './runtime';
@@ -16,6 +17,13 @@ export const STARTER_LEVEL = 5;
 let game: GameState = createGameState();
 let loaded = false;
 
+/** A fresh game: empty, except that demo builds start with the showcase PC. */
+function newGameState(): GameState {
+  const fresh = createGameState();
+  if (DEMO_MODE) seedShowcase(fresh);
+  return fresh;
+}
+
 /** Loads the stored save once (no-op afterwards). */
 export function loadGameOnce(): void {
   if (loaded) return;
@@ -24,6 +32,8 @@ export function loadGameOnce(): void {
   if (data) {
     game = restoreGame(data);
     applySettings(data);
+  } else {
+    game = newGameState();
   }
 }
 
@@ -39,7 +49,7 @@ export function saveGame(): void {
 
 export function resetGame(): GameState {
   clearSave();
-  game = createGameState();
+  game = newGameState();
   loaded = true;
   return game;
 }

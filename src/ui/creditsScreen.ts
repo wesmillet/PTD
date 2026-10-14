@@ -38,6 +38,12 @@ export const GENERAL_CREDITS: { title: string; lines: string[] }[] = [
       'Start-menu icons: ripped by spaceemotion.',
     ],
   },
+  {
+    title: 'Font',
+    lines: [
+      'Power Clear and Power Clear Bold, the DS-era Pokémon text fonts distributed with Pokémon Essentials (https://github.com/Maruno17/pokemon-essentials, Fonts folder), by the Pokémon Essentials contributors. Creative Commons Attribution-NonCommercial-ShareAlike 4.0; non-commercial use only.',
+    ],
+  },
   { title: 'Engine', lines: ['Phaser 3, https://phaser.io'] },
   { title: 'Pokémon', lines: ['Pokémon is a trademark of Nintendo, Creatures Inc. and GAME FREAK. This is a non-commercial fan project.'] },
 ];

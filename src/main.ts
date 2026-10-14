@@ -28,7 +28,7 @@ function start(): void {
 // Make sure the pixel font is available before any canvas text is created.
 const fonts = typeof document !== 'undefined' && 'fonts' in document ? document.fonts : null;
 if (fonts) {
-  Promise.all([fonts.load('700 16px "Pixelify Sans"'), fonts.load('400 16px "Pixelify Sans"')])
+  Promise.all([fonts.load('13px "Power Clear"'), fonts.load('700 13px "Power Clear Bold"')])
     .catch(() => undefined)
     .finally(start);
 } else {

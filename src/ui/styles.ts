@@ -1,17 +1,25 @@
-/** Canvas-side mirror of theme.css (Phaser text cannot read CSS variables). Platinum palette. */
-export const FONT = '"Pixelify Sans", "Courier New", monospace';
-export const FONT_BODY = 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif';
+/**
+ * Canvas-side mirror of theme.css (Phaser text cannot read CSS variables).
+ * Power Clear (DS-era Pokémon font, Pokémon Essentials) renders on a 13 px
+ * grid: 13 px is the DS size, 26 px its 2x. Only those two sizes are used
+ * so glyphs stay on whole pixels. Text is dark grey with a light shadow one
+ * pixel down and right on light panels, white with a dark shadow elsewhere.
+ */
+export const FONT = '"Power Clear", monospace';
+export const FONT_BOLD = '"Power Clear Bold", "Power Clear", monospace';
+export const SIZE_SMALL = 13;
+export const SIZE_LARGE = 26;
 
-export const TEXT = { fontFamily: FONT, fontSize: '15px', color: '#404848' } as const;
-export const TEXT_DIM = { fontFamily: FONT, fontSize: '13px', color: '#687078' } as const;
-export const TEXT_BIG = { fontFamily: FONT, fontSize: '24px', color: '#404848', fontStyle: 'bold' } as const;
-export const TEXT_TITLE = { fontFamily: FONT, fontSize: '48px', color: '#f8f8f8', fontStyle: 'bold', stroke: '#283028', strokeThickness: 6 } as const;
-/** Light text with a dark outline, for labels drawn over the map or dark boxes. */
-export const TEXT_LIGHT = { fontFamily: FONT, fontSize: '15px', color: '#f8f8f8', stroke: '#283028', strokeThickness: 3 } as const;
+const SHADOW_LIGHT = { offsetX: 1, offsetY: 1, color: '#d0d0c8', blur: 0, stroke: false, fill: true } as const;
+const SHADOW_DARK = { offsetX: 1, offsetY: 1, color: '#283028', blur: 0, stroke: false, fill: true } as const;
 
-/** Bitmap fonts cut from the Platinum battle GUI (registered in BootScene). */
-export const FONT_NAME = 'gen4-name';
-export const FONT_NUM = 'gen4-num';
+export const TEXT = { fontFamily: FONT, fontSize: '13px', color: '#484848', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+export const TEXT_DIM = { fontFamily: FONT, fontSize: '13px', color: '#707878', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+export const TEXT_BIG = { fontFamily: FONT_BOLD, fontSize: '26px', color: '#484848', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+export const TEXT_TITLE = { fontFamily: FONT_BOLD, fontSize: '26px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
+/** Light text with a dark shadow, for labels over the map or dark boxes. */
+export const TEXT_LIGHT = { fontFamily: FONT, fontSize: '13px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
+export const TEXT_LIGHT_BIG = { fontFamily: FONT_BOLD, fontSize: '26px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
 
 export const COLORS = {
   bg: 0xc0ccdc,
@@ -23,7 +31,7 @@ export const COLORS = {
   button: 0xf8f8f8,
   buttonHover: 0xd0e4f8,
   buttonDisabled: 0xe0e4e8,
-  text: 0x404848,
+  text: 0x484848,
   hpBack: 0xf8f8f8,
   hpFrame: 0x000000,
   hpFront: 0x18c320,

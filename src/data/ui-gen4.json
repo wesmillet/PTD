@@ -417,24 +417,6 @@
     "fnt": "assets/ui/gen4/ball-fnt.png",
     "status": "assets/ui/gen4/ball-status.png"
   },
-  "fonts": {
-    "name": {
-      "file": "assets/ui/gen4/font-name.png",
-      "chars": "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890 ",
-      "width": 7,
-      "height": 13,
-      "charsPerRow": 13,
-      "lineHeight": 13
-    },
-    "numbers": {
-      "file": "assets/ui/gen4/font-numbers.png",
-      "chars": "0123456789",
-      "width": 9,
-      "height": 7,
-      "charsPerRow": 10,
-      "lineHeight": 7
-    }
-  },
   "bag": {
     "pokeball": "assets/ui/gen4/pokeball-big.png",
     "pokeballPressed": "assets/ui/gen4/pokeball-big-pressed.png",

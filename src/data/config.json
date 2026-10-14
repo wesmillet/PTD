@@ -149,5 +149,6 @@
     "hpMultiplier": 4,
     "spriteScale": 1.5,
     "retryBossWave": true
-  }
+  },
+  "demoMode": true
 }

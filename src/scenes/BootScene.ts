@@ -5,22 +5,13 @@ import spriteFolders from '../data/spriteFolders.json';
 import uiGen4 from '../data/ui-gen4.json';
 import { assetUrl, badgeTextureKey, itemTextureKey, itemUrl, trainerTextureKey, urlParam } from '../game/runtime';
 import { PC } from '../sim/pc';
-import { FONT_NAME, FONT_NUM, frameKey } from '../ui/styles';
-
-interface RetroFontMeta {
-  file: string;
-  chars: string;
-  width: number;
-  height: number;
-  charsPerRow: number;
-}
+import { frameKey, TEXT_BIG } from '../ui/styles';
 
 const ui = uiGen4 as {
   frames: Record<string, { file: string }>;
   hpBoxes: Record<string, { file: string }>;
   status: Record<string, string>;
   balls: Record<string, string>;
-  fonts: { name: RetroFontMeta; numbers: RetroFontMeta };
   bag: { pokeball: string; pokeballPressed: string; buttons: Record<string, Record<string, string>>; pocketIcons: string; pocketIconsDim: string; pocketCursor: string; pocketPanel: string };
   menu: Record<string, { on: string; off: string }>;
 };
@@ -37,7 +28,7 @@ export class BootScene extends Phaser.Scene {
   preload(): void {
     const { width, height } = this.scale;
     const label = this.add
-      .text(width / 2, height / 2 - 20, 'Loading…', { fontFamily: '"Pixelify Sans", monospace', fontSize: '18px', color: '#f4ecd8' })
+      .text(width / 2, height / 2 - 20, 'Loading…', TEXT_BIG)
       .setOrigin(0.5);
     const bar = this.add.graphics();
     this.load.on('progress', (value: number) => {
@@ -75,8 +66,6 @@ export class BootScene extends Phaser.Scene {
     for (const [name, b] of Object.entries(ui.hpBoxes)) this.load.image(`ui-hpbox-${name}`, assetUrl(b.file));
     for (const [name, file] of Object.entries(ui.status)) this.load.image(`ui-status-${name}`, assetUrl(file));
     for (const [name, file] of Object.entries(ui.balls)) this.load.image(`ui-ball-${name}`, assetUrl(file));
-    this.load.image('ui-font-name', assetUrl(ui.fonts.name.file));
-    this.load.image('ui-font-numbers', assetUrl(ui.fonts.numbers.file));
     this.load.image('ui-pokeball', assetUrl(ui.bag.pokeball));
     this.load.image('ui-pokeball-pressed', assetUrl(ui.bag.pokeballPressed));
     for (const [pocket, states] of Object.entries(ui.bag.buttons)) for (const [state, file] of Object.entries(states)) this.load.image(`ui-button-${pocket}-${state}`, assetUrl(file));
@@ -98,25 +87,6 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Bitmap fonts from the battle GUI: the name font and the Lv / HP numbers.
-    const retro = (key: string, image: string, f: RetroFontMeta) => {
-      if (!this.textures.exists(image) || this.cache.bitmapFont.has(key)) return;
-      const config: Phaser.Types.GameObjects.BitmapText.RetroFontConfig = {
-        image,
-        'offset.x': 0,
-        'offset.y': 0,
-        width: f.width,
-        height: f.height,
-        chars: f.chars,
-        charsPerRow: f.charsPerRow,
-        'spacing.x': 0,
-        'spacing.y': 0,
-        lineSpacing: 0,
-      };
-      this.cache.bitmapFont.add(key, Phaser.GameObjects.RetroFont.Parse(this, config));
-    };
-    retro(FONT_NAME, 'ui-font-name', ui.fonts.name);
-    retro(FONT_NUM, 'ui-font-numbers', ui.fonts.numbers);
     // A small star for shiny sparkles.
     const star = this.add.graphics();
     star.fillStyle(0xffffff, 1);

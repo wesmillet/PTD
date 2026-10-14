@@ -17,14 +17,18 @@ import {
   type SlotRef,
   type SortKey,
 } from '../sim/pc';
-import { Button } from '../ui/button';
+import { Button, framePanel } from '../ui/button';
 import { PcSummary } from '../ui/pcSummary';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
 
-const CELL = 48;
-/** Wallpaper layout: a 12 px margin and a 36 px title band (see scripts/build-placeholders.mjs). */
-const GRID_X = 12;
-const GRID_Y = 36;
+/**
+ * Layout for the full 960x600 canvas, edge to edge like the DS PC screen:
+ * the party column on the left edge, the box (wallpaper at 3x) filling the
+ * middle, and the summary side panel (DOM, 350 px) on the right.
+ */
+const PARTY_W = 112;
+const PANEL_W = 362;
+const WALL_SCALE = 3;
 const ICON_FRAME_MS = 170;
 /** Hovering an arrow while dragging switches boxes after this long. */
 const ARROW_HOLD_MS = 450;
@@ -33,6 +37,7 @@ interface SlotView {
   ref: SlotRef;
   x: number;
   y: number;
+  size: number;
   hit: Phaser.GameObjects.Rectangle;
   icon?: Phaser.GameObjects.Image;
   mon: Monster | null;
@@ -50,10 +55,10 @@ interface Drag {
 }
 
 /**
- * The PC, laid out like the DS games: the party in a column on the left, a
- * 6x5 box grid on the right over the box's wallpaper inside the frame image,
- * arrows to switch boxes, a cursor image, drag and drop between any slots,
- * and a summary side panel with sort and filter. Frame, cursor and
+ * The PC, laid out like the DS games and filling the whole canvas: the party
+ * in a column on the left, a 6x5 box grid over the box's wallpaper inside the
+ * frame image, arrows to switch boxes, a cursor image, drag and drop between
+ * any slots, and a summary side panel with sort and filter. Frame, cursor and
  * wallpapers are images named in src/data/pc.json.
  */
 export class PCScene extends Phaser.Scene {
@@ -63,7 +68,6 @@ export class PCScene extends Phaser.Scene {
   private drag: Drag | null = null;
   private cursor?: Phaser.GameObjects.Image;
   private wallpaper?: Phaser.GameObjects.Image;
-  private frame?: Phaser.GameObjects.NineSlice | Phaser.GameObjects.Image;
   private boxTitle?: Phaser.GameObjects.Text;
   private countText?: Phaser.GameObjects.Text;
   private leftArrow?: Button;
@@ -74,8 +78,10 @@ export class PCScene extends Phaser.Scene {
   private toast?: Phaser.GameObjects.Text;
   private boxX = 0;
   private boxY = 0;
-  private partyX = 0;
-  private partyY = 0;
+  private wallW = 0;
+  private wallH = 0;
+  private cell = 48;
+  private iconScale = 1;
 
   constructor() {
     super('PC');
@@ -89,49 +95,53 @@ export class PCScene extends Phaser.Scene {
     this.drag = null;
     this.boxIndex = Math.min(this.boxIndex, game.boxes.length - 1);
 
-    this.add.text(24, 16, 'Pokémon Storage', TEXT_BIG);
-    this.add.text(24, 48, `Party ${game.party.length} / ${MAX_PARTY}`, TEXT_DIM);
-    new Button(this, width - 70, 28, 'Back', () => this.scene.start('LevelSelect'), 100, 30);
-
-    // Party column (left).
-    this.partyX = 60;
-    this.partyY = 110;
-    this.add.text(this.partyX, this.partyY - 26, 'Party', TEXT).setOrigin(0.5, 1);
-    const column = this.add.graphics();
-    column.fillStyle(COLORS.borderOuter, 1).fillRoundedRect(this.partyX - 32, this.partyY - 8, 64, MAX_PARTY * 56 + 8, 8);
-    column.fillStyle(COLORS.panel, 1).fillRoundedRect(this.partyX - 29, this.partyY - 5, 58, MAX_PARTY * 56 + 2, 6);
-
-    // Box (right): frame image around the wallpaper and grid.
-    const gridW = PC.columns * CELL;
-    const gridH = PC.rows * CELL;
-    const wallW = gridW + GRID_X * 2;
-    const wallH = gridH + GRID_Y + 12;
-    // The box sits right of the party column; the summary side panel (DOM) takes the right third.
-    this.boxX = this.partyX + 76;
-    this.boxY = Math.round(height / 2 - wallH / 2 + 10);
-    void width;
-    const frameKey = 'pc-frame';
-    if (this.textures.exists(frameKey)) {
-      this.frame = this.add.nineslice(this.boxX + wallW / 2, this.boxY + wallH / 2, frameKey, undefined, wallW + 24, wallH + 24, 12, 12, 12, 12);
-    } else {
-      this.frame = this.add.rectangle(this.boxX + wallW / 2, this.boxY + wallH / 2, wallW + 24, wallH + 24, COLORS.borderOuter) as unknown as Phaser.GameObjects.Image;
-    }
-    this.wallpaper = this.add.image(this.boxX, this.boxY, '').setOrigin(0).setDisplaySize(wallW, wallH);
-    this.boxTitle = this.add.text(this.boxX + wallW / 2, this.boxY + 14, '', { ...TEXT, fontStyle: 'bold', stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5);
-    this.leftArrow = new Button(this, this.boxX + 28, this.boxY + 14, '<', () => this.switchBox(-1), 36, 24);
-    this.rightArrow = new Button(this, this.boxX + wallW - 28, this.boxY + 14, '>', () => this.switchBox(1), 36, 24);
-    this.countText = this.add.text(this.boxX + wallW, this.boxY + wallH + 22, '', TEXT_DIM).setOrigin(1, 0.5);
-    new Button(this, this.boxX + 70, this.boxY + wallH + 22, 'Wallpaper', () => this.nextWallpaper(), 120, 24);
-
-    // Slot hit areas: party column and box grid.
+    // Party column: the left edge, top to bottom.
+    framePanel(this, PARTY_W / 2, height / 2, PARTY_W + 8, height + 8, 'blue');
+    this.add.text(PARTY_W / 2, 18, 'Party', TEXT_BIG).setOrigin(0.5);
+    this.add.text(PARTY_W / 2, 44, `${game.party.length} / ${MAX_PARTY}`, TEXT_DIM).setOrigin(0.5);
+    const partyTop = 70;
+    const partyStep = Math.floor((height - partyTop - 50) / MAX_PARTY);
     for (let i = 0; i < MAX_PARTY; i++) {
-      this.makeSlot({ kind: 'party', index: i }, this.partyX, this.partyY + i * 56 + 24);
+      const y = partyTop + i * partyStep + partyStep / 2;
+      this.add.rectangle(PARTY_W / 2, y, 64, partyStep - 8, COLORS.panel2).setStrokeStyle(2, 0xa8b8c8);
+      this.makeSlot({ kind: 'party', index: i }, PARTY_W / 2, y, 64);
     }
+    new Button(this, PARTY_W / 2, height - 24, 'Back', () => this.scene.start('LevelSelect'), 96, 28, 'ui-menu-exit');
+
+    // Box: everything between the party column and the summary panel.
+    const boxAreaX = PARTY_W + 8;
+    const boxAreaW = width - PANEL_W - boxAreaX;
+    this.wallW = 158 * WALL_SCALE;
+    this.wallH = 118 * WALL_SCALE;
+    this.boxX = Math.round(boxAreaX + (boxAreaW - this.wallW) / 2);
+    this.boxY = 64;
+    const frameKeyPc = 'pc-frame';
+    if (this.textures.exists(frameKeyPc)) {
+      this.add.nineslice(this.boxX + this.wallW / 2, this.boxY + this.wallH / 2, frameKeyPc, undefined, this.wallW + 24, this.wallH + 24, 12, 12, 12, 12);
+    } else {
+      this.add.rectangle(this.boxX + this.wallW / 2, this.boxY + this.wallH / 2, this.wallW + 24, this.wallH + 24, COLORS.borderOuter);
+    }
+    this.wallpaper = this.add.image(this.boxX, this.boxY, '').setOrigin(0).setDisplaySize(this.wallW, this.wallH);
+    // Title band above the box with the arrows.
+    framePanel(this, this.boxX + this.wallW / 2, 30, this.wallW + 24, 40, 'blue');
+    this.boxTitle = this.add.text(this.boxX + this.wallW / 2, 30, '', TEXT_BIG).setOrigin(0.5);
+    this.leftArrow = new Button(this, this.boxX + 26, 30, '<', () => this.switchBox(-1), 40, 28);
+    this.rightArrow = new Button(this, this.boxX + this.wallW - 26, 30, '>', () => this.switchBox(1), 40, 28);
+    // Grid cells fill the wallpaper (its 3 px bevel aside).
+    const inset = 4 * WALL_SCALE;
+    this.cell = Math.floor(Math.min((this.wallW - inset * 2) / PC.columns, (this.wallH - inset * 2) / PC.rows));
+    this.iconScale = this.cell >= 64 ? 2 : 1;
+    const gridX = this.boxX + Math.round((this.wallW - this.cell * PC.columns) / 2);
+    const gridY = this.boxY + Math.round((this.wallH - this.cell * PC.rows) / 2);
     for (let r = 0; r < PC.rows; r++) {
       for (let c = 0; c < PC.columns; c++) {
-        this.makeSlot({ kind: 'box', box: -1, slot: r * PC.columns + c }, this.boxX + GRID_X + c * CELL + CELL / 2, this.boxY + GRID_Y + r * CELL + CELL / 2);
+        this.makeSlot({ kind: 'box', box: -1, slot: r * PC.columns + c }, gridX + c * this.cell + this.cell / 2, gridY + r * this.cell + this.cell / 2, this.cell);
       }
     }
+    const footY = this.boxY + this.wallH + 36;
+    new Button(this, this.boxX + 70, footY, 'Wallpaper', () => this.nextWallpaper(), 130, 28);
+    this.countText = this.add.text(this.boxX + this.wallW, footY, '', TEXT).setOrigin(1, 0.5);
+    this.add.text(this.boxX + this.wallW / 2, height - 14, 'Drag between slots and the party; hold over an arrow to turn the page', TEXT_DIM).setOrigin(0.5);
 
     // Cursor image follows the pointer over the canvas.
     if (this.textures.exists('pc-cursor')) {
@@ -191,12 +201,12 @@ export class PCScene extends Phaser.Scene {
     this.refresh();
   }
 
-  private makeSlot(ref: SlotRef, x: number, y: number): void {
-    const hit = this.add.rectangle(x, y, CELL - 4, CELL - 4, 0xffffff, 0.001).setInteractive({ useHandCursor: false });
+  private makeSlot(ref: SlotRef, x: number, y: number, size: number): void {
+    const hit = this.add.rectangle(x, y, size - 4, size - 4, 0xffffff, 0.001).setInteractive({ useHandCursor: false });
     hit.on('pointerdown', (p: Phaser.Input.Pointer) => this.onSlotDown(ref, p));
     hit.on('pointerover', () => hit.setStrokeStyle(2, COLORS.placeableHover));
     hit.on('pointerout', () => hit.setStrokeStyle());
-    this.slots.push({ ref, x, y, hit, mon: null });
+    this.slots.push({ ref, x, y, size, hit, mon: null });
   }
 
   private currentRef(ref: SlotRef): SlotRef {
@@ -240,7 +250,7 @@ export class PCScene extends Phaser.Scene {
     if (this.wallpaper) {
       if (this.textures.exists(wpKey)) this.wallpaper.setTexture(wpKey).setVisible(true);
       else this.wallpaper.setVisible(false);
-      this.wallpaper.setDisplaySize(PC.columns * CELL + GRID_X * 2, PC.rows * CELL + GRID_Y + 12);
+      this.wallpaper.setDisplaySize(this.wallW, this.wallH);
     }
     this.boxTitle?.setText(`${box.name}  (${this.boxIndex + 1}/${game.boxes.length})`);
     const count = box.slots.filter((m) => m).length;
@@ -254,12 +264,11 @@ export class PCScene extends Phaser.Scene {
       if (!mon || (this.drag && this.drag.mon === mon)) continue;
       const key = iconTextureKey(mon.species, this.iconFrame);
       if (!this.textures.exists(key)) continue;
-      const icon = this.add.image(slot.x, slot.y - 4, key).setDepth(10);
+      const scale = slot.ref.kind === 'box' ? this.iconScale : 1.5;
+      const icon = this.add.image(slot.x, slot.y - 2 * scale, key).setScale(scale).setDepth(10);
       const matches = matchesFilter(mon, this.filter);
       icon.setAlpha(matches ? 1 : 0.25);
-      if (mon.shiny) {
-        icon.setTint(0xfff5c0);
-      }
+      if (mon.shiny) icon.setTint(0xfff5c0);
       if (mon === this.summary?.selected) slot.hit.setStrokeStyle(2, COLORS.selected);
       else slot.hit.setStrokeStyle();
       slot.icon = icon;
@@ -281,17 +290,17 @@ export class PCScene extends Phaser.Scene {
       return;
     }
     const key = iconTextureKey(mon.species, this.iconFrame);
-    const icon = this.add.image(pointer.x, pointer.y - 6, key).setDepth(4000).setScale(1.15);
+    const icon = this.add.image(pointer.x, pointer.y - 6, key).setDepth(4000).setScale(this.iconScale * 1.15);
     this.drag = { from: real, mon, icon, startX: pointer.x, startY: pointer.y, moved: false, arrowTimer: 0, arrowDir: 0 };
     this.refresh();
   }
 
   private slotUnder(x: number, y: number): SlotView | undefined {
-    return this.slots.find((s) => Math.abs(s.x - x) <= CELL / 2 && Math.abs(s.y - y) <= CELL / 2);
+    return this.slots.find((s) => Math.abs(s.x - x) <= s.size / 2 && Math.abs(s.y - y) <= s.size / 2);
   }
 
   private arrowUnder(x: number, y: number): -1 | 1 | 0 {
-    const hit = (b: Button | undefined) => b !== undefined && Math.abs(b.x - x) <= 22 && Math.abs(b.y - y) <= 16;
+    const hit = (b: Button | undefined) => b !== undefined && Math.abs(b.x - x) <= 24 && Math.abs(b.y - y) <= 18;
     if (hit(this.leftArrow)) return -1;
     if (hit(this.rightArrow)) return 1;
     return 0;
@@ -333,7 +342,7 @@ export class PCScene extends Phaser.Scene {
   private showToast(text: string): void {
     this.toast?.destroy();
     this.toast = this.add
-      .text(this.scale.width / 2, this.scale.height - 24, text, { ...TEXT, backgroundColor: '#000000aa', padding: { x: 8, y: 4 } })
+      .text(this.boxX + this.wallW / 2, this.scale.height - 40, text, { ...TEXT, backgroundColor: '#f8f8f8ee', padding: { x: 8, y: 4 } })
       .setOrigin(0.5)
       .setDepth(4500);
     this.time.delayedCall(1800, () => this.toast?.destroy());

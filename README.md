@@ -48,13 +48,18 @@ the levels in order: Route 201 (free) → Lake Verity (free) → Route 202 (free
 Free levels unlock the next one once you leave with at least one wave
 cleared; defend levels when you win.
 
-- Place a Pokémon by clicking its party slot and then a blue tile; drag a
-  placed Pokémon to move it (also mid-wave); tap it for its panel.
+- Place a Pokémon by dragging it from the party strip onto a worn patch
+  (or tap the slot, then the patch); drag a placed Pokémon to move it (also
+  mid-wave); tap it for its panel.
 - Click a ball in the ball bar, then a wild Pokémon, to throw it. Trainer
   Pokémon (Route 202's Tristan, Route 203's Barry, Roark in the mine)
   bounce the ball off; Roark's Cranidos is a boss with its own HP bar.
 - Speed toggle: 1x, 2x, 4x (extra fixed steps per frame, same results).
-- Menu (or Esc) pauses the level: Resume, Settings (game speed) and Exit.
+- Menu (or Esc) opens the Platinum start menu: Pokédex, Pokémon, Bag,
+  trainer card, Save, Options, Exit and Leave level (arrow keys, Enter, Esc
+  or the mouse).
+- Demo mode (`config.json` `demoMode`, on for now) unlocks every level and
+  starts a new game with a showcase PC.
   A selected ball is thrown with the next click on a wild Pokémon; any
   other click drops it.
 - Between levels: PC (boxes, drag and drop, sort, filter, Rare Candy), Shop,

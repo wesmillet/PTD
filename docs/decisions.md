@@ -100,3 +100,25 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   the bag's round buttons; the other five pockets are not sold yet.
 - The 33 Platinum wallpapers replace the placeholder ones; old saves that
   named a placeholder wallpaper fall back to the first Platinum one.
+- Power Clear's pixel grid is 13 px per em (measured: edge pixels are
+  sharpest at 13, 26 and 39 px), so the UI uses 13 px for body text and
+  26 px for titles, headings and dialogue; 1x and 2x of the DS size.
+- The battle GUI's cut name and number fonts were dropped in favour of Power
+  Clear everywhere, as asked; the boss box and party strip use it too.
+- The start menu keeps Platinum's seven entries (Exit closes the menu, as
+  in the games) and adds "Leave level" with the flag icon, since the games
+  have no way to quit a battle from the menu.
+- The Pokédex page lists only what the save has seen (name hidden until
+  caught); there is still no full Pokédex screen.
+- Trainer intros moved from the card to the bottom dialogue box: page one
+  "<name> wants to battle!" with the party icons, page two the intro line.
+- A press on a party slot starts a drag at once; a release within 6 px is
+  the old tap, so both ways of placing keep working.
+- Demo mode seeds the showcase on the first run without a save and on New
+  Game; the showcase Pokémon count as caught in the Pokédex record.
+- In the showcase, each species is never below the level its evolution line
+  reaches it by level (no Lv 20 Charizard); levels are rolled from a fixed
+  seed so the file only changes when the list does.
+- The debug panel and the map editor keep their monospace developer styling
+  (they are tools, not game UI, and the editor belongs to the maps session);
+  the save-code text areas use Power Clear like the rest.

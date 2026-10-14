@@ -10,15 +10,18 @@ import { editorStore } from '../map/editorStore';
 import { MapRenderer } from '../map/renderer';
 import { cloneModel, toMapDef, type MapModel } from '../map/tiled';
 import config from '../data/config.json';
-import { itemTextureKey, portraitUrl, runtime, runtimeConfig, spriteFolder, urlParam } from '../game/runtime';
+import { iconTextureKey, iconUrl, itemTextureKey, portraitUrl, runtime, runtimeConfig, spriteFolder, trainerTextureKey, urlParam } from '../game/runtime';
 import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
 import { addPokemon, markSeen, recordLevelResult } from '../sim/game';
 import { usePotion } from '../sim/items';
 import { BALLS } from '../sim/catch';
 import { advance, createClock, type Clock } from '../sim/clock';
 import { EvolutionDialog } from '../ui/evolutionDialog';
-import { showTrainerCard } from '../ui/trainerCard';
-import { PauseMenu } from '../ui/pauseMenu';
+import { DialogueBox } from '../ui/dialogue';
+import { MenuPages } from '../ui/menuPages';
+import { SavePanel } from '../ui/savePanel';
+import { StartMenu, startMenuEntries, type StartMenuId } from '../ui/startMenu';
+import { currentSaveCode, importSaveCode, resetGame } from '../game/session';
 import {
   activeBoss,
   createLevel,
@@ -51,16 +54,17 @@ import { Hud } from '../ui/hud';
 import { LearnDialog } from '../ui/learnDialog';
 import { PokemonPanel } from '../ui/pokemonPanel';
 import { capitalize } from '../ui/domOverlay';
-import { getMove } from '../data/pokedata';
+import { findPokemonId, getMove } from '../data/pokedata';
+import { counterStarter } from '../sim/waves';
 import type { Monster } from '../sim/monster';
-import { COLORS, FONT_NAME, FONT_NUM, TEXT, TEXT_DIM } from '../ui/styles';
+import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
 import { STATUS_BADGE } from '../ui/domOverlay';
 import { showSummary } from '../ui/summary';
 
 /** Sprites sit a little above the tile center so their feet land on the tile. */
 const SPRITE_Y_OFFSET = -4;
-/** How long the trainer intro card stays up without a click. */
-const TRAINER_CARD_MS = 2500;
+/** The trainer card name shown on the start menu and trainer card page. */
+const PLAYER_NAME = 'Trainer';
 
 interface EnemyView {
   sprite: Phaser.GameObjects.Sprite;
@@ -79,10 +83,8 @@ interface EnemyView {
 interface TowerView {
   sprite: Phaser.GameObjects.Sprite;
   busy: boolean;
-  /** Battle-GUI HP bar, Lv label and status badge under the placed Pokémon. */
+  /** Battle-GUI HP bar and status badge under the placed Pokémon (no level: that stays in the panel). */
   hpBar: Phaser.GameObjects.Graphics;
-  lvLabel?: Phaser.GameObjects.BitmapText;
-  lvNumber?: Phaser.GameObjects.BitmapText;
   badge?: Phaser.GameObjects.Image;
 }
 
@@ -118,8 +120,13 @@ export class LevelScene extends Phaser.Scene {
   private panel?: PokemonPanel;
   private learnDialog?: LearnDialog;
   private evolutionDialog?: EvolutionDialog;
-  private pauseMenu?: PauseMenu;
+  private startMenu?: StartMenu;
+  private menuPages?: MenuPages;
+  private savePanel?: SavePanel;
+  private dialogue?: DialogueBox;
   private paused = false;
+  /** A party-strip Pokémon being dragged onto the map. */
+  private stripDrag: { partyIndex: number; startX: number; startY: number; moved: boolean; sprite: Phaser.GameObjects.Sprite | Phaser.GameObjects.Image | null } | null = null;
   private selectedBall: string | null = null;
   private drag: { towerId: number; startX: number; startY: number; moved: boolean } | null = null;
   private dragGfx!: Phaser.GameObjects.Graphics;
@@ -155,7 +162,7 @@ export class LevelScene extends Phaser.Scene {
     if (game.party.length === 0) return;
     const def = getLevel(this.levelId);
     const { width, height } = this.scale;
-    const label = this.add.text(width / 2, height / 2 - 20, `Loading ${def.name}…`, { ...TEXT, fontSize: '18px' }).setOrigin(0.5);
+    const label = this.add.text(width / 2, height / 2 - 20, `Loading ${def.name}…`, TEXT_BIG).setOrigin(0.5);
     const bar = this.add.graphics();
     this.load.on('progress', (value: number) => {
       bar.clear();
@@ -201,11 +208,12 @@ export class LevelScene extends Phaser.Scene {
       onToggleSpeed: () => this.toggleSpeed(),
       onLeave: () => this.leave(),
       onMenu: () => this.openMenu(),
-      onPartySlot: (i) => this.handlePartySlot(i),
+      onPartySlotDown: (i, pointer) => this.onPartySlotDown(i, pointer),
       onBall: (id) => this.selectBall(id),
     });
     this.panel = new PokemonPanel({
       portraitUrl: (species) => portraitUrl(species),
+      iconUrl: (species) => iconUrl(species),
       setActiveMove: (mon, index) => {
         const tower = this.state.towers.find((t) => t.mon === mon);
         if (tower) setActiveMove(this.state, tower.id, index);
@@ -240,18 +248,36 @@ export class LevelScene extends Phaser.Scene {
     });
     this.learnDialog = new LearnDialog();
     this.evolutionDialog = new EvolutionDialog();
-    this.pauseMenu = new PauseMenu({
-      levelName: def.name,
-      free: def.objective === 'free',
+    this.dialogue = new DialogueBox(this, { bottom: this.scale.height - Hud.BOTTOM - 4 });
+    this.menuPages = new MenuPages({
+      game: getGame(),
+      party: () => this.state.party.map((p) => p.mon),
+      isPlaced: (mon) => this.state.towers.some((t) => t.mon === mon),
+      openPokemon: (mon) => {
+        this.closeMenu();
+        this.openPanelFor(mon);
+      },
       getSpeed: () => runtime.gameSpeed,
       setSpeed: (speed) => {
         runtime.gameSpeed = speed;
         saveGame();
       },
-      onResume: () => {
-        if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen) this.paused = false;
+      onClose: () => this.startMenu?.setLocked(false),
+    });
+    this.savePanel = new SavePanel({
+      getCode: () => currentSaveCode(),
+      importCode: (code) => importSaveCode(code),
+      newGame: () => {
+        resetGame();
+        this.scene.start('Title');
       },
-      onExit: () => this.exitLevel(),
+      onClose: () => this.startMenu?.setLocked(false),
+    });
+    this.startMenu = new StartMenu(this, startMenuEntries(PLAYER_NAME), {
+      onSelect: (id) => this.onMenuSelect(id),
+      onClose: () => {
+        if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen && !this.dialogue?.isOpen) this.paused = false;
+      },
     });
     this.add.text(this.scale.width / 2, Hud.HEIGHT - 86, `seed ${this.seed}`, TEXT_DIM).setOrigin(0.5, 0).setDepth(1001);
 
@@ -260,10 +286,10 @@ export class LevelScene extends Phaser.Scene {
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => this.onPointerUp(pointer));
     this.input.on('pointerupoutside', (pointer: Phaser.Input.Pointer) => this.onPointerUp(pointer));
     this.input.keyboard?.on('keydown-ESC', () => {
-      if (this.pauseMenu?.isOpen) {
-        this.pauseMenu.close();
-        if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen) this.paused = false;
-      } else if (this.panel?.isOpen) this.panel.hide();
+      if (this.menuPages?.isOpen || this.savePanel?.isOpen) return; // the page handles Esc itself
+      if (this.startMenu?.isOpen) return; // the menu handles Esc itself
+      if (this.dialogue?.isOpen) return;
+      if (this.panel?.isOpen) this.panel.hide();
       else if (this.selectedBall !== null || this.selectedTowerId !== null || this.selectedPartyIndex !== null) {
         this.selectedBall = null;
         this.selectedTowerId = null;
@@ -307,8 +333,16 @@ export class LevelScene extends Phaser.Scene {
       this.learnDialog = undefined;
       this.evolutionDialog?.close();
       this.evolutionDialog = undefined;
-      this.pauseMenu?.close();
-      this.pauseMenu = undefined;
+      this.startMenu?.destroy();
+      this.startMenu = undefined;
+      this.menuPages?.close(false);
+      this.menuPages = undefined;
+      this.savePanel?.close();
+      this.savePanel = undefined;
+      this.dialogue?.destroy();
+      this.dialogue = undefined;
+      this.stripDrag?.sprite?.destroy();
+      this.stripDrag = null;
       this.syncGame();
       (window as unknown as { __ptd?: unknown }).__ptd = undefined;
     });
@@ -423,7 +457,7 @@ export class LevelScene extends Phaser.Scene {
         gfx.lineStyle(2, COLORS.placeableHover, 1).strokeEllipse(c.px + SPOT_ELLIPSE.dx, c.py + SPOT_ELLIPSE.dy, SPOT_ELLIPSE.w + 4, SPOT_ELLIPSE.h + 4);
       }
     }
-    if (this.drag?.moved) {
+    if (this.drag?.moved || this.stripDrag?.moved) {
       for (const [tx, ty] of this.state.map.placeable) {
         if (towerAt(this.state, tx, ty)) continue;
         const c = this.tilePixel(tx, ty);
@@ -504,6 +538,19 @@ export class LevelScene extends Phaser.Scene {
       return;
     }
     this.hoverTile = this.tileAt(pointer.x, pointer.y);
+    const strip = this.stripDrag;
+    if (strip && pointer.isDown) {
+      if (!strip.moved && Math.hypot(pointer.x - strip.startX, pointer.y - strip.startY) > 6) {
+        strip.moved = true;
+        const placed = this.state.towers.some((t) => t.mon === this.state.party[strip.partyIndex]?.mon);
+        strip.sprite = placed ? null : this.stripDragSprite(strip.partyIndex, pointer.x, pointer.y - 8);
+      }
+      if (strip.sprite) {
+        strip.sprite.setPosition(pointer.x, pointer.y - 8);
+        if (strip.sprite instanceof Phaser.GameObjects.Sprite) syncShadow(strip.sprite);
+      }
+      return;
+    }
     const drag = this.drag;
     if (!drag || !pointer.isDown) return;
     if (!drag.moved && Math.hypot(pointer.x - drag.startX, pointer.y - drag.startY) > 6) drag.moved = true;
@@ -519,6 +566,29 @@ export class LevelScene extends Phaser.Scene {
   private onPointerUp(pointer: Phaser.Input.Pointer): void {
     if (this.mapEditor?.active) {
       this.mapEditor.onPointerUp();
+      return;
+    }
+    const strip = this.stripDrag;
+    if (strip) {
+      this.stripDrag = null;
+      strip.sprite?.destroy();
+      if (!strip.moved) {
+        this.handlePartySlot(strip.partyIndex);
+        return;
+      }
+      const tile = this.tileAt(pointer.x, pointer.y);
+      const entry = this.state.party[strip.partyIndex];
+      if (!tile || !entry || this.ended) return;
+      if (this.state.towers.some((t) => t.mon === entry.mon)) return;
+      if (isPlaceable(this.state.map, tile[0], tile[1]) && !towerAt(this.state, tile[0], tile[1])) {
+        try {
+          const tower = placeTower(this.state, strip.partyIndex, tile[0], tile[1]);
+          this.selectedPartyIndex = null;
+          this.createTowerView(tower);
+        } catch (err) {
+          this.showToast(err instanceof Error ? err.message : String(err));
+        }
+      }
       return;
     }
     const drag = this.drag;
@@ -587,7 +657,29 @@ export class LevelScene extends Phaser.Scene {
     }
   }
 
-  /** Party strip click: open the panel for a placed member, or pick an unplaced one to place next. */
+  /**
+   * Press on a party slot: an unplaced Pokémon can be dragged straight onto a
+   * free spot (its sprite follows the pointer and the spots light up); a
+   * release without movement is the old tap (select, then tap a spot).
+   */
+  private onPartySlotDown(index: number, pointer: Phaser.Input.Pointer): void {
+    if (this.ended || this.paused) return;
+    const entry = this.state.party[index];
+    if (!entry) return;
+    this.stripDrag?.sprite?.destroy();
+    this.stripDrag = { partyIndex: index, startX: pointer.x, startY: pointer.y, moved: false, sprite: null };
+  }
+
+  private stripDragSprite(partyIndex: number, x: number, y: number): Phaser.GameObjects.Sprite | Phaser.GameObjects.Image | null {
+    const entry = this.state.party[partyIndex];
+    if (!entry) return null;
+    const dex = spriteFolder(entry.mon.species, entry.mon.shiny);
+    if (isLoaded(dex)) return createPmdSprite(this, dex, x, y, 'Idle', Direction.Down).setDepth(5000).setAlpha(0.9);
+    const icon = iconTextureKey(entry.mon.species, 0);
+    return this.textures.exists(icon) ? this.add.image(x, y, icon).setDepth(5000) : null;
+  }
+
+  /** Party strip tap: open the panel for a placed member, or pick an unplaced one to place next. */
   private handlePartySlot(index: number): void {
     const entry = this.state.party[index];
     if (!entry || this.ended) return;
@@ -616,12 +708,57 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private openMenu(): void {
-    if (this.ended || !this.pauseMenu || this.mapEditor?.active) return;
+    if (this.ended || !this.startMenu || this.mapEditor?.active || this.dialogue?.isOpen) return;
     this.selectedBall = null;
     this.selectedTowerId = null;
     this.selectedPartyIndex = null;
+    this.panel?.hide();
     this.paused = true;
-    this.pauseMenu.show();
+    this.startMenu.show();
+  }
+
+  private closeMenu(): void {
+    this.menuPages?.close(false);
+    this.savePanel?.close();
+    this.startMenu?.close();
+  }
+
+  /** A start-menu entry was chosen: open its page (the menu stays behind it, locked). */
+  private onMenuSelect(id: StartMenuId): void {
+    if (!this.menuPages || !this.startMenu) return;
+    this.startMenu.setLocked(true);
+    switch (id) {
+      case 'pokedex':
+        this.menuPages.pokedex();
+        break;
+      case 'party':
+        this.menuPages.party();
+        break;
+      case 'bag':
+        this.menuPages.bag();
+        break;
+      case 'card':
+        this.menuPages.trainerCard(PLAYER_NAME);
+        break;
+      case 'save':
+        this.savePanel?.show();
+        break;
+      case 'options':
+        this.menuPages.options();
+        break;
+      case 'leave': {
+        this.startMenu.setLocked(false);
+        const free = this.state.def.objective === 'free';
+        const message = free ? 'Leave the route now? EXP and caught Pokémon are kept.' : 'Exit this level? Progress on it is lost; caught Pokémon are kept.';
+        if (window.confirm(message)) {
+          this.startMenu.close();
+          this.exitLevel();
+        }
+        break;
+      }
+      default:
+        this.startMenu.setLocked(false);
+    }
   }
 
   /** Exit from the pause menu: free levels leave with the summary, defend levels abandon the run. */
@@ -684,6 +821,7 @@ export class LevelScene extends Phaser.Scene {
     this.drawOverlay();
     const boss = activeBoss(this.state);
     this.hud.setBoss(boss ? { name: capitalize(boss.mon.name), hp: boss.mon.hp, maxHp: boss.mon.stats.hp, level: boss.mon.level } : null);
+    this.dialogue?.update(delta);
     this.hud.setPaused(this.paused);
     this.hud.tick(delta);
     this.hud.update(this.state, runtime.gameSpeed, this.selectedPartyIndex, this.selectedBall);
@@ -829,12 +967,19 @@ export class LevelScene extends Phaser.Scene {
     else open();
   }
 
-  /** Pauses the sim and shows the trainer card; play resumes when it is dismissed. */
+  /** Pauses the sim and runs the trainer intro in the bottom text box; play resumes after the last page. */
   private showTrainer(trainer: NonNullable<LevelEvent['trainer']>, boss: boolean): void {
+    if (!this.dialogue) return;
     this.paused = true;
     this.selectedBall = null;
-    showTrainerCard(this, trainer, this.state.starter, boss, TRAINER_CARD_MS, () => {
-      if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen) this.paused = false;
+    const portrait = trainerTextureKey(trainer.id);
+    const icons = trainer.party.map((p) => iconTextureKey(p.species === 'counter-starter' ? counterStarter(this.state.starter) : (findPokemonId(p.species) ?? 0), 0));
+    const pages = [
+      { text: boss ? `${trainer.name} wants to battle! Beat the boss to earn the badge.` : `${trainer.name} wants to battle!`, portrait, icons },
+      ...(trainer.intro ? [{ text: trainer.intro, portrait }] : []),
+    ];
+    this.dialogue.show(pages, () => {
+      if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen && !this.startMenu?.isOpen) this.paused = false;
     });
   }
 
@@ -1038,11 +1183,6 @@ export class LevelScene extends Phaser.Scene {
     const { px, py } = this.tilePixel(tower.tile[0], tower.tile[1]);
     const sprite = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Idle', Direction.Down);
     const view: TowerView = { sprite, busy: false, hpBar: this.add.graphics().setDepth(800) };
-    if (this.cache.bitmapFont.has(FONT_NAME) && this.cache.bitmapFont.has(FONT_NUM)) {
-      // RetroFont sizes are relative to the cell width: 7 and 9 draw the glyphs at 1x.
-      view.lvLabel = this.add.bitmapText(0, 0, FONT_NAME, 'Lv', 7).setDepth(801);
-      view.lvNumber = this.add.bitmapText(0, 0, FONT_NUM, String(tower.mon.level), 9).setDepth(801);
-    }
     this.towerViews.set(tower.id, view);
   }
 
@@ -1051,8 +1191,6 @@ export class LevelScene extends Phaser.Scene {
     if (!view) return;
     view.sprite.destroy();
     view.hpBar.destroy();
-    view.lvLabel?.destroy();
-    view.lvNumber?.destroy();
     view.badge?.destroy();
     this.towerViews.delete(towerId);
   }
@@ -1215,8 +1353,6 @@ export class LevelScene extends Phaser.Scene {
       }
       if (this.drag?.moved && this.drag.towerId === tower.id) {
         view.hpBar.clear();
-        view.lvLabel?.setVisible(false);
-        view.lvNumber?.setVisible(false);
         view.badge?.setVisible(false);
         continue;
       }
@@ -1233,10 +1369,6 @@ export class LevelScene extends Phaser.Scene {
       view.hpBar.fillStyle(0xf8f8f8, 1).fillRect(bx - 1, by - 1, w + 2, 5);
       view.hpBar.fillStyle(0x000000, 1).fillRect(bx, by, w, 3);
       view.hpBar.fillStyle(colour, 1).fillRect(bx, by, Math.round(w * frac), 3);
-      if (view.lvLabel && view.lvNumber) {
-        view.lvLabel.setPosition(px + 2, py - size / 2 - 6).setVisible(true);
-        view.lvNumber.setText(String(tower.mon.level)).setPosition(px + 15, py - size / 2 - 3).setVisible(true);
-      }
       this.syncBadge(view, tower.mon.status.ailment, bx + w + 3, by + 1);
       view.badge?.setVisible(true);
     }

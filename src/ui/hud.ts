@@ -6,7 +6,7 @@ import { iconInfo, iconTextureKey, itemTextureKey } from '../game/runtime';
 import config from '../data/config.json';
 import uiGen4 from '../data/ui-gen4.json';
 import { Button, framePanel } from './button';
-import { COLORS, FONT_NAME, FONT_NUM, TEXT, TEXT_BIG, TEXT_DIM, TEXT_LIGHT } from './styles';
+import { COLORS, TEXT, TEXT_BIG, TEXT_DIM, TEXT_LIGHT, TEXT_LIGHT_BIG } from './styles';
 
 const HPBOX = (uiGen4 as { hpBoxes: Record<string, { width: number; height: number; hpFill: { x: number; y: number; width: number; height: number } | null; lv: { x: number; y: number } | null }> }).hpBoxes;
 /** The boss HP box (battle GUI enemy box) is drawn at this scale. */
@@ -17,7 +17,8 @@ export interface HudCallbacks {
   onToggleSpeed: () => void;
   onLeave: () => void;
   onMenu: () => void;
-  onPartySlot: (partyIndex: number) => void;
+  /** Press on a party slot: the scene starts a drag and treats a release without movement as a tap. */
+  onPartySlotDown: (partyIndex: number, pointer: Phaser.Input.Pointer) => void;
   onBall: (ballId: string) => void;
 }
 
@@ -65,8 +66,8 @@ export class Hud {
   private readonly leaveButton: Button | undefined;
   private readonly bossGfx: Phaser.GameObjects.Graphics;
   private readonly bossBox?: Phaser.GameObjects.Image;
-  private readonly bossName: Phaser.GameObjects.Text | Phaser.GameObjects.BitmapText;
-  private readonly bossLevel?: Phaser.GameObjects.BitmapText;
+  private readonly bossName: Phaser.GameObjects.Text;
+  private readonly bossLevel?: Phaser.GameObjects.Text;
   private readonly bossHp: Phaser.GameObjects.Text;
   private bossShown = false;
   private slots: Slot[] = [];
@@ -99,29 +100,24 @@ export class Hud {
     if (box && scene.textures.exists('ui-hpbox-enemy')) {
       this.bossBox = scene.add.image(boxX, boxY, 'ui-hpbox-enemy').setOrigin(0).setScale(BOSS_BOX_SCALE).setDepth(1002).setVisible(false);
     }
-    if (scene.cache.bitmapFont.has(FONT_NAME)) {
-      // RetroFont sizes are relative to the cell width (7 and 9 px), so 14 / 18 draw the glyphs at 2x like the box.
-      this.bossName = scene.add.bitmapText(boxX + 16, boxY + 14, FONT_NAME, '', 14).setDepth(1004).setVisible(false);
-    } else {
-      this.bossName = scene.add.text(boxX + 16, boxY + 12, '', TEXT_LIGHT).setDepth(1004).setVisible(false);
+    this.bossName = scene.add.text(boxX + 16, boxY + 8, '', TEXT_LIGHT_BIG).setDepth(1004).setVisible(false);
+    if (box?.lv) {
+      this.bossLevel = scene.add.text(boxX + (box.lv.x + 13) * BOSS_BOX_SCALE, boxY + box.lv.y * BOSS_BOX_SCALE - 1, '', TEXT_LIGHT).setDepth(1004).setVisible(false);
     }
-    if (box?.lv && scene.cache.bitmapFont.has(FONT_NUM)) {
-      this.bossLevel = scene.add.bitmapText(boxX + (box.lv.x + 13) * BOSS_BOX_SCALE, boxY + box.lv.y * BOSS_BOX_SCALE, FONT_NUM, '', 18).setDepth(1004).setVisible(false);
-    }
-    this.bossHp = scene.add.text(boxX + (box ? box.width * BOSS_BOX_SCALE : 256) - 20, boxY + 60, '', { ...TEXT_LIGHT, fontSize: '12px' }).setOrigin(1, 0.5).setDepth(1004).setVisible(false);
+    this.bossHp = scene.add.text(boxX + (box ? box.width * BOSS_BOX_SCALE : 256) - 20, boxY + 60, '', TEXT_LIGHT).setOrigin(1, 0.5).setDepth(1004).setVisible(false);
     this.startButton = new Button(scene, width - 80, 22, 'Start wave', callbacks.onStartWave, 130, 30).setDepth(1001);
     this.speedButton = new Button(scene, width - 185, 22, '1x', callbacks.onToggleSpeed, 60, 30).setDepth(1001);
     if (state.def.objective === 'free') {
       this.leaveButton = new Button(scene, width - 300, 22, 'Leave route', callbacks.onLeave, 130, 30).setDepth(1001);
     }
     new Button(scene, width - (state.def.objective === 'free' ? 415 : 300), 22, 'Menu', callbacks.onMenu, 80, 30).setDepth(1001);
-    scene.add.text(16, this.bottomY + 24, 'Party', { ...TEXT_DIM, fontSize: '11px' }).setOrigin(0, 0.5).setDepth(1001);
+    scene.add.text(16, this.bottomY + 24, 'Party', TEXT_DIM).setOrigin(0, 0.5).setDepth(1001);
     this.rebuildSlots(state);
 
     // Ball bar, right side of the bottom bar, with the Gen 5 item sprites.
     const obtainable = BALL_IDS.filter((id) => BALLS[id]?.obtainable !== false);
     const startX = width - 16 - obtainable.length * 46 + 22;
-    scene.add.text(startX - 30, this.bottomY + 30, 'Balls', { ...TEXT_DIM, fontSize: '11px' }).setOrigin(1, 0.5).setDepth(1001);
+    scene.add.text(startX - 30, this.bottomY + 30, 'Balls', TEXT_DIM).setOrigin(1, 0.5).setDepth(1001);
     obtainable.forEach((id, i) => {
       const x = startX + i * 46;
       const y = this.bottomY + 30;
@@ -134,7 +130,7 @@ export class Hud {
       const icon = scene.textures.exists(key)
         ? scene.add.image(x, y - 7, key).setDepth(1002)
         : scene.add.circle(x, y - 8, 9, 0xe03030).setStrokeStyle(2, 0x202020).setDepth(1002);
-      const count = scene.add.text(x, y + 13, '', { ...TEXT_DIM, fontSize: '11px', color: '#f4ecd8' }).setOrigin(0.5).setDepth(1003);
+      const count = scene.add.text(x, y + 13, '', TEXT).setOrigin(0.5).setDepth(1003);
       this.balls.push({ id, frame, icon, count });
     });
     this.update(state, 1);
@@ -164,9 +160,9 @@ export class Hud {
       const y = this.bottomY + 24;
       const species = entry.mon.species;
       const frame = this.scene.add.rectangle(x, y + 6, 46, 46, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
-      frame.on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
+      frame.on('pointerdown', (p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
         event.stopPropagation();
-        this.callbacks.onPartySlot(i);
+        this.callbacks.onPartySlotDown(i, p);
       });
       // Gen 5 box icon (PokeAPI sprites); falls back to the SpriteCollab portrait.
       const info = iconInfo(species);
@@ -177,8 +173,8 @@ export class Hud {
         : this.scene.textures.exists(portraitKey)
           ? this.scene.add.image(x, y + 6, portraitKey).setDepth(1002)
           : undefined;
-      const level = this.scene.add.text(x + 22, y - 17, '', { ...TEXT_DIM, fontSize: '10px', color: '#f4ecd8' }).setOrigin(1, 0).setDepth(1003);
-      const placed = this.scene.add.text(x - 22, y - 17, '', { ...TEXT_DIM, fontSize: '10px', color: '#9ad0ff' }).setOrigin(0, 0).setDepth(1003);
+      const level = this.scene.add.text(x + 22, y - 17, '', TEXT).setOrigin(1, 0).setDepth(1003);
+      const placed = this.scene.add.text(x - 22, y - 17, '', { ...TEXT, color: '#3878e0' }).setOrigin(0, 0).setDepth(1003);
       const hp = this.scene.add.graphics().setDepth(1003);
       const slot: Slot = { species, frame, level, hp, placed, animated: info.animatedIcon && this.scene.textures.exists(iconKey) };
       if (image) slot.image = image;
@@ -247,7 +243,7 @@ export class Hud {
     } else if (selectedBall) {
       this.hint.setText(`${BALLS[selectedBall]?.name ?? selectedBall}: click a wild Pokémon to throw (Esc cancels)`);
     } else if (state.phase === 'build') {
-      this.hint.setText(state.towers.length === 0 ? 'Click a worn patch beside the path to place your Pokémon' : 'Drag a Pokémon to move it. Tap it for its panel. Start when ready.');
+      this.hint.setText(state.towers.length === 0 ? 'Drag a party Pokémon onto a worn patch beside the path' : 'Drag Pokémon to move them. Tap one for its panel. Start when ready.');
     } else if (state.phase === 'wave') {
       this.hint.setText(`${state.enemies.length} on the path, ${state.pending.length} to come`);
     } else {

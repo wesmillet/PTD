@@ -49,7 +49,7 @@ function save(rel, image) {
   return `assets/ui/gen4/${rel}`;
 }
 
-const meta = { frames: {}, hpBoxes: {}, bars: {}, status: {}, balls: {}, fonts: {}, bag: {}, menu: {}, wallpapers: [] };
+const meta = { frames: {}, hpBoxes: {}, bars: {}, status: {}, balls: {}, bag: {}, menu: {}, wallpapers: [] };
 
 // --------------------------------------------------------------- text frames
 // Sheet order (left column then right column); the first is the plain
@@ -152,57 +152,7 @@ const GUI_BG = [64, 64, 64];
   const balls = { empty: 26, ok: 43, fnt: 60, status: 77 };
   for (const [name, x] of Object.entries(balls)) meta.balls[name] = save(`ball-${name}.png`, cut(img, x, 113, 15, 15, [GUI_BG]));
 
-  // Name font: 6x10 glyphs (descenders to 12) in five rows. The lowercase
-  // rows are split 14 / 12 and a few glyphs are narrower (i, j, l, f), so
-  // each glyph is cut at its measured x and width and left-aligned in a 7x13
-  // cell, 13 cells per row, for Phaser's RetroFont. A trailing space cell
-  // lets names with spaces render.
-  const six = (x0, n) => Array.from({ length: n }, (_, k) => [x0 + 7 * k, 6]);
-  const rows = [
-    ['ABCDEFGHIJKLM', 155, six(15, 13)],
-    ['NOPQRSTUVWXYZ', 168, six(15, 13)],
-    ['abcdefghijklmn', 182, [[15, 6], [22, 6], [29, 6], [36, 6], [43, 6], [50, 5], [56, 6], [63, 6], [70, 3], [74, 5], [80, 6], [87, 4], [92, 6], [99, 6]]],
-    ['opqrstuvwxyz', 195, [[15, 6], [22, 6], [29, 6], [36, 6], [43, 6], [50, 6], [57, 6], [64, 6], [71, 6], [78, 6], [85, 6], [92, 6]]],
-    ['1234567890', 210, [[15, 5], [21, 6], [28, 6], [35, 6], [42, 6], [49, 6], [56, 6], [63, 6], [70, 6], [77, 6]]],
-  ];
-  const cellW = 7;
-  const cellH = 13;
-  const perRow = 13;
-  const chars = rows.map((r) => r[0]).join('') + ' ';
-  const packed = createImage(cellW * perRow, cellH * Math.ceil(chars.length / perRow));
-  let index = 0;
-  for (const [text, y, glyphs] of rows) {
-    for (let k = 0; k < text.length; k++) {
-      const [gx, gw] = glyphs[k];
-      const glyph = cut(img, gx, y, gw, 12, [GUI_BG]);
-      const cx = (index % perRow) * cellW;
-      const cy = Math.floor(index / perRow) * cellH;
-      for (let yy = 0; yy < 12; yy++) {
-        for (let xx = 0; xx < gw; xx++) {
-          const si = (yy * gw + xx) * 4;
-          const di = ((cy + yy) * packed.width + cx + xx) * 4;
-          packed.data.set(glyph.data.subarray(si, si + 4), di);
-        }
-      }
-      index++;
-    }
-  }
-  meta.fonts.name = { file: save('font-name.png', packed), chars, width: cellW, height: cellH, charsPerRow: perRow, lineHeight: 13 };
-  // Lv / HP numbers: 8x7 glyphs at a 9 px pitch on the HP box's green.
-  const NUM_BG = [75, 127, 94];
-  const digits = '0123456789';
-  const numPacked = createImage(9 * 10, 7);
-  for (let k = 0; k < 10; k++) {
-    const glyph = cut(img, 135 + 9 * k, 195, 8, 7, [GUI_BG, NUM_BG]);
-    for (let yy = 0; yy < 7; yy++) {
-      for (let xx = 0; xx < 8; xx++) {
-        const si = (yy * 8 + xx) * 4;
-        const di = (yy * numPacked.width + k * 9 + xx) * 4;
-        numPacked.data.set(glyph.data.subarray(si, si + 4), di);
-      }
-    }
-  }
-  meta.fonts.numbers = { file: save('font-numbers.png', numPacked), chars: digits, width: 9, height: 7, charsPerRow: 10, lineHeight: 7 };
+  // The sheet's name and number fonts are not cut: text uses Power Clear (public/assets/fonts).
 }
 
 // ----------------------------------------------------------------------- bag

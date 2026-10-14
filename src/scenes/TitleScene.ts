@@ -19,9 +19,9 @@ export class TitleScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.cameras.main.setBackgroundColor(COLORS.bg);
     // The bag screen's big Poké Ball behind the title.
-    if (this.textures.exists('ui-pokeball')) this.add.image(width / 2, height * 0.3 - 10, 'ui-pokeball').setScale(1.6).setAlpha(0.95);
-    this.add.text(width / 2, height * 0.3 + 4, 'Sinnoh Tower Defense', TEXT_TITLE).setOrigin(0.5);
-    this.add.text(width / 2, height * 0.3 + 44, 'A Pokémon Tower Defense fan game', { ...TEXT_DIM, color: '#404848' }).setOrigin(0.5);
+    if (this.textures.exists('ui-pokeball')) this.add.image(width / 2, 112, 'ui-pokeball').setScale(1.25);
+    this.add.text(width / 2, 222, 'Sinnoh Tower Defense', TEXT_TITLE).setOrigin(0.5);
+    this.add.text(width / 2, 252, 'A Pokémon Tower Defense fan game', TEXT_DIM).setOrigin(0.5);
     const saved = hasSave();
     const game = getGame();
     // Badge case under the subtitle: lit for the badges this save has earned.
@@ -30,7 +30,7 @@ export class TitleScene extends Phaser.Scene {
     for (const b of badges) {
       const earned = hasBadge(game, b.id);
       const key = badgeTextureKey(b.id, earned);
-      if (this.textures.exists(key)) this.add.image(bx, height * 0.3 + 84, key).setAlpha(earned ? 1 : 0.5);
+      if (this.textures.exists(key)) this.add.image(bx, 290, key).setAlpha(earned ? 1 : 0.5);
       bx += 40;
     }
     const y = height * 0.58;

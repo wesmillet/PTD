@@ -35,13 +35,21 @@ keys out their solid backgrounds and cuts them into
   added.
 
 ## Fonts
-- **Pixelify Sans** (`public/assets/fonts/PixelifySans.ttf`, SIL Open Font
-  License, licence file beside it): headings, labels, buttons, badges and
-  all HUD text. CSS variable `--ptd-font-pixel`; Phaser `FONT`.
-- **System sans-serif** (`--ptd-font-body`): long text in panels, so it stays
-  legible at phone width.
-- The font is loaded by `@font-face` in theme.css; `main.ts` waits for
-  `document.fonts.load` before starting Phaser so canvas text renders in it.
+- **Power Clear** and **Power Clear Bold** (`public/assets/fonts/`, from
+  Pokémon Essentials, CC BY-NC-SA 4.0, credits in `CREDITS.txt` and on the
+  credits screen): the DS-era Pokémon fonts, used for everything in the DOM
+  and on the canvas. `--ptd-font-body` / `FONT` is the regular (body text
+  and numbers), `--ptd-font-pixel` / `FONT_BOLD` the bold (titles,
+  headings, buttons).
+- Sizes: the font's grid is 13 px, so only `--ptd-size` 13 px and
+  `--ptd-size-big` 26 px are used (`SIZE_SMALL` / `SIZE_LARGE` in
+  styles.ts). No smoothing (`-webkit-font-smoothing: none; font-smooth:
+  never`), Phaser text at resolution 1.
+- Colours: `--ptd-text` #484848 with `--ptd-shadow-light` (1px 1px #d0d0c8)
+  on light panels; white with `--ptd-shadow-dark` (#283028) on dark
+  backgrounds (`TEXT_LIGHT`, `TEXT_TITLE`).
+- `$` is the Pokédollar sign in this font; money is written `$1000`.
+- `main.ts` waits for both faces before starting Phaser.
 
 ## Palette (CSS variables)
 | Variable | Use |
@@ -63,6 +71,8 @@ keys out their solid backgrounds and cuts them into
   centres. Always call `isolateFromGame(root)` so clicks never fall through
   to the canvas.
 - `.ptd-hpbox` battle-GUI HP box at 2x (`hpBox(mon)`), `img.ptd-status-badge`.
+- `.ptd-sum-head`, `.ptd-sum-info`, `.ptd-sum-types`: the summary-page
+  layout of the Pokémon panel.
 - `button.ptd-pocket` round bag button (shop pocket tabs).
 - `h2` panel title (pixel font); `.ptd-heading` section heading (accent).
 - `.ptd-head` portrait + text row; `.ptd-portrait` (80 px) and
@@ -84,10 +94,13 @@ keys out their solid backgrounds and cuts them into
   1x/2x/4x, Start / Leave, boss HP bar via `setBoss`) and bottom bar (party
   strip, ball bar with the item sprites; `ballOrigin(id)` is where a thrown
   ball starts). The map sits between them; nothing overlaps the playfield.
-- Trainer card (`src/ui/trainerCard.ts`): portrait image, name, intro and
-  party icons; red frame for a boss.
-- Pause menu (`src/ui/pauseMenu.ts`, DOM modal, Menu button or Esc):
-  Resume, Settings (game speed), Exit level.
+- Dialogue box (`src/ui/dialogue.ts`): the bottom text box, typewriter
+  text, click or Enter to advance; trainer intros with portrait and party
+  icons.
+- Start menu (`src/ui/startMenu.ts`, Menu button or Esc): Platinum's menu
+  column with the start-menu icons and a red cursor; its pages are DOM
+  panels in `src/ui/menuPages.ts` (Pokédex, Pokémon, Bag, Trainer Card,
+  Options) plus `SavePanel`.
 - Floating text uses `TEXT` with a dark stroke.
 - Skinnable images, all named in config so a skin is a file swap:
   `assets/pc/frame.png` (9-slice box frame), `assets/pc/cursor.png`,

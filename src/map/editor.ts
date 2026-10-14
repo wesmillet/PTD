@@ -317,7 +317,7 @@ export class MapEditor {
       const colour = i === 0 ? 0x5ad35a : i === path.length - 1 ? 0xd35a5a : 0xffe066;
       g.fillStyle(colour, 1).fillCircle(px, py, 5);
       if (i === 0 || (i === path.length - 1 && path.length > 1)) {
-        const text = this.hooks.scene.add.text(px, py - 18, i === 0 ? 'IN' : 'OUT', { fontFamily: 'monospace', fontSize: '12px', color: '#ffffff', stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5).setDepth(951);
+        const text = this.hooks.scene.add.text(px, py - 18, i === 0 ? 'IN' : 'OUT', { fontFamily: '"Power Clear", monospace', fontSize: '13px', color: '#ffffff', stroke: '#000000', strokeThickness: 3, resolution: 1 }).setOrigin(0.5).setDepth(951);
         this.labels.push(text);
       }
     });

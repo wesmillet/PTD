@@ -20,7 +20,7 @@ import { SavePanel } from '../ui/savePanel';
 import { ShopScreen } from '../ui/shopScreen';
 import { CreditsScreen } from '../ui/creditsScreen';
 import { showStarterDialog } from '../ui/starterDialog';
-import { COLORS, TEXT_BIG, TEXT_DIM } from '../ui/styles';
+import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
 
 /** Level list with the unlock chain, the bag strip, badges, and the PC, Shop and Save entries. */
 export class LevelSelectScene extends Phaser.Scene {
@@ -120,7 +120,7 @@ export class LevelSelectScene extends Phaser.Scene {
         x += pocketGap;
       }
       if (this.textures.exists(e.key)) this.add.image(x, y, e.key);
-      this.add.text(x + 14, y + 2, String(e.count), { ...TEXT_DIM, fontSize: '12px', color: e.count > 0 ? '#404848' : '#a0a8b0' }).setOrigin(0, 0.5);
+      this.add.text(x + 14, y + 2, String(e.count), { ...TEXT, color: e.count > 0 ? '#484848' : '#a0a8b0' }).setOrigin(0, 0.5);
       x += gap;
     }
   }
@@ -131,7 +131,7 @@ export class LevelSelectScene extends Phaser.Scene {
     const badges = allBadges();
     if (badges.length === 0) return;
     let x = right - badges.length * 36 + 18;
-    this.add.text(x - 26, y, 'Badges', { ...TEXT_DIM, fontSize: '11px' }).setOrigin(1, 0.5);
+    this.add.text(x - 26, y, 'Badges', TEXT_DIM).setOrigin(1, 0.5);
     for (const b of badges) {
       const earned = hasBadge(game, b.id);
       const key = badgeTextureKey(b.id, earned);

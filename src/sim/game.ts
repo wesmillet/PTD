@@ -152,7 +152,11 @@ export function isLevelCompleted(game: GameState, levelId: string): boolean {
   return game.progress[levelId]?.completed ?? false;
 }
 
+/** Demo builds open every level from the start (config.json `demoMode`; off for release). */
+export const DEMO_MODE: boolean = (config as { demoMode?: boolean }).demoMode ?? false;
+
 export function isLevelUnlocked(game: GameState, levelId: string): boolean {
+  if (DEMO_MODE) return true;
   const def = getLevel(levelId);
   const requires = (def as { requires?: string | null }).requires;
   if (!requires) return true;

@@ -1,0 +1,488 @@
+{
+  "pokemon": [
+    {
+      "species": 94,
+      "level": 35,
+      "shiny": true,
+      "moves": [
+        389,
+        325,
+        371,
+        247
+      ]
+    },
+    {
+      "species": 130,
+      "level": 32,
+      "shiny": true,
+      "moves": [
+        82,
+        43,
+        239,
+        423
+      ]
+    },
+    {
+      "species": 38,
+      "level": 60,
+      "shiny": true,
+      "moves": [
+        98,
+        109,
+        219,
+        417
+      ]
+    },
+    {
+      "species": 212,
+      "level": 38,
+      "shiny": true,
+      "moves": [
+        210,
+        163,
+        13,
+        334
+      ]
+    },
+    {
+      "species": 197,
+      "level": 32,
+      "shiny": true,
+      "moves": [
+        28,
+        228,
+        98,
+        109
+      ]
+    },
+    {
+      "species": 282,
+      "level": 40,
+      "shiny": true,
+      "moves": [
+        345,
+        347,
+        94,
+        286
+      ]
+    },
+    {
+      "species": 376,
+      "level": 45,
+      "shiny": true,
+      "moves": [
+        94,
+        334,
+        97,
+        359
+      ]
+    },
+    {
+      "species": 405,
+      "level": 52,
+      "shiny": true,
+      "moves": [
+        207,
+        422,
+        242,
+        184
+      ]
+    },
+    {
+      "species": 448,
+      "level": 49,
+      "shiny": true,
+      "moves": [
+        14,
+        396,
+        370,
+        406
+      ]
+    },
+    {
+      "species": 445,
+      "level": 59,
+      "shiny": true,
+      "moves": [
+        337,
+        91,
+        242,
+        407
+      ]
+    },
+    {
+      "species": 447,
+      "level": 43,
+      "shiny": true,
+      "moves": [
+        364,
+        179,
+        103,
+        383
+      ]
+    },
+    {
+      "species": 133,
+      "level": 45,
+      "shiny": true,
+      "moves": [
+        98,
+        44,
+        226,
+        36
+      ]
+    },
+    {
+      "species": 6,
+      "level": 53,
+      "shiny": false,
+      "moves": [
+        163,
+        17,
+        53,
+        83
+      ]
+    },
+    {
+      "species": 9,
+      "level": 43,
+      "shiny": false,
+      "moves": [
+        182,
+        352,
+        401,
+        130
+      ]
+    },
+    {
+      "species": 3,
+      "level": 59,
+      "shiny": false,
+      "moves": [
+        80,
+        388,
+        235,
+        76
+      ]
+    },
+    {
+      "species": 25,
+      "level": 24,
+      "shiny": false,
+      "moves": [
+        86,
+        98,
+        104,
+        21
+      ]
+    },
+    {
+      "species": 149,
+      "level": 58,
+      "shiny": false,
+      "moves": [
+        407,
+        219,
+        349,
+        17
+      ]
+    },
+    {
+      "species": 131,
+      "level": 32,
+      "shiny": false,
+      "moves": [
+        34,
+        240,
+        195,
+        58
+      ]
+    },
+    {
+      "species": 143,
+      "level": 42,
+      "shiny": false,
+      "moves": [
+        214,
+        34,
+        335,
+        205
+      ]
+    },
+    {
+      "species": 59,
+      "level": 35,
+      "shiny": false,
+      "moves": [
+        46,
+        316,
+        422,
+        424
+      ]
+    },
+    {
+      "species": 214,
+      "level": 47,
+      "shiny": false,
+      "moves": [
+        68,
+        36,
+        370,
+        179
+      ]
+    },
+    {
+      "species": 248,
+      "level": 57,
+      "shiny": false,
+      "moves": [
+        371,
+        242,
+        89,
+        444
+      ]
+    },
+    {
+      "species": 196,
+      "level": 42,
+      "shiny": false,
+      "moves": [
+        93,
+        98,
+        129,
+        60
+      ]
+    },
+    {
+      "species": 229,
+      "level": 55,
+      "shiny": false,
+      "moves": [
+        185,
+        373,
+        53,
+        242
+      ]
+    },
+    {
+      "species": 257,
+      "level": 55,
+      "shiny": false,
+      "moves": [
+        98,
+        299,
+        163,
+        413
+      ]
+    },
+    {
+      "species": 254,
+      "level": 40,
+      "shiny": false,
+      "moves": [
+        228,
+        103,
+        348,
+        97
+      ]
+    },
+    {
+      "species": 260,
+      "level": 41,
+      "shiny": false,
+      "moves": [
+        193,
+        426,
+        36,
+        330
+      ]
+    },
+    {
+      "species": 359,
+      "level": 33,
+      "shiny": false,
+      "moves": [
+        228,
+        14,
+        44,
+        104
+      ]
+    },
+    {
+      "species": 306,
+      "level": 42,
+      "shiny": false,
+      "moves": [
+        36,
+        442,
+        182,
+        319
+      ]
+    },
+    {
+      "species": 373,
+      "level": 53,
+      "shiny": false,
+      "moves": [
+        428,
+        184,
+        19,
+        242
+      ]
+    },
+    {
+      "species": 350,
+      "level": 35,
+      "shiny": false,
+      "moves": [
+        105,
+        445,
+        401,
+        240
+      ]
+    },
+    {
+      "species": 330,
+      "level": 53,
+      "shiny": false,
+      "moves": [
+        225,
+        103,
+        337,
+        201
+      ]
+    },
+    {
+      "species": 389,
+      "level": 39,
+      "shiny": false,
+      "moves": [
+        72,
+        89,
+        73,
+        235
+      ]
+    },
+    {
+      "species": 392,
+      "level": 59,
+      "shiny": false,
+      "moves": [
+        370,
+        83,
+        347,
+        394
+      ]
+    },
+    {
+      "species": 395,
+      "level": 36,
+      "shiny": false,
+      "moves": [
+        207,
+        31,
+        362,
+        453
+      ]
+    },
+    {
+      "species": 398,
+      "level": 36,
+      "shiny": false,
+      "moves": [
+        18,
+        332,
+        36,
+        370
+      ]
+    },
+    {
+      "species": 468,
+      "level": 49,
+      "shiny": false,
+      "moves": [
+        143,
+        245,
+        396,
+        403
+      ]
+    },
+    {
+      "species": 461,
+      "level": 45,
+      "shiny": false,
+      "moves": [
+        196,
+        400,
+        374,
+        232
+      ]
+    },
+    {
+      "species": 430,
+      "level": 28,
+      "shiny": false,
+      "moves": [
+        114,
+        228,
+        310,
+        207
+      ]
+    },
+    {
+      "species": 442,
+      "level": 54,
+      "shiny": false,
+      "moves": [
+        389,
+        417,
+        262,
+        399
+      ]
+    },
+    {
+      "species": 464,
+      "level": 53,
+      "shiny": false,
+      "moves": [
+        32,
+        359,
+        444,
+        89
+      ]
+    },
+    {
+      "species": 466,
+      "level": 25,
+      "shiny": false,
+      "moves": [
+        67,
+        129,
+        351,
+        113
+      ]
+    },
+    {
+      "species": 467,
+      "level": 23,
+      "shiny": false,
+      "moves": [
+        52,
+        108,
+        185,
+        83
+      ]
+    },
+    {
+      "species": 443,
+      "level": 29,
+      "shiny": false,
+      "moves": [
+        36,
+        328,
+        163,
+        337
+      ]
+    }
+  ]
+}

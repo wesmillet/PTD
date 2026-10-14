@@ -4,6 +4,7 @@ import {
   allBadges,
   chooseStarter,
   createGameState,
+  DEMO_MODE,
   hasBadge,
   isLevelCompleted,
   isLevelUnlocked,
@@ -63,6 +64,13 @@ describe('level unlock chain', () => {
     const game = createGameState();
     expect(orderedLevelIds()).toEqual(['route-201', 'lake-verity', 'route-202', 'route-203', 'oreburgh-gate', 'oreburgh-mine-1f']);
     expect(isLevelUnlocked(game, 'route-201')).toBe(true);
+    if (DEMO_MODE) {
+      // Demo builds open everything; completion still records normally.
+      expect(isLevelUnlocked(game, 'oreburgh-mine-1f')).toBe(true);
+      expect(recordLevelResult(game, 'route-201', 'left', 1)).toBe(true);
+      expect(isLevelCompleted(game, 'route-201')).toBe(true);
+      return;
+    }
     expect(isLevelUnlocked(game, 'lake-verity')).toBe(false);
     expect(recordLevelResult(game, 'route-201', 'left', 0)).toBe(false); // free: needs a cleared wave
     expect(isLevelUnlocked(game, 'lake-verity')).toBe(false);
