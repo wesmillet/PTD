@@ -393,3 +393,12 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
 - Optional sheets (Attack, Shoot, Hurt, Faint, shadows) that fail to
   download drop the action (`dropFailedSheet`) instead of failing the
   level; only AnimData, Idle, Walk and the map trigger the retry loop.
+
+## Phase 9 batch 2, item 2 (shiny box icons)
+
+- Reverses the Phase 7 / Phase 9 item 4 headshot icons: shinies now share
+  the normal box icon in the party strip, box grid, lists and summaries,
+  with the sparkle badge as the only mark. The boot-time portrait cut,
+  the `-shiny.png` icon files, `make-shiny-icons.py` and the `shinyIcon`
+  index field are gone; `iconUrl` / `iconTextureKey` keep their shiny
+  argument for the callers but ignore it.

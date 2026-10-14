@@ -209,7 +209,7 @@ export class Hud {
       // A placed Pokémon shows as the blue frame outline (see update); the text stays for a possible marker.
       const placed = this.scene.add.text(x - Hud.SLOT_W / 2 + 4, y - 14, '', { ...TEXT, color: '#3878e0' }).setOrigin(0, 0.5).setDepth(1003).setVisible(false);
       const hp = this.scene.add.graphics().setDepth(1003);
-      const slot: Slot = { species, shiny, frame, level, hp, placed, animated: !shiny && info.animatedIcon && this.scene.textures.exists(iconKey) };
+      const slot: Slot = { species, shiny, frame, level, hp, placed, animated: info.animatedIcon && this.scene.textures.exists(iconKey) };
       if (image) slot.image = image;
       if (shiny) slot.star = this.scene.add.image(x + Hud.SLOT_W / 2 - 8, y - 20, 'star').setDepth(1003).setTint(0xf8d030);
       this.slots.push(slot);

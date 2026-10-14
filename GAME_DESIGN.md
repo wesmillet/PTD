@@ -75,15 +75,12 @@ carry `species`, `form` and `formName`, and every folder lists its
 `parseFolder` / `folderIconName` in `src/game/runtime.ts` and never assume
 it is a number.
 
-Shiny Pokémon use the shiny portrait (`portraits/<folder>/shiny/<Emotion>.png`,
-236 of 283 folders) in the dialogue box, Pokémon panel, PC summary and party
-page, and their box and party-strip icon is the shiny Normal portrait scaled
-to 32x32 with nearest filtering (the `scripts/make-fallback-icons.py`
-recipe), with a small sparkle badge; a folder with shiny sheets but no
-shiny portrait (14 today, Mega Kangaskhan among them) ships a shiny icon
-cut from its shiny Idle sheet by `scripts/make-shiny-icons.py`
-(`icons/<name>-shiny.png`, `shinyIcon` in `spriteFolders.json`). Normal
-Pokémon keep the icons below.
+Shiny Pokémon use the shiny portrait (`portraits/<folder>/shiny/<Emotion>.png`)
+in the dialogue box, Pokémon panel, PC summary and party page, and the
+shiny sprite folder on the field. Their box and party-strip icon is the
+normal box icon with a small sparkle badge (never a portrait headshot), so
+the strip and grid stay uniform; a shiny with an animated icon bobs like
+the rest. Normal Pokémon keep the icons below.
 
 Small Pokémon icons (party strip, Party / PC lists, starter choice, level
 summary) are the Gen 5 Black/White box icons from github.com/PokeAPI/sprites

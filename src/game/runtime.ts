@@ -73,9 +73,8 @@ export function iconInfo(species: number): IconInfo {
  * animate it in an <img>); otherwise the static icon. Undefined when the
  * species ships no icon.
  */
-export function iconUrl(species: number, animated = true, shiny = false): string | undefined {
-  if (shiny && hasShinyPortrait(species)) return portraitUrl(species, 'Normal', true);
-  if (shiny && hasShinyIcon(species)) return `${import.meta.env.BASE_URL}assets/icons/${folderIconName(dexFolder(species))}-shiny.png`;
+export function iconUrl(species: number, animated = true, _shiny = false): string | undefined {
+  // Shiny Pokémon use the normal box icon (the caller adds the sparkle badge); the shiny art is the portrait and sprite.
   const info = iconInfo(species);
   if (!info.icon) return undefined;
   const base = `${import.meta.env.BASE_URL}assets/icons/${folderIconName(dexFolder(species))}`;
@@ -83,26 +82,13 @@ export function iconUrl(species: number, animated = true, shiny = false): string
 }
 
 /**
- * Phaser texture key of an icon frame (0 or 1), loaded by BootScene. A shiny
- * with a shiny portrait gets the 32x32 icon BootScene cuts from it
- * ("icon-<dex>-shiny", one frame); otherwise the normal icon.
+ * Phaser texture key of an icon frame (0 or 1), loaded by BootScene. Shiny
+ * Pokémon share the normal icon; the caller draws the sparkle badge.
  */
-export function iconTextureKey(species: number, frame: 0 | 1, shiny = false): string {
-  if (shiny && (hasShinyPortrait(species) || hasShinyIcon(species))) return shinyIconTextureKey(species);
+export function iconTextureKey(species: number, frame: 0 | 1, _shiny = false): string {
   const info = iconInfo(species);
   const stem = folderIconName(dexFolder(species));
   return info.animatedIcon ? `icon-${stem}-${frame}` : `icon-${stem}`;
-}
-
-/** Whether a folder ships a shiny icon file (cut from the shiny Idle sheet by scripts/make-shiny-icons.py). */
-export function hasShinyIcon(species: number): boolean {
-  const info = (spriteFolders as Record<string, { shinyIcon?: boolean }>)[dexFolder(species)];
-  return info?.shinyIcon ?? false;
-}
-
-/** Texture key of the shiny box icon: cut from the shiny Normal portrait at boot, or the shipped shiny icon file. */
-export function shinyIconTextureKey(species: number): string {
-  return `icon-${folderIconName(dexFolder(species))}-shiny`;
 }
 
 /** Texture key of a loaded portrait: "portrait-<dex>" or "portrait-<dex>-shiny". */

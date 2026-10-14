@@ -66,11 +66,9 @@ for (const folder of [...present].sort()) {
   const id = String(Number(dex)) + (form ? `-${form}` : '');
   const icon = existsSync(resolve(iconDir, `${id}.png`));
   const animatedIcon = existsSync(resolve(iconDir, `${id}-f0.png`)) && existsSync(resolve(iconDir, `${id}-f1.png`));
-  // A shiny icon cut from the shiny Idle sheet (scripts/make-shiny-icons.py) for folders without a shiny portrait.
-  const shinyIcon = existsSync(resolve(iconDir, `${id}-shiny.png`));
   folders[folder] = form
-    ? { shiny, portraits, shinyPortraits, icon, animatedIcon, ...(shinyIcon ? { shinyIcon } : {}), species: Number(dex), form, formName: node?.name ?? form }
-    : { shiny, portraits, shinyPortraits, icon, animatedIcon, ...(shinyIcon ? { shinyIcon } : {}) };
+    ? { shiny, portraits, shinyPortraits, icon, animatedIcon, species: Number(dex), form, formName: node?.name ?? form }
+    : { shiny, portraits, shinyPortraits, icon, animatedIcon };
 }
 writeFileSync(foldersPath, JSON.stringify(folders, null, 2) + '\n');
 console.log(`wrote ${foldersPath}`);

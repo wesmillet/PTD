@@ -366,9 +366,9 @@ export class PCScene extends Phaser.Scene {
       this.iconTimer -= ICON_FRAME_MS;
       this.iconFrame = this.iconFrame === 0 ? 1 : 0;
       for (const slot of this.slots) {
-        if (slot.icon && slot.mon && !slot.mon.shiny && iconInfo(slot.mon.species).animatedIcon) slot.icon.setTexture(iconTextureKey(slot.mon.species, this.iconFrame));
+        if (slot.icon && slot.mon && iconInfo(slot.mon.species).animatedIcon) slot.icon.setTexture(iconTextureKey(slot.mon.species, this.iconFrame));
       }
-      if (this.drag && !this.drag.mon.shiny && iconInfo(this.drag.mon.species).animatedIcon) this.drag.icon.setTexture(iconTextureKey(this.drag.mon.species, this.iconFrame));
+      if (this.drag && iconInfo(this.drag.mon.species).animatedIcon) this.drag.icon.setTexture(iconTextureKey(this.drag.mon.species, this.iconFrame));
     }
     // Holding a dragged Pokémon over an arrow turns the page.
     const drag = this.drag;

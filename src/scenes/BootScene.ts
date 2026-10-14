@@ -44,12 +44,8 @@ export class BootScene extends Phaser.Scene {
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       label.setText(`Failed to load ${file.src}`).setColor('#ff6b6b');
     });
-    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[]; shinyPortraits?: string[]; icon?: boolean; animatedIcon?: boolean; shinyIcon?: boolean }>;
+    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[]; shinyPortraits?: string[]; icon?: boolean; animatedIcon?: boolean }>;
     for (const [dex, info] of Object.entries(folders)) {
-      // Shiny icon files for folders without a shiny portrait (the rest are cut from the portrait in buildShinyIcons).
-      if (info.shinyIcon && !info.shinyPortraits?.includes('Normal')) {
-        this.load.image(`icon-${folderIconName(dex)}-shiny`, `${import.meta.env.BASE_URL}assets/icons/${folderIconName(dex)}-shiny.png`);
-      }
       if (info.portraits.includes('Normal')) {
         this.load.image(`portrait-${dex}`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/Normal.png`);
       }
@@ -121,26 +117,6 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet('ow-player', assetUrl('assets/trainers/overworld/player_m.png'), { frameWidth: 32, frameHeight: 32 });
   }
 
-  /**
-   * Box icons for shinies: the shiny Normal portrait scaled to 32x32 with
-   * nearest filtering (what scripts/make-fallback-icons.py does for folders
-   * without a PokeAPI icon), keyed "icon-<species>[-form]-shiny".
-   */
-  private buildShinyIcons(): void {
-    const folders = spriteFolders as Record<string, { shinyPortraits?: string[] }>;
-    for (const [dex, info] of Object.entries(folders)) {
-      if (!info.shinyPortraits?.includes('Normal')) continue;
-      const src = `portrait-${dex}-shiny`;
-      const key = `icon-${folderIconName(dex)}-shiny`;
-      if (!this.textures.exists(src) || this.textures.exists(key)) continue;
-      const canvas = this.textures.createCanvas(key, 32, 32);
-      if (!canvas) continue;
-      const ctx = canvas.context;
-      ctx.imageSmoothingEnabled = false;
-      ctx.drawImage(this.textures.get(src).getSourceImage() as HTMLImageElement, 0, 0, 32, 32);
-      canvas.refresh();
-    }
-  }
 
   /** Blacked-out copies of the Ace Trainer sprite for roster trainers without art (Ash, Paul, Tobias, ...). */
   private buildSilhouettes(): void {
@@ -172,7 +148,6 @@ export class BootScene extends Phaser.Scene {
     ], true);
     star.generateTexture('star', 8, 8);
     star.destroy();
-    this.buildShinyIcons();
     this.buildSilhouettes();
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
