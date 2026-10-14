@@ -9,6 +9,8 @@ export interface BallDef {
   name: string;
   modifier: number;
   price: number;
+  /** PokeAPI item sprite name (public/assets/items/<sprite>.png). */
+  sprite: string;
   condition?: string;
   obtainable?: boolean;
 }

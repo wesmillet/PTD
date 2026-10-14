@@ -1,18 +1,22 @@
 /**
- * Save format v1, save codes and validation. No Phaser or DOM imports; the
- * storage layer (src/game/storage.ts) handles localStorage.
+ * Save format v2 (boxes and badges), save codes and validation. Version 1
+ * saves and codes still load. No Phaser or DOM imports; the storage layer
+ * (src/game/storage.ts) handles localStorage.
  */
 import config from '../data/config.json';
 import { levelIds } from '../data/levels';
 import { getMove, getPokemon, expForLevel } from '../data/pokedata';
 import { createGameState, type DexEntry, type GameState, type LevelProgress } from './game';
 import { createMonster, makeMoveSlot, type Monster } from './monster';
+import { createBoxes, depositToBox, PC, SLOTS_PER_BOX, type Box } from './pc';
 import { hashString } from './rng';
 import type { SpeedConfig } from './speed';
 import { createStatus } from './status';
 
-export const SAVE_VERSION = 1;
+export const SAVE_VERSION = 2;
 const CODE_PREFIX = `PTD${SAVE_VERSION}.`;
+const CODE_PATTERN = /^PTD([12])\./;
+const GAME_SPEEDS: number[] = config.gameSpeeds;
 
 export interface SavedMonster {
   species: number;
@@ -22,6 +26,12 @@ export interface SavedMonster {
   moves: { id: number; pp: number }[];
   activeMove: number;
   shiny: boolean;
+}
+
+export interface SavedBox {
+  name: string;
+  wallpaper: string;
+  slots: (SavedMonster | null)[];
 }
 
 export interface SavedSettings {
@@ -34,11 +44,12 @@ export interface SaveData {
   savedAt: number;
   starter?: number;
   party: SavedMonster[];
-  box: SavedMonster[];
+  boxes: SavedBox[];
   progress: Record<string, LevelProgress>;
   items: { balls: Record<string, number>; potions: number; rareCandies: number };
   money: number;
   pokedex: Record<string, DexEntry>;
+  badges: string[];
   settings: SavedSettings;
 }
 
@@ -74,11 +85,12 @@ export function serializeGame(game: GameState, settings: SavedSettings, now = Da
     savedAt: now,
     ...(game.starter !== undefined ? { starter: game.starter } : {}),
     party: game.party.map(saveMonster),
-    box: game.box.map(saveMonster),
+    boxes: game.boxes.map((b) => ({ name: b.name, wallpaper: b.wallpaper, slots: b.slots.map((m) => (m ? saveMonster(m) : null)) })),
     progress: JSON.parse(JSON.stringify(game.progress)) as Record<string, LevelProgress>,
     items: { balls: { ...game.items.balls }, potions: game.items.potions, rareCandies: game.items.rareCandies },
     money: game.money,
     pokedex: JSON.parse(JSON.stringify(game.pokedex)) as Record<string, DexEntry>,
+    badges: [...game.badges],
     settings: { gameSpeed: settings.gameSpeed, speed: { ...settings.speed } },
   };
 }
@@ -121,16 +133,49 @@ function validateMonster(raw: unknown, where: string): SavedMonster {
   return { species: m.species, level: m.level, exp, hp: m.hp, moves, activeMove: m.activeMove, shiny: m.shiny };
 }
 
+function validateBox(raw: unknown, index: number): SavedBox {
+  if (!raw || typeof raw !== 'object') throw new SaveError(`boxes[${index}]: not an object`);
+  const b = raw as Record<string, unknown>;
+  if (typeof b.name !== 'string' || b.name.length === 0 || b.name.length > 24) throw new SaveError(`boxes[${index}]: bad name`);
+  const wallpaper = typeof b.wallpaper === 'string' && PC.wallpapers.some((w) => w.id === b.wallpaper) ? b.wallpaper : (PC.wallpapers[0]?.id ?? 'forest');
+  if (!Array.isArray(b.slots) || b.slots.length > SLOTS_PER_BOX) throw new SaveError(`boxes[${index}]: bad slots`);
+  const slots = b.slots.map((m, i) => (m === null ? null : validateMonster(m, `boxes[${index}].slots[${i}]`)));
+  while (slots.length < SLOTS_PER_BOX) slots.push(null);
+  return { name: b.name, wallpaper, slots };
+}
+
+/** Version 1 saves keep a flat box list; it fills the boxes in order. */
+function boxesFromFlatList(list: SavedMonster[]): SavedBox[] {
+  const boxes = createBoxes().map((b) => ({ name: b.name, wallpaper: b.wallpaper, slots: new Array<SavedMonster | null>(SLOTS_PER_BOX).fill(null) }));
+  list.forEach((m, i) => {
+    const box = boxes[Math.floor(i / SLOTS_PER_BOX)];
+    if (!box) throw new SaveError('too many boxed Pokémon for the PC');
+    box.slots[i % SLOTS_PER_BOX] = m;
+  });
+  return boxes;
+}
+
 /** Checks a parsed object thoroughly and returns a clean SaveData, or throws SaveError. */
 export function validateSave(raw: unknown): SaveData {
   if (!raw || typeof raw !== 'object') throw new SaveError('save is not an object');
   const s = raw as Record<string, unknown>;
-  if (s.version !== SAVE_VERSION) throw new SaveError(`unsupported save version ${String(s.version)}`);
+  if (s.version !== 1 && s.version !== 2) throw new SaveError(`unsupported save version ${String(s.version)}`);
   if (!isNum(s.savedAt)) throw new SaveError('bad savedAt');
-  if (!Array.isArray(s.party) || !Array.isArray(s.box)) throw new SaveError('party and box must be arrays');
+  if (!Array.isArray(s.party)) throw new SaveError('party must be an array');
   if (s.party.length > config.party.maxParty) throw new SaveError('party too large');
   const party = s.party.map((m, i) => validateMonster(m, `party[${i}]`));
-  const box = s.box.map((m, i) => validateMonster(m, `box[${i}]`));
+  let boxes: SavedBox[];
+  if (s.version === 1) {
+    if (!Array.isArray(s.box)) throw new SaveError('box must be an array');
+    boxes = boxesFromFlatList(s.box.map((m, i) => validateMonster(m, `box[${i}]`)));
+  } else {
+    if (!Array.isArray(s.boxes) || s.boxes.length === 0 || s.boxes.length > 64) throw new SaveError('bad boxes');
+    boxes = s.boxes.map(validateBox);
+    while (boxes.length < PC.boxes) {
+      const b = createBoxes()[boxes.length]!;
+      boxes.push({ name: b.name, wallpaper: b.wallpaper, slots: new Array<SavedMonster | null>(SLOTS_PER_BOX).fill(null) });
+    }
+  }
   if (s.starter !== undefined && !isInt(s.starter, 1, 493)) throw new SaveError('bad starter');
   if (!s.progress || typeof s.progress !== 'object') throw new SaveError('bad progress');
   const progress: Record<string, LevelProgress> = {};
@@ -159,6 +204,14 @@ export function validateSave(raw: unknown): SaveData {
     if (!d || typeof d.seen !== 'boolean' || typeof d.caught !== 'boolean' || typeof d.shinyCaught !== 'boolean') throw new SaveError(`bad pokedex entry ${id}`);
     pokedex[id] = { seen: d.seen, caught: d.caught, shinyCaught: d.shinyCaught };
   }
+  const badges: string[] = [];
+  if (s.badges !== undefined) {
+    if (!Array.isArray(s.badges)) throw new SaveError('bad badges');
+    for (const b of s.badges) {
+      if (typeof b !== 'string' || b.length > 32) throw new SaveError('bad badge');
+      if (!badges.includes(b)) badges.push(b);
+    }
+  }
   const settings = s.settings as Record<string, unknown> | undefined;
   if (!settings || !isNum(settings.gameSpeed) || !settings.speed || typeof settings.speed !== 'object') throw new SaveError('bad settings');
   const speed = { ...config.speed } as SpeedConfig;
@@ -174,12 +227,13 @@ export function validateSave(raw: unknown): SaveData {
     savedAt: s.savedAt,
     ...(s.starter !== undefined ? { starter: s.starter as number } : {}),
     party,
-    box,
+    boxes,
     progress,
     items: { balls, potions: items.potions as number, rareCandies: items.rareCandies as number },
     money: s.money as number,
     pokedex,
-    settings: { gameSpeed: settings.gameSpeed === 2 ? 2 : 1, speed },
+    badges,
+    settings: { gameSpeed: GAME_SPEEDS.includes(settings.gameSpeed) ? settings.gameSpeed : 1, speed },
   };
 }
 
@@ -188,11 +242,14 @@ export function restoreGame(data: SaveData): GameState {
   const game = createGameState();
   if (data.starter !== undefined) game.starter = data.starter;
   game.party = data.party.map(loadMonster);
-  game.box = data.box.map(loadMonster);
+  game.boxes = data.boxes.map((b): Box => ({ name: b.name, wallpaper: b.wallpaper, slots: b.slots.map((m) => (m ? loadMonster(m) : null)) }));
+  // A party past the limit (never written by the game) spills into the boxes rather than being lost.
+  while (game.party.length > config.party.maxParty) depositToBox(game, game.party.pop() as Monster);
   game.progress = data.progress;
   game.items = { balls: { ...game.items.balls, ...data.items.balls }, potions: data.items.potions, rareCandies: data.items.rareCandies };
   game.money = data.money;
   game.pokedex = data.pokedex;
+  game.badges = [...data.badges];
   return game;
 }
 
@@ -213,18 +270,19 @@ function fromBase64Url(code: string): string {
   return new TextDecoder().decode(bytes);
 }
 
-/** `PTD1.<base64url json>.<checksum>` */
+/** `PTD2.<base64url json>.<checksum>` */
 export function encodeSaveCode(data: SaveData): string {
   const json = JSON.stringify(data);
   const body = toBase64Url(json);
   return `${CODE_PREFIX}${body}.${hashString(body).toString(36)}`;
 }
 
-/** Parses and validates a save code; throws SaveError for anything corrupt. */
+/** Parses and validates a save code (v1 or v2); throws SaveError for anything corrupt. */
 export function decodeSaveCode(code: string): SaveData {
   const trimmed = code.trim();
-  if (!trimmed.startsWith(CODE_PREFIX)) throw new SaveError('not a save code for this version');
-  const rest = trimmed.slice(CODE_PREFIX.length);
+  const match = CODE_PATTERN.exec(trimmed);
+  if (!match) throw new SaveError('not a save code for this version');
+  const rest = trimmed.slice(match[0].length);
   const dot = rest.lastIndexOf('.');
   if (dot <= 0) throw new SaveError('save code is incomplete');
   const body = rest.slice(0, dot);

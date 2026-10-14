@@ -109,6 +109,50 @@
       ]
     },
     {
+      "dex": "0066",
+      "name": "Machop",
+      "sprite": [
+        "CHUNSOFT",
+        "Emboarger"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Felis-Licht",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0067",
+      "name": "Machoke",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0068",
+      "name": "Machamp",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
       "dex": "0074",
       "name": "Geodude",
       "sprite": [
@@ -168,6 +212,98 @@
       ]
     },
     {
+      "dex": "0118",
+      "name": "Goldeen",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0119",
+      "name": "Seaking",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0129",
+      "name": "Magikarp",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire",
+        "Noo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JemDragons"
+      ]
+    },
+    {
+      "dex": "0130",
+      "name": "Gyarados",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Noo",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "G〜",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0161",
+      "name": "Sentret",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin",
+        "Neat_Neato"
+      ],
+      "shiny": [
+        "Lovi",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Deleca7755",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0162",
+      "name": "Furret",
+      "sprite": [
+        "CHUNSOFT",
+        "Neat_Neato"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "RelicCipher"
+      ]
+    },
+    {
       "dex": "0169",
       "name": "Crobat",
       "sprite": [
@@ -193,6 +329,53 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ]
+    },
+    {
+      "dex": "0315",
+      "name": "Roselia",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "RaoKurai",
+        "G〜"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0339",
+      "name": "Barboach",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "chikorene"
+      ]
+    },
+    {
+      "dex": "0340",
+      "name": "Whiscash",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "bwappi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Noo",
+        "Emmuffin",
+        "baronessfaron"
       ]
     },
     {
@@ -476,6 +659,72 @@
       "portrait": [
         "CHUNSOFT",
         "Soulja"
+      ]
+    },
+    {
+      "dex": "0406",
+      "name": "Budew",
+      "sprite": [
+        "CHUNSOFT",
+        "Uni"
+      ],
+      "shiny": [
+        "RaoKurai",
+        "Uni"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Discord user 237814999634935808",
+        "Deeshura"
+      ]
+    },
+    {
+      "dex": "0407",
+      "name": "Roserade",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain",
+        "G〜"
+      ],
+      "shiny": [
+        "Discord user 195280695009083392",
+        "ShyStarryRain",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0408",
+      "name": "Cranidos",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi",
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0409",
+      "name": "Rampardos",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Noo",
+        "NikolaP"
       ]
     },
     {

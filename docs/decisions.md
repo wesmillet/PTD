@@ -46,3 +46,44 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   frames for the canvas party strip, which alternates them every 170 ms like
   Black/White. Portraits stay for the large Pokémon panel and the evolution
   prompt.
+- Geodude was listed as a featured spawn in both Oreburgh Gate and the Mine;
+  the one-featured-level rule allows one, so it is featured in the Gate (its
+  first appearance) and rare (10 %) in the Mine, where Onix and Machop carry
+  the level and Roark's own Geodude still shows up.
+- Lake Verity's roster uses the old/good-rod level ranges (3–6) for Psyduck,
+  Magikarp and Goldeen instead of the surf table (20–40), since it is the
+  second level.
+- Route 202 is a free level with a "final" trainer wave: Tristan comes on
+  wave 6 and clearing it wins the level (PTD levels end on their trainer);
+  the player can still leave earlier or replay it.
+- A ball thrown at a trainer's Pokémon bounces off and is not consumed
+  (PTD refused the throw rather than taking the ball).
+- Trainer KOs give 1.5x EXP as in the main games; trainer Pokémon are never
+  shiny.
+- Boss moves are the only enemy attacks so far: Cranidos hits every placed
+  Pokémon within the move's range on a timer, towers keep at least 1 HP
+  (towers still cannot faint).
+- Barry's Route 203 party is Starly 9 and the counter-starter 11, between
+  the Diamond/Pearl and Platinum rematch levels; Roark uses his Platinum
+  team (Geodude 12, Onix 12, Cranidos 14).
+- Boss-wave retry restores the lives the wave started with and keeps the
+  placed Pokémon as they are (HP included) rather than restoring a full
+  snapshot.
+- The PC has 8 boxes of 30 (Gen 4 boxes are 30 slots); the party column
+  stays dense like the games (an empty party slot means "append"), and the
+  last party member cannot be boxed.
+- Saves moved to format 2 (boxes, badges); version 1 saves and PTD1 codes
+  still load with their flat box list filling the boxes in order.
+- The PC summary panel is a DOM side panel (readable at phone width) while
+  the box grid, wallpapers, frame and cursor are canvas images from
+  `pc.json`, so the DS-style skin can be swapped without touching code.
+- 4x speed runs four fixed steps per frame; waves on free levels auto-start
+  inside the sim so the determinism test has no frame-timed inputs.
+- Level sprite preloading now covers the roster and the trainer's party
+  (previously only the area table), so bosses never load on demand.
+- A selected ball is used by the next click on a wild Pokémon only; any
+  other click drops the selection and acts normally (the old behaviour left
+  the ball selected and blocked placement).
+- Exit from the pause menu leaves a free level with its summary (EXP and
+  catches kept) and abandons a defend level (caught Pokémon still kept, no
+  progress recorded).

@@ -1,16 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
   addPokemon,
+  allBadges,
   chooseStarter,
   createGameState,
+  hasBadge,
   isLevelCompleted,
   isLevelUnlocked,
-  moveToBox,
-  moveToParty,
   orderedLevelIds,
   recordLevelResult,
   sortMonsters,
-  swapPartyBox,
   MAX_PARTY,
   dexCounts,
   levelMoney,
@@ -18,6 +17,7 @@ import {
   spendMoney,
 } from './game';
 import { createMonster } from './monster';
+import { allBoxed, moveMon, moveToBox, moveToParty } from './pc';
 
 describe('party and box', () => {
   it('fills the party to six then the box', () => {
@@ -26,7 +26,8 @@ describe('party and box', () => {
     expect(() => chooseStarter(game, 390, createMonster(390, 5))).toThrow();
     for (let i = 0; i < 7; i++) addPokemon(game, createMonster(396, 2));
     expect(game.party).toHaveLength(MAX_PARTY);
-    expect(game.box).toHaveLength(2);
+    expect(allBoxed(game)).toHaveLength(2);
+    expect(game.boxes[0]?.slots.slice(0, 3).map((m) => m?.species ?? null)).toEqual([396, 396, null]);
     expect(game.party[0]?.species).toBe(387);
   });
 
@@ -36,16 +37,16 @@ describe('party and box', () => {
     addPokemon(game, createMonster(396, 2));
     moveToBox(game, 1);
     expect(game.party).toHaveLength(1);
-    expect(game.box[0]?.species).toBe(396);
+    expect(game.boxes[0]?.slots[0]?.species).toBe(396);
     expect(() => moveToBox(game, 0)).toThrow(/at least one/);
-    moveToParty(game, 0);
+    moveToParty(game, 0, 0);
     expect(game.party).toHaveLength(2);
-    expect(game.box).toHaveLength(0);
+    expect(allBoxed(game)).toHaveLength(0);
     for (let i = 0; i < 5; i++) addPokemon(game, createMonster(399, 2));
-    expect(() => moveToParty(game, 0)).toThrow(/full/);
-    swapPartyBox(game, 0, 0);
+    expect(() => moveToParty(game, 0, 0)).toThrow(/full/);
+    moveMon(game, { kind: 'party', index: 0 }, { kind: 'box', box: 0, slot: 0 });
     expect(game.party[0]?.species).toBe(399);
-    expect(game.box[0]?.species).toBe(387);
+    expect(game.boxes[0]?.slots[0]?.species).toBe(387);
   });
 
   it('sorts by level, type and name', () => {
@@ -77,6 +78,23 @@ describe('level unlock chain', () => {
     expect(isLevelCompleted(game, 'route-203')).toBe(true);
     expect(game.progress['route-203']?.wavesCleared).toBe(8);
     expect(isLevelUnlocked(game, 'oreburgh-gate')).toBe(true);
+  });
+
+  it('awards a badge for winning a gym level, once', () => {
+    const game = createGameState();
+    expect(allBadges()).toEqual([{ id: 'coal', name: 'Coal Badge', levelId: 'oreburgh-mine-1f' }]);
+    recordLevelResult(game, 'oreburgh-mine-1f', 'lost', 7);
+    expect(game.badges).toEqual([]);
+    recordLevelResult(game, 'oreburgh-mine-1f', 'won', 8);
+    recordLevelResult(game, 'oreburgh-mine-1f', 'won', 8);
+    expect(game.badges).toEqual(['coal']);
+    expect(hasBadge(game, 'coal')).toBe(true);
+  });
+
+  it('counts a free level with a beaten trainer as won', () => {
+    const game = createGameState();
+    expect(recordLevelResult(game, 'route-202', 'won', 6)).toBe(true);
+    expect(game.progress['route-202']).toEqual({ wavesCleared: 6, won: true, completed: true });
   });
 });
 

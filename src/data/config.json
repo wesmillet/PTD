@@ -7,11 +7,11 @@
     "speedBase": 0.8,
     "speedScale": 0.015,
     "enemyClampMin": 0.5,
-    "enemyClampMax": 2.0,
+    "enemyClampMax": 2,
     "speedRef": 60,
     "clampMin": 0.5,
-    "clampMax": 2.0,
-    "moveRate": 1.0
+    "clampMax": 2,
+    "moveRate": 1
   },
   "combat": {
     "critRate": 0.0625,
@@ -19,7 +19,8 @@
     "maxMoves": 4
   },
   "exp": {
-    "expPerHitFraction": 0.05
+    "expPerHitFraction": 0.05,
+    "trainerExpMultiplier": 1.5
   },
   "waves": {
     "freeWaveMaxEnemies": 12,
@@ -28,7 +29,8 @@
   },
   "gameSpeeds": [
     1,
-    2
+    2,
+    4
   ],
   "status": {
     "tickSeconds": 2,
@@ -56,43 +58,50 @@
   "shinyRate": 0.000244140625,
   "balls": {
     "poke": {
-      "name": "Pok\u00e9 Ball",
+      "name": "Poké Ball",
       "modifier": 1,
-      "price": 200
+      "price": 200,
+      "sprite": "poke-ball"
     },
     "great": {
       "name": "Great Ball",
       "modifier": 1.5,
-      "price": 600
+      "price": 600,
+      "sprite": "great-ball"
     },
     "ultra": {
       "name": "Ultra Ball",
       "modifier": 2,
-      "price": 1200
+      "price": 1200,
+      "sprite": "ultra-ball"
     },
     "dusk": {
       "name": "Dusk Ball",
       "modifier": 3.5,
       "condition": "cave-or-night",
-      "price": 1000
+      "price": 1000,
+      "sprite": "dusk-ball"
     },
     "net": {
       "name": "Net Ball",
       "modifier": 3,
       "condition": "bug-or-water",
-      "price": 1000
+      "price": 1000,
+      "sprite": "net-ball"
     },
     "quick": {
       "name": "Quick Ball",
       "modifier": 4,
       "condition": "undamaged",
-      "price": 1000
+      "price": 1000,
+      "sprite": "quick-ball"
     },
     "master": {
       "name": "Master Ball",
       "modifier": 255,
       "price": 0,
-      "obtainable": false
+      "obtainable": false,
+      "sprite": "master-ball"
     }
   },
   "catch": {
@@ -127,11 +136,18 @@
   "shop": {
     "potion": {
       "name": "Potion",
-      "price": 300
+      "price": 300,
+      "sprite": "potion"
     },
     "rareCandy": {
       "name": "Rare Candy",
-      "price": 4800
+      "price": 4800,
+      "sprite": "rare-candy"
     }
+  },
+  "bosses": {
+    "hpMultiplier": 4,
+    "spriteScale": 1.5,
+    "retryBossWave": true
   }
 }

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { BALL_IDS, BALLS } from '../sim/catch';
 import type { LevelState } from '../sim/level';
 import { getGame } from '../game/session';
-import { iconInfo, iconTextureKey } from '../game/runtime';
+import { iconInfo, iconTextureKey, itemTextureKey } from '../game/runtime';
 import config from '../data/config.json';
 import { Button } from './button';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
@@ -11,6 +11,7 @@ export interface HudCallbacks {
   onStartWave: () => void;
   onToggleSpeed: () => void;
   onLeave: () => void;
+  onMenu: () => void;
   onPartySlot: (partyIndex: number) => void;
   onBall: (ballId: string) => void;
 }
@@ -28,21 +29,18 @@ interface Slot {
 interface BallButton {
   id: string;
   frame: Phaser.GameObjects.Rectangle;
+  icon: Phaser.GameObjects.Image | Phaser.GameObjects.Arc;
   count: Phaser.GameObjects.Text;
 }
 
-export const BALL_COLORS: Record<string, number> = {
-  poke: 0xe03030,
-  great: 0x3070e0,
-  ultra: 0xe0c030,
-  dusk: 0x40a060,
-  net: 0x30b0c0,
-  quick: 0x60c0f0,
-  master: 0xa040c0,
-};
+export interface BossStatus {
+  name: string;
+  hp: number;
+  maxHp: number;
+}
 
 /**
- * Top bar: level name, wave, lives, money, speed, Start / Leave.
+ * Top bar: level name, wave, lives, money, speed, Start / Leave, boss bar.
  * Bottom bar (below the map): party slots and the ball bar.
  */
 export class Hud {
@@ -60,6 +58,8 @@ export class Hud {
   private readonly startButton: Button;
   private readonly speedButton: Button;
   private readonly leaveButton: Button | undefined;
+  private readonly bossGfx: Phaser.GameObjects.Graphics;
+  private readonly bossName: Phaser.GameObjects.Text;
   private slots: Slot[] = [];
   private readonly balls: BallButton[] = [];
   private paused = false;
@@ -84,15 +84,18 @@ export class Hud {
     this.lives = scene.add.text(16, 62, '', TEXT).setDepth(1001);
     this.money = scene.add.text(250, 42, '', { ...TEXT, color: '#ffe066' }).setDepth(1001);
     this.hint = scene.add.text(width / 2, 70, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
+    this.bossGfx = scene.add.graphics().setDepth(1002);
+    this.bossName = scene.add.text(width / 2, 58, '', { ...TEXT_DIM, color: '#ffb3b3' }).setOrigin(0.5, 1).setDepth(1003).setVisible(false);
     this.startButton = new Button(scene, width - 80, 22, 'Start wave', callbacks.onStartWave, 130, 30).setDepth(1001);
     this.speedButton = new Button(scene, width - 185, 22, '1x', callbacks.onToggleSpeed, 60, 30).setDepth(1001);
     if (state.def.objective === 'free') {
       this.leaveButton = new Button(scene, width - 300, 22, 'Leave route', callbacks.onLeave, 130, 30).setDepth(1001);
     }
+    new Button(scene, width - (state.def.objective === 'free' ? 415 : 300), 22, 'Menu', callbacks.onMenu, 80, 30).setDepth(1001);
     scene.add.text(16, this.bottomY + 24, 'Party', { ...TEXT_DIM, fontSize: '11px' }).setOrigin(0, 0.5).setDepth(1001);
     this.rebuildSlots(state);
 
-    // Ball bar, right side of the bottom bar.
+    // Ball bar, right side of the bottom bar, with the Gen 5 item sprites.
     const obtainable = BALL_IDS.filter((id) => BALLS[id]?.obtainable !== false);
     const startX = width - 16 - obtainable.length * 46 + 22;
     scene.add.text(startX - 30, this.bottomY + 30, 'Balls', { ...TEXT_DIM, fontSize: '11px' }).setOrigin(1, 0.5).setDepth(1001);
@@ -104,17 +107,24 @@ export class Hud {
         event.stopPropagation();
         callbacks.onBall(id);
       });
-      scene.add.circle(x, y - 8, 9, BALL_COLORS[id] ?? 0xffffff).setStrokeStyle(2, 0x202020).setDepth(1002);
-      scene.add.rectangle(x, y - 8, 18, 2, 0x202020).setDepth(1003);
-      scene.add.circle(x, y - 8, 3, 0xffffff).setStrokeStyle(1, 0x202020).setDepth(1003);
+      const key = itemTextureKey(BALLS[id]?.sprite ?? 'poke-ball');
+      const icon = scene.textures.exists(key)
+        ? scene.add.image(x, y - 7, key).setDepth(1002)
+        : scene.add.circle(x, y - 8, 9, 0xe03030).setStrokeStyle(2, 0x202020).setDepth(1002);
       const count = scene.add.text(x, y + 13, '', { ...TEXT_DIM, fontSize: '11px', color: '#f4ecd8' }).setOrigin(0.5).setDepth(1003);
-      this.balls.push({ id, frame, count });
+      this.balls.push({ id, frame, icon, count });
     });
     this.update(state, 1);
   }
 
   setPaused(paused: boolean): void {
     this.paused = paused;
+  }
+
+  /** Screen position of a ball's slot in the bar (where a thrown ball starts). */
+  ballOrigin(ballId: string): { x: number; y: number } {
+    const b = this.balls.find((bb) => bb.id === ballId);
+    return b ? { x: b.icon.x, y: b.icon.y } : { x: this.scene.scale.width / 2, y: this.bottomY + 24 };
   }
 
   private rebuildSlots(state: LevelState): void {
@@ -164,6 +174,24 @@ export class Hud {
     }
   }
 
+  /** Boss HP bar across the top bar; null hides it. */
+  setBoss(boss: BossStatus | null): void {
+    this.bossGfx.clear();
+    if (!boss) {
+      this.bossName.setVisible(false);
+      return;
+    }
+    const width = this.scene.scale.width;
+    const w = Math.min(520, width - 300);
+    const x = width / 2 - w / 2;
+    const y = 62;
+    const frac = boss.maxHp > 0 ? Math.max(0, Math.min(1, boss.hp / boss.maxHp)) : 0;
+    this.bossGfx.fillStyle(COLORS.borderOuter, 1).fillRoundedRect(x - 2, y - 2, w + 4, 16, 5);
+    this.bossGfx.fillStyle(COLORS.hpBack, 1).fillRoundedRect(x, y, w, 12, 4);
+    if (frac > 0) this.bossGfx.fillStyle(frac > 0.5 ? 0xd35a5a : frac > 0.2 ? 0xd3b05a : 0xff7b7b, 1).fillRoundedRect(x, y, Math.max(8, w * frac), 12, 4);
+    this.bossName.setText(`${boss.name}   ${boss.hp} / ${boss.maxHp}`).setVisible(true);
+  }
+
   update(state: LevelState, gameSpeed: number, selectedPartyIndex: number | null = null, selectedBall: string | null = null): void {
     const def = state.def;
     if (def.objective === 'defend') {
@@ -179,6 +207,7 @@ export class Hud {
     this.startButton.setEnabled(canStart);
     const nextIn = def.objective === 'free' && state.phase === 'build' && state.towers.length > 0 ? ` (auto in ${Math.ceil(state.buildTimer)}s)` : '';
     this.startButton.setText(state.phase === 'build' ? `Start wave${nextIn}` : 'Wave running');
+    const bossShown = this.bossName.visible;
     if (this.paused) {
       this.hint.setText('Paused');
     } else if (selectedBall) {
@@ -190,6 +219,8 @@ export class Hud {
     } else {
       this.hint.setText('');
     }
+    this.hint.setVisible(!bossShown || this.paused || selectedBall !== null);
+    this.hint.setY(bossShown ? 84 : 70);
     this.leaveButton?.setEnabled(state.phase === 'build' || state.phase === 'wave');
 
     if (this.slots.length !== state.party.length || this.slots.some((s, i) => s.species !== state.party[i]?.mon.species)) {
@@ -212,6 +243,7 @@ export class Hud {
       b.count.setText(String(n));
       b.frame.setStrokeStyle(2, b.id === selectedBall ? COLORS.selected : COLORS.borderOuter);
       b.frame.setAlpha(n > 0 ? 1 : 0.4);
+      b.icon.setAlpha(n > 0 ? 1 : 0.4);
     }
   }
 }

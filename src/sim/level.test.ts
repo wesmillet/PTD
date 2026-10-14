@@ -34,6 +34,7 @@ const mine = getLevel('oreburgh-mine-1f');
 const route201Map = route201Fixture as unknown as MapDef;
 const mineMap = mineFixture as unknown as MapDef;
 const TACKLE = 33;
+const RAZOR_LEAF = 75;
 
 function turtwig(level = 5) {
   return createMonster(387, level, [TACKLE]);
@@ -102,16 +103,18 @@ describe('defend objective', () => {
   });
 
   it('is won after clearing all waves with a strong tower', () => {
-    const state = createLevel(mine, mineMap, { seed: 3, party: [turtwig(40)] });
+    // Razor Leaf: Grass hits the mine's Rock and Ground types for 4x, Tackle would be resisted.
+    const state = createLevel(mine, mineMap, { seed: 3, party: [createMonster(387, 40, [RAZOR_LEAF])], starter: 387 });
     placeTower(state, 0, 14, 6);
     let kos = 0;
     let levelUps = 0;
     for (let w = 0; w < 8; w++) {
       expect(state.phase).toBe('build');
       startWave(state);
-      const events = run(state, 90);
+      const events = run(state, 120);
       kos += events.filter((e) => e.type === 'ko').length;
       levelUps += events.filter((e) => e.type === 'levelUp').length;
+      expect(events.some((e) => e.type === 'bossRetry')).toBe(false);
     }
     expect(state.phase).toBe('won');
     expect(state.wavesCleared).toBe(8);
@@ -180,7 +183,7 @@ describe('free objective', () => {
   });
 
   it('can be left at any time with a summary of EXP and level-ups', () => {
-    const state = createLevel(route201, route201Map, { seed: 2, party: [turtwig(5)] });
+    const state = createLevel(route201, route201Map, { seed: 2, party: [turtwig(10)] });
     placeTower(state, 0, 9, 5);
     run(state, 120);
     const events = leaveLevel(state);
@@ -205,10 +208,15 @@ describe('debug overrides', () => {
     expect(mon.hp).toBe(mon.stats.hp);
     expect(state.party[0]!.levelFrom).toBe(40);
     expect(() => setPartyLevel(state, 0, 0)).toThrow();
+    // Rosters ignore the time of day; an area table (no roster) follows it.
     setTimeOfDay(state, 'night');
-    expect(state.table.some((e) => e.species === 401)).toBe(true); // Kricketot
-    setTimeOfDay(state, 'day');
-    expect(state.table.some((e) => e.species === 401)).toBe(false);
+    expect(state.table.some((e) => e.species === 401)).toBe(true); // Kricketot is a rare roster entry
+    const { roster: _roster, ...areaDef } = route201;
+    const areaState = createLevel(areaDef, route201Map, { seed: 4, party: [turtwig(5)] });
+    setTimeOfDay(areaState, 'night');
+    expect(areaState.table.some((e) => e.species === 401)).toBe(true);
+    setTimeOfDay(areaState, 'day');
+    expect(areaState.table.some((e) => e.species === 401)).toBe(false);
   });
 
 
@@ -428,26 +436,28 @@ describe('catching', () => {
       expect(state.items.balls['ultra']).toBe(0);
       expect(events[0]).toMatchObject({ type: 'ballThrow', ball: 'ultra', enemyId: target.id });
       expect(events[0]?.caught).toBe(true);
-      expect(events).toContainEqual({ type: 'caught', enemyId: target.id, species: 399, shiny: false });
+      expect(events).toContainEqual({ type: 'caught', enemyId: target.id, species: 399, shiny: false, ball: 'ultra' });
       expect(state.enemies.find((e) => e.id === target.id)).toBeUndefined();
-      expect(state.caught).toEqual([target.mon]);
+      expect(state.caught).toEqual([{ mon: target.mon, ball: 'ultra' }]);
       expect(state.party.map((p) => p.mon)).toContain(target.mon);
-      expect(summarize(state).caught).toEqual([{ name: 'bidoof', species: 399, level: target.mon.level, shiny: false }]);
+      expect(summarize(state).caught).toEqual([{ name: 'bidoof', species: 399, level: target.mon.level, shiny: false, ball: 'ultra' }]);
       expect(summarize(state).party.map((p) => p.name)).toEqual(['turtwig']);
     }
   });
 
-  it("refuses trainers' Pokémon", () => {
-    const def = { ...route201, trainer: true };
-    const state = createLevel(def, route201Map, { seed: 1, party: [turtwig(5)] });
+  it("bounces balls off trainers' Pokémon without using one", () => {
+    const def = { ...route201, trainerWaves: true };
+    const state = createLevel(def, route201Map, { seed: 1, party: [turtwig(5)], items: { balls: { poke: 3 } } });
     const tower = placeTower(state, 0, 26, 3);
     tower.mon.moves = [];
     startWave(state);
     run(state, 3);
     const enemy = state.enemies[0]!;
     expect(enemy.trainer).toBe(true);
-    expect(canThrow(state, 'poke', enemy.id)).toMatch(/trainer/);
-    expect(() => throwBall(state, 'poke', enemy.id)).toThrow(/trainer/);
+    expect(canThrow(state, 'poke', enemy.id)).toBeNull();
+    expect(throwBall(state, 'poke', enemy.id)).toEqual([{ type: 'ballBlocked', enemyId: enemy.id, ball: 'poke' }]);
+    expect(state.items.balls['poke']).toBe(3);
+    expect(state.enemies).toContain(enemy);
   });
 
   it('is deterministic for a seed and ends the wave when the last enemy is caught', () => {

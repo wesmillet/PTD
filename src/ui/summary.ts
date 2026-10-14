@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import type { LevelSummary } from '../sim/level';
-import { iconTextureKey } from '../game/runtime';
+import { BALLS } from '../sim/catch';
+import { badgeTextureKey, iconTextureKey, itemTextureKey } from '../game/runtime';
 import { Button } from './button';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 
@@ -15,14 +16,15 @@ const TITLES: Record<string, string> = {
   left: 'Left the route',
 };
 
-/** End-of-level overlay with EXP per Pokémon and level-ups. */
-export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money?: number }, callbacks: SummaryCallbacks): Phaser.GameObjects.Container {
+/** End-of-level overlay with EXP per Pokémon, level-ups, catches (with the ball used), trainer and badge. */
+export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money?: number; newBadge?: boolean }, callbacks: SummaryCallbacks): Phaser.GameObjects.Container {
   const { width, height } = scene.scale;
   const container = scene.add.container(0, 0).setDepth(2000);
   container.add(scene.add.rectangle(0, 0, width, height, 0x000000, 0.6).setOrigin(0).setInteractive());
-  const panelW = 440;
-  const lines = summary.party.length + summary.caught.length + (summary.caught.length ? 1 : 0);
-  const panelH = 150 + lines * 26;
+  const panelW = 460;
+  const extra = (summary.trainer ? 1 : 0) + (summary.badge ? 1 : 0);
+  const lines = summary.party.length + summary.caught.length + (summary.caught.length ? 1 : 0) + extra;
+  const panelH = Math.min(height - 20, 150 + lines * 26);
   const px = width / 2;
   const py = height / 2;
   const frame = scene.add.graphics();
@@ -37,25 +39,38 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
       .setOrigin(0.5),
   );
   let y = py - panelH / 2 + 90;
+  const left = px - panelW / 2;
   const portrait = (species: number, x: number, cy: number) => {
     const icon = iconTextureKey(species, 0);
     const key = scene.textures.exists(icon) ? icon : `portrait-${String(species).padStart(4, '0')}`;
     if (scene.textures.exists(key)) container.add(scene.add.image(x, cy, key).setScale(key === icon ? 1 : 0.6));
   };
+  if (summary.trainer) {
+    container.add(scene.add.text(left + 24, y, `Defeated ${summary.trainer}!`, { ...TEXT, color: '#ffe066' }));
+    y += 26;
+  }
+  if (summary.badge) {
+    const key = badgeTextureKey(summary.badge.id);
+    if (scene.textures.exists(key)) container.add(scene.add.image(left + 30, y + 10, key).setScale(0.75));
+    container.add(scene.add.text(left + 50, y, summary.newBadge === false ? `${summary.badge.name} (already earned)` : `Earned the ${summary.badge.name}!`, { ...TEXT, color: '#ffe066' }));
+    y += 26;
+  }
   for (const p of summary.party) {
     const name = p.name.charAt(0).toUpperCase() + p.name.slice(1);
     const levelText = p.levelTo > p.levelFrom ? `Lv ${p.levelFrom} -> ${p.levelTo}` : `Lv ${p.levelTo}`;
-    portrait(p.species, px - panelW / 2 + 30, y + 10);
-    container.add(scene.add.text(px - panelW / 2 + 50, y, `${name}   +${p.expGained} EXP   ${levelText}`, TEXT));
+    portrait(p.species, left + 30, y + 10);
+    container.add(scene.add.text(left + 50, y, `${name}   +${p.expGained} EXP   ${levelText}`, TEXT));
     y += 26;
   }
   if (summary.caught.length) {
-    container.add(scene.add.text(px - panelW / 2 + 24, y, 'Caught:', TEXT_DIM));
+    container.add(scene.add.text(left + 24, y, 'Caught:', TEXT_DIM));
     y += 22;
     for (const c of summary.caught) {
       const name = c.name.charAt(0).toUpperCase() + c.name.slice(1);
-      portrait(c.species, px - panelW / 2 + 30, y + 10);
-      container.add(scene.add.text(px - panelW / 2 + 50, y, `${c.shiny ? '★ ' : ''}${name}   Lv ${c.level}`, TEXT));
+      portrait(c.species, left + 30, y + 10);
+      const ballKey = itemTextureKey(BALLS[c.ball]?.sprite ?? 'poke-ball');
+      if (scene.textures.exists(ballKey)) container.add(scene.add.image(left + 58, y + 10, ballKey).setScale(0.8));
+      container.add(scene.add.text(left + 76, y, `${c.shiny ? '★ ' : ''}${name}   Lv ${c.level}`, TEXT));
       y += 26;
     }
   }

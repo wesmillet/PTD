@@ -1,0 +1,19 @@
+{
+  "boxes": 8,
+  "columns": 6,
+  "rows": 5,
+  "frame": "assets/pc/frame.png",
+  "cursor": "assets/pc/cursor.png",
+  "defaultNames": ["Box 1", "Box 2", "Box 3", "Box 4", "Box 5", "Box 6", "Box 7", "Box 8"],
+  "defaultWallpapers": ["forest", "city", "desert", "savanna", "crag", "volcano", "snow", "cave"],
+  "wallpapers": [
+    { "id": "forest", "name": "Forest", "image": "assets/pc/wallpapers/forest.png" },
+    { "id": "city", "name": "City", "image": "assets/pc/wallpapers/city.png" },
+    { "id": "desert", "name": "Desert", "image": "assets/pc/wallpapers/desert.png" },
+    { "id": "savanna", "name": "Savanna", "image": "assets/pc/wallpapers/savanna.png" },
+    { "id": "crag", "name": "Crag", "image": "assets/pc/wallpapers/crag.png" },
+    { "id": "volcano", "name": "Volcano", "image": "assets/pc/wallpapers/volcano.png" },
+    { "id": "snow", "name": "Snow", "image": "assets/pc/wallpapers/snow.png" },
+    { "id": "cave", "name": "Cave", "image": "assets/pc/wallpapers/cave.png" }
+  ]
+}

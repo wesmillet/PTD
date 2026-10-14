@@ -78,6 +78,7 @@ html, body { background: var(--ptd-bg); color: var(--ptd-text); }
 .ptd-panel .ptd-portrait { width: 80px; height: 80px; image-rendering: pixelated; border: 2px solid var(--ptd-border-outer); border-radius: var(--ptd-radius-sm); background: var(--ptd-bg); flex: none; }
 .ptd-panel .ptd-portrait.small { width: 40px; height: 40px; }
 .ptd-icon { width: 32px; height: 32px; image-rendering: pixelated; flex: none; vertical-align: middle; }
+.ptd-item { width: 24px; height: 24px; image-rendering: pixelated; flex: none; vertical-align: middle; }
 .ptd-panel .ptd-dim { color: var(--ptd-text-dim); font-size: 13px; }
 .ptd-panel .ptd-label { font: 13px/1.3 var(--ptd-font-pixel); color: var(--ptd-text-dim); }
 .ptd-panel .ptd-bar { position: relative; height: 12px; background: var(--ptd-bar-back); border-radius: 6px; overflow: hidden; margin: 4px 0; border: 1px solid var(--ptd-border-outer); }

@@ -1,11 +1,13 @@
 /**
- * Pure game-wide state: starter, party, PC box, level completion, items.
- * Saved by Phase 4. No Phaser imports.
+ * Pure game-wide state: starter, party, PC boxes, level completion, items,
+ * money, badges. No Phaser imports.
  */
 import config from '../data/config.json';
 import { getLevel, levelIds } from '../data/levels';
-import { typeName } from '../data/pokedata';
 import type { Monster } from './monster';
+import { createBoxes, depositToBox, type Box } from './pc';
+
+export { sortMonsters, type SortKey } from './pc';
 
 export interface LevelProgress {
   /** Waves cleared on the best run. */
@@ -31,11 +33,13 @@ export interface Inventory {
 export interface GameState {
   starter?: number;
   party: Monster[];
-  box: Monster[];
+  boxes: Box[];
   progress: Record<string, LevelProgress>;
   items: Inventory;
   money: number;
   pokedex: Record<string, DexEntry>;
+  /** Badge ids in the order they were won. */
+  badges: string[];
 }
 
 export const MAX_PARTY = config.party.maxParty;
@@ -43,11 +47,12 @@ export const MAX_PARTY = config.party.maxParty;
 export function createGameState(): GameState {
   return {
     party: [],
-    box: [],
+    boxes: createBoxes(),
     progress: {},
     items: { balls: { ...config.startingItems.balls }, potions: config.startingItems.potions, rareCandies: config.startingItems.rareCandies },
     money: config.money.starting,
     pokedex: {},
+    badges: [],
   };
 }
 
@@ -95,61 +100,18 @@ export function chooseStarter(game: GameState, species: number, starter: Monster
   markCaught(game, species, starter.shiny);
 }
 
-/** Adds a Pokémon to the party if there is room, else to the box. Returns where it went. */
+/** Adds a Pokémon to the party if there is room, else to the first free box slot. Returns where it went. */
 export function addPokemon(game: GameState, mon: Monster): 'party' | 'box' {
   markCaught(game, mon.species, mon.shiny);
   if (game.party.length < MAX_PARTY) {
     game.party.push(mon);
     return 'party';
   }
-  game.box.push(mon);
+  depositToBox(game, mon);
   return 'box';
 }
 
-export function moveToBox(game: GameState, index: number): void {
-  const mon = game.party[index];
-  if (!mon) throw new Error(`no party member ${index}`);
-  if (game.party.length <= 1) throw new Error('the party needs at least one Pokémon');
-  game.party.splice(index, 1);
-  game.box.push(mon);
-}
-
-export function moveToParty(game: GameState, boxIndex: number): void {
-  const mon = game.box[boxIndex];
-  if (!mon) throw new Error(`no box entry ${boxIndex}`);
-  if (game.party.length >= MAX_PARTY) throw new Error('the party is full');
-  game.box.splice(boxIndex, 1);
-  game.party.push(mon);
-}
-
-/** Swaps a party member with a box Pokémon. */
-export function swapPartyBox(game: GameState, partyIndex: number, boxIndex: number): void {
-  const a = game.party[partyIndex];
-  const b = game.box[boxIndex];
-  if (!a || !b) throw new Error('bad swap indices');
-  game.party[partyIndex] = b;
-  game.box[boxIndex] = a;
-}
-
-export type SortKey = 'level' | 'type' | 'name';
-
-export function sortMonsters(list: Monster[], key: SortKey): Monster[] {
-  const sorted = [...list];
-  switch (key) {
-    case 'level':
-      sorted.sort((a, b) => b.level - a.level || a.name.localeCompare(b.name));
-      break;
-    case 'type':
-      sorted.sort((a, b) => typeName(a.types[0] ?? 0).localeCompare(typeName(b.types[0] ?? 0)) || b.level - a.level);
-      break;
-    case 'name':
-      sorted.sort((a, b) => a.name.localeCompare(b.name) || b.level - a.level);
-      break;
-  }
-  return sorted;
-}
-
-/** Records a level outcome, awards money, and returns whether the run counted as cleared. */
+/** Records a level outcome, awards money and badges, and returns whether the run counted as cleared. */
 export function recordLevelResult(game: GameState, levelId: string, outcome: 'won' | 'lost' | 'left', wavesCleared: number, kos = 0): boolean {
   const def = getLevel(levelId);
   const prev = game.progress[levelId] ?? { wavesCleared: 0, won: false, completed: false };
@@ -161,13 +123,29 @@ export function recordLevelResult(game: GameState, levelId: string, outcome: 'wo
       cleared = true;
     }
     progress.completed = progress.won;
-  } else if (wavesCleared >= 1 && outcome !== 'lost') {
+  } else if (outcome === 'won' || (wavesCleared >= 1 && outcome !== 'lost')) {
     progress.completed = true;
+    if (outcome === 'won') progress.won = true;
     cleared = true;
   }
   game.progress[levelId] = progress;
   game.money += levelMoney(kos, cleared);
+  if (outcome === 'won' && def.badge && !game.badges.includes(def.badge.id)) game.badges.push(def.badge.id);
   return cleared;
+}
+
+export function hasBadge(game: GameState, badgeId: string): boolean {
+  return game.badges.includes(badgeId);
+}
+
+/** Every badge the levels define, in level order. */
+export function allBadges(): { id: string; name: string; levelId: string }[] {
+  const out: { id: string; name: string; levelId: string }[] = [];
+  for (const id of levelIds()) {
+    const badge = getLevel(id).badge;
+    if (badge) out.push({ ...badge, levelId: id });
+  }
+  return out;
 }
 
 export function isLevelCompleted(game: GameState, levelId: string): boolean {

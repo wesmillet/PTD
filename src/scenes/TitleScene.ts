@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { hasSave } from '../game/storage';
+import { badgeTextureKey } from '../game/runtime';
 import { getGame, resetGame } from '../game/session';
+import { allBadges, hasBadge } from '../sim/game';
 import { Button } from '../ui/button';
 import { CreditsScreen } from '../ui/creditsScreen';
 import { COLORS, TEXT_DIM, TEXT_TITLE } from '../ui/styles';
@@ -24,6 +26,15 @@ export class TitleScene extends Phaser.Scene {
     this.add.text(width / 2, height * 0.3 + 44, 'A Pokémon Tower Defense fan game', TEXT_DIM).setOrigin(0.5);
     const saved = hasSave();
     const game = getGame();
+    // Badge case under the subtitle: lit for the badges this save has earned.
+    const badges = allBadges();
+    let bx = width / 2 - (badges.length - 1) * 20;
+    for (const b of badges) {
+      const earned = hasBadge(game, b.id);
+      const key = badgeTextureKey(b.id, earned);
+      if (this.textures.exists(key)) this.add.image(bx, height * 0.3 + 84, key).setAlpha(earned ? 1 : 0.5);
+      bx += 40;
+    }
     const y = height * 0.58;
     const cont = new Button(this, width / 2, y, saved ? 'Continue' : 'Continue (no save)', () => this.scene.start('LevelSelect'), 220, 36);
     cont.setEnabled(saved || game.party.length > 0);

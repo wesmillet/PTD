@@ -193,18 +193,23 @@ range, from a seeded RNG so a level replays identically for the same seed.
 - Currency: Poké Dollars per KO and per level cleared (`config.json`
   `money`). The shop between levels sells all six balls, Potions (restore a
   placed Pokémon to full HP between waves, from its panel) and Rare Candy
-  (one level, not past 100, from the Party screen; triggers move learning
-  and evolution). Evolution stones, TMs and vitamins come later.
+  (one level, not past 100, from the PC summary panel; triggers move
+  learning and evolution). Evolution stones, TMs and vitamins come later.
+  Items show their Gen 5 sprites (PokeAPI sprites, `sprites/items/gen5/`,
+  fetched by `scripts/fetch-items.sh`) in the ball bar, shop, the bag strip
+  on level select and the summaries.
 - The save tracks seen (on spawn), caught, and shiny caught per species for
   later features; there is no Pokédex screen.
 
 ### Save data
 - Saved to localStorage after every level and every party, PC, shop or
-  settings change; loaded on startup. Contents: starter, party and PC box
-  (species, level, EXP, HP, moves with PP, active move, shiny), level
-  progress, items, money, Pokédex, settings (game speed and the speed
-  constants).
-- Save code: a `PTD1.` prefixed base64url string with a checksum. Import
+  settings change; loaded on startup. Contents (format version 2): starter,
+  party and PC boxes (name, wallpaper and 30 slots each; a Pokémon is
+  species, level, EXP, HP, moves with PP, active move, shiny), level
+  progress, items, money, Pokédex record, badges, settings (game speed and
+  the speed constants). Version 1 saves and codes still load; their flat
+  box list fills the boxes in order.
+- Save code: a `PTD2.` prefixed base64url string with a checksum. Import
   validates every field against the data tables and rejects corrupt codes
   with the reason, never a crash.
 - New Game asks for confirmation and wipes the save.
@@ -310,16 +315,30 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Title screen: game name, Continue, New Game, Credits.
 - Level select map per act, styled after the Sinnoh region map (a plain list
   with the unlock chain for now)
-- In-level HUD: a top bar with wave counter, lives, money and the speed
-  toggle (1x, 2x; 4x and pause later), and a bottom bar with the party strip
-  and the Poké Ball bar; nothing overlaps the playfield
+- In-level HUD: a top bar with wave counter, lives, money, the speed toggle
+  (1x, 2x, 4x), a Menu button (pause menu with Resume, Settings and Exit;
+  Esc opens it too) and the boss HP bar when a boss is on the path, and a bottom
+  bar with the party strip and the Poké Ball bar (item sprites); nothing
+  overlaps the playfield. Game speed runs extra fixed 1/60 s steps per
+  frame (`src/sim/clock.ts`), never a bigger step, so 4x replays exactly
+  like 1x for the same seed (`clock.test.ts` proves it).
 - Pokémon panel: portrait, level, HP and EXP bars with numbers, status and
   stat stages, all four moves with type and power, the active move
   highlighted (click a move to make it active), a Move button, and later an
   evolution button when eligible. Opened by clicking a placed Pokémon or its
   slot in the party strip along the bottom of the HUD. It is a DOM overlay so
   it stays readable at phone width.
-- Party / PC screen with filters (type, level, shiny)
+- PC (`PCScene`, full screen, reached from level select): laid out like the
+  DS games with the party column on the left, the box grid (6x5) on the
+  right over the box's wallpaper inside a frame image, arrows and a name
+  to switch boxes (8 boxes), a cursor image, drag and drop between any
+  slots (holding a drag over an arrow turns the page), and a side panel
+  with the summary (icon, portrait, level, types, stats, moves, EXP, Rare
+  Candy) plus sort and filter. The frame, cursor and wallpapers are images
+  named in `src/data/pc.json` (plain placeholders from
+  `scripts/build-placeholders.mjs`), so a Gen 4 skin is a file swap.
+- Badge case on the title screen and level select; bag strip (balls,
+  Potion, Rare Candy with counts) on level select.
 - Dialogue boxes with portraits
 - Settings: volume, sprite scale, colorblind-friendly type colors
 
@@ -341,8 +360,12 @@ Phase 4 (done): Save/load with export codes, money, shop, Potions and Rare
 Cleanup (done): Credits screen, design doc update.
 UI pass (done): Pixel font, palette, consistent overlays, HUD bars, title
          screen, docs/ui.md.
-Phase 5: Story Act 1 levels with dialogue and gym bosses, map editor and
-         PMD tilesets (maps branch), region map level select.
+Phase 5 (in progress): per-level rosters with the one-featured-level
+         rule, trainer waves (Tristan, Barry, Roark), the Cranidos boss,
+         badges, boss-wave retry, the PC scene, 4x speed, Gen 5 item
+         sprites and the ball-throw animation, map editor and tilesets
+         (merged from the maps branch). Still to come: dialogue, the rest
+         of Act 1, region map level select.
 Phase 6: Challenge levels and the full shiny system.
 Phase 7: Hisui rifts and Unova.
 Phase 8: Polish: audio, settings, performance pass; strip the debug panel.

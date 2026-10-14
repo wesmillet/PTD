@@ -50,9 +50,16 @@ cleared; defend levels when you win.
 
 - Place a Pokémon by clicking its party slot and then a blue tile; drag a
   placed Pokémon to move it (also mid-wave); tap it for its panel.
-- Click a ball in the ball bar, then a wild Pokémon, to throw it.
-- Between levels: Party / PC (swap, sort, Rare Candy), Shop, Save (save code
-  export and import, New Game) and Credits.
+- Click a ball in the ball bar, then a wild Pokémon, to throw it. Trainer
+  Pokémon (Route 202's Tristan, Route 203's Barry, Roark in the mine)
+  bounce the ball off; Roark's Cranidos is a boss with its own HP bar.
+- Speed toggle: 1x, 2x, 4x (extra fixed steps per frame, same results).
+- Menu (or Esc) pauses the level: Resume, Settings (game speed) and Exit.
+  A selected ball is thrown with the next click on a wild Pokémon; any
+  other click drops it.
+- Between levels: PC (boxes, drag and drop, sort, filter, Rare Candy), Shop,
+  Save (save code export and import, New Game) and Credits. Badges show on
+  the title screen and level select.
 - The game saves itself after every level and change. URL flags:
   `?level=<id>` opens a level, `&seed=<n>` replays the same waves,
   `&shiny=1` makes every spawn shiny, `?party=debug` loads the test party.

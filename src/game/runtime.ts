@@ -12,7 +12,7 @@ if (typeof window !== 'undefined' && new URLSearchParams(window.location.search)
   runtimeConfig.shinyRate = 1;
 }
 
-/** Game speed multiplier applied to simulation time (1x, 2x). */
+/** Game speed multiplier: extra fixed steps per frame (1x, 2x, 4x; see config.gameSpeeds). */
 export const runtime = {
   gameSpeed: 1,
   /** Level the debug panel sets for the player's Turtwig (party member 0). */
@@ -64,6 +64,31 @@ export function iconUrl(species: number, animated = true): string | undefined {
 export function iconTextureKey(species: number, frame: 0 | 1): string {
   const info = iconInfo(species);
   return info.animatedIcon ? `icon-${species}-${frame}` : `icon-${species}`;
+}
+
+/** URL of a shipped asset by its path under public/ (as config files write it). */
+export function assetUrl(rel: string): string {
+  return `${import.meta.env.BASE_URL}${rel.replace(/^\/+/, '')}`;
+}
+
+/** URL of a Gen 5 item sprite (24x24) by its PokeAPI name, e.g. "poke-ball". */
+export function itemUrl(sprite: string): string {
+  return `${import.meta.env.BASE_URL}assets/items/${sprite}.png`;
+}
+
+/** Phaser texture key of an item sprite, loaded by BootScene. */
+export function itemTextureKey(sprite: string): string {
+  return `item-${sprite}`;
+}
+
+/** Texture key of a trainer portrait placeholder (assets/trainers/<id>.png). */
+export function trainerTextureKey(id: string): string {
+  return `trainer-${id}`;
+}
+
+/** Texture key of a badge icon; `lit` false gives the greyed version. */
+export function badgeTextureKey(id: string, lit = true): string {
+  return lit ? `badge-${id}` : `badge-${id}-off`;
 }
 
 /** URL of a portrait emotion PNG, if the folder has it. */

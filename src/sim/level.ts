@@ -3,7 +3,7 @@
  * seed, party and sequence of calls produce the same result. The Phaser
  * scene renders this state and animates the events `step` returns.
  */
-import { encounterTable, expForLevel, getEncounterArea, getPokemon, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
+import { expForLevel, findMoveId, getEncounterArea, getPokemon, type EncounterEntry, type TimeOfDay } from '../data/pokedata';
 import { attemptCatch, ballModifier, BALLS } from './catch';
 import { evolutionOptions, evolveMonster } from './evolution';
 import config from '../data/config.json';
@@ -31,17 +31,25 @@ import {
   type StatusConfig,
 } from './status';
 import { selectTarget, type TargetCandidate } from './targeting';
-import { generateWave, type LevelDef, type SpawnDef } from './waves';
+import { generateWave, levelTable, trainerWave, trainerWaveIndex, type BadgeDef, type LevelDef, type SpawnDef, type TrainerDef } from './waves';
 
 export type Phase = 'build' | 'wave' | 'won' | 'lost' | 'left';
+
+export interface BossConfig {
+  hpMultiplier: number;
+  spriteScale: number;
+  /** Losing during the boss wave restarts that wave once per attempt. */
+  retryBossWave: boolean;
+}
 
 export interface RuntimeConfig {
   speed: SpeedConfig;
   combat: { critRate: number; defaultRangeTiles: number; maxMoves: number };
-  exp: { expPerHitFraction: number };
+  exp: { expPerHitFraction: number; trainerExpMultiplier: number };
   waves: { freeWaveMaxEnemies: number; freeWaveGapSeconds: number };
   status: StatusConfig;
   shinyRate: number;
+  bosses: BossConfig;
   /** Debug: force spawned enemies to this level (undefined = off). */
   enemyLevelOverride?: number;
 }
@@ -54,6 +62,7 @@ export function defaultRuntimeConfig(): RuntimeConfig {
     waves: { freeWaveMaxEnemies: config.waves.freeWaveMaxEnemies, freeWaveGapSeconds: config.waves.freeWaveGapSeconds },
     status: { ...(config.status as StatusConfig), sleepSeconds: [...config.status.sleepSeconds] as [number, number], freezeSeconds: [...config.status.freezeSeconds] as [number, number], confusionSeconds: [...config.status.confusionSeconds] as [number, number] },
     shinyRate: config.shinyRate,
+    bosses: { ...config.bosses },
   };
 }
 
@@ -63,6 +72,13 @@ export interface Tower {
   tile: Tile;
   /** Seconds until the next attack may fire. */
   cooldown: number;
+}
+
+export interface BossMoveTimer {
+  moveId: number;
+  every: number;
+  /** Seconds until the move fires next. */
+  timer: number;
 }
 
 export interface Enemy {
@@ -77,6 +93,8 @@ export interface Enemy {
   damagedBy: Set<number>;
   /** Trainer-owned enemies cannot be caught. */
   trainer: boolean;
+  /** Boss: boosted HP, bigger sprite, moves on timers. */
+  boss?: { moves: BossMoveTimer[] };
 }
 
 export interface PendingEvolution {
@@ -97,6 +115,11 @@ export interface PendingLearn {
   moveId: number;
 }
 
+export interface CaughtEntry {
+  mon: Monster;
+  ball: string;
+}
+
 export type LevelEventType =
   | 'spawn'
   | 'attack'
@@ -114,10 +137,15 @@ export type LevelEventType =
   | 'moveLearned'
   | 'moveLearnPrompt'
   | 'ballThrow'
+  | 'ballBlocked'
   | 'caught'
   | 'evolutionPrompt'
   | 'evolved'
   | 'waveStart'
+  | 'trainerStart'
+  | 'bossMove'
+  | 'towerHit'
+  | 'bossRetry'
   | 'waveEnd'
   | 'phase';
 
@@ -140,6 +168,8 @@ export interface LevelEvent {
   shakes?: number;
   caught?: boolean;
   species?: number;
+  trainer?: TrainerDef;
+  boss?: boolean;
 }
 
 export interface LevelState {
@@ -151,10 +181,15 @@ export interface LevelState {
   seed: number;
   rng: Rng;
   config: RuntimeConfig;
+  /** The player's starter species (the rival's counter-starter depends on it). */
+  starter: number | undefined;
   phase: Phase;
   /** Waves started so far (1-based once the first wave starts). */
   wave: number;
   lives: number;
+  /** Lives at the start of the running wave (a boss retry restores them). */
+  waveStartLives: number;
+  bossRetryUsed: boolean;
   elapsed: number;
   waveTime: number;
   /** Free levels: seconds until the next wave auto-starts during build phase. */
@@ -169,12 +204,14 @@ export interface LevelState {
   pendingEvolutions: PendingEvolution[];
   /** Ball inventory, shared with the game state object that was passed in. */
   items: { balls: Record<string, number> };
-  /** Pokémon caught in this level, in order. */
-  caught: Monster[];
+  /** Pokémon caught in this level, in order, with the ball used. */
+  caught: CaughtEntry[];
   maxParty: number;
   kos: number;
   leaks: number;
   wavesCleared: number;
+  /** Set once the trainer wave has been cleared. */
+  trainerBeaten: boolean;
   nextId: number;
 }
 
@@ -186,10 +223,17 @@ export interface CreateLevelOptions {
   /** Ball inventory to draw from (mutated). Defaults to config.startingItems. */
   items?: { balls: Record<string, number> };
   maxParty?: number;
+  starter?: number;
 }
 
 /** Moves that confuse their user after use (Gen 4). */
 const SELF_CONFUSING = new Set(['thrash', 'outrage', 'petal-dance']);
+
+function moveIdByName(name: string): number {
+  const id = findMoveId(name);
+  if (id === undefined) throw new Error(`unknown move "${name}"`);
+  return id;
+}
 
 export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOptions): LevelState {
   const path = validateMap(map);
@@ -199,14 +243,17 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
     def,
     map,
     path,
-    table: encounterTable(getEncounterArea(def.area), 'walk', time),
+    table: levelTable(def, time),
     time,
     seed: options.seed,
     rng: new Rng(options.seed),
     config: cfg,
+    starter: options.starter,
     phase: 'build',
     wave: 0,
     lives: def.objective === 'defend' ? (def.lives ?? 0) : 0,
+    waveStartLives: def.objective === 'defend' ? (def.lives ?? 0) : 0,
+    bossRetryUsed: false,
     elapsed: 0,
     waveTime: 0,
     buildTimer: def.objective === 'free' ? cfg.waves.freeWaveGapSeconds : 0,
@@ -222,10 +269,12 @@ export function createLevel(def: LevelDef, map: MapDef, options: CreateLevelOpti
     kos: 0,
     leaks: 0,
     wavesCleared: 0,
+    trainerBeaten: false,
     nextId: 1,
   };
-  if (state.table.length === 0) throw new Error(`createLevel: no walk table for ${def.area} at ${time}`);
+  if (state.table.length === 0) throw new Error(`createLevel: no spawn table for ${def.name} at ${time}`);
   if (def.objective === 'defend' && (!def.waves || !def.lives)) throw new Error('createLevel: defend levels need waves and lives');
+  if (def.trainer) trainerWave(def, state.starter, moveIdByName); // validate names early
   return state;
 }
 
@@ -245,10 +294,11 @@ export function setPartyLevel(state: LevelState, partyIndex: number, level: numb
   entry.expGained = 0;
 }
 
-/** Changes the time of day; the next wave uses the matching table. */
+/** Changes the time of day; the next wave uses the matching table (rosters ignore time). */
 export function setTimeOfDay(state: LevelState, time: TimeOfDay): void {
   state.time = time;
-  state.table = encounterTable(getEncounterArea(state.def.area), 'walk', time);
+  getEncounterArea(state.def.area);
+  state.table = levelTable(state.def, time);
 }
 
 export function towerAt(state: LevelState, x: number, y: number): Tower | undefined {
@@ -314,23 +364,37 @@ export function setActiveMove(state: LevelState, towerId: number, index: number)
   tower.mon.activeMove = index;
 }
 
+/** Whether wave `waveIndex` (0-based) is the trainer's. */
+export function isTrainerWave(state: LevelState, waveIndex: number): boolean {
+  return state.def.trainer !== undefined && trainerWaveIndex(state.def) === waveIndex;
+}
+
+/** The trainer wave contains a boss. */
+export function trainerHasBoss(def: LevelDef): boolean {
+  return def.trainer?.party.some((p) => p.boss) ?? false;
+}
+
 /** Starts the next wave. Build phase only; needs at least one tower. */
 export function startWave(state: LevelState): LevelEvent[] {
   if (state.phase !== 'build') throw new Error('startWave: only during build phase');
   if (state.towers.length === 0) throw new Error('startWave: place a Pokémon first');
   const waveIndex = state.wave;
-  const spawns = generateWave(state.table, state.def, waveIndex, state.rng, {
-    freeWaveMaxEnemies: state.config.waves.freeWaveMaxEnemies,
-    ...(state.config.enemyLevelOverride !== undefined ? { levelOverride: state.config.enemyLevelOverride } : {}),
-  });
+  const trainer = isTrainerWave(state, waveIndex);
+  const spawns = trainer
+    ? trainerWave(state.def, state.starter, moveIdByName)
+    : generateWave(state.table, state.def, waveIndex, state.rng, {
+        freeWaveMaxEnemies: state.config.waves.freeWaveMaxEnemies,
+        ...(state.config.enemyLevelOverride !== undefined ? { levelOverride: state.config.enemyLevelOverride } : {}),
+      });
   state.pending = spawns;
   state.wave = waveIndex + 1;
   state.waveTime = 0;
+  state.waveStartLives = state.lives;
   state.phase = 'wave';
-  return [
-    { type: 'waveStart', wave: state.wave },
-    { type: 'phase', phase: 'wave' },
-  ];
+  const events: LevelEvent[] = [{ type: 'waveStart', wave: state.wave, ...(trainer ? { trainer: state.def.trainer } : {}) }];
+  if (trainer && state.def.trainer) events.push({ type: 'trainerStart', wave: state.wave, trainer: state.def.trainer, boss: trainerHasBoss(state.def) });
+  events.push({ type: 'phase', phase: 'wave' });
+  return events;
 }
 
 /** Free levels only: ends the level with everything kept. */
@@ -349,23 +413,33 @@ export function enemyById(state: LevelState, enemyId: number): Enemy | undefined
   return state.enemies.find((e) => e.id === enemyId);
 }
 
-/** Whether a ball can be thrown at this enemy right now (reason if not). */
+/**
+ * Whether a ball can be thrown at this enemy right now (reason if not). A
+ * trainer's Pokémon can be thrown at: the throw is blocked instead (see
+ * `throwBall`), as in the games.
+ */
 export function canThrow(state: LevelState, ballId: string, enemyId: number): string | null {
   if (state.phase !== 'wave') return 'no wave running';
   if (!BALLS[ballId]) return `unknown ball ${ballId}`;
   if ((state.items.balls[ballId] ?? 0) <= 0) return `no ${BALLS[ballId]?.name ?? ballId} left`;
   const enemy = enemyById(state, enemyId);
   if (!enemy) return 'no such enemy';
-  if (enemy.trainer) return "a trainer's Pokémon can't be caught";
   if (enemy.distance < 0) return 'not on the path yet';
   return null;
 }
 
-/** Throws a ball. Consumes one ball; on a catch the enemy leaves the wave and joins the party or the catch list. */
+export const TRAINER_BLOCK_MESSAGE = "You can't catch a trainer's Pokémon!";
+
+/**
+ * Throws a ball. At a trainer's Pokémon the ball bounces off (`ballBlocked`,
+ * nothing consumed). Otherwise one ball is used; on a catch the enemy leaves
+ * the wave and joins the party or the catch list.
+ */
 export function throwBall(state: LevelState, ballId: string, enemyId: number): LevelEvent[] {
   const reason = canThrow(state, ballId, enemyId);
   if (reason) throw new Error(`throwBall: ${reason}`);
   const enemy = enemyById(state, enemyId) as Enemy;
+  if (enemy.trainer) return [{ type: 'ballBlocked', enemyId, ball: ballId }];
   state.items.balls[ballId] = (state.items.balls[ballId] ?? 0) - 1;
   const mod = ballModifier(ballId, {
     types: enemy.mon.types,
@@ -376,11 +450,11 @@ export function throwBall(state: LevelState, ballId: string, enemyId: number): L
   const events: LevelEvent[] = [{ type: 'ballThrow', enemyId, ball: ballId, shakes: result.shakes, caught: result.caught }];
   if (!result.caught) return events;
   removeEnemy(state, enemy);
-  state.caught.push(enemy.mon);
+  state.caught.push({ mon: enemy.mon, ball: ballId });
   if (state.party.length < state.maxParty) {
     state.party.push({ index: state.party.length, mon: enemy.mon, expGained: 0, levelFrom: enemy.mon.level });
   }
-  events.push({ type: 'caught', enemyId, species: enemy.mon.species, shiny: enemy.mon.shiny });
+  events.push({ type: 'caught', enemyId, species: enemy.mon.species, shiny: enemy.mon.shiny, ball: ballId });
   if (state.pending.length === 0 && state.enemies.length === 0) endWave(state, events);
   return events;
 }
@@ -486,14 +560,15 @@ function removeEnemy(state: LevelState, enemy: Enemy): void {
 }
 
 function koEnemy(state: LevelState, enemy: Enemy, creditTowerId: number | null, events: LevelEvent[]): void {
-  const exp = koExp(enemy.mon.baseExp, enemy.mon.level);
+  const base = koExp(enemy.mon.baseExp, enemy.mon.level);
+  const exp = enemy.trainer ? Math.floor(base * state.config.exp.trainerExpMultiplier) : base;
   state.kos++;
   removeEnemy(state, enemy);
   const ids = new Set(enemy.damagedBy);
   if (creditTowerId !== null) ids.add(creditTowerId);
   const participants = state.towers.filter((t) => ids.has(t.id));
   const credit = creditTowerId !== null ? state.towers.find((t) => t.id === creditTowerId) : undefined;
-  events.push({ type: 'ko', enemyId: enemy.id, exp, ...(credit ? { towerId: credit.id } : {}) });
+  events.push({ type: 'ko', enemyId: enemy.id, exp, ...(credit ? { towerId: credit.id } : {}), ...(enemy.boss ? { boss: true } : {}) });
   if (participants.length === 0) return;
   const share = Math.max(1, Math.floor(exp / participants.length));
   for (const tower of participants) grantExp(state, tower, share, events);
@@ -594,8 +669,57 @@ function attack(state: LevelState, tower: Tower, move: MoveSpec, enemy: Enemy | 
   }
 }
 
+/**
+ * A boss uses one of its timed moves: every placed Pokémon within the move's
+ * range takes Gen 4 damage (never below 1 HP) and may flinch or be afflicted.
+ */
+function bossAttack(state: LevelState, enemy: Enemy, moveId: number, events: LevelEvent[]): void {
+  const move = resolveMove(moveId);
+  const p = enemyPoint(state, enemy);
+  events.push({ type: 'bossMove', enemyId: enemy.id, moveId });
+  for (const tower of state.towers) {
+    if (Math.hypot(p.x - tower.tile[0], p.y - tower.tile[1]) > move.range) continue;
+    if (!hits(move.accuracy, state.rng)) {
+      events.push({ type: 'miss', enemyId: enemy.id, towerId: tower.id });
+      continue;
+    }
+    let dealt = 0;
+    if (move.category !== 'status' && move.power !== null) {
+      const damage = rollDamage(
+        {
+          level: enemy.mon.level,
+          power: move.power,
+          moveType: move.type,
+          category: move.category,
+          attackerTypes: enemy.mon.types,
+          attackerStats: enemy.mon.stats,
+          defenderTypes: tower.mon.types,
+          defenderStats: tower.mon.stats,
+          attackStage: enemy.mon.status.stages[move.category === 'physical' ? 'atk' : 'spa'],
+          defenseStage: tower.mon.status.stages[move.category === 'physical' ? 'def' : 'spd'],
+          attackerBurned: enemy.mon.status.ailment === 'burn',
+          burnMultiplier: physicalDamageMultiplier({ ...enemy.mon.status, ailment: 'burn' }, state.config.status),
+        },
+        state.rng,
+        state.config.combat.critRate,
+      );
+      dealt = Math.min(damage.damage, tower.mon.hp - 1); // towers cannot faint yet
+      tower.mon.hp = Math.max(1, tower.mon.hp - damage.damage);
+      events.push({ type: 'towerHit', towerId: tower.id, enemyId: enemy.id, damage: { ...damage, damage: Math.max(0, dealt) } });
+    }
+    const e = move.effect;
+    if (isAilment(e.ailment) && (e.kind === 'ailment' || state.rng.chance(e.ailmentChance / 100))) {
+      if (applyAilment(tower.mon.status, e.ailment, state.rng, state.config.status)) events.push({ type: 'status', towerId: tower.id, ailment: e.ailment });
+    }
+    if (e.flinchChance > 0 && state.rng.chance(e.flinchChance / 100)) {
+      applyFlinch(tower.mon.status, state.config.status);
+      events.push({ type: 'status', towerId: tower.id, ailment: 'none', block: 'flinch' });
+    }
+  }
+}
+
 function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
-  const shiny = state.rng.chance(state.config.shinyRate);
+  const shiny = def.trainer ? false : state.rng.chance(state.config.shinyRate);
   const mon = createMonster(def.species, def.level, undefined, { shiny });
   const enemy: Enemy = {
     id: state.nextId++,
@@ -606,14 +730,22 @@ function spawn(state: LevelState, def: SpawnDef, events: LevelEvent[]): void {
     damagedBy: new Set(),
     trainer: def.trainer ?? false,
   };
+  if (def.boss) {
+    mon.stats = { ...mon.stats, hp: Math.max(1, Math.round(mon.stats.hp * state.config.bosses.hpMultiplier)) };
+    mon.hp = mon.stats.hp;
+    enemy.boss = { moves: (def.bossMoves ?? []).map((m) => ({ moveId: m.moveId, every: m.every, timer: m.every })) };
+  }
   state.enemies.push(enemy);
-  events.push({ type: 'spawn', enemyId: enemy.id, shiny });
+  events.push({ type: 'spawn', enemyId: enemy.id, shiny, ...(def.boss ? { boss: true } : {}) });
 }
 
 function endWave(state: LevelState, events: LevelEvent[]): void {
   state.wavesCleared++;
+  const trainerWaveDone = isTrainerWave(state, state.wave - 1);
+  if (trainerWaveDone) state.trainerBeaten = true;
   events.push({ type: 'waveEnd', wave: state.wave });
-  if (state.def.objective === 'defend' && state.wave >= (state.def.waves ?? 0)) {
+  const won = state.def.objective === 'defend' ? state.wave >= (state.def.waves ?? 0) : trainerWaveDone;
+  if (won) {
     state.phase = 'won';
     events.push({ type: 'phase', phase: 'won' });
     return;
@@ -621,6 +753,26 @@ function endWave(state: LevelState, events: LevelEvent[]): void {
   state.phase = 'build';
   state.buildTimer = state.config.waves.freeWaveGapSeconds;
   events.push({ type: 'phase', phase: 'build' });
+}
+
+/** Out of lives: lose, or restart the boss wave once per attempt. */
+function loseOrRetry(state: LevelState, events: LevelEvent[]): void {
+  const bossWave = isTrainerWave(state, state.wave - 1) && trainerHasBoss(state.def);
+  if (bossWave && state.config.bosses.retryBossWave && !state.bossRetryUsed) {
+    state.bossRetryUsed = true;
+    state.lives = state.waveStartLives;
+    state.enemies = [];
+    state.pending = [];
+    state.wave -= 1;
+    state.phase = 'build';
+    state.buildTimer = state.config.waves.freeWaveGapSeconds;
+    events.push({ type: 'bossRetry', wave: state.wave + 1 }, { type: 'phase', phase: 'build' });
+    return;
+  }
+  state.phase = 'lost';
+  state.enemies = [];
+  state.pending = [];
+  events.push({ type: 'phase', phase: 'lost' });
 }
 
 function tickTowerStatuses(state: LevelState, dt: number, events: LevelEvent[]): void {
@@ -676,11 +828,19 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
       if (state.def.objective === 'defend') {
         state.lives = Math.max(0, state.lives - 1);
         if (state.lives === 0) {
-          state.phase = 'lost';
-          state.enemies = [];
-          state.pending = [];
-          events.push({ type: 'phase', phase: 'lost' });
+          loseOrRetry(state, events);
           return events;
+        }
+      }
+      continue;
+    }
+    // Boss moves on their timers, once the boss is on the path.
+    if (enemy.boss && enemy.distance > 0) {
+      for (const m of enemy.boss.moves) {
+        m.timer -= dt;
+        if (m.timer <= 0) {
+          m.timer += m.every;
+          bossAttack(state, enemy, m.moveId, events);
         }
       }
     }
@@ -710,17 +870,26 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
   return events;
 }
 
+/** The first living boss, for the boss HP bar. */
+export function activeBoss(state: LevelState): Enemy | undefined {
+  return state.enemies.find((e) => e.boss !== undefined);
+}
+
 export interface LevelSummary {
   outcome: Phase;
   wavesCleared: number;
   kos: number;
   leaks: number;
   party: { name: string; species: number; levelFrom: number; levelTo: number; expGained: number }[];
-  caught: { name: string; species: number; level: number; shiny: boolean }[];
+  caught: { name: string; species: number; level: number; shiny: boolean; ball: string }[];
+  /** The trainer beaten this run, if any. */
+  trainer?: string;
+  /** Badge earned by winning (the game state decides whether it is new). */
+  badge?: BadgeDef;
 }
 
 export function summarize(state: LevelState): LevelSummary {
-  const caughtSet = new Set(state.caught);
+  const caughtSet = new Set(state.caught.map((c) => c.mon));
   return {
     outcome: state.phase,
     wavesCleared: state.wavesCleared,
@@ -729,6 +898,8 @@ export function summarize(state: LevelState): LevelSummary {
     party: state.party
       .filter((p) => !caughtSet.has(p.mon))
       .map((p) => ({ name: p.mon.name, species: p.mon.species, levelFrom: p.levelFrom, levelTo: p.mon.level, expGained: p.expGained })),
-    caught: state.caught.map((m) => ({ name: m.name, species: m.species, level: m.level, shiny: m.shiny })),
+    caught: state.caught.map((c) => ({ name: c.mon.name, species: c.mon.species, level: c.mon.level, shiny: c.mon.shiny, ball: c.ball })),
+    ...(state.trainerBeaten && state.def.trainer ? { trainer: state.def.trainer.name } : {}),
+    ...(state.phase === 'won' && state.def.badge ? { badge: state.def.badge } : {}),
   };
 }

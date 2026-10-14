@@ -1,6 +1,9 @@
 import Phaser from 'phaser';
+import config from '../data/config.json';
+import levelsJson from '../data/levels.json';
 import spriteFolders from '../data/spriteFolders.json';
-import { urlParam } from '../game/runtime';
+import { assetUrl, badgeTextureKey, itemTextureKey, itemUrl, trainerTextureKey, urlParam } from '../game/runtime';
+import { PC } from '../sim/pc';
 
 /**
  * Loads the small shared assets (portraits, generated textures) and hands
@@ -38,6 +41,23 @@ export class BootScene extends Phaser.Scene {
         this.load.image(`icon-${id}`, `${import.meta.env.BASE_URL}assets/icons/${id}.png`);
       }
     }
+    // Item sprites (balls, Potion, Rare Candy).
+    const items = new Set<string>();
+    for (const ball of Object.values(config.balls)) items.add(ball.sprite);
+    for (const ware of Object.values(config.shop)) items.add(ware.sprite);
+    for (const sprite of items) this.load.image(itemTextureKey(sprite), itemUrl(sprite));
+    // PC skin: frame, cursor and wallpapers (placeholders until a real skin is dropped in).
+    this.load.image('pc-frame', assetUrl(PC.frame));
+    this.load.image('pc-cursor', assetUrl(PC.cursor));
+    for (const wp of PC.wallpapers) this.load.image(`wallpaper-${wp.id}`, assetUrl(wp.image));
+    // Trainer portraits and badges named by the levels.
+    for (const def of Object.values(levelsJson as Record<string, { trainer?: { id: string }; badge?: { id: string } }>)) {
+      if (def.trainer) this.load.image(trainerTextureKey(def.trainer.id), assetUrl(`assets/trainers/${def.trainer.id}.png`));
+      if (def.badge) {
+        this.load.image(badgeTextureKey(def.badge.id), assetUrl(`assets/badges/${def.badge.id}.png`));
+        this.load.image(badgeTextureKey(def.badge.id, false), assetUrl(`assets/badges/${def.badge.id}-off.png`));
+      }
+    }
   }
 
   create(): void {
@@ -52,6 +72,7 @@ export class BootScene extends Phaser.Scene {
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
     else if (scene === 'select') this.scene.start('LevelSelect');
+    else if (scene === 'pc') this.scene.start('PC');
     else if (urlParam('level')) this.scene.start('Level');
     else this.scene.start('Title');
   }

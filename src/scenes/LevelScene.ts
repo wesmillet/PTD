@@ -8,15 +8,21 @@ import { MapEditor } from '../map/editor';
 import { editorStore } from '../map/editorStore';
 import { MapRenderer } from '../map/renderer';
 import { cloneModel, toMapDef, type MapModel } from '../map/tiled';
-import { portraitUrl, runtime, runtimeConfig, spriteFolder, urlParam } from '../game/runtime';
+import config from '../data/config.json';
+import { itemTextureKey, portraitUrl, runtime, runtimeConfig, spriteFolder, urlParam } from '../game/runtime';
 import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
 import { addPokemon, markSeen, recordLevelResult } from '../sim/game';
 import { usePotion } from '../sim/items';
 import { BALLS } from '../sim/catch';
+import { advance, createClock, type Clock } from '../sim/clock';
 import { EvolutionDialog } from '../ui/evolutionDialog';
+import { showTrainerCard } from '../ui/trainerCard';
+import { PauseMenu } from '../ui/pauseMenu';
 import {
+  activeBoss,
   createLevel,
   isOver,
+  TRAINER_BLOCK_MESSAGE,
   leaveLevel,
   moveTower,
   placeTower,
@@ -29,7 +35,6 @@ import {
   setPartyLevel,
   setTimeOfDay,
   startWave,
-  step,
   summarize,
   towerAt,
   towerMove,
@@ -50,20 +55,10 @@ import type { Monster } from '../sim/monster';
 import { COLORS, TEXT, TEXT_DIM } from '../ui/styles';
 import { showSummary } from '../ui/summary';
 
-const SIM_STEP = 1 / 60;
-const MAX_FRAME_SECONDS = 0.25;
 /** Sprites sit a little above the tile center so their feet land on the tile. */
 const SPRITE_Y_OFFSET = -4;
-
-const BALL_COLORS_UI: Record<string, number> = {
-  poke: 0xe03030,
-  great: 0x3070e0,
-  ultra: 0xe0c030,
-  dusk: 0x40a060,
-  net: 0x30b0c0,
-  quick: 0x60c0f0,
-  master: 0xa040c0,
-};
+/** How long the trainer intro card stays up without a click. */
+const TRAINER_CARD_MS = 2500;
 
 const STATUS_COLORS: Record<string, number | undefined> = {
   poison: 0xa040a0,
@@ -80,6 +75,8 @@ interface EnemyView {
   shiny: boolean;
   /** Caught: frozen in place while the ball animation plays. */
   captured: boolean;
+  /** Inside a thrown ball (hidden) until it clicks or bursts. */
+  inBall: boolean;
   /** Playing Hurt or Faint; Walk must not override it. */
   busy: boolean;
   dying: boolean;
@@ -109,7 +106,7 @@ export class LevelScene extends Phaser.Scene {
   private selectedTowerId: number | null = null;
   /** Party member chosen from the strip to be placed on the next tile click. */
   private selectedPartyIndex: number | null = null;
-  private accumulator = 0;
+  private clock: Clock = createClock();
   private ended = false;
   private overlay!: Phaser.GameObjects.Graphics;
   private hoverTile: [number, number] | null = null;
@@ -122,6 +119,7 @@ export class LevelScene extends Phaser.Scene {
   private panel?: PokemonPanel;
   private learnDialog?: LearnDialog;
   private evolutionDialog?: EvolutionDialog;
+  private pauseMenu?: PauseMenu;
   private paused = false;
   private selectedBall: string | null = null;
   private drag: { towerId: number; startX: number; startY: number; moved: boolean } | null = null;
@@ -144,7 +142,7 @@ export class LevelScene extends Phaser.Scene {
     this.selectedBall = null;
     this.drag = null;
     this.levelSynced = false;
-    this.accumulator = 0;
+    this.clock = createClock();
     this.ended = false;
     this.hoverTile = null;
   }
@@ -192,7 +190,7 @@ export class LevelScene extends Phaser.Scene {
     this.children.removeAll(true);
     const { model, map, error } = this.resolveMap(def.map);
     this.mapModel = model;
-    this.state = createLevel(def, map, { seed: this.seed, party: game.party, config: runtimeConfig, items: game.items });
+    this.state = createLevel(def, map, { seed: this.seed, party: game.party, config: runtimeConfig, items: game.items, ...(game.starter !== undefined ? { starter: game.starter } : {}) });
     // The renderer gets its own copy: the editor paints into it, and Discard restores from this.mapModel.
     this.mapRenderer = new MapRenderer(this, cloneModel(model), Hud.HEIGHT);
     this.drawMap();
@@ -203,6 +201,7 @@ export class LevelScene extends Phaser.Scene {
       onStartWave: () => this.tryStartWave(),
       onToggleSpeed: () => this.toggleSpeed(),
       onLeave: () => this.leave(),
+      onMenu: () => this.openMenu(),
       onPartySlot: (i) => this.handlePartySlot(i),
       onBall: (id) => this.selectBall(id),
     });
@@ -243,6 +242,19 @@ export class LevelScene extends Phaser.Scene {
     });
     this.learnDialog = new LearnDialog();
     this.evolutionDialog = new EvolutionDialog();
+    this.pauseMenu = new PauseMenu({
+      levelName: def.name,
+      free: def.objective === 'free',
+      getSpeed: () => runtime.gameSpeed,
+      setSpeed: (speed) => {
+        runtime.gameSpeed = speed;
+        saveGame();
+      },
+      onResume: () => {
+        if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen) this.paused = false;
+      },
+      onExit: () => this.exitLevel(),
+    });
     this.add.text(this.scale.width / 2, Hud.HEIGHT - 86, `seed ${this.seed}`, TEXT_DIM).setOrigin(0.5, 0).setDepth(1001);
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => this.onPointerDown(pointer));
@@ -250,12 +262,15 @@ export class LevelScene extends Phaser.Scene {
     this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => this.onPointerUp(pointer));
     this.input.on('pointerupoutside', (pointer: Phaser.Input.Pointer) => this.onPointerUp(pointer));
     this.input.keyboard?.on('keydown-ESC', () => {
-      if (this.panel?.isOpen) this.panel.hide();
+      if (this.pauseMenu?.isOpen) {
+        this.pauseMenu.close();
+        if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen) this.paused = false;
+      } else if (this.panel?.isOpen) this.panel.hide();
       else if (this.selectedBall !== null || this.selectedTowerId !== null || this.selectedPartyIndex !== null) {
         this.selectedBall = null;
         this.selectedTowerId = null;
         this.selectedPartyIndex = null;
-      } else this.scene.start('LevelSelect');
+      } else this.openMenu();
     });
     this.input.keyboard?.on('keydown-SPACE', () => this.tryStartWave());
 
@@ -279,7 +294,7 @@ export class LevelScene extends Phaser.Scene {
       debugPanel: this.debugPanel,
       mapEditor: () => this.mapEditor,
       mapRenderer: () => this.mapRenderer,
-      sim: { setPartyLevel, setTimeOfDay, resolveLearn, resolveEvolution, setActiveMove, moveTower, placeTower, throwBall },
+      sim: { setPartyLevel, setTimeOfDay, resolveLearn, resolveEvolution, setActiveMove, moveTower, placeTower, throwBall, startWave, activeBoss },
     };
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.debugPanel?.destroy();
@@ -294,6 +309,8 @@ export class LevelScene extends Phaser.Scene {
       this.learnDialog = undefined;
       this.evolutionDialog?.close();
       this.evolutionDialog = undefined;
+      this.pauseMenu?.close();
+      this.pauseMenu = undefined;
       this.syncGame();
       (window as unknown as { __ptd?: unknown }).__ptd = undefined;
     });
@@ -442,7 +459,7 @@ export class LevelScene extends Phaser.Scene {
     let best: number | null = null;
     let bestD = radius;
     for (const [id, view] of this.enemyViews) {
-      if (view.dying || view.captured) continue;
+      if (view.dying || view.captured || view.inBall) continue;
       const d = Math.hypot(view.sprite.x - px, view.sprite.y - py);
       if (d < bestD) {
         bestD = d;
@@ -461,19 +478,16 @@ export class LevelScene extends Phaser.Scene {
     const tile = this.tileAt(pointer.x, pointer.y);
     if (!tile) return;
     if (this.selectedBall) {
+      // One throw per selection; any other click drops the ball and acts normally.
+      const ballId = this.selectedBall;
+      this.selectedBall = null;
       const enemyId = this.enemyNear(pointer.x, pointer.y);
-      if (enemyId === null) {
-        this.showToast('Click a wild Pokémon on the path');
+      if (enemyId !== null) {
+        const reason = canThrow(this.state, ballId, enemyId);
+        if (reason) this.showToast(reason);
+        else this.handleEvents(throwBall(this.state, ballId, enemyId));
         return;
       }
-      const reason = canThrow(this.state, this.selectedBall, enemyId);
-      if (reason) {
-        this.showToast(reason);
-        return;
-      }
-      this.handleEvents(throwBall(this.state, this.selectedBall, enemyId));
-      if ((this.state.items.balls[this.selectedBall] ?? 0) <= 0) this.selectedBall = null;
-      return;
     }
     const tower = towerAt(this.state, tile[0], tile[1]);
     if (tower) {
@@ -576,6 +590,7 @@ export class LevelScene extends Phaser.Scene {
   private handlePartySlot(index: number): void {
     const entry = this.state.party[index];
     if (!entry || this.ended) return;
+    this.selectedBall = null;
     const placed = this.state.towers.some((t) => t.mon === entry.mon);
     if (placed) {
       this.selectedPartyIndex = null;
@@ -599,8 +614,29 @@ export class LevelScene extends Phaser.Scene {
     this.panel.show(mon, placed);
   }
 
+  private openMenu(): void {
+    if (this.ended || !this.pauseMenu || this.mapEditor?.active) return;
+    this.selectedBall = null;
+    this.selectedTowerId = null;
+    this.selectedPartyIndex = null;
+    this.paused = true;
+    this.pauseMenu.show();
+  }
+
+  /** Exit from the pause menu: free levels leave with the summary, defend levels abandon the run. */
+  private exitLevel(): void {
+    if (this.ended) return;
+    if (this.state.def.objective === 'free') {
+      this.paused = false;
+      this.handleEvents(leaveLevel(this.state));
+      return;
+    }
+    this.scene.start('LevelSelect');
+  }
+
   private tryStartWave(): void {
     if (this.ended || this.state.phase !== 'build' || this.mapEditor?.active) return;
+    this.selectedBall = null;
     if (this.state.towers.length === 0) {
       this.showToast('Place your Pokémon first');
       return;
@@ -609,8 +645,9 @@ export class LevelScene extends Phaser.Scene {
     this.handleEvents(startWave(this.state));
   }
 
+  /** Cycles 1x, 2x, 4x (config.gameSpeeds): more fixed steps per frame, never a bigger step. */
   private toggleSpeed(): void {
-    const speeds = [1, 2];
+    const speeds: number[] = config.gameSpeeds;
     const i = speeds.indexOf(runtime.gameSpeed);
     runtime.gameSpeed = speeds[(i + 1) % speeds.length] ?? 1;
     saveGame();
@@ -636,14 +673,16 @@ export class LevelScene extends Phaser.Scene {
     if (this.ended) return;
     this.mapRenderer?.update(delta);
     if (!this.paused) {
-      this.accumulator += Math.min(delta / 1000, MAX_FRAME_SECONDS) * runtime.gameSpeed;
-      while (this.accumulator >= SIM_STEP && !this.ended && !this.paused) {
-        this.accumulator -= SIM_STEP;
-        this.handleEvents(step(this.state, SIM_STEP));
-      }
+      // Events are handled per step so a dialog opened mid-frame stops the rest of the frame.
+      advance(this.clock, this.state, delta / 1000, runtime.gameSpeed, (events) => {
+        this.handleEvents(events);
+        return this.ended || this.paused;
+      });
     }
     this.syncViews();
     this.drawOverlay();
+    const boss = activeBoss(this.state);
+    this.hud.setBoss(boss ? { name: capitalize(boss.mon.name), hp: boss.mon.hp, maxHp: boss.mon.stats.hp } : null);
     this.hud.setPaused(this.paused);
     this.hud.tick(delta);
     this.hud.update(this.state, runtime.gameSpeed, this.selectedPartyIndex, this.selectedBall);
@@ -701,9 +740,29 @@ export class LevelScene extends Phaser.Scene {
           if (e.towerId !== undefined && e.moveId !== undefined && !this.paused) this.promptLearn(e.towerId, e.moveId);
           break;
         case 'ballThrow':
-          this.animateBall(e.enemyId as number, e.ball ?? 'poke', e.shakes ?? 0, e.caught ?? false);
+          this.animateBall(e.enemyId as number, e.ball ?? 'poke', e.shakes ?? 0, e.caught ?? false, false);
+          break;
+        case 'ballBlocked':
+          this.animateBall(e.enemyId as number, e.ball ?? 'poke', 0, false, true);
           break;
         case 'caught':
+          break;
+        case 'trainerStart':
+          if (e.trainer) this.showTrainer(e.trainer, e.boss ?? false);
+          break;
+        case 'bossMove':
+          this.animateBossMove(e.enemyId as number);
+          break;
+        case 'towerHit':
+          if (e.towerId !== undefined) {
+            this.floatText(this.towerPixel(e.towerId), `-${e.damage?.damage ?? 0}`, '#ff7b7b');
+            const view = this.towerViews.get(e.towerId);
+            if (view) this.tweens.add({ targets: view.sprite, x: view.sprite.x + 4, duration: 40, yoyo: true, repeat: 3 });
+          }
+          break;
+        case 'bossRetry':
+          this.showToast(`Out of lives! The boss wave restarts once. Get ready for wave ${e.wave}.`);
+          for (const id of [...this.enemyViews.keys()]) this.removeEnemyView(id);
           break;
         case 'evolutionPrompt':
           if (e.towerId !== undefined && e.species !== undefined) this.promptEvolution(e.towerId, e.species);
@@ -730,6 +789,7 @@ export class LevelScene extends Phaser.Scene {
         case 'ko':
           this.animateKo(e.enemyId as number);
           if (e.towerId !== undefined && e.exp) this.floatText(this.towerPixel(e.towerId), `+${e.exp} EXP`, '#9ad0ff');
+          if (e.boss) this.showToast('The boss went down!');
           break;
         case 'leak':
           this.removeEnemyView(e.enemyId as number);
@@ -738,7 +798,7 @@ export class LevelScene extends Phaser.Scene {
           if (e.towerId !== undefined) this.floatText(this.towerPixel(e.towerId), `Lv ${e.level}!`, '#ffe066');
           break;
         case 'waveStart':
-          this.showToast(`Wave ${e.wave}`);
+          this.showToast(e.trainer ? `Wave ${e.wave}: ${e.trainer.name}` : `Wave ${e.wave}`);
           break;
         case 'waveEnd':
           break;
@@ -769,51 +829,163 @@ export class LevelScene extends Phaser.Scene {
     else open();
   }
 
-  private animateBall(enemyId: number, ballId: string, shakes: number, caught: boolean): void {
+  /** Pauses the sim and shows the trainer card; play resumes when it is dismissed. */
+  private showTrainer(trainer: NonNullable<LevelEvent['trainer']>, boss: boolean): void {
+    this.paused = true;
+    this.selectedBall = null;
+    showTrainerCard(this, trainer, this.state.starter, boss, TRAINER_CARD_MS, () => {
+      if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen) this.paused = false;
+    });
+  }
+
+  private animateBossMove(enemyId: number): void {
     const view = this.enemyViews.get(enemyId);
-    const target = this.enemyPixel(enemyId);
+    if (!view || view.dying) return;
+    const dex = spriteDex(view.sprite);
+    const action = pickAction(dex, ['Attack']);
+    const dir = spriteDirection(view.sprite) ?? Direction.Down;
+    this.floatText(this.enemyPixel(enemyId), 'Boss attack!', '#ffb3b3');
+    if (!action || view.busy) return;
+    view.busy = true;
+    playAnim(view.sprite, action, dir);
+    view.sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      view.busy = false;
+    });
+  }
+
+  /** A short white sparkle (the "click" of a catch). */
+  private clickFlash(x: number, y: number): void {
+    if (!this.textures.exists('star')) return;
+    const emitter = this.add.particles(x, y, 'star', {
+      speed: { min: 40, max: 120 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.9, end: 0 },
+      alpha: { start: 1, end: 0 },
+      lifespan: 500,
+      tint: [0xffffff, 0xfff5a0],
+      emitting: false,
+    }).setDepth(2650);
+    emitter.explode(12, 0, 0);
+    this.time.delayedCall(700, () => emitter.destroy());
+  }
+
+  /** The ball bursting open: a flash ring and a puff. */
+  private burst(x: number, y: number): void {
+    const ring = this.add.circle(x, y, 6, 0xffffff, 0.9).setDepth(2640);
+    this.tweens.add({ targets: ring, radius: 26, alpha: 0, duration: 260, onComplete: () => ring.destroy() });
+    if (!this.textures.exists('star')) return;
+    const emitter = this.add.particles(x, y, 'star', {
+      speed: { min: 60, max: 160 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.7, end: 0 },
+      alpha: { start: 0.9, end: 0 },
+      lifespan: 350,
+      tint: [0xffffff],
+      emitting: false,
+    }).setDepth(2650);
+    emitter.explode(8, 0, 0);
+    this.time.delayedCall(500, () => emitter.destroy());
+  }
+
+  /**
+   * The thrown ball: its item sprite arcs from the ball bar to the target.
+   * A trainer's Pokémon bounces it off. Otherwise the Pokémon goes inside,
+   * the ball wiggles (three times on a catch, else once per successful
+   * shake) and then clicks with a sparkle or bursts open.
+   */
+  private animateBall(enemyId: number, ballId: string, shakes: number, caught: boolean, blocked: boolean): void {
+    const view = this.enemyViews.get(enemyId);
     if (caught && view) {
+      // The sim already removed the enemy: keep its view frozen in place until the ball lands.
       view.captured = true;
       view.busy = true;
       view.sprite.anims.stop();
       view.hpBar.clear();
     }
-    const ball = this.add.circle(this.scale.width / 2, this.scale.height + 10, 7, BALL_COLORS_UI[ballId] ?? 0xff0000).setStrokeStyle(2, 0x202020).setDepth(2600);
-    const follow = () => (view ? { x: view.sprite.x, y: view.sprite.y } : { x: target.px, y: target.py });
+    const origin = this.hud.ballOrigin(ballId);
+    const key = itemTextureKey(BALLS[ballId]?.sprite ?? 'poke-ball');
+    const ball = this.textures.exists(key)
+      ? this.add.image(origin.x, origin.y, key).setDepth(2600)
+      : this.add.circle(origin.x, origin.y, 7, 0xe03030).setStrokeStyle(2, 0x202020).setDepth(2600);
+    const target = () => {
+      if (view && view.sprite.active) return { x: view.sprite.x, y: view.sprite.y };
+      const p = this.enemyPixel(enemyId);
+      return { x: p.px, y: p.py };
+    };
+    const start = { x: origin.x, y: origin.y };
+    const flight = { t: 0 };
     this.tweens.add({
-      targets: ball,
-      x: follow().x,
-      y: follow().y - 10,
-      duration: 350,
-      ease: 'Quad.easeOut',
+      targets: flight,
+      t: 1,
+      duration: 520,
+      ease: 'Sine.easeInOut',
       onUpdate: () => {
-        if (!caught) {
-          const p = follow();
-          ball.x = Phaser.Math.Linear(ball.x, p.x, 0.2);
-        }
+        const p = target();
+        const t = flight.t;
+        ball.x = start.x + (p.x - start.x) * t;
+        ball.y = start.y + (p.y - 12 - start.y) * t - Math.sin(t * Math.PI) * 110;
+        ball.angle = t * 540;
       },
       onComplete: () => {
-        if (caught && view) view.sprite.setVisible(false);
-        const p = follow();
-        ball.setPosition(p.x, p.y - 6);
+        const p = target();
+        if (blocked) {
+          this.showToast(TRAINER_BLOCK_MESSAGE);
+          this.floatText({ px: p.x, py: p.y }, 'Blocked!', '#ffb3b3');
+          const back = start.x < p.x ? -70 : 70;
+          this.tweens.add({
+            targets: ball,
+            x: p.x + back,
+            y: p.y - 46,
+            angle: ball.angle - 360,
+            duration: 260,
+            ease: 'Quad.easeOut',
+            onComplete: () => this.tweens.add({ targets: ball, y: p.y + 12, alpha: 0, duration: 280, ease: 'Quad.easeIn', onComplete: () => ball.destroy() }),
+          });
+          return;
+        }
+        // The Pokémon goes into the ball.
+        if (view && view.sprite.active) {
+          view.inBall = true;
+          view.sprite.setVisible(false);
+          syncShadow(view.sprite);
+          view.hpBar.clear();
+        }
+        ball.setAngle(0).setPosition(p.x, p.y - 6);
+        const wiggles = caught ? 3 : shakes;
         let n = 0;
-        const shake = () => {
-          if (n >= shakes || (!caught && n >= shakes)) return finish();
-          n++;
-          this.tweens.add({ targets: ball, angle: { from: -25, to: 25 }, duration: 160, yoyo: true, onComplete: () => this.time.delayedCall(220, shake) });
-        };
         const finish = () => {
+          const at = { px: ball.x, py: ball.y };
           if (caught) {
-            this.floatText({ px: p.x, py: p.y }, 'Gotcha!', '#fff5a0');
-            this.tweens.add({ targets: ball, alpha: 0, scale: 1.6, duration: 400, onComplete: () => ball.destroy() });
-            this.removeEnemyView(enemyId);
+            this.clickFlash(ball.x, ball.y);
+            this.floatText(at, 'Gotcha!', '#fff5a0');
+            this.tweens.add({
+              targets: ball,
+              alpha: 0,
+              duration: 450,
+              delay: 350,
+              onComplete: () => {
+                ball.destroy();
+                this.removeEnemyView(enemyId);
+              },
+            });
           } else {
-            this.floatText({ px: p.x, py: p.y }, 'Broke free!', '#cccccc');
-            ball.destroy();
+            this.burst(ball.x, ball.y);
+            this.tweens.add({ targets: ball, scale: 1.8, alpha: 0, duration: 180, onComplete: () => ball.destroy() });
+            if (view && view.sprite.active) {
+              view.inBall = false;
+              view.sprite.setVisible(true);
+              syncShadow(view.sprite);
+            }
+            this.floatText(at, 'Broke free!', '#cccccc');
           }
         };
-        if (shakes === 0) finish();
-        else shake();
+        const wiggle = () => {
+          if (!ball.active) return;
+          if (n >= wiggles) return finish();
+          n++;
+          this.tweens.add({ targets: ball, angle: { from: -24, to: 24 }, duration: 130, yoyo: true, repeat: 1, onComplete: () => this.time.delayedCall(280, wiggle) });
+        };
+        this.time.delayedCall(220, wiggle);
       },
     });
   }
@@ -822,8 +994,8 @@ export class LevelScene extends Phaser.Scene {
     if (this.levelSynced || !this.state) return;
     this.levelSynced = true;
     const game = getGame();
-    for (const mon of this.state.caught) {
-      if (!game.party.includes(mon) && !game.box.includes(mon)) {
+    for (const { mon } of this.state.caught) {
+      if (!game.party.includes(mon) && !game.boxes.some((b) => b.slots.includes(mon))) {
         if (this.state.party.some((p) => p.mon === mon) && game.party.length < this.state.maxParty) game.party.push(mon);
         else addPokemon(game, mon);
       }
@@ -838,10 +1010,13 @@ export class LevelScene extends Phaser.Scene {
 
   private endLevel(): void {
     this.ended = true;
+    const badge = this.state.def.badge;
+    const hadBadge = badge ? getGame().badges.includes(badge.id) : false;
     this.syncGame();
     for (const id of [...this.enemyViews.keys()]) this.removeEnemyView(id);
+    this.hud.setBoss(null);
     this.hud.update(this.state, runtime.gameSpeed);
-    showSummary(this, { ...summarize(this.state), money: this.moneyEarned }, {
+    showSummary(this, { ...summarize(this.state), money: this.moneyEarned, newBadge: !hadBadge }, {
       onRetry: () => this.scene.restart({ levelId: this.levelId, seed: this.seed + 1 }),
       onLevelSelect: () => this.scene.start('LevelSelect'),
     });
@@ -881,8 +1056,12 @@ export class LevelScene extends Phaser.Scene {
     const { px, py } = this.tilePixel(point.x, point.y);
     const dir = directionFromVector(point.dx, point.dy, Direction.Right);
     const sprite = createPmdSprite(this, dex, px, py + SPRITE_Y_OFFSET, 'Walk', dir);
+    if (enemy.boss) {
+      sprite.setScale(runtimeConfig.bosses.spriteScale);
+      syncShadow(sprite);
+    }
     const hpBar = this.add.graphics().setDepth(800);
-    this.enemyViews.set(enemyId, { sprite, hpBar, busy: false, dying: false, shiny, captured: false });
+    this.enemyViews.set(enemyId, { sprite, hpBar, busy: false, dying: false, shiny, captured: false, inBall: false });
     if (shiny) this.sparkle(px + 32, py + SPRITE_Y_OFFSET);
   }
 
@@ -1015,6 +1194,7 @@ export class LevelScene extends Phaser.Scene {
       view.sprite.setPosition(px, py + SPRITE_Y_OFFSET).setDepth(py);
       if (!view.busy) playAnim(view.sprite, 'Walk', directionFromVector(point.dx, point.dy, Direction.Right));
       syncShadow(view.sprite);
+      if (view.inBall) continue;
       this.drawHpBar(view.hpBar, enemy, px, py, size, view.shiny);
     }
     for (const [id, view] of this.enemyViews) {
@@ -1029,6 +1209,8 @@ export class LevelScene extends Phaser.Scene {
     const frac = Math.max(0, Math.min(1, enemy.mon.hp / enemy.mon.stats.hp));
     const color = frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical;
     gfx.clear();
+    if (enemy.boss) gfx.lineStyle(1, 0xff6b6b, 1).strokeRect(x - 1, y - 1, w + 2, 6);
+    else if (enemy.trainer) gfx.lineStyle(1, 0x9ad0ff, 1).strokeRect(x - 1, y - 1, w + 2, 6);
     if (shiny) gfx.lineStyle(1, 0xffd700, 1).strokeRect(x - 1, y - 1, w + 2, 6);
     gfx.fillStyle(COLORS.hpBack, 1).fillRect(x, y, w, 4);
     gfx.fillStyle(color, 1).fillRect(x, y, w * frac, 4);

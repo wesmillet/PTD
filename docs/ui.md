@@ -41,16 +41,29 @@ palette: `src/ui/theme.css` defines it as CSS variables and
   each with `.ptd-name`, a `typeBadge(name)` (`.ptd-type`) and `.ptd-meta`.
 - `.ptd-actions` button row; `button.ptd-close` top-right close.
 - `.ptd-icon` 32 px box icon (`iconImage(url)`), used wherever a Pokémon
-  appears small; `.ptd-status` chips; `.ptd-grid` + `.ptd-card` for grids.
+  appears small; `.ptd-item` 24 px item sprite (`itemUrl(sprite)`);
+  `.ptd-status` chips; `.ptd-grid` + `.ptd-card` for grids.
 
 ## Components (canvas)
 - `Button` (`src/ui/button.ts`): rounded frame with the double border.
-- `Hud` (`src/ui/hud.ts`): top bar (level name, wave, lives, money, speed,
-  Start / Leave) and bottom bar (party strip, ball bar). The map sits
-  between them; nothing overlaps the playfield.
+- `Hud` (`src/ui/hud.ts`): top bar (level name, wave, lives, money, speed
+  1x/2x/4x, Start / Leave, boss HP bar via `setBoss`) and bottom bar (party
+  strip, ball bar with the item sprites; `ballOrigin(id)` is where a thrown
+  ball starts). The map sits between them; nothing overlaps the playfield.
+- Trainer card (`src/ui/trainerCard.ts`): portrait image, name, intro and
+  party icons; red frame for a boss.
+- Pause menu (`src/ui/pauseMenu.ts`, DOM modal, Menu button or Esc):
+  Resume, Settings (game speed), Exit level.
 - Floating text uses `TEXT` with a dark stroke.
+- Skinnable images, all named in config so a skin is a file swap:
+  `assets/pc/frame.png` (9-slice box frame), `assets/pc/cursor.png`,
+  `assets/pc/wallpapers/*.png` (`src/data/pc.json`), `assets/trainers/<id>.png`
+  and `assets/badges/<id>.png` / `<id>-off.png` (level ids in `levels.json`).
+  `scripts/build-placeholders.mjs` regenerates the plain placeholders.
 
 ## Screens
-Title (`TitleScene`) → Level select (`LevelSelectScene`, with Party / PC,
-Shop, Save, Credits overlays) → Level (`LevelScene`, with the
-Pokémon panel, replace dialog, evolution prompt and summary).
+Title (`TitleScene`, with the badge case) → Level select
+(`LevelSelectScene`, with the bag strip, badges, and the Shop, Save and
+Credits overlays) → PC (`PCScene`, full screen: party column, box grid,
+`PcSummary` side panel) or Level (`LevelScene`, with the Pokémon panel,
+replace dialog, evolution prompt, trainer card, boss bar and summary).

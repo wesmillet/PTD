@@ -23,8 +23,10 @@ export const GENERAL_CREDITS: { title: string; lines: string[] }[] = [
   },
   { title: 'Pokémon data', lines: ['PokeAPI, https://pokeapi.co and https://github.com/PokeAPI/pokeapi (Gen 1 to 4 CSV data)'] },
   {
-    title: 'Box icons',
-    lines: ['PokeAPI sprites, https://github.com/PokeAPI/sprites (Generation V Black/White box icons, with Generation VIII icons as the fallback for forms without one)'],
+    title: 'Box icons and item sprites',
+    lines: [
+      'PokeAPI sprites, https://github.com/PokeAPI/sprites (Generation V Black/White box icons, with Generation VIII icons as the fallback for forms without one; Generation V item sprites for the Poké Balls, Potion and Rare Candy)',
+    ],
   },
   tilesetCredits(),
   { title: 'Engine', lines: ['Phaser 3, https://phaser.io'] },

@@ -2,6 +2,7 @@
 import config from '../data/config.json';
 import { BALL_IDS, BALLS } from '../sim/catch';
 import { spendMoney, type GameState } from '../sim/game';
+import { itemUrl } from '../game/runtime';
 import { ensureOverlayStyles, isolateFromGame } from './domOverlay';
 
 export interface ShopHooks {
@@ -12,6 +13,7 @@ export interface ShopHooks {
 interface Ware {
   id: string;
   name: string;
+  sprite: string;
   price: number;
   count: () => number;
   add: (n: number) => void;
@@ -31,14 +33,15 @@ export class ShopScreen {
     const balls: Ware[] = BALL_IDS.filter((id) => BALLS[id]?.obtainable !== false).map((id) => ({
       id,
       name: BALLS[id]?.name ?? id,
+      sprite: BALLS[id]?.sprite ?? 'poke-ball',
       price: BALLS[id]?.price ?? 0,
       count: () => g.items.balls[id] ?? 0,
       add: (n) => (g.items.balls[id] = (g.items.balls[id] ?? 0) + n),
     }));
     return [
       ...balls,
-      { id: 'potion', name: config.shop.potion.name, price: config.shop.potion.price, count: () => g.items.potions, add: (n) => (g.items.potions += n) },
-      { id: 'rareCandy', name: config.shop.rareCandy.name, price: config.shop.rareCandy.price, count: () => g.items.rareCandies, add: (n) => (g.items.rareCandies += n) },
+      { id: 'potion', name: config.shop.potion.name, sprite: config.shop.potion.sprite, price: config.shop.potion.price, count: () => g.items.potions, add: (n) => (g.items.potions += n) },
+      { id: 'rareCandy', name: config.shop.rareCandy.name, sprite: config.shop.rareCandy.sprite, price: config.shop.rareCandy.price, count: () => g.items.rareCandies, add: (n) => (g.items.rareCandies += n) },
     ];
   }
 
@@ -86,7 +89,12 @@ export class ShopScreen {
       const li = document.createElement('li');
       li.className = 'ptd-move';
       li.style.cursor = 'default';
-      li.style.gridTemplateColumns = '1fr auto auto';
+      li.style.gridTemplateColumns = 'auto 1fr auto auto';
+      const icon = document.createElement('img');
+      icon.className = 'ptd-item';
+      icon.alt = '';
+      icon.src = itemUrl(ware.sprite);
+      li.appendChild(icon);
       const name = document.createElement('span');
       name.className = 'ptd-name';
       name.textContent = `${ware.name}  (have ${ware.count()})`;

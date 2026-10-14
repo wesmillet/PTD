@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { addPokemon, chooseStarter, createGameState, recordLevelResult } from './game';
 import { createMonster } from './monster';
+import { allBoxed } from './pc';
 import { decodeSaveCode, encodeSaveCode, restoreGame, SaveError, serializeGame, validateSave } from './save';
 
 function sampleGame() {
@@ -21,12 +22,14 @@ describe('save round trip', () => {
   it('serializes and restores the whole game state', () => {
     const game = sampleGame();
     const data = serializeGame(game, settings, 123);
-    expect(data.version).toBe(1);
+    expect(data.version).toBe(2);
     expect(data.savedAt).toBe(123);
     const restored = restoreGame(validateSave(JSON.parse(JSON.stringify(data))));
     expect(restored.starter).toBe(387);
     expect(restored.party.map((m) => [m.species, m.level, m.hp, m.shiny])).toEqual(game.party.map((m) => [m.species, m.level, m.hp, m.shiny]));
-    expect(restored.box).toHaveLength(2);
+    expect(allBoxed(restored)).toHaveLength(2);
+    expect(restored.boxes).toHaveLength(8);
+    expect(restored.boxes[0]?.slots).toHaveLength(30);
     expect(restored.party[1]?.hp).toBe(3);
     expect(restored.party[0]?.moves.map((m) => m.id)).toEqual(game.party[0]?.moves.map((m) => m.id));
     expect(restored.progress).toEqual(game.progress);
@@ -40,7 +43,7 @@ describe('save round trip', () => {
   it('encodes a compact code that decodes to the same data', () => {
     const data = serializeGame(sampleGame(), settings, 5);
     const code = encodeSaveCode(data);
-    expect(code.startsWith('PTD1.')).toBe(true);
+    expect(code.startsWith('PTD2.')).toBe(true);
     expect(code).toMatch(/^[A-Za-z0-9._-]+$/);
     expect(decodeSaveCode(code)).toEqual(data);
     expect(decodeSaveCode(`  ${code}\n`)).toEqual(data);
@@ -56,7 +59,7 @@ describe('corrupt saves are rejected', () => {
     expect(() => decodeSaveCode('PTD9.abc.def')).toThrow(/version/);
     expect(() => decodeSaveCode(code.slice(0, -1) + (code.endsWith('a') ? 'b' : 'a'))).toThrow(/checksum/);
     expect(() => decodeSaveCode(code.slice(0, 40))).toThrow(SaveError);
-    const tampered = code.replace(/^PTD1\.(.)/, (_m, c: string) => `PTD1.${c === 'A' ? 'B' : 'A'}`);
+    const tampered = code.replace(/^PTD2\.(.)/, (_m, c: string) => `PTD2.${c === 'A' ? 'B' : 'A'}`);
     expect(() => decodeSaveCode(tampered)).toThrow(SaveError);
     expect(() => decodeSaveCode('')).toThrow(SaveError);
   });

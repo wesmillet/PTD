@@ -3,9 +3,9 @@
  * Pokémon instead of every folder in spriteIndex.json.
  */
 import spriteFolders from '../data/spriteFolders.json';
-import { getEvolutions, getEncounterArea, getPokemon, type EncounterArea } from '../data/pokedata';
+import { findPokemonId, getEvolutions, getEncounterArea, getPokemon, type EncounterArea } from '../data/pokedata';
 import type { GameState } from '../sim/game';
-import type { LevelDef } from '../sim/waves';
+import { counterStarter, rosterTable, type LevelDef } from '../sim/waves';
 import { dexFolder } from './runtime';
 
 const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
@@ -25,12 +25,23 @@ export function evolutionLine(species: number): number[] {
   return out;
 }
 
-/** Dex folders (base and shiny) a level can show: party lines and the area's tables, all times of day. */
+/**
+ * Dex folders (base and shiny) a level can show: party lines, the roster (or
+ * the area's tables for a level without one) and the trainer's party.
+ */
 export function levelSpriteFolders(def: LevelDef, game: GameState): string[] {
   const species = new Set<number>();
   for (const mon of game.party) for (const id of evolutionLine(mon.species)) species.add(id);
-  const area: EncounterArea = getEncounterArea(def.area);
-  for (const e of area.walk ?? []) for (const id of evolutionLine(e.species)) species.add(id);
+  if (def.roster) {
+    for (const e of rosterTable(def)) for (const id of evolutionLine(e.species)) species.add(id);
+  } else {
+    const area: EncounterArea = getEncounterArea(def.area);
+    for (const e of area.walk ?? []) for (const id of evolutionLine(e.species)) species.add(id);
+  }
+  for (const p of def.trainer?.party ?? []) {
+    const id = p.species === 'counter-starter' ? counterStarter(game.starter) : findPokemonId(p.species);
+    if (id !== undefined) species.add(id);
+  }
   const out: string[] = [];
   for (const id of species) {
     getPokemon(id); // validate

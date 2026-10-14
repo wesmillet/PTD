@@ -3,6 +3,7 @@ import './ui/theme.css';
 import { BootScene } from './scenes/BootScene';
 import { LevelScene } from './scenes/LevelScene';
 import { LevelSelectScene } from './scenes/LevelSelectScene';
+import { PCScene } from './scenes/PCScene';
 import { Phase0Scene } from './scenes/Phase0Scene';
 import { TitleScene } from './scenes/TitleScene';
 import { Hud } from './ui/hud';
@@ -20,7 +21,7 @@ function start(): void {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
     },
-    scene: [BootScene, TitleScene, LevelSelectScene, LevelScene, Phase0Scene],
+    scene: [BootScene, TitleScene, LevelSelectScene, LevelScene, PCScene, Phase0Scene],
   });
 }
 
