@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { SPOT_ELLIPSE, spotTexture } from '../ui/spotMarker';
 import { Direction, directionFromVector } from '../assets/direction';
 import { createPmdSprite, ensureLoaded, isLoaded, pickAction, playAnim, queuePokemon, registerAnims, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
 import { ALL_ACTIONS, OPTIONAL_ACTIONS, levelSpriteFolders } from '../game/assets';
@@ -115,7 +116,7 @@ export class LevelScene extends Phaser.Scene {
   private mapRenderer?: MapRenderer;
   private mapEditor?: MapEditor;
   private mapModel!: MapModel;
-  private placeableGfx?: Phaser.GameObjects.Graphics;
+  private placeableGfx?: Phaser.GameObjects.Container;
   private panel?: PokemonPanel;
   private learnDialog?: LearnDialog;
   private evolutionDialog?: EvolutionDialog;
@@ -360,11 +361,12 @@ export class LevelScene extends Phaser.Scene {
   private drawMap(): void {
     const { map } = this.state;
     const size = map.tileSize;
-    const gfx = this.add.graphics().setDepth(1);
+    const spots = this.add.container(0, 0).setDepth(1);
+    const key = spotTexture(this, map.theme);
     for (const [x, y] of map.placeable) {
-      gfx.lineStyle(2, COLORS.placeable, 0.9).strokeRect(x * size + 3, Hud.HEIGHT + y * size + 3, size - 6, size - 6);
+      spots.add(this.add.image(x * size + size / 2, Hud.HEIGHT + y * size + size / 2, key));
     }
-    this.placeableGfx = gfx;
+    this.placeableGfx = spots;
     const first = map.path[0]!;
     const last = map.path[map.path.length - 1]!;
     const a = this.tilePixel(first[0], first[1]);
@@ -420,13 +422,15 @@ export class LevelScene extends Phaser.Scene {
     if (this.state.phase === 'build' && this.hoverTile) {
       const [x, y] = this.hoverTile;
       if (isPlaceable(this.state.map, x, y) && !towerAt(this.state, x, y)) {
-        gfx.lineStyle(2, COLORS.placeableHover, 1).strokeRect(x * size + 2, Hud.HEIGHT + y * size + 2, size - 4, size - 4);
+        const c = this.tilePixel(x, y);
+        gfx.lineStyle(2, COLORS.placeableHover, 1).strokeEllipse(c.px + SPOT_ELLIPSE.dx, c.py + SPOT_ELLIPSE.dy, SPOT_ELLIPSE.w + 4, SPOT_ELLIPSE.h + 4);
       }
     }
     if (this.drag?.moved) {
       for (const [tx, ty] of this.state.map.placeable) {
         if (towerAt(this.state, tx, ty)) continue;
-        gfx.fillStyle(COLORS.placeableHover, 0.25).fillRect(tx * size + 2, Hud.HEIGHT + ty * size + 2, size - 4, size - 4);
+        const c = this.tilePixel(tx, ty);
+        gfx.fillStyle(COLORS.placeableHover, 0.35).fillEllipse(c.px + SPOT_ELLIPSE.dx, c.py + SPOT_ELLIPSE.dy, SPOT_ELLIPSE.w + 2, SPOT_ELLIPSE.h + 2);
       }
     }
     const selected = this.selectedTowerId !== null ? this.state.towers.find((t) => t.id === this.selectedTowerId) : undefined;
@@ -605,7 +609,7 @@ export class LevelScene extends Phaser.Scene {
     this.selectedPartyIndex = index;
     this.selectedTowerId = null;
     this.panel?.hide();
-    this.showToast(`Click a blue tile to place ${capitalize(entry.mon.name)} (click the slot again for its panel)`);
+    this.showToast(`Click a worn patch beside the path to place ${capitalize(entry.mon.name)} (click the slot again for its panel)`);
   }
 
   private openPanelFor(mon: Monster | undefined): void {

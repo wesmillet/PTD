@@ -19,6 +19,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CAT = json.loads((ROOT / 'src/data/tiles.json').read_text())
 GEN = json.loads((ROOT / 'src/data/tilesets.json').read_text())
 TILE = 32
+MELEE = json.loads((ROOT / 'src/data/move_overrides.json').read_text())['defaults']['range']
 DEFS = {t['id']: t for t in CAT['tiles']}
 
 
@@ -138,10 +139,26 @@ class Map:
                 cells |= {(x, y + 1) for x, y in self.path_cells} | {(x + 1, y) for x, y in self.path_cells}
             self.terrain_cells(terrain, cells, on_path=True)
 
+    def reach(self, p):
+        """Distance in tiles from a spot to the nearest point on the enemy path."""
+        best = 1e9
+        px, py = p
+        for (ax, ay), (bx, by) in zip(self.waypoints, self.waypoints[1:]):
+            vx, vy = bx - ax, by - ay
+            ln = vx * vx + vy * vy
+            t = 0 if ln == 0 else max(0, min(1, ((px - ax) * vx + (py - ay) * vy) / ln))
+            best = min(best, ((ax + t * vx - px) ** 2 + (ay + t * vy - py) ** 2) ** 0.5)
+        return best
+
     def spots(self, pts):
+        """Placement spots. Every spot must be in reach of the path for a
+        melee move (move_overrides.json defaults.range, 1.5 tiles), since
+        early Pokémon only know Tackle, Scratch, Pound and the like."""
         for p in pts:
             assert p not in self.path_cells, f'{self.name}: spot {p} on path'
             assert self.inb(*p), f'{self.name}: spot {p} out of bounds'
+            assert self.reach(p) <= MELEE + 1e-9, f'{self.name}: spot {p} is {self.reach(p):.2f} tiles from the path (max {MELEE})'
+            assert p not in self.placeable, f'{self.name}: duplicate spot {p}'
             self.placeable.append(p)
             self.reserved.add(p)
 
@@ -280,215 +297,223 @@ def tree_band_bottom(m, kinds=('tree-pair', 'tree-pair-2'), y=None, gaps=()):
         x += 5
 
 
-def forest(m, x0, y0, x1, y1, kinds=('tree-pair', 'tree-pair-2', 'tree-pair'), big=('tree-big', 'tree-big-2')):
-    """A dense forest wall from whole tree stamps packed edge to edge (the map
-    has one decoration layer, so stamps must not overlap). Rows are 4 tiles
-    apart and alternate rows shift by 2 so canopies stagger; a 5x5 cluster
-    replaces a pair now and then. Nothing covers reserved cells; single
+
+def forest(m, x0, y0, x1, y1, kinds=('pine-pair', 'pine-pair-2'), big=('pine-big',)):
+    """A Sinnoh forest wall: conifer stamps packed edge to edge in rows four
+    tiles apart, alternate rows shifted by two, a 5x5 cluster now and then.
+    Stamps never overlap (one decoration layer) or cover reserved cells; round
     trees plug gaps a pair can't fill."""
     row = 0
     for y in range(y0, y1 + 1, 4):
         off = 2 if row % 2 else 0
         for x in range(x0 - off, x1 + 1, 5):
-            tid = m.rng.choice(big) if m.rng.random() < 0.25 else m.rng.choice(kinds)
-            if m.stamp(tid, x, y, must=False):
+            tid = m.rng.choice(big) if m.rng.random() < 0.2 else m.rng.choice(kinds)
+            if m.stamp(tid, x, y, must=False) or m.stamp(m.rng.choice(kinds), x, y, must=False):
                 continue
-            if m.stamp(m.rng.choice(kinds), x, y, must=False):
-                continue
-            for dx in (0, 2):
+            for dx in (0, 2, 1):
                 m.stamp('tree', x + dx, y, must=False) or m.stamp('tree', x + dx, y + 1, must=False)
         row += 1
 
 
-def grass_blob(m, tid, cx, cy, rx, ry):
-    """Tall grass in an irregular clump: a few overlapping rectangles."""
-    m.terrain_rect(tid, cx - rx, cy - ry + 1, cx + rx, cy + ry - 1)
-    m.terrain_rect(tid, cx - rx + 1, cy - ry, cx + rx - 1, cy + ry)
-    if m.rng.random() < 0.6:
-        m.terrain_rect(tid, cx - rx - 1, cy, cx - rx, cy + m.rng.randint(0, 1))
-    if m.rng.random() < 0.6:
-        m.terrain_rect(tid, cx + rx, cy - m.rng.randint(0, 1), cx + rx + 1, cy)
+def fill_trees(m, x0, y0, x1, y1):
+    """Plug leftover holes in a forest area with round trees."""
+    for y in range(y0, y1 + 1):
+        for x in range(x0, x1 + 1):
+            m.stamp('tree', x, y, must=False)
 
 
-def flower_beds(m, n, area):
-    """Small planted clusters of flowers, the way BW towns and routes use them."""
-    return m.scatter(['flower-patch-pink', 'flower-patch-white', 'flower-bed-red', 'flower-patch-pink'],
-                     n, area=area, margin=0)
+def auto_cliff(m, walls):
+    """Paint a set of wall cells with the raised rock-shelf tiles, choosing
+    rim, side and face pieces from the neighbouring cells (cells outside the
+    map count as wall)."""
+    W = lambda x, y: (x, y) in walls or not m.inb(x, y)
+    for (x, y) in walls:
+        if not m.inb(x, y):
+            continue
+        up, down, left, right = W(x, y - 1), W(x, y + 1), W(x - 1, y), W(x + 1, y)
+        if not down:
+            tid = 'cliff-bl' if not left else 'cliff-br' if not right else 'cliff-face'
+        elif not up:
+            tid = 'cliff-tl' if not left else 'cliff-tr' if not right else 'cliff-t'
+        elif not left:
+            tid = 'cliff-l'
+        elif not right:
+            tid = 'cliff-r'
+        else:
+            tid = 'cliff-top'
+        m.ground[m.idx(x, y)] = m.tile(tid) + 1
+        m.reserved.add((x, y))
+
+
+def rect_cells(x0, y0, x1, y1):
+    return {(x, y) for y in range(y0, y1 + 1) for x in range(x0, x1 + 1)}
+
+
+GRASS = [('grass', 30), ('grass-2', 1)]
+DOTS = ['flowers-white', 'flowers-white-2', 'weeds-1', 'weeds-2']
 
 
 # --------------------------------------------------------------------------
-# Route 201: Twinleaf Town (west) to Sandgem Town (east). A short, friendly
-# route: one dirt road through clumps of tall grass between two forest walls,
-# with the side path north to Lake Verity and a route sign at the start.
+# Route 201 (Platinum: 65x22, Twinleaf to the south-west, Sandgem east).
+# The road climbs out of Twinleaf, runs east in a wide band with right-angle
+# jogs, conifer forest several rows deep on both sides, tall grass in blocks,
+# a long ledge, lone trees in the clearing, a side path north toward Lake
+# Verity, tiny white flowers along the verge.
 def route_201():
     m = Map('route-201', 30, 14, seed=201)
     m.fill_ground(GRASS)
-    path = [(0, 6), (7, 6), (7, 9), (16, 9), (16, 5), (24, 5), (24, 8), (29, 8)]
+    path = [(3, 13), (3, 8), (12, 8), (12, 5), (22, 5), (22, 8), (29, 8)]
     m.set_path(path)
-    m.terrain_rect('dirt-path', 11, 0, 12, 4)
-    m.terrain_rect('dirt-path', 11, 4, 16, 4)
-    grass_blob(m, 'tall-grass', 3, 9, 2, 1)
-    grass_blob(m, 'tall-grass', 20, 8, 2, 2)
-    grass_blob(m, 'tall-grass', 27, 3, 1, 1)
-    grass_blob(m, 'tall-grass', 12, 7, 2, 1)
-    m.spots([(4, 4), (5, 8), (9, 7), (10, 10), (14, 7), (18, 3), (20, 6), (22, 3), (26, 10), (28, 10)])
-    m.reserved |= {(x, y) for x in range(10, 14) for y in range(0, 5)}
-    forest(m, -1, -2, 31, -2)
+    m.terrain_rect('dirt-path', 17, 0, 17, 4)          # side path north to Lake Verity
+    m.terrain_rect('tall-grass', 14, 7, 20, 9)
+    m.terrain_rect('tall-grass', 24, 10, 29, 10)
+    m.terrain_rect('tall-grass', 5, 10, 10, 10)
+    m.spots([(4, 7), (11, 7), (13, 6), (21, 6), (23, 7), (2, 11), (7, 9), (16, 4), (27, 7), (18, 4)])
+    m.reserved |= rect_cells(16, 0, 18, 4)
+    forest(m, -1, -1, 31, -1)
     forest(m, -1, 11, 31, 11)
-    m.stamp('sign', 1, 3)
-    m.stamp('sign', 13, 2, must=False)
-    flower_beds(m, 3, (0, 3, 29, 10))
-    m.scatter(['flowers-purple', 'flowers-blue', 'flowers-white'], 6, area=(0, 3, 29, 10))
+    m.stamp('tree', 5, 4, must=False)
+    m.stamp('tree', 8, 4, must=False)
+    m.stamp('tree', 25, 2, must=False)
+    m.stamp('sign', 1, 6)
+    m.stamp('sign', 19, 2, must=False)
+    m.scatter(DOTS, 12, area=(0, 3, 29, 10))
     m.write()
 
 
 # --------------------------------------------------------------------------
-# Lake Verity: a quiet lake in a ring of forest just north of Twinleaf. The
-# path walks the shore around the water; reeds line the sandy bank.
+# Lake Verity (Platinum: a great octagonal lake filling the clearing, a rocky
+# island with a cave in the middle, a thin grass shore under dense forest,
+# tall grass in the south-west). Enemies walk the shore around the water.
 def lake_verity():
     m = Map('lake-verity', 30, 14, seed=301)
     m.fill_ground(GRASS)
-    path = [(0, 11), (4, 11), (4, 2), (25, 2), (25, 11), (29, 11)]
+    path = [(29, 11), (24, 11), (24, 2), (5, 2), (5, 11), (0, 11)]
     m.set_path(path)
-    for r in [(7, 4, 22, 10), (9, 3, 20, 3), (6, 5, 6, 9), (23, 5, 23, 9)]:
-        m.terrain_rect('sand', *r)
-    for r in [(9, 5, 20, 9), (8, 6, 21, 8), (11, 4, 18, 4), (12, 10, 17, 10)]:
-        m.terrain_rect('water', *r)
-    m.spots([(2, 8), (6, 4), (6, 10), (9, 3), (15, 3), (21, 3), (23, 4), (23, 10), (27, 4), (27, 9)])
-    forest(m, -1, -3, 31, -3, kinds=('pine-pair', 'pine-pair-2'), big=('pine-big',))
-    forest(m, -1, 12, 31, 12)
-    forest(m, -4, 2, 0, 10)
-    forest(m, 28, 2, 32, 10)
-    for x, y in [(7, 4), (22, 4), (7, 9), (22, 9), (10, 11), (19, 11)]:
-        m.stamp(m.rng.choice(['reeds-green', 'reeds-teal', 'reeds-green-2']), x, y - 1, clip=False, must=False)
-    flower_beds(m, 2, (0, 3, 29, 11))
-    m.scatter(['flowers-white', 'flowers-blue'], 5, area=(0, 3, 29, 11))
+    lake = rect_cells(7, 4, 22, 9) | rect_cells(8, 3, 21, 3) | rect_cells(8, 10, 21, 10)
+    island = rect_cells(14, 6, 15, 7)
+    m.terrain_cells('water', lake - island)
+    m.ground_rect('dirt', 14, 6, 15, 7)
+    m.stamp('rock-big', 14, 6, clip=False)
+    m.reserved |= lake
+    m.terrain_rect('tall-grass', 6, 11, 12, 12)
+    m.spots([(6, 4), (6, 8), (10, 1), (15, 1), (20, 1), (23, 4), (23, 8), (4, 10), (25, 10), (6, 11)])
+    forest(m, -1, -3, 31, -3)
+    forest(m, 13, 12, 31, 12)
+    forest(m, -1, 12, 5, 12)
+    forest(m, -3, 2, 3, 9)
+    forest(m, 26, 2, 32, 9)
+    fill_trees(m, 0, 0, 3, 10)
+    fill_trees(m, 26, 0, 29, 10)
+    m.scatter(DOTS, 6, area=(5, 1, 25, 12))
     m.write()
 
 
 # --------------------------------------------------------------------------
-# Route 202: Sandgem Town (south) to Jubilife City (north). The tall-grass
-# route where Dawn teaches catching: the road zigzags north through wide
-# grass fields between forest on both flanks, with a ledge to hop down.
+# Route 202 (Platinum: north-south from Sandgem up to the Jubilife gate.
+# Forest walls on both sides, a column of trees down the middle splitting the
+# route, ledges across it, big tall-grass fields where Dawn teaches catching).
 def route_202():
     m = Map('route-202', 30, 14, seed=202)
     m.fill_ground(GRASS)
-    path = [(3, 13), (3, 9), (12, 9), (12, 4), (20, 4), (20, 9), (26, 9), (26, 0)]
+    path = [(5, 13), (5, 8), (12, 8), (12, 3), (20, 3), (20, 9), (25, 9), (25, 0)]
     m.set_path(path)
-    grass_blob(m, 'tall-grass', 7, 5, 3, 2)
-    grass_blob(m, 'tall-grass', 16, 8, 2, 3)
-    grass_blob(m, 'tall-grass', 23, 4, 1, 2)
-    grass_blob(m, 'tall-grass-yellow', 8, 11, 2, 1)
-    m.spots([(1, 8), (5, 10), (9, 8), (11, 2), (14, 3), (17, 5), (19, 8), (21, 10), (24, 11), (28, 5)])
-    forest(m, -3, -2, 1, 6)
-    forest(m, 13, -2, 22, -2)
-    forest(m, 27, 10, 33, 10)
-    forest(m, 13, 12, 25, 12)
-    m.stamp('tree', 28, -1, must=False)
-    for x in range(14, 19):
-        m.stamp('ledge', x, 11, clip=False, must=False)
-    m.stamp('ledge-left', 13, 11, clip=False, must=False)
-    m.stamp('ledge-right', 19, 11, clip=False, must=False)
-    m.stamp('sign', 4, 11, must=False)
-    flower_beds(m, 3, (0, 0, 29, 13))
-    m.scatter(['rock-small', 'rock-small-2'], 2, area=(0, 0, 29, 13), margin=1)
+    m.terrain_rect('tall-grass', 6, 3, 10, 6)
+    m.terrain_rect('tall-grass', 21, 2, 23, 7)
+    m.terrain_rect('tall-grass', 8, 10, 17, 10)
+    m.spots([(6, 7), (11, 7), (13, 4), (19, 4), (21, 8), (24, 8), (4, 11), (9, 9), (16, 2), (26, 5)])
+    forest(m, -3, -1, 1, 11)
+    forest(m, 27, -1, 33, 11)
+    forest(m, 2, -2, 26, -2)
+    forest(m, 2, 11, 26, 11)
+    m.stamp('pine-pair', 14, 5, clip=False)      # the tree column splitting the route
+    m.stamp('tree', 15, 9, clip=False, must=False)
+    m.stamp('sign', 6, 11, must=False)
+    m.scatter(DOTS, 10, area=(2, 2, 26, 10))
     m.write()
 
 
 # --------------------------------------------------------------------------
-# Route 203: Jubilife City (west) to Oreburgh Gate (east). Where Barry
-# challenges you. The road runs past a pond and the land turns rocky toward
-# the cliffs of Mt. Coronet that hold the Oreburgh Gate cave.
+# Route 203 (Platinum: west from Jubilife, a middle section with a pond, then
+# a wide tall-grass field under the stepped brown cliffs of Mt. Coronet, with
+# Oreburgh Gate's cave in the cliff to the east).
 def route_203():
     m = Map('route-203', 30, 14, seed=203)
     m.fill_ground(GRASS)
-    path = [(0, 4), (6, 4), (6, 10), (14, 10), (14, 6), (21, 6), (21, 9), (29, 9)]
+    path = [(0, 5), (8, 5), (8, 9), (17, 9), (17, 6), (23, 6), (23, 9), (29, 9)]
     m.set_path(path)
-    for r in [(22, 3, 29, 13), (20, 5, 21, 13), (19, 8, 19, 12)]:
-        m.terrain_rect('pebbles', *r)
-    m.set_path(path)
-    m.terrain_rect('water', 9, 5, 12, 7)
-    grass_blob(m, 'tall-grass', 2, 9, 2, 2)
-    grass_blob(m, 'tall-grass', 17, 11, 1, 1)
-    plateau(m, 21, 0, 30, 2, open_top=True)
-    m.spots([(3, 2), (4, 6), (8, 9), (9, 3), (12, 8), (13, 4), (17, 7), (19, 5), (23, 7), (26, 11)])
-    forest(m, -1, -2, 20, -2)
-    forest(m, -1, 12, 15, 12)
+    mountain = rect_cells(24, 0, 29, 2) | rect_cells(26, 3, 29, 5) | rect_cells(27, 6, 29, 7)
+    auto_cliff(m, mountain)
+    m.terrain_rect('water', 10, 2, 14, 4)
+    m.reserved |= rect_cells(10, 2, 14, 4)
+    m.terrain_rect('tall-grass', 1, 7, 5, 10)
+    m.terrain_rect('tall-grass', 18, 2, 22, 4)
+    m.terrain_rect('tall-grass', 19, 10, 22, 11)
+    m.spots([(7, 6), (9, 8), (16, 8), (18, 7), (22, 7), (24, 8), (3, 4), (12, 10), (20, 5), (27, 10)])
+    forest(m, -1, -2, 23, -2)
+    forest(m, -1, 11, 18, 11)
+    forest(m, 24, 11, 31, 11)
+    m.stamp('tree', 3, 1, must=False)
     m.stamp('tree', 15, 1, must=False)
-    for tid, x, y in [('boulder', 24, 4), ('rock-big', 27, 4), ('boulder', 23, 11), ('rock-small', 28, 7),
-                      ('rock-small-2', 20, 11), ('rock-small', 27, 12)]:
-        m.stamp(tid, x, y, must=False)
-    m.stamp('sign', 1, 5, must=False)
-    for x, y in [(8, 5), (13, 5), (8, 8)]:
+    for x, y in [(9, 3), (15, 3)]:
         m.stamp('reeds-green', x, y - 1, clip=False, must=False)
-    flower_beds(m, 2, (0, 2, 18, 11))
-    m.scatter(['rock-small', 'rock-small-2'], 3, area=(20, 3, 29, 12), margin=1)
+    m.stamp('sign', 1, 3, must=False)
+    m.stamp('rock-small', 25, 4, must=False)
+    m.scatter(DOTS, 8, area=(0, 2, 25, 10))
     m.write()
-
-def plateau(m, x0, y0, x1, y1, open_top=False, open_bottom=False):
-    """A raised rock shelf from the cliff tiles: rim on top, face on the bottom
-    row. open_top/open_bottom continue it past the map edge."""
-    for y in range(y0, y1 + 1):
-        for x in range(x0, x1 + 1):
-            top = y == y0 and not open_top
-            bot = y == y1 and not open_bottom
-            col = 'l' if x == x0 else 'r' if x == x1 else 'm'
-            if bot:
-                tid = {'l': 'cliff-bl', 'm': 'cliff-face', 'r': 'cliff-br'}[col]
-            elif top:
-                tid = {'l': 'cliff-tl', 'm': 'cliff-t', 'r': 'cliff-tr'}[col]
-            else:
-                tid = {'l': 'cliff-l', 'm': 'cliff-top', 'r': 'cliff-r'}[col]
-            if m.inb(x, y):
-                m.ground[m.idx(x, y)] = m.tile(tid) + 1
-                m.reserved.add((x, y))
-
-
-CAVE_FLOOR = [('dirt', 8), ('rock-floor', 2), ('dirt-dark', 1)]
 
 
 # --------------------------------------------------------------------------
-# Oreburgh Gate: the cave tunnel through the mountain between Route 203 and
-# Oreburgh City. Rock walls above and below, an underground stream, boulders.
+# Caves: corridors carved out of rock-shelf walls, like Platinum's tunnels.
+def carve_cave(m, path, extra=()):
+    """Everything is wall except a three-tile corridor around the path (plus
+    any extra open cells); the walls get rimmed rock-shelf tiles."""
+    m.fill_ground([('rock-floor', 1)])
+    open_cells = set()
+    for (x, y) in m.path_cells:
+        open_cells |= rect_cells(x - 1, y - 1, x + 1, y + 1)
+    for c in extra:
+        open_cells |= c
+    walls = {(x, y) for y in range(m.h) for x in range(m.w)} - open_cells
+    auto_cliff(m, walls)
+    return open_cells
+
+
+# Oreburgh Gate 1F (Platinum: a narrow C-shaped tunnel, boulders and small
+# rocks along the walls, the exits east and west).
 def oreburgh_gate():
     m = Map('oreburgh-gate', 30, 14, theme='cave', seed=401)
-    m.fill_ground([('rock-floor', 1)])
-    plateau(m, -1, 0, 30, 1, open_top=True)
-    plateau(m, -1, 12, 30, 13, open_bottom=True)
-    plateau(m, 10, 6, 13, 8)
-    path = [(0, 5), (7, 5), (7, 10), (16, 10), (16, 3), (24, 3), (24, 7), (29, 7)]
-    m.set_path(path, terrain='sand')
-    m.terrain_rect('water', 18, 5, 21, 11)
-    m.terrain_rect('pebbles', 1, 7, 5, 10)
-    m.terrain_rect('pebbles', 25, 9, 28, 11)
-    m.spots([(3, 3), (5, 7), (9, 4), (9, 9), (14, 8), (14, 4), (18, 2), (22, 4), (26, 5), (27, 9)])
-    for tid, x, y in [('boulder', 1, 2), ('rock-big', 11, 2), ('boulder', 27, 2), ('boulder', 2, 11), ('rock-big', 13, 11),
-                      ('boulder', 23, 11), ('rock-small', 6, 2), ('rock-small-2', 20, 2), ('rock-small', 11, 9)]:
-        m.stamp(tid, x, y, must=False)
-    m.scatter(['rock-small', 'rock-small-2', 'pebbles-brown', 'pebbles-tan'], 8, area=(0, 2, 29, 11))
+    path = [(0, 10), (6, 10), (6, 3), (22, 3), (22, 10), (29, 10)]
+    m.set_path(path, terrain=None)
+    open_cells = carve_cave(m, path, extra=[rect_cells(9, 5, 19, 7)])
+    m.set_path(path, terrain=None)
+    for (x, y) in m.path_cells:
+        m.ground[m.idx(x, y)] = m.tile('gravel') + 1
+    m.spots([(5, 9), (7, 9), (7, 4), (5, 2), (12, 4), (16, 2), (21, 4), (23, 2), (23, 9), (26, 11)])
+    for tid, x, y in [('boulder', 10, 5), ('boulder', 17, 6), ('rock-small', 13, 6), ('rock-small-2', 1, 11),
+                      ('rock-small', 28, 11), ('rock-small-2', 9, 2), ('rock-small', 20, 4)]:
+        m.stamp(tid, x, y, clip=False, must=False)
     m.write()
 
 
-# --------------------------------------------------------------------------
-# Oreburgh Mine 1F: Roark's coal mine under Oreburgh City. Dark floor,
-# rock shelves the miners left behind, coal and boulders everywhere, and a
-# long winding route from the entrance (east) down to the mine face (west).
+# Oreburgh Mine (Platinum: a big dug-out floor stepping down in terraces,
+# conveyor belts down the middle, coal and boulders everywhere). The path
+# winds from the entrance down across the terraces to the mine face.
 def oreburgh_mine():
     m = Map('oreburgh-mine-1f', 30, 14, theme='cave', seed=402)
-    m.fill_ground([('rock-floor', 1)])
-    plateau(m, -1, 0, 30, 1, open_top=True)
-    plateau(m, -1, 12, 30, 13, open_bottom=True)
-    plateau(m, 2, 3, 6, 5)
-    plateau(m, 21, 7, 26, 9)
-    path = [(29, 3), (18, 3), (18, 9), (10, 9), (10, 4), (8, 4), (8, 10), (0, 10)]
-    m.set_path(path, terrain='sand')
-    m.terrain_rect('pebbles', 12, 5, 16, 7)
-    m.terrain_rect('pebbles', 1, 7, 5, 8)
-    m.spots([(27, 5), (22, 2), (20, 6), (16, 4), (14, 8), (12, 10), (9, 6), (6, 7), (4, 11), (2, 9)])
-    for tid, x, y in [('boulder', 27, 10), ('boulder', 15, 10), ('rock-big', 24, 4), ('boulder', 11, 2), ('rock-big', 0, 2),
-                      ('boulder', 4, 2), ('rock-small', 20, 11), ('rock-small-2', 26, 11), ('rock-small', 17, 2)]:
-        m.stamp(tid, x, y, must=False)
-    m.scatter(['rock-small', 'rock-small-2', 'pebbles-brown'], 8, area=(0, 2, 29, 11))
+    path = [(29, 2), (18, 2), (18, 7), (9, 7), (9, 11), (0, 11)]
+    m.set_path(path, terrain=None)
+    hall = rect_cells(3, 1, 26, 12)
+    carve_cave(m, path, extra=[hall])
+    # Terrace shelves left in the hall, like the stepped floors of the mine.
+    auto_cliff(m, rect_cells(3, 1, 7, 4) | rect_cells(21, 9, 26, 12) | rect_cells(12, 9, 16, 12) - rect_cells(12, 9, 16, 9))
+    m.set_path(path, terrain=None)
+    for (x, y) in m.path_cells:
+        m.ground[m.idx(x, y)] = m.tile('gravel') + 1
+    m.spots([(19, 3), (17, 1), (17, 6), (19, 8), (10, 6), (8, 8), (10, 10), (8, 12), (24, 1), (3, 10)])
+    for tid, x, y in [('boulder', 12, 4), ('boulder', 22, 5), ('rock-big', 13, 6) , ('rock-small', 20, 4), ('rock-small-2', 5, 7),
+                      ('boulder', 25, 6), ('rock-small', 15, 4), ('rock-small-2', 11, 9)]:
+        m.stamp(tid, x, y, clip=False, must=False)
     m.write()
 
 

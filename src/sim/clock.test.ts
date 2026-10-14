@@ -28,9 +28,11 @@ function snapshot(state: LevelState): unknown {
  * at different speeds).
  */
 function fresh(seed: number): LevelState {
-  const state = createLevel(getLevel('route-201'), getMap('route-201'), { seed, party: [createMonster(387, 12, [75]), createMonster(393, 10, [55])] });
-  placeTower(state, 0, 9, 7);
-  placeTower(state, 1, 14, 7);
+  const map = getMap('route-201');
+  const state = createLevel(getLevel('route-201'), map, { seed, party: [createMonster(387, 12, [75]), createMonster(393, 10, [55])] });
+  // Any two spots: every spot is in melee range of the path (spot-reach.test.ts).
+  placeTower(state, 0, ...map.placeable[0]!);
+  placeTower(state, 1, ...map.placeable[1]!);
   startWave(state);
   return state;
 }

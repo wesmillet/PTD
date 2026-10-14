@@ -213,7 +213,7 @@ export class Hud {
     } else if (selectedBall) {
       this.hint.setText(`${BALLS[selectedBall]?.name ?? selectedBall}: click a wild Pokémon to throw (Esc cancels)`);
     } else if (state.phase === 'build') {
-      this.hint.setText(state.towers.length === 0 ? 'Click a blue tile to place your Pokémon' : 'Drag a Pokémon to move it. Tap it for its panel. Start when ready.');
+      this.hint.setText(state.towers.length === 0 ? 'Click a worn patch beside the path to place your Pokémon' : 'Drag a Pokémon to move it. Tap it for its panel. Start when ready.');
     } else if (state.phase === 'wave') {
       this.hint.setText(`${state.enemies.length} on the path, ${state.pending.length} to come`);
     } else {

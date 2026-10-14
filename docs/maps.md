@@ -152,11 +152,20 @@ the deliverable.
 
 The six opening maps (Route 201, Lake Verity, Route 202, Route 203, Oreburgh
 Gate, Oreburgh Mine 1F) are designed in code in `scripts/sinnoh-maps.py`, one
-function per location, based on the real Platinum areas: Route 201's side path
-north to Lake Verity, the lake ringed by sand and trees, Route 202's tall-grass
-zigzag, Route 203's pond and rocky approach to Mt. Coronet, and the two caves
-built from the outdoor sheet's rock floor, cliff shelves and boulders until a
-cave tileset exists. Run `python3 scripts/sinnoh-maps.py [map-id ...]` to
+function per location, modelled on the Platinum map renders: deep conifer
+forest walls, uniform grass, tall grass in blocks, lone trees in clearings,
+Lake Verity's big lake with its rocky island, Route 202's central tree column,
+Route 203's pond and stepped Mt. Coronet cliff, and cave corridors carved out
+of rock-shelf walls (`auto_cliff` picks rim, side and face pieces from the
+neighbours) with a cobbled track, until a cave tileset exists.
+
+Placement spots must be within melee range of the path (move_overrides.json
+`defaults.range`, 1.5 tiles), because starters only know moves like Tackle;
+the script refuses any spot further away and puts most of them in the inside
+corners of bends. `src/sim/spot-reach.test.ts` places a level 5 Tackle user
+on every spot of every level and fails if one never lands a hit. In game the
+spots are drawn as small worn-earth patches (flat stones in caves) from
+`src/ui/spotMarker.ts` and only highlight while placing or dragging. Run `python3 scripts/sinnoh-maps.py [map-id ...]` to
 regenerate; it refuses to put decoration on the path or on a placeable spot.
 Edits made in the in-game editor and exported win over the script: once a map
 is hand-edited, stop regenerating it.
