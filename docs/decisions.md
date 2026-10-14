@@ -275,3 +275,18 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   Psystrike is a boss move with `range: 99` and `flinchAll`.
 - The daily ticket is claimed when the level select opens (date in the
   save); a lost challenge refunds the ticket as the design says.
+
+## Phase 8 item 8 (polish)
+
+- The design gives the number keys two jobs (party slots and speeds); the
+  plain digits pick party slots and Shift with 1, 2 or 4 sets the speed.
+  Space keeps starting the wave; P pauses.
+- Stars: one for clearing, one for keeping every life (free levels: three
+  waves), one for a catch (defend levels without one: no leaks).
+- Save slots: slot 1 is the original `ptd.save.v1` key so nobody loses a
+  save; slots 2 and 3 are new keys; the active slot is remembered.
+- The Pokédex lists every species some level spawns wild (from rosters,
+  area tables and wave scripts) plus anything the save has seen, with
+  unknown ones blacked out and named "???".
+- The wave banner merges the wave's start events (trainer, lane, rule
+  texts) into one frame; rule toasts mid-wave stay toasts.

@@ -9,7 +9,7 @@ import { createMonster } from '../sim/monster';
 import { SaveError } from '../sim/save';
 import { urlParam } from './runtime';
 import { restoreGame } from '../sim/save';
-import { applySettings, clearSave, gameFromCode, readSave, saveCodeFor, writeSave } from './storage';
+import { activeSlot, applySettings, clearSave, gameFromCode, readSave, saveCodeFor, setActiveSlot, writeSave } from './storage';
 
 export const STARTERS = [387, 390, 393] as const;
 export const STARTER_LEVEL = 5;
@@ -35,6 +35,19 @@ export function loadGameOnce(): void {
   } else {
     game = newGameState();
   }
+}
+
+/** Switches to another save slot and loads it (a fresh game when it is empty). */
+export function switchSlot(slot: number): GameState {
+  if (loaded) saveGame();
+  setActiveSlot(slot);
+  loaded = false;
+  loadGameOnce();
+  return game;
+}
+
+export function currentSlot(): number {
+  return activeSlot();
 }
 
 export function getGame(): GameState {

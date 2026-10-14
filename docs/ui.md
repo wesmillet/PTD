@@ -128,6 +128,16 @@ ready-cut from `scripts/build-platinum.py` (pret/pokeplatinum; credits in
   and `assets/badges/<id>.png` / `<id>-off.png` (level ids in `levels.json`).
   `scripts/build-placeholders.mjs` regenerates the plain placeholders.
 
+## Content-build components
+- `WaveBanner` (`waveBanner.ts`): the wave/trainer/rule frame under the top bar.
+- `showCaughtBanner` (`caughtBanner.ts`): the "Gotcha!" frame above the party strip.
+- `showLocationPopup`, `VsIntro` (see above), `Diorama` (`diorama.ts`, the title scenes).
+- `ConferenceScreen` (`conferenceScreen.ts`): bracket board, roulette, locker room, entry.
+- `LotteryScreen` (`lotteryScreen.ts`): tickets, the three-ball draw, the reroll.
+- `MenuPages.pokedex`: the Pokédex list with portraits, type icons and areas.
+- `SavePanel` slot picker (`slots`, `activeSlot`, `switchSlot` hooks).
+- `summaryStars` in `summary.ts`; the summary's Next level button.
+
 ## Screens
 Title (`TitleScene`, with the badge case) → Level select
 (`LevelSelectScene`: the town map at 3x with a marker per level, the

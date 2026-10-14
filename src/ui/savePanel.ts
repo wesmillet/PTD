@@ -6,6 +6,10 @@ export interface SavePanelHooks {
   importCode: (code: string) => string | null; // returns an error message or null
   newGame: () => void;
   onClose: () => void;
+  /** The three save slots: which is active, what each holds, and switching. */
+  slots?: () => { slot: number; empty: boolean; savedAt?: number; party?: number; badges?: number; money?: number }[];
+  activeSlot?: () => number;
+  switchSlot?: (slot: number) => void;
 }
 
 export class SavePanel {
@@ -34,6 +38,31 @@ export class SavePanel {
     info.className = 'ptd-dim';
     info.textContent = 'The game saves itself after every level and party change. Use a save code to move to another device.';
     root.append(close, title, info);
+
+    if (this.hooks.slots && this.hooks.activeSlot && this.hooks.switchSlot) {
+      const slotLabel = document.createElement('div');
+      slotLabel.style.marginTop = '10px';
+      slotLabel.textContent = 'Save slots';
+      const row = document.createElement('div');
+      row.className = 'ptd-actions';
+      row.id = 'ptd-save-slots';
+      const active = this.hooks.activeSlot();
+      for (const s of this.hooks.slots()) {
+        const b = document.createElement('button');
+        b.dataset.slot = String(s.slot);
+        const when = s.savedAt ? new Date(s.savedAt).toLocaleDateString() : '';
+        b.textContent = s.empty ? `Slot ${s.slot}: empty` : `Slot ${s.slot}: ${s.party} in party, ${s.badges} badge${s.badges === 1 ? '' : 's'}, $${s.money} (${when})`;
+        b.style.opacity = s.slot === active ? '1' : '0.6';
+        b.style.fontWeight = s.slot === active ? 'bold' : 'normal';
+        b.addEventListener('click', () => {
+          if (s.slot === active) return;
+          this.hooks.switchSlot?.(s.slot);
+          this.close();
+        });
+        row.appendChild(b);
+      }
+      root.append(slotLabel, row);
+    }
 
     const codeLabel = document.createElement('div');
     codeLabel.style.marginTop = '10px';

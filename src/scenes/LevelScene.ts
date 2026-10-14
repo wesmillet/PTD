@@ -12,7 +12,9 @@ import { cloneModel, toMapDef, type MapModel } from '../map/tiled';
 import config from '../data/config.json';
 import { iconTextureKey, iconUrl, itemTextureKey, portraitUrl, runtime, runtimeConfig, spriteFolder, trainerTextureKey, urlParam } from '../game/runtime';
 import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
-import { addPokemon, giveItems, hasFlag, markSeen, placementLimit, recordLevelResult, setFlag } from '../sim/game';
+import { addPokemon, giveItems, hasFlag, isLevelUnlocked, markSeen, orderedLevelIds, placementLimit, recordLevelResult, setFlag } from '../sim/game';
+import { WaveBanner } from '../ui/waveBanner';
+import { showCaughtBanner } from '../ui/caughtBanner';
 import { purifyProgress } from '../sim/shadow';
 import { usePotion } from '../sim/items';
 import { BALLS } from '../sim/catch';
@@ -24,7 +26,8 @@ import { VsIntro } from '../ui/vsIntro';
 import { MenuPages } from '../ui/menuPages';
 import { SavePanel } from '../ui/savePanel';
 import { StartMenu, startMenuEntries, type StartMenuId } from '../ui/startMenu';
-import { currentSaveCode, importSaveCode, resetGame } from '../game/session';
+import { currentSaveCode, currentSlot, importSaveCode, resetGame, switchSlot } from '../game/session';
+import { listSlots } from '../game/storage';
 import {
   activeBoss,
   createLevel,
@@ -150,6 +153,9 @@ export class LevelScene extends Phaser.Scene {
   private dialogue?: DialogueBox;
   private vsIntro?: VsIntro;
   private escortView?: Phaser.GameObjects.Sprite;
+  private waveBanner?: WaveBanner;
+  /** Banner pieces gathered from one wave's start events. */
+  private bannerParts: { title?: string; details: string[] } = { details: [] };
   /** Trainers whose VS intro and opening lines have played this level (later waves of theirs skip them). */
   private readonly introduced = new Set<string>();
   /** The trainer's throwing pose beside the entrance while their wave is being sent. */
@@ -314,6 +320,7 @@ export class LevelScene extends Phaser.Scene {
     this.evolutionDialog = new EvolutionDialog();
     this.dialogue = new DialogueBox(this, { bottom: this.scale.height - Hud.BOTTOM - 4 });
     this.vsIntro = new VsIntro(this);
+    this.waveBanner = new WaveBanner(this, Hud.HEIGHT);
     showLocationPopup(this, levelPopup(def), def.name, Hud.HEIGHT + 8);
     this.menuPages = new MenuPages({
       game: getGame(),
@@ -338,6 +345,12 @@ export class LevelScene extends Phaser.Scene {
         this.scene.start('Title');
       },
       onClose: () => this.startMenu?.setLocked(false),
+      slots: () => listSlots(),
+      activeSlot: () => currentSlot(),
+      switchSlot: (slot) => {
+        switchSlot(slot);
+        this.scene.start('LevelSelect');
+      },
     });
     this.startMenu = new StartMenu(this, startMenuEntries(PLAYER_NAME), {
       onSelect: (id) => this.onMenuSelect(id),
@@ -363,6 +376,27 @@ export class LevelScene extends Phaser.Scene {
       } else this.openMenu();
     });
     this.input.keyboard?.on('keydown-SPACE', () => this.tryStartWave());
+    // Number keys pick party slots (Shift + 1, 2, 4 set the speed); P pauses.
+    this.input.keyboard?.on('keydown', (e: KeyboardEvent) => {
+      if (this.ended || this.dialogue?.isOpen || this.startMenu?.isOpen || this.menuPages?.isOpen || this.savePanel?.isOpen) return;
+      const n = Number(e.key);
+      if (e.shiftKey && (e.code === 'Digit1' || e.code === 'Digit2' || e.code === 'Digit4')) {
+        const speed = Number(e.code.slice(-1));
+        if ((config.gameSpeeds as number[]).includes(speed)) {
+          runtime.gameSpeed = speed;
+          saveGame();
+        }
+        return;
+      }
+      if (Number.isInteger(n) && n >= 1 && n <= 6 && !e.shiftKey) {
+        if (this.state.party[n - 1]) this.handlePartySlot(n - 1);
+        return;
+      }
+      if (e.key === 'p' || e.key === 'P') {
+        this.paused = !this.paused;
+        if (this.paused) this.showToast('Paused (P resumes)');
+      }
+    });
 
     this.debugPanel = new DebugPanel({
       getState: () => this.state,
@@ -929,6 +963,7 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private handleEvents(events: LevelEvent[]): void {
+    this.bannerParts = { details: [] };
     for (const e of events) {
       switch (e.type) {
         case 'spawn': {
@@ -971,8 +1006,11 @@ export class LevelScene extends Phaser.Scene {
         case 'ballBlocked':
           this.animateBall(e.enemyId as number, e.ball ?? 'poke', 0, false, true);
           break;
-        case 'caught':
+        case 'caught': {
+          const entry = this.state.caught[this.state.caught.length - 1];
+          if (entry) showCaughtBanner(this, capitalize(entry.mon.name), e.ball ?? 'poke', this.state.party.some((p) => p.mon === entry.mon) ? 'party' : 'box', this.scale.height - Hud.BOTTOM - 4);
           break;
+        }
         case 'trainerStart':
           if (e.trainer) this.showTrainer(e.trainer, e.boss ?? false);
           break;
@@ -1023,7 +1061,7 @@ export class LevelScene extends Phaser.Scene {
           if (e.towerId !== undefined) this.floatText(this.towerPixel(e.towerId), `Lv ${e.level}!`, '#ffe066');
           break;
         case 'waveStart':
-          this.showToast(e.trainer ? `Wave ${e.wave}: ${e.trainer.name}` : `Wave ${e.wave}`);
+          this.bannerParts = { title: e.trainer ? `Wave ${e.wave}: ${e.trainer.name}` : `Wave ${e.wave}`, details: [] };
           if (e.trainer) this.showTrainerOnField(e.trainer.id);
           break;
         case 'waveEnd':
@@ -1043,7 +1081,7 @@ export class LevelScene extends Phaser.Scene {
           if (e.type === 'flee' && e.enemyId !== undefined) this.removeEnemyView(e.enemyId);
           break;
         case 'banner':
-          if (e.text) this.showToast(e.text);
+          if (e.text) this.bannerParts.details.push(e.text);
           break;
         case 'allyPlaced':
           if (e.text) this.showToast(`${e.text} joins the fight!`);
@@ -1057,6 +1095,11 @@ export class LevelScene extends Phaser.Scene {
           break;
       }
     }
+    if (this.bannerParts.title && !this.ended) {
+      const detail = this.bannerParts.details.join(' · ');
+      this.waveBanner?.show(this.bannerParts.title, detail || undefined);
+    }
+    this.bannerParts = { details: [] };
   }
 
   private promptEvolution(towerId: number, to: number): void {
@@ -1381,11 +1424,23 @@ export class LevelScene extends Phaser.Scene {
     for (const id of [...this.enemyViews.keys()]) this.removeEnemyView(id);
     this.hud.setBoss(null);
     this.hud.update(this.state, runtime.gameSpeed);
+    const next = this.customDef ? undefined : this.nextLevelId();
     showSummary(this, { ...summarize(this.state), money: this.moneyEarned, newBadge: !hadBadge }, {
       onRetry: () => this.scene.restart({ levelId: this.levelId, seed: this.seed + 1, def: this.customDef, returnTo: this.returnTo, mode: this.mode }),
       onLevelSelect: () => this.scene.start(this.returnTo),
       ...(this.customDef ? { noRetry: true, continueLabel: this.mode === 'conference' ? 'Locker room' : 'Continue' } : {}),
+      ...(next ? { onNext: () => this.scene.start('Level', { levelId: next }) } : {}),
     });
+  }
+
+  /** The next story level that is open after this one, if any. */
+  private nextLevelId(): string | undefined {
+    const ids = orderedLevelIds();
+    const i = ids.indexOf(this.levelId);
+    if (i < 0) return undefined;
+    const game = getGame();
+    for (const id of ids.slice(i + 1)) if (isLevelUnlocked(game, id)) return id;
+    return undefined;
   }
 
   // ---------------------------------------------------------------- views

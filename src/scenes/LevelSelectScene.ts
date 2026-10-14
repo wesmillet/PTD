@@ -2,8 +2,11 @@ import Phaser from 'phaser';
 import config from '../data/config.json';
 import { getLevel } from '../data/levels';
 import { badgeTextureKey, iconUrl, itemTextureKey } from '../game/runtime';
+import { listSlots } from '../game/storage';
 import {
   currentSaveCode,
+  currentSlot,
+  switchSlot,
   getGame,
   importSaveCode,
   loadDebugPartyIfRequested,
@@ -129,6 +132,12 @@ export class LevelSelectScene extends Phaser.Scene {
         this.scene.restart();
       },
       onClose: () => this.scene.restart(),
+      slots: () => listSlots(),
+      activeSlot: () => currentSlot(),
+      switchSlot: (slot) => {
+        switchSlot(slot);
+        this.scene.restart();
+      },
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.shop?.close();

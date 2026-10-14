@@ -2,7 +2,10 @@ import Phaser from 'phaser';
 import type { LevelSummary } from '../sim/level';
 import { BALLS } from '../sim/catch';
 import { badgeTextureKey, iconTextureKey, itemTextureKey, portraitTextureKey } from '../game/runtime';
+import { summaryStars } from '../sim/stars';
 import { Button, framePanel } from './button';
+
+export { summaryStars };
 import { TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 
 export interface SummaryCallbacks {
@@ -11,7 +14,11 @@ export interface SummaryCallbacks {
   /** Runtime levels (Conference rounds) cannot be retried. */
   noRetry?: boolean;
   continueLabel?: string;
+  /** The next story level, when one is open. */
+  onNext?: () => void;
+  nextLabel?: string;
 }
+
 
 const TITLES: Record<string, string> = {
   won: 'Level cleared!',
@@ -27,17 +34,22 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
   const panelW = 460;
   const extra = (summary.trainer ? 1 : 0) + (summary.badge ? 1 : 0);
   const lines = summary.party.length + summary.caught.length + (summary.caught.length ? 1 : 0) + extra;
-  const panelH = Math.min(height - 20, 150 + lines * 26);
+  const panelH = Math.min(height - 20, 176 + lines * 26);
   const px = width / 2;
   const py = height / 2;
   container.add(framePanel(scene, px, py, panelW, panelH, summary.outcome === 'won' ? 'green' : 'blue'));
   container.add(scene.add.text(px, py - panelH / 2 + 24, TITLES[summary.outcome] ?? summary.outcome, TEXT_BIG).setOrigin(0.5));
+  // Stars: cleared, lives kept (or three waves), a catch (or no leaks).
+  const stars = summaryStars(summary);
+  for (let i = 0; i < 3; i++) {
+    container.add(scene.add.text(px - 30 + i * 30, py - panelH / 2 + 48, '★', { ...TEXT_BIG, color: i < stars ? '#f8c020' : '#b0b8c0' }).setOrigin(0.5));
+  }
   container.add(
     scene.add
-      .text(px, py - panelH / 2 + 54, `Waves cleared ${summary.wavesCleared}   KOs ${summary.kos}   Leaks ${summary.leaks}${summary.money ? `   +$${summary.money}` : ''}`, TEXT_DIM)
+      .text(px, py - panelH / 2 + 76, `Waves cleared ${summary.wavesCleared}   KOs ${summary.kos}   Leaks ${summary.leaks}${summary.money ? `   +$${summary.money}` : ''}`, TEXT_DIM)
       .setOrigin(0.5),
   );
-  let y = py - panelH / 2 + 90;
+  let y = py - panelH / 2 + 110;
   const left = px - panelW / 2;
   const portrait = (species: number, x: number, cy: number, shiny = false) => {
     const icon = iconTextureKey(species, 0, shiny);
@@ -75,6 +87,10 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
   }
   if (callbacks.noRetry) {
     container.add(new Button(scene, px, py + panelH / 2 - 30, callbacks.continueLabel ?? 'Continue', callbacks.onLevelSelect, 180, 30));
+  } else if (callbacks.onNext && summary.outcome !== 'lost') {
+    container.add(new Button(scene, px - 150, py + panelH / 2 - 30, 'Retry', callbacks.onRetry, 130, 30));
+    container.add(new Button(scene, px, py + panelH / 2 - 30, callbacks.continueLabel ?? 'Level select', callbacks.onLevelSelect, 130, 30));
+    container.add(new Button(scene, px + 150, py + panelH / 2 - 30, callbacks.nextLabel ?? 'Next level', callbacks.onNext, 130, 30));
   } else {
     container.add(new Button(scene, px - 80, py + panelH / 2 - 30, 'Retry', callbacks.onRetry));
     container.add(new Button(scene, px + 80, py + panelH / 2 - 30, callbacks.continueLabel ?? 'Level select', callbacks.onLevelSelect));

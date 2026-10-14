@@ -81,6 +81,31 @@ export class CreditsScreen {
     const title = document.createElement('h2');
     title.textContent = 'Credits';
     root.appendChild(title);
+    const scroll = document.createElement('button');
+    scroll.textContent = 'Auto-scroll';
+    scroll.style.cssText = 'position:absolute;right:48px;top:12px';
+    let timer: number | null = null;
+    scroll.addEventListener('click', () => {
+      if (timer !== null) {
+        window.clearInterval(timer);
+        timer = null;
+        scroll.textContent = 'Auto-scroll';
+        return;
+      }
+      scroll.textContent = 'Stop';
+      timer = window.setInterval(() => {
+        root.scrollTop += 1;
+        if (root.scrollTop + root.clientHeight >= root.scrollHeight - 1) {
+          window.clearInterval(timer!);
+          timer = null;
+          scroll.textContent = 'Auto-scroll';
+        }
+      }, 40);
+    });
+    root.appendChild(scroll);
+    root.addEventListener('remove', () => {
+      if (timer !== null) window.clearInterval(timer);
+    });
     for (const section of GENERAL_CREDITS) {
       const h = document.createElement('div');
       h.style.cssText = 'font-weight:bold;margin-top:12px';

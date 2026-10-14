@@ -93,6 +93,17 @@ which maps the maps session still needs to build. Updated per commit.
   Premier Ball with the ticket number as its memo. Dynamax is a spawn flag
   (2.5x sprite, red aura, 3x HP) with no raid levels yet.
 
+- **Polish**: wave banner in a Platinum frame naming the wave, trainer and
+  the twist in play; boss HP bar with phase ticks and the Poké Ball icon
+  in the catch window; the "Gotcha!" caught banner with the ball shaking
+  and the destination; the Pokédex screen (counts, portraits, type icons,
+  the areas a species appears in, unknown species blacked out); the result
+  screen with three stars and a Next level button; three save slots
+  (slot 1 keeps the old key) with a picker in the Save panel; keyboard
+  shortcuts (1 to 6 pick party slots, Shift+1/2/4 set the speed, P
+  pauses, Space starts the wave, Esc the menu; touch drag places); the
+  credits screen with an auto-scroll button. No audio (no assets).
+
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
@@ -125,6 +136,21 @@ which maps the maps session still needs to build. Updated per commit.
   secret level is not built); the Mega Mewtwo Y unlock is a flag only.
 - Cresselia's "Sleep catch bonus" is the ordinary sleep bonus (2x).
 - The Lottery's nature is "neutral" (the game has no natures).
+- Speed keys are Shift+1/2/4 so the plain number keys can pick party
+  slots as the design asks; the trainer card's play time and overworld
+  sprite, and the "text speed" / colourblind settings are not built.
+
+## Not built yet (design order items 4 and 9)
+
+The story set pieces (Valley Windworks, Eterna Forest escort, Old Chateau,
+Galactic Eterna Building, Mt. Coronet, Solaceon Ruins, the Warehouse, Great
+Marsh, Lake Valor timer, Iron Island tag battle, Lake Acuity, Galactic HQ
+Shadow waves), the secret HM levels, Max Raids, the Regis and Arceus were
+not in this batch. Their rules (wind, escort, timer, tag-ally, shadow-wave,
+darkness) already exist in `src/sim/rules/`, and their maps (`valley-
+windworks`, `eterna-forest`, `old-chateau`, `iron-island`, `galactic-hq`,
+`great-marsh`, `lake-valor`, `lake-acuity`, `lake-verity-island`) are in
+the repo, so they are level data away.
 
 ## Maps still needed
 

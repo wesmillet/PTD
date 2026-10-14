@@ -492,6 +492,12 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
 - Badge case on the title screen and level select; bag strip (balls,
   Potion, Rare Candy with counts) on level select.
 - Dialogue boxes with portraits
+- Wave banner (Platinum frame: wave, trainer, the twist in play), caught
+  banner ("Gotcha!" with the ball shaking and the destination), boss bar
+  with phase ticks and the catch-window Poké Ball, Pokédex screen (counts,
+  portraits, type icons, areas), result screen with three stars and Next
+  level, three save slots in the Save panel, keyboard shortcuts (1 to 6
+  party slots, Shift+1/2/4 speed, P pause, Space start, Esc menu).
 - Options page: game speed (1x, 2x, 4x) and zoom. Zoom is Fit (default:
   the canvas scales to the window), 1x, 1.5x or 2x (the 960x600 canvas at
   that CSS size, centred, scrolling when bigger than the window); `+` and
@@ -527,9 +533,17 @@ Phase 7 (done, docs/plan-phase-7.md): zoom option, attack rate from base
          intro, poses, badges, type icons, location popups) and the town
          map level select, form sprite folders. Still to come for Act 1:
          the rest of its levels.
-Phase 6: Challenge levels and the full shiny system.
-Phase 7: Hisui rifts and Unova.
-Phase 8: Polish: audio, settings, performance pass; strip the debug panel.
+Phase 8 (done, docs/plan-phase-8.md): the content build of
+         docs/design-content.md: forms and later species in the data,
+         scripted waves, lanes and the rules engine; gyms 2 to 8; the title
+         diorama; the Team Galactic finale; the Sinnoh Conference; the
+         Hisui rifts; the mystery events and the Shiny lottery; the polish
+         list (banners, Pokédex, stars, save slots, shortcuts). Progress
+         and stand-ins: docs/progress.md.
+Phase 9: Story set pieces (Windworks, Eterna Forest, Old Chateau, Lake
+         Valor, Iron Island, Galactic HQ), secret HM levels, Max Raids,
+         the Regis, Arceus; audio and the performance pass; strip the
+         debug panel.
 
 ## Working rules for Claude Code
 - Read this file at the start of every session.

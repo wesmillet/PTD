@@ -4,8 +4,10 @@
  * Options. Save uses SavePanel. One page is open at a time.
  */
 import config from '../data/config.json';
-import { getPokemon, typeName } from '../data/pokedata';
-import { badgeTextureKey, iconUrl, itemUrl } from '../game/runtime';
+import { displayName, getPokemon, typeName } from '../data/pokedata';
+import { badgeTextureKey, iconUrl, itemUrl, portraitUrl } from '../game/runtime';
+import { allWildSpecies, speciesAreas } from '../sim/dex';
+import { capitalizeName } from '../sim/names';
 import { BALL_IDS, BALLS } from '../sim/catch';
 import { allBadges, dexCounts, hasBadge, type GameState } from '../sim/game';
 import type { Monster } from '../sim/monster';
@@ -71,39 +73,55 @@ export class MenuPages {
     if (notify) this.hooks.onClose();
   }
 
+  /** The Pokédex: seen, caught and shiny counts, then every species some level spawns with its portrait, types and areas. */
   pokedex(): void {
     const root = this.openPanel('Pokédex', 'pokedex');
+    root.style.width = 'min(640px, calc(100vw - 24px))';
     const game = this.hooks.game;
     const counts = dexCounts(game);
     const line = document.createElement('div');
     line.className = 'ptd-dim';
     line.textContent = `Seen ${counts.seen}   Caught ${counts.caught}   Shiny ${counts.shiny}`;
     root.appendChild(line);
-    const grid = document.createElement('div');
-    grid.className = 'ptd-grid';
-    grid.style.gridTemplateColumns = 'repeat(auto-fill, 72px)';
-    const ids = Object.keys(game.pokedex)
-      .map(Number)
-      .filter((id) => game.pokedex[String(id)]?.seen)
-      .sort((a, b) => a - b);
-    for (const id of ids) {
-      const entry = game.pokedex[String(id)]!;
-      const card = document.createElement('div');
-      card.className = `ptd-card${entry.caught ? '' : ' unknown'}`;
-      const icon = iconImage(iconUrl(id));
-      if (icon) card.appendChild(icon);
+    const list = document.createElement('ul');
+    list.className = 'ptd-moves';
+    const ids = new Set<number>(allWildSpecies());
+    for (const id of Object.keys(game.pokedex).map(Number)) if (game.pokedex[String(id)]?.seen) ids.add(id);
+    for (const id of [...ids].sort((a, b) => a - b)) {
+      const entry = game.pokedex[String(id)];
+      const data = getPokemon(id);
+      const li = document.createElement('li');
+      li.className = 'ptd-move';
+      li.style.gridTemplateColumns = 'auto 1fr auto';
+      li.style.cursor = 'default';
+      const portrait = document.createElement('img');
+      portrait.className = 'ptd-portrait small';
+      portrait.alt = '';
+      const url = portraitUrl(id, 'Normal', entry?.shinyCaught ?? false);
+      if (url) portrait.src = url;
+      if (!entry?.caught) portrait.style.filter = 'brightness(0.15)';
+      const text = document.createElement('div');
       const name = document.createElement('div');
-      name.textContent = `${entry.caught ? '' : '? '}${capitalize(getPokemon(id).name)}${entry.shinyCaught ? ' ★' : ''}`;
-      card.appendChild(name);
-      grid.appendChild(card);
+      name.className = 'ptd-name';
+      name.textContent = `#${String(data.species ?? id).padStart(3, '0')} ${entry?.seen ? capitalizeName(displayName(id)) : '???'}${entry?.shinyCaught ? ' ★' : ''}`;
+      const areas = document.createElement('div');
+      areas.className = 'ptd-dim';
+      const where = speciesAreas(id);
+      areas.textContent = entry?.seen ? (where.length ? `Areas: ${where.join(', ')}` : 'No known area') : entry?.caught ? '' : `${entry?.seen ? 'Seen' : 'Not seen yet'}`;
+      text.append(name, areas);
+      const types = document.createElement('div');
+      types.style.cssText = 'display:flex;gap:2px;align-items:center';
+      if (entry?.seen) for (const t of data.types) types.appendChild(typeIcon(typeName(t)));
+      li.append(portrait, text, types);
+      list.appendChild(li);
     }
-    if (ids.length === 0) {
+    if (ids.size === 0) {
       const none = document.createElement('div');
       none.className = 'ptd-dim';
       none.textContent = 'No Pokémon seen yet.';
-      grid.appendChild(none);
+      list.appendChild(none);
     }
-    root.appendChild(grid);
+    root.appendChild(list);
   }
 
   party(): void {

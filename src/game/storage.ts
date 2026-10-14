@@ -6,7 +6,75 @@ import { applyZoom } from './zoom';
 import type { GameState } from '../sim/game';
 import { decodeSaveCode, encodeSaveCode, restoreGame, SaveError, serializeGame, validateSave, type SaveData } from '../sim/save';
 
-export const SAVE_KEY = 'ptd.save.v1';
+/** Slot 1 keeps the original key so existing saves stay where they are. */
+const SLOT_KEYS = ['ptd.save.v1', 'ptd.save.slot2', 'ptd.save.slot3'] as const;
+const CURRENT_SLOT_KEY = 'ptd.save.slot';
+export const SLOT_COUNT = SLOT_KEYS.length;
+export const SAVE_KEY = SLOT_KEYS[0];
+
+function readSlotIndex(): number {
+  try {
+    const n = Number(localStorage.getItem(CURRENT_SLOT_KEY) ?? '1');
+    return Number.isInteger(n) && n >= 1 && n <= SLOT_COUNT ? n : 1;
+  } catch {
+    return 1;
+  }
+}
+
+let currentSlot = readSlotIndex();
+
+/** The active save slot (1 to 3). */
+export function activeSlot(): number {
+  return currentSlot;
+}
+
+/** Switches the active slot; the caller reloads the game afterwards. */
+export function setActiveSlot(slot: number): void {
+  if (!Number.isInteger(slot) || slot < 1 || slot > SLOT_COUNT) throw new Error(`no save slot ${slot}`);
+  currentSlot = slot;
+  try {
+    localStorage.setItem(CURRENT_SLOT_KEY, String(slot));
+  } catch {
+    // storage unavailable
+  }
+}
+
+function slotKey(slot = currentSlot): string {
+  return SLOT_KEYS[slot - 1] ?? SLOT_KEYS[0];
+}
+
+export interface SlotInfo {
+  slot: number;
+  empty: boolean;
+  savedAt?: number;
+  party?: number;
+  badges?: number;
+  money?: number;
+}
+
+/** What each slot holds, for the slot picker. */
+export function listSlots(): SlotInfo[] {
+  const out: SlotInfo[] = [];
+  for (let slot = 1; slot <= SLOT_COUNT; slot++) {
+    let text: string | null = null;
+    try {
+      text = localStorage.getItem(slotKey(slot));
+    } catch {
+      text = null;
+    }
+    if (!text) {
+      out.push({ slot, empty: true });
+      continue;
+    }
+    try {
+      const data = validateSave(JSON.parse(text));
+      out.push({ slot, empty: false, savedAt: data.savedAt, party: data.party.length, badges: data.badges.length, money: data.money });
+    } catch {
+      out.push({ slot, empty: true });
+    }
+  }
+  return out;
+}
 
 function currentSettings() {
   return { gameSpeed: runtime.gameSpeed, zoom: runtime.zoom, speed: { ...runtimeConfig.speed } };
@@ -19,7 +87,7 @@ export function buildSave(game: GameState): SaveData {
 /** Writes the save; returns false if storage is unavailable. */
 export function writeSave(game: GameState): boolean {
   try {
-    localStorage.setItem(SAVE_KEY, JSON.stringify(buildSave(game)));
+    localStorage.setItem(slotKey(), JSON.stringify(buildSave(game)));
     return true;
   } catch {
     return false;
@@ -28,7 +96,7 @@ export function writeSave(game: GameState): boolean {
 
 export function hasSave(): boolean {
   try {
-    return localStorage.getItem(SAVE_KEY) !== null;
+    return localStorage.getItem(slotKey()) !== null;
   } catch {
     return false;
   }
@@ -38,7 +106,7 @@ export function hasSave(): boolean {
 export function readSave(): SaveData | null {
   let text: string | null;
   try {
-    text = localStorage.getItem(SAVE_KEY);
+    text = localStorage.getItem(slotKey());
   } catch {
     return null;
   }
@@ -53,7 +121,7 @@ export function readSave(): SaveData | null {
 
 export function clearSave(): void {
   try {
-    localStorage.removeItem(SAVE_KEY);
+    localStorage.removeItem(slotKey());
   } catch {
     // storage unavailable
   }

@@ -70,6 +70,12 @@ cleared; defend levels when you win.
   starts a new game with a showcase PC.
   A selected ball is thrown with the next click on a wild Pokémon; any
   other click drops it.
+- Keys in a level: 1 to 6 pick party slots, Space starts the wave, P
+  pauses, Shift+1/2/4 set the speed, Esc opens the menu. The Save panel
+  has three slots.
+- After the finale: the Hisui rifts (purple tears), the Sinnoh Conference
+  (gold marker east of Sunyshore), the Lottery Corner on Jubilife and the
+  mystery event levels, as in `docs/design-content.md`.
 - Between levels: the Platinum town map is the level select (click a
   marker, or arrow keys and Enter; the player sprite walks there), with the
   PC (boxes, drag and drop, sort, filter, Rare Candy), Shop, Save (save
