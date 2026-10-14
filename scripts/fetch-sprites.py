@@ -11,8 +11,8 @@ A spec is a four digit dex number with an optional ":Form" suffix naming a
 tracker.json subgroup (Hisui, Mega, Origin, Sky, Shadow, Alola, Galar...).
 Forms land in public/assets/sprites/<dex>-<form-slug>/ (e.g. 0058-hisui),
 base forms in public/assets/sprites/<dex>/. Each folder gets AnimData.xml,
-credits.txt and the Anim and Shadow sheets for Idle, Walk, Attack, Hurt and
-Faint (following CopyOf), plus a shiny/ subfolder when SpriteCollab has one
+credits.txt and the Anim and Shadow sheets for Idle, Walk, Attack, Shoot (the
+ranged attack, for special moves), Hurt and Faint (following CopyOf), plus a shiny/ subfolder when SpriteCollab has one
 and the five portraits the game uses under public/assets/portraits/<folder>/
 (shiny portraits, when drawn, under public/assets/portraits/<folder>/shiny/).
 
@@ -29,7 +29,7 @@ import xml.etree.ElementTree as ET
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 WORK = os.environ.get('SPRITECOLLAB_DIR', '/tmp/spritecollab')
 REPO = 'https://github.com/PMDCollab/SpriteCollab'
-ACTIONS = ['Idle', 'Walk', 'Attack', 'Hurt', 'Faint']
+ACTIONS = ['Idle', 'Walk', 'Attack', 'Shoot', 'Hurt', 'Faint']
 PORTRAITS = ['Normal', 'Happy', 'Sad', 'Angry', 'Surprised']
 SPRITES = os.path.join(ROOT, 'public', 'assets', 'sprites')
 PORTRAIT_DIR = os.path.join(ROOT, 'public', 'assets', 'portraits')
@@ -116,6 +116,32 @@ def sheets_for(animdata_path):
     return out
 
 
+def prune_animdata(folder):
+    """Drop <Anim> entries whose sheet is not in the folder, so the loader
+    never asks for a file that was not drawn (or not shipped)."""
+    path = os.path.join(folder, 'AnimData.xml')
+    first = open(path, encoding='utf-8').readline()
+    tree = ET.parse(path)
+    root = tree.getroot()
+    anims = root.find('Anims')
+    if anims is None:
+        return
+    copy = {a.findtext('Name'): a.findtext('CopyOf') for a in anims.findall('Anim')}
+    for a in list(anims.findall('Anim')):
+        sheet = a.findtext('Name')
+        seen = set()
+        while copy.get(sheet) and sheet not in seen:
+            seen.add(sheet)
+            sheet = copy[sheet]
+        if not os.path.isfile(os.path.join(folder, f'{sheet}-Anim.png')):
+            anims.remove(a)
+    body = ET.tostring(root, encoding='unicode')
+    with open(path, 'w', encoding='utf-8') as f:
+        if first.startswith('<?xml'):
+            f.write(first if first.endswith('\n') else first + '\n')
+        f.write(body + '\n')
+
+
 def copy_folder(src_rel, dest):
     """Copy a trimmed sprite folder from the checkout."""
     src = os.path.join(WORK, src_rel)
@@ -132,6 +158,7 @@ def copy_folder(src_rel, dest):
             f = f'{sheet}-{kind}.png'
             if os.path.isfile(os.path.join(src, f)):
                 shutil.copyfile(os.path.join(src, f), os.path.join(dest, f))
+    prune_animdata(dest)
     return True
 
 
@@ -149,6 +176,7 @@ def trim_folder(folder):
         if os.path.isfile(p) and f not in keep:
             os.remove(p)
             removed += 1
+    prune_animdata(folder)
     return removed
 
 

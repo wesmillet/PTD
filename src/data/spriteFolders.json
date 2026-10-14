@@ -8,7 +8,13 @@
       "Sad",
       "Surprised"
     ],
-    "shinyPortraits": [],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
     "icon": true,
     "animatedIcon": true
   },
@@ -40,7 +46,13 @@
       "Sad",
       "Surprised"
     ],
-    "shinyPortraits": [],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
     "icon": true,
     "animatedIcon": true
   },
@@ -129,7 +141,13 @@
       "Sad",
       "Surprised"
     ],
-    "shinyPortraits": [],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
     "icon": true,
     "animatedIcon": true
   },
@@ -1008,7 +1026,29 @@
     "icon": true,
     "animatedIcon": true
   },
+  "0144": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
   "0145": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0146": {
     "shiny": true,
     "portraits": [
       "Normal"
@@ -1072,6 +1112,25 @@
     "species": 150,
     "form": "shadow",
     "formName": "Shadow"
+  },
+  "0151": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0155": {
     "shiny": true,
@@ -2033,7 +2092,45 @@
     "icon": true,
     "animatedIcon": true
   },
+  "0243": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
   "0244": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0245": {
     "shiny": true,
     "portraits": [
       "Angry",
@@ -2061,7 +2158,13 @@
       "Sad",
       "Surprised"
     ],
-    "shinyPortraits": [],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
     "icon": true,
     "animatedIcon": true
   },
@@ -2100,6 +2203,44 @@
     "form": "shadow",
     "formName": "Shadow"
   },
+  "0250": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0251": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
   "0254": {
     "shiny": true,
     "portraits": [
@@ -2109,7 +2250,13 @@
       "Sad",
       "Surprised"
     ],
-    "shinyPortraits": [],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
     "icon": true,
     "animatedIcon": true
   },
@@ -2141,7 +2288,13 @@
       "Sad",
       "Surprised"
     ],
-    "shinyPortraits": [],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
     "icon": true,
     "animatedIcon": true
   },
@@ -2328,7 +2481,13 @@
       "Sad",
       "Surprised"
     ],
-    "shinyPortraits": [],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
     "icon": true,
     "animatedIcon": true
   },
@@ -2785,6 +2944,101 @@
     "species": 381,
     "form": "mega",
     "formName": "Mega"
+  },
+  "0382": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0383": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0384": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0385": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0386": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0387": {
     "shiny": true,
@@ -4654,6 +4908,44 @@
     "icon": true,
     "animatedIcon": true
   },
+  "0489": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0490": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
   "0491": {
     "shiny": true,
     "portraits": [
@@ -4715,6 +5007,25 @@
     "formName": "Sky"
   },
   "0493": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0494": {
     "shiny": true,
     "portraits": [
       "Angry",
@@ -4873,6 +5184,196 @@
     "form": "hisui",
     "formName": "Hisui"
   },
+  "0638": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0639": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0640": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0641": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0642": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0643": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0644": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0645": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0646": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0647": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0648": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": true
+  },
+  "0649": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
   "0712": {
     "shiny": true,
     "portraits": [
@@ -4900,6 +5401,118 @@
     "form": "hisui",
     "formName": "Hisui"
   },
+  "0716": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0717": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0718": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0719": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0720": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0721": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
   "0724-hisui": {
     "shiny": true,
     "portraits": [
@@ -4917,6 +5530,435 @@
     "species": 724,
     "form": "hisui",
     "formName": "Hisui"
+  },
+  "0772": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0773": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0785": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0786": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0787": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0788": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0789": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0790": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0791": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0792": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0800": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0801": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0802": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0807": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0808": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0809": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0888": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0889": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0890": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0891": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0892": {
+    "shiny": true,
+    "portraits": [
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0894": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0895": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0897": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0898": {
+    "shiny": true,
+    "portraits": [
+      "Happy",
+      "Normal"
+    ],
+    "shinyPortraits": [
+      "Happy",
+      "Normal"
+    ],
+    "icon": true,
+    "animatedIcon": false
   },
   "0899": {
     "shiny": true,
@@ -4990,6 +6032,25 @@
     "animatedIcon": false
   },
   "0904": {
+    "shiny": true,
+    "portraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "shinyPortraits": [
+      "Angry",
+      "Happy",
+      "Normal",
+      "Sad",
+      "Surprised"
+    ],
+    "icon": true,
+    "animatedIcon": false
+  },
+  "0905": {
     "shiny": true,
     "portraits": [
       "Angry",

@@ -2,8 +2,10 @@
 
 import { describe, expect, it } from 'vitest';
 import { animDurationMs, parseAnimData, ticksToMs } from './animData';
-// Real fixture: Turtwig's AnimData.xml as fetched from SpriteCollab.
-import turtwigXml from '../../public/assets/sprites/0387/AnimData.xml?raw';
+// Real fixture: Turtwig's AnimData.xml as SpriteCollab ships it (the copy
+// under public/ is pruned to the animations the game ships, see
+// scripts/fetch-sprites.py).
+import turtwigXml from './fixtures/turtwig-AnimData.xml?raw';
 
 const minimal = (anims: string) =>
   `<?xml version="1.0" ?><AnimData><ShadowSize>1</ShadowSize><Anims>${anims}</Anims></AnimData>`;

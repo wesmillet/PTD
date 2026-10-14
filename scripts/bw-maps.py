@@ -1267,10 +1267,11 @@ def register(n_tree_tiles):
     for i in range(n_tree_tiles):
         c['tiles'].append({'id': f'bw-tree-{i}', 'name': f'BW forest {i}', 'group': 'BW forest', 'layer': 'decoration',
                            'tileset': TS, 'source': 'generated-bw', 'col': i % 8, 'row': i // 8, 'solid': True})
-    terr_ids = {t['id'] for t in c['terrains']}
-    if 'bw-path' not in terr_ids:
-        c['terrains'].append({'id': 'bw-path', 'name': 'BW path', 'source': 'exterior', 'block': [0, 76],
-                              'group': 'Paths', 'base': 'bw-grass-0'})
+    # The route path: the soft-edged sandy dirt block (rows 43-45), which
+    # fades into the grass instead of the hard-edged orange block at row 76.
+    path_entry = {'id': 'bw-path', 'name': 'BW path', 'source': 'exterior', 'block': [0, 43],
+                  'group': 'Paths', 'base': 'bw-grass-0'}
+    c['terrains'] = [t for t in c['terrains'] if t['id'] != 'bw-path'] + [path_entry]
     save_catalogue(c)
     subprocess.run(['node', 'scripts/build-tilesets.mjs'], cwd=ROOT, check=True, stdout=subprocess.DEVNULL)
 
