@@ -35,16 +35,16 @@
    "name": "bw-outdoor",
    "image": "assets/tilesets/bw-outdoor.png",
    "imagewidth": 256,
-   "imageheight": 3552,
+   "imageheight": 3968,
    "tilewidth": 32,
    "tileheight": 32,
    "columns": 8,
-   "tilecount": 888,
+   "tilecount": 992,
    "margin": 0,
    "spacing": 0
   },
   {
-   "firstgid": 889,
+   "firstgid": 993,
    "name": "autotile:dirt-path",
    "image": "assets/tilesets/autotiles/dirt-path.png",
    "imagewidth": 96,
@@ -57,7 +57,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 901,
+   "firstgid": 1005,
    "name": "autotile:dirt-path-dark",
    "image": "assets/tilesets/autotiles/dirt-path-dark.png",
    "imagewidth": 96,
@@ -70,7 +70,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 913,
+   "firstgid": 1017,
    "name": "autotile:sand",
    "image": "assets/tilesets/autotiles/sand.png",
    "imagewidth": 96,
@@ -83,7 +83,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 925,
+   "firstgid": 1029,
    "name": "autotile:soil",
    "image": "assets/tilesets/autotiles/soil.png",
    "imagewidth": 96,
@@ -96,7 +96,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 937,
+   "firstgid": 1041,
    "name": "autotile:pebbles",
    "image": "assets/tilesets/autotiles/pebbles.png",
    "imagewidth": 96,
@@ -109,7 +109,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 949,
+   "firstgid": 1053,
    "name": "autotile:tall-grass",
    "image": "assets/tilesets/autotiles/tall-grass.png",
    "imagewidth": 96,
@@ -122,7 +122,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 961,
+   "firstgid": 1065,
    "name": "autotile:tall-grass-yellow",
    "image": "assets/tilesets/autotiles/tall-grass-yellow.png",
    "imagewidth": 96,
@@ -135,7 +135,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 973,
+   "firstgid": 1077,
    "name": "autotile:water",
    "image": "assets/tilesets/autotiles/water.png",
    "imagewidth": 96,
@@ -148,7 +148,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 985,
+   "firstgid": 1089,
    "name": "autotile:pool",
    "image": "assets/tilesets/autotiles/pool.png",
    "imagewidth": 96,
@@ -161,7 +161,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 997,
+   "firstgid": 1101,
    "name": "autotile:shallow-water",
    "image": "assets/tilesets/autotiles/shallow-water.png",
    "imagewidth": 96,
@@ -174,7 +174,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 1009,
+   "firstgid": 1113,
    "name": "autotile:snow-grass",
    "image": "assets/tilesets/autotiles/snow-grass.png",
    "imagewidth": 96,
@@ -187,7 +187,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 1021,
+   "firstgid": 1125,
    "name": "autotile:ice",
    "image": "assets/tilesets/autotiles/ice.png",
    "imagewidth": 96,
@@ -200,7 +200,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 1033,
+   "firstgid": 1137,
    "name": "autotile:beach-sand",
    "image": "assets/tilesets/autotiles/beach-sand.png",
    "imagewidth": 96,
@@ -213,7 +213,7 @@
    "spacing": 0
   },
   {
-   "firstgid": 1045,
+   "firstgid": 1149,
    "name": "autotile:bw-path",
    "image": "assets/tilesets/autotiles/bw-path.png",
    "imagewidth": 96,

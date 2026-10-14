@@ -15,7 +15,7 @@ Pipeline (all in one run):
      the "bw-outdoor" tileset and run scripts/build-tilesets.mjs.
   4. Resolve names to packed indices and write Tiled JSON to src/data/maps/.
 
-Usage: python3 scripts/bw-maps.py [map-id ...]   (default: all BW maps)
+Usage: python3 scripts/bw-maps.py   (always rewrites every BW map: the shared sheet is repacked each run)
 Placement spots are checked against melee range like scripts/sinnoh-maps.py.
 """
 import json
@@ -1451,7 +1451,10 @@ if __name__ == '__main__':
     built = [fn() for fn in MAPS.values()]
     per_map, n = composite(built)
     register(n)
-    wanted = set(sys.argv[1:]) or set(MAPS)
+    # register() repacks the shared sheet, which renumbers every tile, so every
+    # map is rewritten each run (a partial write once left the untouched maps
+    # pointing at the old indices and drew walls where the trees were).
+    if sys.argv[1:]:
+        print('note: all maps are rewritten (the shared sheet is repacked each run)')
     for m in built:
-        if m.name in wanted:
-            write(m, per_map[m.name])
+        write(m, per_map[m.name])
