@@ -18,6 +18,8 @@ import { BALLS } from '../sim/catch';
 import { advance, createClock, type Clock } from '../sim/clock';
 import { EvolutionDialog } from '../ui/evolutionDialog';
 import { DialogueBox } from '../ui/dialogue';
+import { showLocationPopup } from '../ui/locationPopup';
+import { VsIntro } from '../ui/vsIntro';
 import { MenuPages } from '../ui/menuPages';
 import { SavePanel } from '../ui/savePanel';
 import { StartMenu, startMenuEntries, type StartMenuId } from '../ui/startMenu';
@@ -55,7 +57,7 @@ import { LearnDialog } from '../ui/learnDialog';
 import { PokemonPanel } from '../ui/pokemonPanel';
 import { capitalize } from '../ui/domOverlay';
 import { findPokemonId, getMove } from '../data/pokedata';
-import { counterStarter } from '../sim/waves';
+import { counterStarter, levelPopup } from '../sim/waves';
 import type { Monster } from '../sim/monster';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
 import { STATUS_BADGE } from '../ui/domOverlay';
@@ -129,6 +131,9 @@ export class LevelScene extends Phaser.Scene {
   private menuPages?: MenuPages;
   private savePanel?: SavePanel;
   private dialogue?: DialogueBox;
+  private vsIntro?: VsIntro;
+  /** The trainer's throwing pose beside the entrance while their wave is being sent. */
+  private trainerSprite?: Phaser.GameObjects.Image;
   private paused = false;
   /** A party-strip Pokémon being dragged onto the map. */
   private stripDrag: { partyIndex: number; startX: number; startY: number; moved: boolean; sprite: Phaser.GameObjects.Sprite | Phaser.GameObjects.Image | null } | null = null;
@@ -276,6 +281,8 @@ export class LevelScene extends Phaser.Scene {
     this.learnDialog = new LearnDialog();
     this.evolutionDialog = new EvolutionDialog();
     this.dialogue = new DialogueBox(this, { bottom: this.scale.height - Hud.BOTTOM - 4 });
+    this.vsIntro = new VsIntro(this);
+    showLocationPopup(this, levelPopup(def), def.name, Hud.HEIGHT + 8);
     this.menuPages = new MenuPages({
       game: getGame(),
       party: () => this.state.party.map((p) => p.mon),
@@ -965,8 +972,11 @@ export class LevelScene extends Phaser.Scene {
           break;
         case 'waveStart':
           this.showToast(e.trainer ? `Wave ${e.wave}: ${e.trainer.name}` : `Wave ${e.wave}`);
+          if (e.trainer) this.showTrainerOnField(e.trainer.id);
           break;
         case 'waveEnd':
+          this.trainerSprite?.destroy();
+          this.trainerSprite = undefined;
           break;
         case 'phase':
           if (e.phase === 'won' || e.phase === 'lost' || e.phase === 'left') this.endLevel();
@@ -995,7 +1005,11 @@ export class LevelScene extends Phaser.Scene {
     else open();
   }
 
-  /** Pauses the sim and runs the trainer intro in the bottom text box; play resumes after the last page. */
+  /**
+   * Pauses the sim, plays the VS intro for trainers with a mugshot (gym
+   * leaders, the Elite Four, Cynthia) and runs the trainer intro in the
+   * bottom text box with their standing pose; play resumes after the last page.
+   */
   private showTrainer(trainer: NonNullable<LevelEvent['trainer']>, boss: boolean): void {
     if (!this.dialogue) return;
     this.paused = true;
@@ -1006,9 +1020,27 @@ export class LevelScene extends Phaser.Scene {
       { text: boss ? `${trainer.name} wants to battle! Beat the boss to earn the badge.` : `${trainer.name} wants to battle!`, portrait, icons },
       ...(trainer.intro ? [{ text: trainer.intro, portrait }] : []),
     ];
-    this.dialogue.show(pages, () => {
-      if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen && !this.startMenu?.isOpen) this.paused = false;
-    });
+    const talk = () =>
+      this.dialogue?.show(pages, () => {
+        if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen && !this.startMenu?.isOpen) this.paused = false;
+      });
+    if (this.vsIntro?.canPlay(trainer.id)) this.vsIntro.play(trainer.id, trainer.name, talk);
+    else talk();
+  }
+
+  /** The trainer's throwing pose beside the path entrance for the length of their wave. */
+  private showTrainerOnField(trainerId: string): void {
+    this.trainerSprite?.destroy();
+    const key = this.textures.exists(trainerTextureKey(trainerId, true)) ? trainerTextureKey(trainerId, true) : trainerTextureKey(trainerId);
+    if (!this.textures.exists(key)) return;
+    const first = this.state.map.path[0]!;
+    const { px, py } = this.tilePixel(first[0], first[1]);
+    const size = this.state.map.tileSize;
+    // Stand just off the entrance tile, on whichever side has room.
+    const x = Phaser.Math.Clamp(px + (px < this.scale.width / 2 ? size * 1.5 : -size * 1.5), 40, this.scale.width - 40);
+    const y = Phaser.Math.Clamp(py - size, Hud.HEIGHT + 40, this.scale.height - Hud.BOTTOM - 40);
+    this.trainerSprite = this.add.image(x, y, key).setDepth(850).setAlpha(0);
+    this.tweens.add({ targets: this.trainerSprite, alpha: 1, duration: 200 });
   }
 
   private animateBossMove(enemyId: number): void {
