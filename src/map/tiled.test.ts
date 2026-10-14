@@ -10,7 +10,7 @@ function sample() {
   m.placeable = [[1, 0], [4, 2]];
   m.terrain[1 * 6 + 0] = 'dirt-path';
   m.terrain[1 * 6 + 1] = 'dirt-path';
-  const tree = tileEntry('tree');
+  const tree = tileEntry('rock-grey'); // a solid 2x3 stamp
   for (let dy = 0; dy < tree.h; dy++) for (let dx = 0; dx < tree.w; dx++) m.decoration[(0 + dy) * 6 + 4 + dx] = stampIndex(tree, dx, dy) + 1;
   m.decoration[3 * 6 + 0] = tileEntry('flowers-blue').index + 1;
   return m;
@@ -58,7 +58,7 @@ describe('Tiled map format', () => {
     expect(def).toMatchObject({ theme: 'grass', width: 6, height: 4, tileSize: 32 });
     expect(def.path).toEqual([[0, 1], [3, 1], [3, 3]]);
     expect(def.placeable).toEqual([[1, 0], [4, 2]]);
-    // The 2x3 tree is solid; the flowers are not.
+    // The 2x3 rock is solid; the flowers are not.
     expect(def.blocked).toEqual([[4, 0], [5, 0], [4, 1], [5, 1], [4, 2], [5, 2]]);
     expect(validateMap(def).length).toBe(5);
   });

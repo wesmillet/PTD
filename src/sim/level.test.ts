@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { getLevel } from '../data/levels';
-import { getMap } from '../data/maps';
+import type { MapDef } from './map';
+import route201Fixture from './fixtures/route-201-legacy.json';
+import mineFixture from './fixtures/oreburgh-mine-legacy.json';
 import {
   createLevel,
   defaultRuntimeConfig,
@@ -28,8 +30,9 @@ import { applyAilment } from './status';
 
 const route201 = getLevel('route-201');
 const mine = getLevel('oreburgh-mine-1f');
-const route201Map = getMap('route-201');
-const mineMap = getMap('oreburgh-mine-1f');
+// Frozen layouts: the tests exercise simulation rules, not the current map art.
+const route201Map = route201Fixture as unknown as MapDef;
+const mineMap = mineFixture as unknown as MapDef;
 const TACKLE = 33;
 
 function turtwig(level = 5) {

@@ -148,6 +148,26 @@ to the editor. Everything the editor changes is drawn live.
 Nothing is saved to the game's save data or localStorage; the export file is
 the deliverable.
 
+## The Sinnoh maps script
+
+The six opening maps (Route 201, Lake Verity, Route 202, Route 203, Oreburgh
+Gate, Oreburgh Mine 1F) are designed in code in `scripts/sinnoh-maps.py`, one
+function per location, based on the real Platinum areas: Route 201's side path
+north to Lake Verity, the lake ringed by sand and trees, Route 202's tall-grass
+zigzag, Route 203's pond and rocky approach to Mt. Coronet, and the two caves
+built from the outdoor sheet's rock floor, cliff shelves and boulders until a
+cave tileset exists. Run `python3 scripts/sinnoh-maps.py [map-id ...]` to
+regenerate; it refuses to put decoration on the path or on a placeable spot.
+Edits made in the in-game editor and exported win over the script: once a map
+is hand-edited, stop regenerating it.
+
+Tree stamps in the Kyle-Dove sheet are 3 tiles wide (pairs and big trees 5),
+not 2 and 4; the catalogue was corrected, which repacked the outdoor sheet.
+
+The simulation tests use frozen copies of the original Route 201 and Mine
+layouts (`src/sim/fixtures/`), so redesigning a map does not change test
+geometry.
+
 ## Adding a level
 
 1. Draw the map in the editor (or in Tiled, using
