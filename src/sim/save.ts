@@ -56,6 +56,9 @@ export interface SaveData {
   pokedex: Record<string, DexEntry>;
   badges: string[];
   flags?: string[];
+  conferenceWins?: number;
+  tickets?: number;
+  conference?: unknown;
   settings: SavedSettings;
 }
 
@@ -98,6 +101,9 @@ export function serializeGame(game: GameState, settings: SavedSettings, now = Da
     pokedex: JSON.parse(JSON.stringify(game.pokedex)) as Record<string, DexEntry>,
     badges: [...game.badges],
     flags: [...game.flags],
+    ...(game.conferenceWins ? { conferenceWins: game.conferenceWins } : {}),
+    ...(game.tickets ? { tickets: game.tickets } : {}),
+    ...(game.conference ? { conference: JSON.parse(JSON.stringify(game.conference)) as unknown } : {}),
     settings: { gameSpeed: settings.gameSpeed, ...(settings.zoom !== undefined ? { zoom: settings.zoom } : {}), speed: { ...settings.speed } },
   };
 }
@@ -255,6 +261,9 @@ export function validateSave(raw: unknown): SaveData {
     pokedex,
     badges,
     flags,
+    ...(isInt(s.conferenceWins, 0, 10000) ? { conferenceWins: s.conferenceWins } : {}),
+    ...(isInt(s.tickets, 0, 10000) ? { tickets: s.tickets } : {}),
+    ...(s.conference && typeof s.conference === 'object' ? { conference: JSON.parse(JSON.stringify(s.conference)) as unknown } : {}),
     settings: { gameSpeed: GAME_SPEEDS.includes(settings.gameSpeed) ? settings.gameSpeed : 1, ...(settings.zoom !== undefined ? { zoom: settings.zoom as SavedZoom } : {}), speed },
   };
 }
@@ -273,6 +282,9 @@ export function restoreGame(data: SaveData): GameState {
   game.pokedex = data.pokedex;
   game.badges = [...data.badges];
   game.flags = [...(data.flags ?? [])];
+  if (data.conferenceWins) game.conferenceWins = data.conferenceWins;
+  if (data.tickets) game.tickets = data.tickets;
+  if (data.conference) game.conference = JSON.parse(JSON.stringify(data.conference)) as unknown;
   return game;
 }
 

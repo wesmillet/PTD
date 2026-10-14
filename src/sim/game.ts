@@ -44,6 +44,14 @@ export interface GameState {
   badges: string[];
   /** Story flags, key items, TMs and HMs ("surf", "tm-grass-knot", "oaks-letter", "noble-kleavor"). */
   flags: string[];
+  /** Conference wins so far. */
+  conferenceWins?: number;
+  /** Lottery tickets in hand. */
+  tickets?: number;
+  /** The Conference run in progress (src/sim/conference.ts). */
+  conference?: unknown;
+  /** A lottery challenge just finished: the draw is owed ("won") or the ticket is kept ("lost"). */
+  lotteryPending?: 'won' | 'lost';
 }
 
 export const MAX_PARTY = config.party.maxParty;

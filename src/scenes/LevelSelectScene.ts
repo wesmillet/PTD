@@ -14,7 +14,7 @@ import {
   STARTERS,
 } from '../game/session';
 import { BALL_IDS, BALLS } from '../sim/catch';
-import { allBadges, hasBadge, isLevelCompleted, isLevelUnlocked, orderedLevelIds, unlockBlockers } from '../sim/game';
+import { allBadges, DEMO_MODE, hasBadge, isLevelCompleted, isLevelUnlocked, orderedLevelIds, unlockBlockers } from '../sim/game';
 import { levelPopup, waveCount } from '../sim/waves';
 import { Button, framePanel } from '../ui/button';
 import { SavePanel } from '../ui/savePanel';
@@ -89,6 +89,7 @@ export class LevelSelectScene extends Phaser.Scene {
     this.drawBag(8, 200, height - 12);
     this.drawMenu(width - 8, 30);
     this.drawMarkers(game);
+    this.drawConferenceMarker(game);
     this.createPlayer();
 
     this.input.keyboard?.on('keydown-LEFT', () => this.stepCursor(-1));
@@ -163,6 +164,32 @@ export class LevelSelectScene extends Phaser.Scene {
       const open = this.markers.filter((m) => m.unlocked);
       cursorLevelId = (open[open.length - 1] ?? this.markers[0])?.id;
     }
+  }
+
+  /** Lily of the Valley island: the Conference, a tall gold marker east of Sunyshore. */
+  private drawConferenceMarker(game: ReturnType<typeof getGame>): void {
+    const { x, y } = this.mapPixel([238, 70]);
+    const open = isLevelUnlocked(game, 'distortion-world') && (DEMO_MODE || isLevelCompleted(game, 'distortion-world'));
+    const image = this.textures.exists('map-markers') ? this.add.image(x, y, 'map-markers', 1).setScale(MAP_SCALE) : this.add.image(x, y, '__DEFAULT').setDisplaySize(24, 24);
+    if (open) image.setTintFill(0xf0b020);
+    else image.setAlpha(0.5);
+    image.setDepth(10).setInteractive({ useHandCursor: open });
+    const label = () => {
+      this.hideHover();
+      const name = this.add.text(0, -8, 'Sinnoh Conference', TEXT).setOrigin(0.5);
+      const info = this.add.text(0, 8, open ? 'Lily of the Valley: sixteen trainers, four rounds' : 'Locked: clear the Distortion World', TEXT_DIM).setOrigin(0.5);
+      const w = Math.max(name.width, info.width) + 28;
+      this.hover = this.add.container(Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4), y - 62, [framePanel(this, 0, 0, w, 44, 'blue'), name, info]).setDepth(50);
+    };
+    image.on('pointerover', label);
+    image.on('pointerout', () => this.hideHover());
+    image.on('pointerdown', () => {
+      if (!open) {
+        label();
+        return;
+      }
+      this.guard(() => this.scene.start('Conference'));
+    });
   }
 
   private showHover(id: string, x: number, y: number): void {

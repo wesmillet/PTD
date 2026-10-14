@@ -7,6 +7,7 @@ import { assetUrl, badgeTextureKey, bannerTextureKey, folderIconName, itemTextur
 import { allBadges } from '../sim/game';
 import { levelTrainers, POPUP_KINDS } from '../sim/waves';
 import { TRAINER_ART, trainerArtId } from '../data/trainers';
+import { ROSTER } from '../sim/conference';
 import typesJson from '../data/types.json';
 import { PC } from '../sim/pc';
 import { frameKey, TEXT_BIG } from '../ui/styles';
@@ -87,6 +88,10 @@ export class BootScene extends Phaser.Scene {
     // throwing poses, plus the VS mugshot and class banner when they exist.
     const trainerIds = new Set<string>();
     for (const levelId of levelIds()) for (const t of levelTrainers(getLevel(levelId))) trainerIds.add(t.id);
+    for (const r of ROSTER) if (!r.silhouette) trainerIds.add(r.id);
+    // Anime trainers without art ride on the Ace Trainer sprite, blacked out in create().
+    this.load.image(trainerTextureKey('ace-trainer-male'), assetUrl('assets/trainers/ace-trainer-male.png'));
+    this.load.image(trainerTextureKey('ace-trainer-male', true), assetUrl('assets/trainers/ace-trainer-male-pose.png'));
     for (const id of trainerIds) {
       const art = TRAINER_ART[id];
       const file = trainerArtId(id);
@@ -132,6 +137,27 @@ export class BootScene extends Phaser.Scene {
     }
   }
 
+  /** Blacked-out copies of the Ace Trainer sprite for roster trainers without art (Ash, Paul, Tobias, ...). */
+  private buildSilhouettes(): void {
+    for (const r of ROSTER) {
+      if (!r.silhouette) continue;
+      for (const pose of [false, true]) {
+        const src = trainerTextureKey('ace-trainer-male', pose);
+        const key = trainerTextureKey(r.id, pose);
+        if (!this.textures.exists(src) || this.textures.exists(key)) continue;
+        const image = this.textures.get(src).getSourceImage() as HTMLImageElement;
+        const canvas = this.textures.createCanvas(key, image.width, image.height);
+        if (!canvas) continue;
+        const ctx = canvas.context;
+        ctx.drawImage(image, 0, 0);
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.fillStyle = '#20202c';
+        ctx.fillRect(0, 0, image.width, image.height);
+        canvas.refresh();
+      }
+    }
+  }
+
   create(): void {
     // A small star for shiny sparkles.
     const star = this.add.graphics();
@@ -142,10 +168,12 @@ export class BootScene extends Phaser.Scene {
     star.generateTexture('star', 8, 8);
     star.destroy();
     this.buildShinyIcons();
+    this.buildSilhouettes();
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
     else if (scene === 'select') this.scene.start('LevelSelect');
     else if (scene === 'pc') this.scene.start('PC');
+    else if (scene === 'conference') this.scene.start('Conference');
     else if (urlParam('level')) this.scene.start('Level');
     else this.scene.start('Title');
   }

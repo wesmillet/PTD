@@ -84,8 +84,14 @@ export class PCScene extends Phaser.Scene {
   private cell = 48;
   private iconScale = 1;
 
+  private backTo = 'LevelSelect';
+
   constructor() {
     super('PC');
+  }
+
+  init(data: { backTo?: string } = {}): void {
+    this.backTo = data.backTo ?? 'LevelSelect';
   }
 
   create(): void {
@@ -107,7 +113,7 @@ export class PCScene extends Phaser.Scene {
       this.add.rectangle(PARTY_W / 2, y, 64, partyStep - 8, COLORS.panel2).setStrokeStyle(2, 0xa8b8c8);
       this.makeSlot({ kind: 'party', index: i }, PARTY_W / 2, y, 64);
     }
-    new Button(this, PARTY_W / 2, height - 24, 'Back', () => this.scene.start('LevelSelect'), 96, 28, 'ui-menu-exit');
+    new Button(this, PARTY_W / 2, height - 24, 'Back', () => this.scene.start(this.backTo), 96, 28, 'ui-menu-exit');
 
     // Box: everything between the party column and the summary panel.
     const boxAreaX = PARTY_W + 8;
@@ -152,7 +158,7 @@ export class PCScene extends Phaser.Scene {
     this.input.on('pointermove', (p: Phaser.Input.Pointer) => this.onPointerMove(p));
     this.input.on('pointerup', (p: Phaser.Input.Pointer) => this.onPointerUp(p));
     this.input.on('pointerupoutside', (p: Phaser.Input.Pointer) => this.onPointerUp(p));
-    this.input.keyboard?.on('keydown-ESC', () => this.scene.start('LevelSelect'));
+    this.input.keyboard?.on('keydown-ESC', () => this.scene.start(this.backTo));
     this.input.keyboard?.on('keydown-LEFT', () => this.switchBox(-1));
     this.input.keyboard?.on('keydown-RIGHT', () => this.switchBox(1));
 
@@ -184,7 +190,7 @@ export class PCScene extends Phaser.Scene {
         this.refresh();
       },
       onChange: () => this.changed(),
-      onBack: () => this.scene.start('LevelSelect'),
+      onBack: () => this.scene.start(this.backTo),
     });
 
     (window as unknown as { __ptd?: unknown }).__ptd = {

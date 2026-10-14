@@ -8,6 +8,9 @@ import { TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 export interface SummaryCallbacks {
   onRetry: () => void;
   onLevelSelect: () => void;
+  /** Runtime levels (Conference rounds) cannot be retried. */
+  noRetry?: boolean;
+  continueLabel?: string;
 }
 
 const TITLES: Record<string, string> = {
@@ -70,7 +73,11 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
       y += 26;
     }
   }
-  container.add(new Button(scene, px - 80, py + panelH / 2 - 30, 'Retry', callbacks.onRetry));
-  container.add(new Button(scene, px + 80, py + panelH / 2 - 30, 'Level select', callbacks.onLevelSelect));
+  if (callbacks.noRetry) {
+    container.add(new Button(scene, px, py + panelH / 2 - 30, callbacks.continueLabel ?? 'Continue', callbacks.onLevelSelect, 180, 30));
+  } else {
+    container.add(new Button(scene, px - 80, py + panelH / 2 - 30, 'Retry', callbacks.onRetry));
+    container.add(new Button(scene, px + 80, py + panelH / 2 - 30, callbacks.continueLabel ?? 'Level select', callbacks.onLevelSelect));
+  }
   return container;
 }

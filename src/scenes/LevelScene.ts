@@ -63,7 +63,8 @@ import { LearnDialog } from '../ui/learnDialog';
 import { PokemonPanel } from '../ui/pokemonPanel';
 import { capitalize } from '../ui/domOverlay';
 import { findPokemonId, getMove } from '../data/pokedata';
-import { counterStarter, levelPopup, type DialogueLine } from '../sim/waves';
+import { counterStarter, levelPopup, type DialogueLine, type LevelDef } from '../sim/waves';
+import { resolveRound, type ConferenceRun } from '../sim/conference';
 import type { Monster } from '../sim/monster';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
 import { STATUS_BADGE } from '../ui/domOverlay';
@@ -101,6 +102,12 @@ export interface LevelSceneData {
   seed?: number;
   /** Automatic reload attempts so far after a failed asset download. */
   retry?: number;
+  /** A level built at runtime (a Conference round, a lottery challenge) instead of one from the level files. */
+  def?: LevelDef;
+  /** Scene to return to afterwards (defaults to the level select). */
+  returnTo?: string;
+  /** The runtime level's outcome handler key: "conference" or "lottery". */
+  mode?: 'conference' | 'lottery';
 }
 
 /** Delays before each automatic reload after a download failure (a redeploy or a dropped connection). */
@@ -112,6 +119,9 @@ const RELOAD_DELAYS_MS = [2000, 4000, 8000];
  */
 export class LevelScene extends Phaser.Scene {
   private levelId = 'route-201';
+  private customDef?: LevelDef;
+  private returnTo = 'LevelSelect';
+  private mode?: 'conference' | 'lottery';
   private seed = 1;
   private state!: LevelState;
   private hud!: Hud;
@@ -158,6 +168,9 @@ export class LevelScene extends Phaser.Scene {
 
   init(data: LevelSceneData): void {
     this.levelId = data.levelId ?? urlParam('level') ?? 'route-201';
+    this.customDef = data.def;
+    this.returnTo = data.returnTo ?? 'LevelSelect';
+    this.mode = data.mode;
     this.retry = data.retry ?? 0;
     this.loadFailed = false;
     this.failedFiles = [];
@@ -184,7 +197,7 @@ export class LevelScene extends Phaser.Scene {
     loadDebugPartyIfRequested();
     const game = getGame();
     if (game.party.length === 0) return;
-    const def = getLevel(this.levelId);
+    const def = this.customDef ?? getLevel(this.levelId);
     const { width, height } = this.scale;
     const label = this.add.text(width / 2, height / 2 - 20, `Loading ${def.name}…`, TEXT_BIG).setOrigin(0.5);
     const bar = this.add.graphics();
@@ -209,10 +222,10 @@ export class LevelScene extends Phaser.Scene {
   private loadPhase = 'init';
 
   create(): void {
-    const def = getLevel(this.levelId);
+    const def = this.customDef ?? getLevel(this.levelId);
     const game = getGame();
     if (game.party.length === 0) {
-      this.scene.start('LevelSelect');
+      this.scene.start(this.returnTo);
       return;
     }
     this.loadPhase = this.loadFailed ? 'failed' : 'create';
@@ -1321,23 +1334,34 @@ export class LevelScene extends Phaser.Scene {
     }
     if (isOver(this.state)) {
       const before = game.money;
-      recordLevelResult(game, this.levelId, this.state.phase as 'won' | 'lost' | 'left', this.state.wavesCleared, this.state.kos);
-      this.moneyEarned = game.money - before;
+      if (this.customDef) {
+        game.money += this.state.kos * config.money.perKo;
+        this.moneyEarned = game.money - before;
+        if (this.mode === 'conference') {
+          const run = game.conference as ConferenceRun | undefined;
+          if (run) resolveRound(run, this.state.phase === 'won');
+        }
+        if (this.mode === 'lottery') game.lotteryPending = this.state.phase === 'won' ? 'won' : 'lost';
+      } else {
+        recordLevelResult(game, this.levelId, this.state.phase as 'won' | 'lost' | 'left', this.state.wavesCleared, this.state.kos);
+        this.moneyEarned = game.money - before;
+      }
     }
     saveGame();
   }
 
   private endLevel(): void {
     this.ended = true;
-    const badge = this.state.def.badge;
+    const badge = this.state.def.badge ?? this.state.def.reward?.badge;
     const hadBadge = badge ? getGame().badges.includes(badge.id) : false;
     this.syncGame();
     for (const id of [...this.enemyViews.keys()]) this.removeEnemyView(id);
     this.hud.setBoss(null);
     this.hud.update(this.state, runtime.gameSpeed);
     showSummary(this, { ...summarize(this.state), money: this.moneyEarned, newBadge: !hadBadge }, {
-      onRetry: () => this.scene.restart({ levelId: this.levelId, seed: this.seed + 1 }),
-      onLevelSelect: () => this.scene.start('LevelSelect'),
+      onRetry: () => this.scene.restart({ levelId: this.levelId, seed: this.seed + 1, def: this.customDef, returnTo: this.returnTo, mode: this.mode }),
+      onLevelSelect: () => this.scene.start(this.returnTo),
+      ...(this.customDef ? { noRetry: true, continueLabel: this.mode === 'conference' ? 'Locker room' : 'Continue' } : {}),
     });
   }
 

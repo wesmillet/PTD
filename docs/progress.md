@@ -45,6 +45,20 @@ which maps the maps session still needs to build. Updated per commit.
   three-phase boss with Shadow Force, Will-O-Wisp and gravity every 10 s,
   catchable under 10 %; night cave for Dusk Balls; the Griseous Orb).
 
+- **The Sinnoh Conference** (`src/sim/conference.ts`, `src/data/conference.json`,
+  `src/scenes/ConferenceScene.ts`, `src/ui/conferenceScreen.ts`): the
+  roster with tiers, powers, teams and signature moves; the seeded draw
+  (top four one per quarter, wildcards one run in six, Champion's bracket);
+  the bracket board with simulated results from power ratings; the field
+  roulette on the four stadium floors (`stadium` rule); rounds as runtime
+  levels (3, 4, 5, 6 Pokémon, the ace a boss, 5x HP in the final; Team
+  Rocket down both lanes); the locker room (heal, PC, vendor with five
+  Hyper Potions and five Ultra Balls, board); rewards (trophy, 20,000 and a
+  Master Ball first, a Mega Stone or Lottery ticket every win, the Legend
+  ribbon for Tobias, the Champion's bracket after three wins). The run is
+  saved mid-way (`game.conference`). Reached from the gold marker east of
+  Sunyshore on the level select (after the Distortion World outside demo).
+
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
@@ -58,6 +72,14 @@ which maps the maps session still needs to build. Updated per commit.
   The chase runs the route polyline forward and back (the map has no loop).
 - Dialga and Palkia appear in the cutscene only (the Origin secret level
   is item 9 territory). Cyrus's dialogue is a short paraphrase.
+- Ash, Paul, Tobias, Conway, Nando, Zoey and Team Rocket show as a
+  blacked-out Ace Trainer (canvas silhouette at boot) until art is ripped.
+- The Champion's bracket needs fifteen Elite-or-above trainers; the roster
+  has nine, so the rest are the strongest of the others.
+- Hyper Potions are ordinary Potions in the inventory (full heal); the
+  water field's two water spots are the two spots nearest the path's end
+  (the stadium maps carry no spot properties).
+- Each round plays one opponent Pokémon per wave rather than a mixed wave.
 - The Snowpoint hail pulse fires at every wave start (the design ties it to
   Abomasnow; the rule has no way to know who is on the field yet).
 

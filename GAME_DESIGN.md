@@ -203,6 +203,15 @@ their arena maps (six gym-trainer waves, three leader waves, the ace as a
 `docs/design-content.md`. Badge perks: outside demo mode a save can place
 two Pokémon plus one per badge.
 
+### The Sinnoh Conference
+The Lily of the Valley Conference replaces the Elite Four: a sixteen-trainer
+bracket drawn fresh per run from `src/data/conference.json` (Legend, Elite,
+Frontier, Leader, Rival and Wildcard tiers with power ratings and teams),
+four rounds on the stadium floors picked by the field roulette (3, 4, 5, 6
+Pokémon, the final ace at 5x HP), a locker room between rounds (heal, PC,
+vendor, the simulated board), and the rewards of `docs/design-content.md`.
+`src/sim/conference.ts` is the pure logic; `ConferenceScene` the flow.
+
 ### Level objectives
 Each level definition (`src/data/levels.json`) has an `objective`:
 - `defend`: a fixed wave count and a number of lives. Each enemy that reaches

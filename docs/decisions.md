@@ -231,3 +231,16 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   also flips gravity every ten seconds. Dragon Claw is its timed move.
 - Cutscene `show` names put PMD sprites on the map's `altar` point (or the
   path's end) for the length of the line.
+
+## Phase 8 item 5 (Conference)
+
+- Rounds are runtime level definitions (`LevelSceneData.def`) rather than
+  entries in the level files, so the opponent, floor and party count come
+  from the draw; the run itself (entrants, results, floors, vendor stock)
+  lives in the save under `conference` and survives a reload mid-run.
+- Match simulation is a logistic roll on the power difference divided by 8
+  (Cynthia beats Cheryl about 99 % of the time, Aaron beats Flint about 40 %).
+- Dark Void is Tobias's Darkrai's timed move every 15 s (the move's own
+  sleep effect puts towers in range to sleep); Latios is a second boss.
+- Rewards alternate at random between a Mega Stone the save does not hold
+  and a Lottery ticket; once every stone is owned, tickets only.

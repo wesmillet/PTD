@@ -1,0 +1,65 @@
+{
+  "tiers": {
+    "legend": { "min": 95, "max": 100, "levels": [62, 70] },
+    "elite": { "min": 80, "max": 90, "levels": [56, 64] },
+    "frontier": { "min": 75, "max": 85, "levels": [54, 60] },
+    "leader": { "min": 60, "max": 75, "levels": [50, 56] },
+    "rival": { "min": 55, "max": 70, "levels": [48, 54] },
+    "wildcard": { "min": 60, "max": 70, "levels": [50, 55] }
+  },
+  "roster": [
+    { "id": "champion-cynthia", "name": "Cynthia", "tier": "legend", "power": 100, "team": ["spiritomb", "roserade", "togekiss", "lucario", "milotic", "garchomp"], "signature": "dragon-rush" },
+    { "id": "tobias", "name": "Tobias", "tier": "legend", "power": 98, "silhouette": true, "team": ["darkrai", "latios"], "bosses": [0, 1], "signature": "dark-void", "signatures": { "darkrai": "dark-void", "latios": "dragon-pulse" }, "legend": true },
+    { "id": "elite-four-aaron", "name": "Aaron", "tier": "elite", "power": 84, "team": ["yanmega", "scizor", "vespiquen", "heracross", "drapion"], "signature": "cross-poison" },
+    { "id": "elite-four-bertha", "name": "Bertha", "tier": "elite", "power": 85, "team": ["whiscash", "gliscor", "hippowdon", "golem", "rhyperior"], "signature": "rock-wrecker" },
+    { "id": "elite-four-flint", "name": "Flint", "tier": "elite", "power": 87, "team": ["houndoom", "flareon", "rapidash", "infernape", "magmortar"], "signature": "fire-blast" },
+    { "id": "elite-four-lucian", "name": "Lucian", "tier": "elite", "power": 89, "team": ["mr-mime", "espeon", "bronzong", "alakazam", "gallade"], "signature": "psycho-cut" },
+    { "id": "tower-tycoon", "name": "Palmer", "tier": "elite", "power": 88, "team": ["milotic", "dragonite", "rhyperior", "regigigas"], "signature": "giga-impact" },
+    { "id": "ash", "name": "Ash", "tier": "elite", "power": 86, "silhouette": true, "team": ["pikachu", "infernape", "staraptor", "torterra", "buizel", "gliscor"], "signature": "giga-impact" },
+    { "id": "paul", "name": "Paul", "tier": "elite", "power": 88, "silhouette": true, "team": ["ursaring", "torterra", "weavile", "magnezone", "drapion", "electivire"], "signature": "thunder-punch" },
+    { "id": "arcade-star", "name": "Dahlia", "tier": "frontier", "power": 80, "team": ["ludicolo", "medicham", "dusknoir", "togekiss", "blaziken"], "signature": "blaze-kick" },
+    { "id": "castle-valet", "name": "Darach", "tier": "frontier", "power": 82, "team": ["staraptor", "empoleon", "houndoom", "gallade", "entei"], "signature": "sacred-fire" },
+    { "id": "factory-head", "name": "Thorton", "tier": "frontier", "power": 78, "team": ["bronzong", "ambipom", "kangaskhan", "rotom", "zapdos"], "signature": "thunder" },
+    { "id": "hall-matron", "name": "Argenta", "tier": "frontier", "power": 79, "team": ["blissey", "lopunny", "gastrodon", "altaria", "metagross"], "signature": "meteor-mash" },
+    { "id": "leader-roark", "name": "Roark", "tier": "leader", "power": 62, "team": ["geodude", "onix", "cranidos", "rampardos"], "signature": "head-smash" },
+    { "id": "leader-gardenia", "name": "Gardenia", "tier": "leader", "power": 64, "team": ["turtwig", "cherrim", "roserade", "tropius"], "signature": "leaf-storm" },
+    { "id": "leader-fantina", "name": "Fantina", "tier": "leader", "power": 66, "team": ["duskull", "haunter", "mismagius", "gengar"], "signature": "shadow-ball" },
+    { "id": "leader-maylene", "name": "Maylene", "tier": "leader", "power": 68, "team": ["meditite", "machoke", "lucario", "toxicroak"], "signature": "poison-jab" },
+    { "id": "leader-wake", "name": "Crasher Wake", "tier": "leader", "power": 70, "team": ["gyarados", "quagsire", "floatzel", "lumineon"], "signature": "waterfall" },
+    { "id": "leader-byron", "name": "Byron", "tier": "leader", "power": 71, "team": ["magneton", "steelix", "bastiodon", "magnezone"], "signature": "flash-cannon" },
+    { "id": "leader-candice", "name": "Candice", "tier": "leader", "power": 73, "team": ["sneasel", "piloswine", "abomasnow", "froslass", "glaceon"], "signature": "blizzard" },
+    { "id": "leader-volkner", "name": "Volkner", "tier": "leader", "power": 75, "team": ["jolteon", "raichu", "luxray", "electivire", "ampharos"], "signature": "discharge" },
+    { "id": "rival-barry", "name": "Barry", "tier": "rival", "power": 70, "team": ["staraptor", "heracross", "floatzel", "snorlax", "roserade", "counter-starter-final"], "signature": "close-combat" },
+    { "id": "player-female", "name": "Dawn", "tier": "rival", "power": 62, "team": ["piplup", "buneary", "pachirisu", "mamoswine", "togekiss", "quilava"], "signature": "air-slash" },
+    { "id": "player-male", "name": "Lucas", "tier": "rival", "power": 62, "team": ["chimchar", "luxray", "staraptor", "rapidash", "floatzel", "infernape"], "signature": "flare-blitz" },
+    { "id": "trainer-riley", "name": "Riley", "tier": "rival", "power": 68, "team": ["lucario", "metagross", "absol", "salamence"], "signature": "aura-sphere" },
+    { "id": "trainer-cheryl", "name": "Cheryl", "tier": "rival", "power": 56, "team": ["chansey", "blissey", "wobbuffet", "drifblim"], "signature": "shadow-ball" },
+    { "id": "trainer-mira", "name": "Mira", "tier": "rival", "power": 57, "team": ["kadabra", "alakazam", "togekiss"], "signature": "psychic" },
+    { "id": "trainer-marley", "name": "Marley", "tier": "rival", "power": 60, "team": ["arcanine", "weavile", "ampharos"], "signature": "thunder" },
+    { "id": "trainer-buck", "name": "Buck", "tier": "rival", "power": 61, "team": ["claydol", "magcargo", "umbreon", "hitmontop", "dusclops"], "signature": "shadow-punch" },
+    { "id": "conway", "name": "Conway", "tier": "rival", "power": 58, "silhouette": true, "team": ["slowking", "shuckle", "dusknoir", "lickilicky", "aggron"], "signature": "iron-tail" },
+    { "id": "nando", "name": "Nando", "tier": "rival", "power": 60, "silhouette": true, "team": ["roserade", "sunflora", "kricketune", "lopunny", "armaldo", "altaria"], "signature": "dragon-pulse" },
+    { "id": "zoey", "name": "Zoey", "tier": "rival", "power": 63, "silhouette": true, "team": ["glameow", "mismagius", "gastrodon", "leafeon", "lumineon", "gallade"], "signature": "psycho-cut" },
+    { "id": "commander-mars", "name": "Mars", "tier": "wildcard", "power": 64, "wildcard": true, "team": ["bronzor", "golbat", "purugly"], "signature": "body-slam" },
+    { "id": "commander-jupiter", "name": "Jupiter", "tier": "wildcard", "power": 65, "wildcard": true, "team": ["bronzor", "golbat", "skuntank"], "signature": "night-slash" },
+    { "id": "commander-saturn", "name": "Saturn", "tier": "wildcard", "power": 66, "wildcard": true, "team": ["bronzor", "golbat", "toxicroak"], "signature": "poison-jab" },
+    { "id": "team-rocket", "name": "Jessie and James", "tier": "wildcard", "power": 60, "wildcard": true, "silhouette": true, "tag": true, "team": ["wobbuffet", "seviper", "yanmega", "carnivine", "mime-jr", "meowth"], "signature": "poison-tail" }
+  ],
+  "floors": {
+    "grass": { "map": "stadium-grass", "name": "Grass field", "rule": "Tall grass hides enemies briefly" },
+    "rock": { "map": "stadium-rock", "name": "Rock field", "rule": "Rock and Ground enemies 20% faster" },
+    "water": { "map": "stadium-water", "name": "Water field", "rule": "Two water spots open for Water and Flying types" },
+    "ice": { "map": "stadium-ice", "name": "Ice field", "rule": "Enemies slide" }
+  },
+  "rounds": [
+    { "name": "Round of 16", "pokemon": 3 },
+    { "name": "Quarterfinal", "pokemon": 4 },
+    { "name": "Semifinal", "pokemon": 5 },
+    { "name": "Final", "pokemon": 6, "aceHp": 5 }
+  ],
+  "vendor": { "potion": { "count": 5, "price": 1200 }, "ultra": { "count": 5, "price": 1200 } },
+  "rewards": {
+    "firstWinMoney": 20000,
+    "megaStones": ["lucarionite", "galladite", "gardevoirite", "alakazite", "gengarite", "kangaskhanite", "aerodactylite", "steelixite", "houndoominite", "medichamite", "altarianite", "absolite", "glalitite", "latiosite", "lopunnite"]
+  }
+}
