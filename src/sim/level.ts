@@ -164,6 +164,12 @@ export interface Enemy {
   asleep?: boolean;
   /** Slow Start: seconds left at half speed with no boss moves. */
   slowStart?: number;
+  /** Lane point cached for the tick, distance and direction stamped below (targeting reads it for every tower). */
+  posX?: number;
+  posY?: number;
+  posTick?: number;
+  posDist?: number;
+  posRev?: boolean;
   /** Arceus's plates: the type changes every `every` seconds. */
   typeCycle?: { every: number; timer: number; index: number };
 }
@@ -969,20 +975,37 @@ export function targetable(state: LevelState, tower: Tower, enemy: Enemy): boole
   return rulesCanTarget(state, tower, enemy);
 }
 
+/** Candidate objects reused across towers and ticks (grows to the largest wave, never per tick). */
+const candidateBuf: (TargetCandidate & { enemy: Enemy })[] = [];
+
 function candidates(state: LevelState, tower: Tower): (TargetCandidate & { enemy: Enemy })[] {
-  const list: (TargetCandidate & { enemy: Enemy })[] = [];
+  let n = 0;
   for (const enemy of state.enemies) {
     if (!targetable(state, tower, enemy)) continue;
-    const p = enemyPoint(state, enemy);
-    list.push({
-      id: enemy.id,
-      tileDistance: Math.hypot(p.x - tower.tile[0], p.y - tower.tile[1]),
-      pathDistance: enemy.distance,
-      hp: enemy.mon.hp,
-      enemy,
-    });
+    // An enemy's lane point is the same for every tower this tick: compute it once per tick
+    // (keyed by the tick, the distance and the lane direction, so a moved or reversed enemy is recomputed).
+    if (enemy.posTick !== state.elapsed || enemy.posDist !== enemy.distance || enemy.posRev !== enemy.reversed) {
+      const p = enemyPoint(state, enemy);
+      enemy.posX = p.x;
+      enemy.posY = p.y;
+      enemy.posTick = state.elapsed;
+      enemy.posDist = enemy.distance;
+      enemy.posRev = enemy.reversed;
+    }
+    let c = candidateBuf[n];
+    if (!c) {
+      c = { id: 0, tileDistance: 0, pathDistance: 0, hp: 0, enemy };
+      candidateBuf[n] = c;
+    }
+    c.id = enemy.id;
+    c.tileDistance = Math.hypot((enemy.posX ?? 0) - tower.tile[0], (enemy.posY ?? 0) - tower.tile[1]);
+    c.pathDistance = enemy.distance;
+    c.hp = enemy.mon.hp;
+    c.enemy = enemy;
+    n++;
   }
-  return list;
+  candidateBuf.length = n;
+  return candidateBuf;
 }
 
 /** The enemy a tower would attack right now with its active move, if any. */
@@ -1377,6 +1400,9 @@ function enemyReachedEnd(state: LevelState, enemy: Enemy, events: LevelEvent[]):
 }
 
 /** Advances the simulation by `dt` seconds (already multiplied by game speed). */
+/** Reused by step() so the enemy loop allocates nothing per tick. */
+const enemySnapshot: Enemy[] = [];
+
 export function step(state: LevelState, dt: number): LevelEvent[] {
   const events: LevelEvent[] = [];
   if (dt <= 0) return events;
@@ -1398,8 +1424,12 @@ export function step(state: LevelState, dt: number): LevelEvent[] {
     spawn(state, state.pending.shift() as SpawnDef, events);
   }
 
-  // Enemy statuses, movement and leaks.
-  for (const enemy of [...state.enemies]) {
+  // Enemy statuses, movement and leaks. A KO or a leak removes an enemy mid-loop, so the
+  // loop walks a reused snapshot (no per-tick allocation) and skips anything already gone.
+  const snapshot = enemySnapshot;
+  snapshot.length = 0;
+  for (const e of state.enemies) snapshot.push(e);
+  for (const enemy of snapshot) {
     if (!state.enemies.includes(enemy)) continue;
     const r = tickStatus(enemy.mon.status, enemy.mon.stats.hp, dt, state.rng, state.config.status);
     if (enemy.asleep) {

@@ -448,3 +448,71 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   whoever is on screen is skipped until they leave.
 - The diorama's `playAnim` never throws: a missing action (Thundurus's
   Walk sheet is malformed) falls back to Idle or leaves the frame.
+
+## Phase 9 batch 2, item 6 (bugs and performance)
+
+Measured headless (Chromium with swiftshader, so frame rates are
+render-bound and only the trends count), production build served by
+`vite preview`, cold cache.
+
+| Measure | Before | After |
+| --- | --- | --- |
+| Boot to title | 4753 ms, 3208 requests, 3.7 MB | 2985 to 3164 ms, 1605 requests, 1.3 MB |
+| Boot to Route 201 ready | 8889 ms, 3949 requests, 9.0 MB | 6038 to 6342 ms, 2347 requests, 6.6 MB |
+| Sim, 240 steps, 6 towers vs 12 crawling level-45 enemies (`level.timing.test.ts`) | 2.5 ms best (0.010 ms per step) | 2.1 to 2.3 ms best (0.009 ms per step) |
+| Frame rate at 4x, twelve enemies, six towers (swiftshader) | 28 to 31 fps | 28 to 31 fps |
+| 20 switches Level, PC, Title, Level select: heap after the first fill | grew (190 MB, 1374 textures after 20) | flat (151 to 157 MB, 1204 to 1206 textures) |
+| Same loop: window listeners, tweens, timers, keyboard listeners | 0 growth | 0 growth |
+
+About half of the old requests were `blob:` URLs: every box icon was
+fetched twice (once as a Phaser texture, once as a DOM `<img>`), and boot
+pulled every trainer's standing art, pose, mugshot and banner plus every
+portrait the showcase might want.
+
+- Boot loads the interface, box icons, items, badges, type icons, popups,
+  the town map and the Ace Trainer base; trainer art loads with the level
+  that shows it (`levelTrainerIds`, `queueTrainerArt`), portraits are
+  on-demand `<img>` elements, and the title unloads the sprite sets it
+  cast when it closes. A scene that closes with a sprite download in
+  flight loses its loader listeners but not the download, so the loader
+  now drops those sheets as they land and parses an AnimData that landed
+  late from the text cache instead of re-requesting a key the loader
+  would skip (a species could otherwise never load again that session).
+- Loading screens never error: an optional sheet (Attack, Shoot, Hurt,
+  Faint, shadows) that fails logs one warning and the action is skipped;
+  only the map, AnimData, Idle and Walk trigger the retry loop. The
+  all-screens sweep (every level in `levelIds()`, the title, level
+  select, PC, Pokédex, lottery and Conference) finds no console error,
+  page error or failed request; the only output is swiftshader's own
+  "GPU stall due to ReadPixels" driver notice on the first WebGL frame
+  and the one warning for Primal Dialga's malformed Faint sheet (28
+  frames for a 224-frame entry; the action is skipped).
+- The sim loop allocates nothing per tick: `step()` walks a reused enemy
+  snapshot, `candidates()` fills a pooled list and caches each enemy's
+  lane point per tick (keyed by elapsed, distance and direction so a
+  test that moves an enemy mid-tick still sees the new point), and the
+  rules share one `RuleContext`.
+- The scene pools floating numbers (forty at once at most; a flood of
+  hits at 4x shows no number for the rest), hit flashes are the Hurt
+  animation on the existing sprite, the HUD only rewrites a text whose
+  string changed (Phaser skips identical `setText`) and the Start button
+  no longer redraws every frame, the Pokémon panel refreshes only when
+  its key changes.
+- Leaks: `scene.children.removeAll(true)` only removes (Phaser's list
+  skips the destroy callback), which leaked the preload label's canvas
+  texture once per level; `destroyChildren` destroys them. The shiny
+  star and the title weather particles are drawn on canvases instead of
+  `generateTexture`, which reads the GPU back. The leak loop above runs
+  with `--expose-gc`; tweens, timers, keyboard and window listeners come
+  back to their starting counts after every cycle.
+- Rough edges: the trainer intro shows the standing portrait in dialogue
+  and the throwing pose on the field (checked on Roark); the level select
+  cursor walks land only (`sinnoh-map-land.png` sea colours, one leg per
+  land stretch, four legs to Snowpoint); the speed keys are plain 1, 2
+  and 4 with Q W E R T Y for party slots; the boss box ends at y=110 and
+  the wave banner starts at y=116; Snowpoint's hail pulses only while
+  Abomasnow is pending or on the field (`hailSpecies`); Rowan and Looker
+  use their own overworld sheets. The stale notes in `docs/progress.md`
+  (toast banners, Rowan and Looker stand-ins, the hail rule, Shift speed
+  keys, the Origin level) are gone; the map stand-ins stay as the maps
+  session asked.

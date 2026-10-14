@@ -110,6 +110,7 @@ export class Button extends Phaser.GameObjects.Container {
   }
 
   setEnabled(enabled: boolean): this {
+    if (this.enabled === enabled) return this; // called every frame by the HUD
     this.enabled = enabled;
     this.draw();
     return this;

@@ -1,11 +1,13 @@
 /**
  * Ice floor (Snowpoint Gym): enemies slide faster over the ice region (the
  * middle third of the map unless `ice: [x0, y0, x1, y1]` says otherwise);
- * hail pulses at each wave start shrink every tower's range for a few seconds.
+ * hail pulses at a wave start shrink every tower's range for a few seconds,
+ * only on waves that bring a `hailSpecies` (Abomasnow) when one is named.
  */
+import { findPokemonId } from '../../data/pokedata';
 import { enemyPos } from './helpers';
 import type { RuleModule } from './types';
-import { num } from './types';
+import { num, str } from './types';
 
 export const iceFloor: RuleModule = {
   id: 'ice-floor',
@@ -14,6 +16,7 @@ export const iceFloor: RuleModule = {
     const hailShrink = num(params, 'hailShrink', 1);
     const hailSeconds = num(params, 'hailSeconds', 5);
     const hailFrom = num(params, 'hailFrom', 1);
+    const hailSpecies = params.hailSpecies === undefined ? undefined : findPokemonId(str(params, 'hailSpecies', ''));
     const given = Array.isArray(params.ice) ? (params.ice as number[]) : undefined;
     let ice: [number, number, number, number] = [0, 0, 0, 0];
     let hail = 0;
@@ -25,8 +28,9 @@ export const iceFloor: RuleModule = {
       },
       onWaveStart(ctx, waveIndex) {
         if (waveIndex + 1 < hailFrom) return;
+        if (hailSpecies !== undefined && !ctx.state.pending.some((s) => s.species === hailSpecies) && !ctx.state.enemies.some((e) => e.mon.species === hailSpecies)) return;
         hail = hailSeconds;
-        ctx.events.push({ type: 'rule', rule: 'ice-floor', text: 'Hail! Everyone sees a tile less.' });
+        ctx.events.push({ type: 'rule', rule: 'ice-floor', text: hailSpecies !== undefined ? 'Abomasnow calls hail! Everyone sees a tile less.' : 'Hail! Everyone sees a tile less.' });
       },
       onTick(_ctx, dt) {
         if (hail > 0) hail = Math.max(0, hail - dt);

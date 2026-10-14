@@ -100,23 +100,19 @@ which maps the maps session still needs to build. Updated per commit.
   the areas a species appears in, unknown species blacked out); the result
   screen with three stars and a Next level button; three save slots
   (slot 1 keeps the old key) with a picker in the Save panel; keyboard
-  shortcuts (1 to 6 pick party slots, Shift+1/2/4 set the speed, P
+  shortcuts (Q W E R T Y pick party slots, 1, 2 and 4 set the speed, P
   pauses, Space starts the wave, Esc the menu; touch drag places); the
   credits screen with an auto-scroll button. No audio (no assets).
 
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
-- The wave banner and rule texts show as toasts until the polish item.
 - Fantina's riddle is one question ("What has keys but opens no locks?");
   the right answer lights two lanterns.
 - Gym trainer names are made up (the Platinum gyms' trainers are not in the
   repo's data); their classes and Pokémon follow the design table.
-- Title scene stand-ins: Professor Rowan uses the `gentleman` overworld
-  sheet and Looker the `policeman` one (no Rowan or Looker sheets exist).
-  The chase runs the route polyline forward and back (the map has no loop).
-- Dialga and Palkia appear in the cutscene only (the Origin secret level
-  is item 9 territory). Cyrus's dialogue is a short paraphrase.
+- The title chase runs the route polyline forward and back (the map has
+  no loop). Cyrus's dialogue is a short paraphrase.
 - Ash, Paul, Tobias, Conway, Nando, Zoey and Team Rocket show as a
   blacked-out Ace Trainer (canvas silhouette at boot) until art is ripped.
 - The Champion's bracket needs fifteen Elite-or-above trainers; the roster
@@ -125,20 +121,19 @@ which maps the maps session still needs to build. Updated per commit.
   water field's two water spots are the two spots nearest the path's end
   (the stadium maps carry no spot properties).
 - Each round plays one opponent Pokémon per wave rather than a mixed wave.
-- The Snowpoint hail pulse fires at every wave start (the design ties it to
-  Abomasnow; the rule has no way to know who is on the field yet).
 
 - Balms are Feather Balls thrown at a staggered noble (any Hisuian ball
   works; the throw animation is the ball's). The dome is drawn as a glow
   centre on the map rather than a true third-of-the-map dome.
 - The distortion's "double chain" bonus is not implemented (no chain yet).
-- Shadow Lugia purifies at the finale's Spear Pillar level (the Origin
-  secret level is not built); the Mega Mewtwo Y unlock is a flag only.
+- Shadow Lugia purifies at Spear Pillar (the finale or the Origin level);
+  the Mega Mewtwo Y unlock is a flag only.
 - Cresselia's "Sleep catch bonus" is the ordinary sleep bonus (2x).
 - The Lottery's nature is "neutral" (the game has no natures).
-- Speed keys are Shift+1/2/4 so the plain number keys can pick party
-  slots as the design asks; the trainer card's play time and overworld
-  sprite, and the "text speed" / colourblind settings are not built.
+- Keys: 1, 2 and 4 set the speed and Q W E R T Y pick party slots (the
+  design gave the digits both jobs); the trainer card's play time and
+  overworld sprite, and the "text speed" / colourblind settings are not
+  built.
 
 - **Story set pieces** (Phase 9, `src/data/levels/05-story.json`): Valley
   Windworks (wind, Mars, Drifloon on Fridays), Eterna Forest (Cheryl

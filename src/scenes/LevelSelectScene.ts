@@ -27,6 +27,7 @@ import { LotteryScreen } from '../ui/lotteryScreen';
 import { claimDailyTicket } from '../sim/lottery';
 import { showStarterDialog } from '../ui/starterDialog';
 import { COLORS, TEXT, TEXT_DIM, TEXT_LIGHT } from '../ui/styles';
+import { findGridPath, nearestWalkable, simplifyPath, type WalkGrid } from '../map/gridPath';
 
 /** Height of the two-line hover frames over markers (26 px name and detail). */
 const HOVER_H = 72;
@@ -44,6 +45,44 @@ type Facing = keyof typeof FACING_ROWS;
 
 /** Where the player icon stands between visits (the last level opened or hovered). */
 let cursorLevelId: string | undefined;
+
+/** Town-map pixels per cell of the land grid the cursor walks on. */
+const LAND_CELL = 2;
+/** The sea colours of ui/gen4/sinnoh-map-land.png (deep and coastal water). */
+const SEA_COLOURS = new Set(['98,131,213', '24,164,189', '139,213,255']);
+let landGrid: WalkGrid | undefined;
+
+/** The land grid, read once from the land layer's pixels: cells that are sea are solid. */
+function readLandGrid(scene: Phaser.Scene): WalkGrid | undefined {
+  if (landGrid) return landGrid;
+  if (!scene.textures.exists('sinnoh-map-land')) return undefined;
+  const source = scene.textures.get('sinnoh-map-land').getSourceImage() as HTMLImageElement | HTMLCanvasElement;
+  const canvas = document.createElement('canvas');
+  canvas.width = source.width;
+  canvas.height = source.height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  if (!ctx) return undefined;
+  ctx.drawImage(source, 0, 0);
+  const px = ctx.getImageData(0, 0, source.width, source.height).data;
+  const width = Math.floor(source.width / LAND_CELL);
+  const height = Math.floor(source.height / LAND_CELL);
+  const solid: boolean[] = [];
+  for (let cy = 0; cy < height; cy++) {
+    for (let cx = 0; cx < width; cx++) {
+      // A cell is land when any of its pixels is not a sea colour.
+      let land = false;
+      for (let dy = 0; dy < LAND_CELL && !land; dy++) {
+        for (let dx = 0; dx < LAND_CELL && !land; dx++) {
+          const i = ((cy * LAND_CELL + dy) * source.width + cx * LAND_CELL + dx) * 4;
+          if ((px[i + 3] ?? 0) > 0 && !SEA_COLOURS.has(`${px[i]},${px[i + 1]},${px[i + 2]}`)) land = true;
+        }
+      }
+      solid.push(!land);
+    }
+  }
+  landGrid = { width, height, solid };
+  return landGrid;
+}
 
 interface Marker {
   id: string;
@@ -293,24 +332,43 @@ export class LevelSelectScene extends Phaser.Scene {
     }
     if (this.walking) return;
     this.walking = true;
-    const dx = marker.x - player.x;
-    const dy = marker.y - 14 - player.y;
-    const facing: Facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
-    player.play(`ow-player-walk-${facing}`);
-    const distance = Math.hypot(dx, dy);
-    this.tweens.add({
-      targets: player,
-      x: marker.x,
-      y: marker.y - 14,
-      duration: Math.min(900, Math.max(200, distance * 4)),
-      onComplete: () => {
+    // Walk over land: route on the land grid from the player's cell to the marker's, one straight leg per corner.
+    const legs = this.landRoute(player.x, player.y, marker.x, marker.y - 14);
+    const total = legs.reduce((s, [x, y], i) => s + Math.hypot(x - (i ? legs[i - 1]![0] : player.x), y - (i ? legs[i - 1]![1] : player.y)), 0);
+    const duration = Math.min(1400, Math.max(200, total * 4));
+    const step = (i: number) => {
+      const leg = legs[i];
+      if (!leg || !player.active) {
         player.stop();
         player.setFrame(FACING_ROWS.down);
         this.walking = false;
         cursorLevelId = marker.id;
         then();
-      },
-    });
+        return;
+      }
+      const dx = leg[0] - player.x;
+      const dy = leg[1] - player.y;
+      const facing: Facing = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : dy > 0 ? 'down' : 'up';
+      player.play(`ow-player-walk-${facing}`, true);
+      this.tweens.add({ targets: player, x: leg[0], y: leg[1], duration: Math.max(40, (Math.hypot(dx, dy) / Math.max(1, total)) * duration), onComplete: () => step(i + 1) });
+    };
+    step(0);
+  }
+
+  /** Canvas points to walk through from (x0, y0) to (x1, y1) over the land grid; a straight line when no land route exists (islands). */
+  private landRoute(x0: number, y0: number, x1: number, y1: number): [number, number][] {
+    const grid = readLandGrid(this);
+    if (!grid) return [[x1, y1]];
+    const cell = LAND_CELL * MAP_SCALE;
+    const toCell = (x: number, y: number): [number, number] => [Math.floor((x - this.mapX) / cell), Math.floor((y - this.mapY) / cell)];
+    const toCanvas = ([cx, cy]: readonly [number, number]): [number, number] => [this.mapX + cx * cell + cell / 2, this.mapY + cy * cell + cell / 2];
+    const from = nearestWalkable(grid, ...toCell(x0, y0), 8);
+    const to = nearestWalkable(grid, ...toCell(x1, y1), 8);
+    const path = findGridPath(grid, from, to, 20000);
+    if (!path) return [[x1, y1]];
+    const legs = simplifyPath(path).map(toCanvas);
+    legs.push([x1, y1]); // finish exactly at the marker
+    return legs;
   }
 
   /** Picks a marker: locked ones only show why; open ones are walked to and opened. */

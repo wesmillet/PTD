@@ -1,8 +1,9 @@
 import Phaser from 'phaser';
+import { destroyChildren } from '../game/sceneUtil';
 import { SPOT_ELLIPSE, spotTexture } from '../ui/spotMarker';
 import { Direction, directionFromVector } from '../assets/direction';
 import { createPmdSprite, dropFailedSheet, ensureLoaded, isLoaded, pickAction, playAnim, queuePokemon, registerAnims, spriteDex, spriteDirection, syncShadow } from '../assets/pmdLoader';
-import { ALL_ACTIONS, OPTIONAL_ACTIONS, levelSpriteFolders } from '../game/assets';
+import { ALL_ACTIONS, OPTIONAL_ACTIONS, levelSpriteFolders, levelTrainerIds, queueTrainerArt } from '../game/assets';
 import { getLevel } from '../data/levels';
 import { getMapModel } from '../data/maps';
 import { MapEditor } from '../map/editor';
@@ -116,6 +117,10 @@ export interface LevelSceneData {
 }
 
 /** Delays before each automatic reload after a download failure (a redeploy or a dropped connection). */
+/** Floating damage numbers alive at once; beyond this, extra hits show no number. */
+const FLOAT_POOL_MAX = 40;
+/** Keys for party slots one to six (the digits set the speed). */
+const PARTY_KEYS = ['KeyQ', 'KeyW', 'KeyE', 'KeyR', 'KeyT', 'KeyY'];
 const RELOAD_DELAYS_MS = [2000, 4000, 8000];
 
 /**
@@ -222,6 +227,7 @@ export class LevelScene extends Phaser.Scene {
       label.setText(`Could not load ${file.src}`).setColor('#ff7b7b');
     });
     MapRenderer.queueAssets(this);
+    queueTrainerArt(this, levelTrainerIds(def));
     this.loadedFolders = levelSpriteFolders(def, game);
     for (const dex of this.loadedFolders) queuePokemon(this, dex, ALL_ACTIONS, { optional: OPTIONAL_ACTIONS });
     // Debug hook for the automated load checks.
@@ -257,7 +263,7 @@ export class LevelScene extends Phaser.Scene {
       return;
     }
     for (const dex of this.loadedFolders) registerAnims(this, dex);
-    this.children.removeAll(true);
+    destroyChildren(this);
     const { model, map, error } = this.resolveMap(def.map);
     this.mapModel = model;
     this.state = createLevel(def, map, {
@@ -380,11 +386,11 @@ export class LevelScene extends Phaser.Scene {
       } else this.openMenu();
     });
     this.input.keyboard?.on('keydown-SPACE', () => this.tryStartWave());
-    // Number keys pick party slots (Shift + 1, 2, 4 set the speed); P pauses.
+    // 1, 2 and 4 set the speed; Q W E R T Y pick party slots one to six; P pauses.
     this.input.keyboard?.on('keydown', (e: KeyboardEvent) => {
       if (this.ended || this.dialogue?.isOpen || this.startMenu?.isOpen || this.menuPages?.isOpen || this.savePanel?.isOpen) return;
-      const n = Number(e.key);
-      if (e.shiftKey && (e.code === 'Digit1' || e.code === 'Digit2' || e.code === 'Digit4')) {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      if (e.code === 'Digit1' || e.code === 'Digit2' || e.code === 'Digit4') {
         const speed = Number(e.code.slice(-1));
         if ((config.gameSpeeds as number[]).includes(speed)) {
           runtime.gameSpeed = speed;
@@ -392,8 +398,9 @@ export class LevelScene extends Phaser.Scene {
         }
         return;
       }
-      if (Number.isInteger(n) && n >= 1 && n <= 6 && !e.shiftKey) {
-        if (this.state.party[n - 1]) this.handlePartySlot(n - 1);
+      const slot = PARTY_KEYS.indexOf(e.code);
+      if (slot >= 0) {
+        if (this.state.party[slot]) this.handlePartySlot(slot);
         return;
       }
       if (e.key === 'p' || e.key === 'P') {
@@ -1643,9 +1650,29 @@ export class LevelScene extends Phaser.Scene {
     else finish();
   }
 
+  /** Pooled floating numbers and labels: a text object is reused once its rise has faded, and at most FLOAT_POOL_MAX ride at once. */
+  private readonly floatPool: Phaser.GameObjects.Text[] = [];
+  private floatActive = 0;
+
   private floatText(pos: { px: number; py: number }, text: string, color: string): void {
-    const t = this.add.text(pos.px, pos.py - 20, text, { ...TEXT_SMALL, color, stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5).setDepth(3000);
-    this.tweens.add({ targets: t, y: pos.py - 48, alpha: 0, duration: 900, ease: 'Quad.easeOut', onComplete: () => t.destroy() });
+    if (this.floatActive >= FLOAT_POOL_MAX) return; // a flood of hits at 4x: the rest of the numbers are not worth a canvas each
+    let t = this.floatPool.pop();
+    if (!t) t = this.add.text(0, 0, '', { ...TEXT_SMALL, stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5).setDepth(3000);
+    t.setText(text).setColor(color).setPosition(pos.px, pos.py - 20).setAlpha(1).setVisible(true).setActive(true);
+    this.floatActive++;
+    this.tweens.add({
+      targets: t,
+      y: pos.py - 48,
+      alpha: 0,
+      duration: 900,
+      ease: 'Quad.easeOut',
+      onComplete: () => {
+        this.floatActive--;
+        if (!t.scene) return; // the scene went away with the text
+        t.setVisible(false).setActive(false);
+        this.floatPool.push(t);
+      },
+    });
   }
 
   private syncViews(): void {

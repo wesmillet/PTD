@@ -54,6 +54,22 @@ const pendingActions = new Map<string, { actions: Set<string>; optional: Set<str
 /** Texture keys of sheets whose download may fail without failing the Pokémon: optional actions and every shadow sheet. */
 const optionalKeys = new Map<string, { dex: string; action: string; shadow: boolean }>();
 const warned = new Set<string>();
+/**
+ * Sheet keys of Pokémon unloaded while their files were still downloading.
+ * A scene that shuts down mid-load drops its loader listeners, but the
+ * downloads still land in the texture manager; these are removed on arrival.
+ */
+const dropOnArrival = new Set<string>();
+let dropHooked = false;
+
+function dropLateArrivals(scene: Phaser.Scene): void {
+  if (dropHooked) return;
+  dropHooked = true;
+  const textures = scene.textures;
+  textures.on(Phaser.Textures.Events.ADD, (key: string) => {
+    if (dropOnArrival.delete(key) && textures.exists(key)) textures.remove(key);
+  });
+}
 
 /** Whether a loader file key belongs to an optional sheet (a failed download drops the action, nothing else). */
 export function isOptionalSheetKey(key: string): boolean {
@@ -189,6 +205,20 @@ export function queuePokemon(
   pendingActions.set(dex, { actions: new Set(actions), optional, shadows });
 
   const key = animDataKey(dex);
+  const onAnimData = (xml: string) => {
+    const set: LoadedSet = { dex, animData: parseAnimData(xml), actions: new Set() };
+    loadedSets.set(dex, set);
+    const wanted = pendingActions.get(dex) ?? { actions: new Set(actions), optional, shadows };
+    pendingActions.delete(dex);
+    queueSheets(scene, set, [...wanted.actions], wanted.optional, wanted.shadows);
+  };
+  // The XML can already be in the cache when an earlier scene shut down with the
+  // download in flight; the loader would skip a cached key, so parse it directly.
+  const cached = scene.cache.text.get(key) as string | undefined;
+  if (cached) {
+    onAnimData(cached);
+    return;
+  }
   scene.load.text(key, `${SPRITE_ROOT}/${dex}/AnimData.xml`);
   // If the download fails, forget the pending entry so a later preload (the
   // scene's automatic reload) requests the file again instead of skipping it.
@@ -200,11 +230,7 @@ export function queuePokemon(
   scene.load.on('loaderror', onError);
   scene.load.once(`filecomplete-text-${key}`, (_key: string, _type: string, xml: string) => {
     scene.load.off('loaderror', onError);
-    const set: LoadedSet = { dex, animData: parseAnimData(xml), actions: new Set() };
-    loadedSets.set(dex, set);
-    const wanted = pendingActions.get(dex) ?? { actions: new Set(actions), optional, shadows };
-    pendingActions.delete(dex);
-    queueSheets(scene, set, [...wanted.actions], wanted.optional, wanted.shadows);
+    onAnimData(xml);
   });
 }
 
@@ -223,6 +249,7 @@ function queueSheets(
     }
     set.actions.add(action);
     const texKey = sheetKey(set.dex, entry.sheet);
+    dropOnArrival.delete(texKey);
     if (optional.has(action)) optionalKeys.set(texKey, { dex: set.dex, action, shadow: false });
     if (!scene.textures.exists(texKey)) {
       scene.load.spritesheet(texKey, `${SPRITE_ROOT}/${set.dex}/${entry.sheet}-Anim.png`, {
@@ -231,6 +258,7 @@ function queueSheets(
       });
     }
     const rawShadowKey = rawShadowSheetKey(set.dex, entry.sheet);
+    dropOnArrival.delete(rawShadowKey);
     optionalKeys.set(rawShadowKey, { dex: set.dex, action, shadow: true });
     if (shadows && !scene.textures.exists(rawShadowKey) && !scene.textures.exists(shadowSheetKey(set.dex, entry.sheet))) {
       scene.load.spritesheet(rawShadowKey, `${SPRITE_ROOT}/${set.dex}/${entry.sheet}-Shadow.png`, {
@@ -244,6 +272,41 @@ function queueSheets(
 /** Whether `dex` has finished loading (AnimData parsed and sheets queued). */
 export function isLoaded(dex: string): boolean {
   return loadedSets.has(dex);
+}
+
+/**
+ * Forgets a loaded Pokémon: its animations, sheet and shadow textures and
+ * the parsed AnimData, so a screen that cast it (the title diorama) does
+ * not keep it in memory for the rest of the session. A later queuePokemon
+ * loads it again. Safe while the files are still downloading: whatever
+ * lands afterwards is dropped on arrival.
+ */
+export function unloadPokemon(scene: Phaser.Scene, dex: string): void {
+  pendingActions.delete(dex);
+  scene.cache.text.remove(animDataKey(dex));
+  const set = loadedSets.get(dex);
+  if (!set) return;
+  const sheets = new Set<string>();
+  for (const action of set.actions) {
+    const entry = set.animData.anims[action];
+    if (entry) sheets.add(entry.sheet);
+    for (const direction of ALL_DIRECTIONS) {
+      scene.anims.remove(animKey(dex, action, direction));
+      scene.anims.remove(shadowAnimKey(dex, action, direction));
+    }
+  }
+  for (const sheet of sheets) {
+    for (const key of [sheetKey(dex, sheet), shadowSheetKey(dex, sheet), rawShadowSheetKey(dex, sheet)]) {
+      optionalKeys.delete(key);
+      if (scene.textures.exists(key)) scene.textures.remove(key);
+      else if (key !== shadowSheetKey(dex, sheet)) {
+        // Still downloading (the shadow texture is built here, never downloaded).
+        dropOnArrival.add(key);
+        dropLateArrivals(scene);
+      }
+    }
+  }
+  loadedSets.delete(dex);
 }
 
 /**

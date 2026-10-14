@@ -12,7 +12,7 @@
  */
 import Phaser from 'phaser';
 import { Direction, directionFromVector } from '../assets/direction';
-import { createPmdSprite, ensureLoaded, isLoaded, pickAction, playAnim as playPmdAnim, syncShadow } from '../assets/pmdLoader';
+import { createPmdSprite, ensureLoaded, isLoaded, pickAction, playAnim as playPmdAnim, syncShadow, unloadPokemon } from '../assets/pmdLoader';
 
 /** playAnim that never throws: a missing action falls back to Idle, and a sprite without even that is left as it is. */
 function playAnim(sprite: Phaser.GameObjects.Sprite, action: string, direction: Direction): void {
@@ -103,6 +103,8 @@ export class Diorama {
   private readonly onScreen = new Map<string, number>();
   /** Every PMD actor alive, for the debug check that nobody stands on a solid tile. */
   private readonly actors = new Set<Phaser.GameObjects.Sprite>();
+  /** Sprite sets this diorama requested itself (landed or still downloading); destroy() unloads them so the title never hoards the roster. */
+  private readonly loadedHere = new Set<string>();
 
   constructor(scene: Phaser.Scene, offsetY: number, path: [number, number][], points: StagePoints, grid?: WalkGrid, seed = Date.now()) {
     this.scene = scene;
@@ -170,6 +172,8 @@ export class Diorama {
     for (const t of this.runs) t.cancelled = true;
     for (const o of this.objects) o.destroy();
     this.objects.length = 0;
+    for (const dex of this.loadedHere) unloadPokemon(this.scene, dex);
+    this.loadedHere.clear();
   }
 
   // ------------------------------------------------------------------ casting
@@ -268,6 +272,7 @@ export class Diorama {
   /** Loads a PMD sprite set; null when it is not ready within the timeout. */
   private async actor(folder: string, x: number, y: number, action = 'Idle', dir: Direction = Direction.Down, shiny = false): Promise<Actor | null> {
     const dex = shiny && (FOLDERS[folder] as { shiny?: boolean } | undefined)?.shiny ? `${folder}/shiny` : folder;
+    if (!isLoaded(dex)) this.loadedHere.add(dex);
     const ready = await Promise.race([
       ensureLoaded(this.scene, dex, ['Idle', 'Walk'], { optional: ['Attack', 'Hurt', 'Faint'] }).then(() => true).catch(() => false),
       new Promise<boolean>((resolve) => this.scene.time.delayedCall(LOAD_TIMEOUT_MS, () => resolve(isLoaded(dex)))),
@@ -568,7 +573,7 @@ export class Diorama {
       ticks++;
       if (ticks === 2) {
         const [px0, py0] = at(5, -4);
-        const prof = await this.ow('gentleman', px0, py0 - SPRITE_Y, 'down');
+        const prof = await this.ow('prof_rowan', px0, py0 - SPRITE_Y, 'down');
         if (prof) {
           await this.route(prof, lx + 3, ly, 40, token);
           await this.route(prof, lx + 3, ly + 1, 40, token);
@@ -589,7 +594,7 @@ export class Diorama {
     const g1 = await this.ow('grunt_m', col(-6)[0], col(-6)[1] - SPRITE_Y, 'right');
     const g2 = await this.ow('grunt_f', col(-7)[0], col(-7)[1] - SPRITE_Y, 'right');
     const bronzor = await this.actor('0436', col(-8)[0], col(-8)[1] - 6, 'Walk', Direction.Right);
-    const looker = await this.ow('policeman', col(-10)[0], col(-10)[1] - SPRITE_Y, 'right');
+    const looker = await this.ow('looker', col(-10)[0], col(-10)[1] - SPRITE_Y, 'right');
     if (!g1) {
       this.discard(g2, bronzor, looker);
       return;

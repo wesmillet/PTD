@@ -10,6 +10,7 @@ import { allBadges, hasBadge } from '../sim/game';
 import { Button, framePanel } from '../ui/button';
 import { CreditsScreen } from '../ui/creditsScreen';
 import { Diorama, type StagePoints } from '../ui/diorama';
+import { ensureLoaded, isLoaded } from '../assets/pmdLoader';
 import { MenuPages } from '../ui/menuPages';
 import { COLORS, TEXT_DIM, TEXT_SMALL_DIM, TEXT_TITLE } from '../ui/styles';
 
@@ -89,7 +90,7 @@ export class TitleScene extends Phaser.Scene {
     };
     this.diorama = new Diorama(this, MAP_TOP, model.path.map((t) => [t[0], t[1]]), stage, walkGrid(model));
     // Debug hook for the automated title checks.
-    (window as unknown as { __ptdTitle?: unknown }).__ptdTitle = { diorama: this.diorama, scene: this };
+    (window as unknown as { __ptdTitle?: unknown }).__ptdTitle = { diorama: this.diorama, scene: this, pmd: { ensureLoaded, isLoaded } };
     this.addTint(model.width * 32, model.height * 32);
     this.addWeather(model.width * 32, model.height * 32, stage);
   }
@@ -128,15 +129,26 @@ export class TitleScene extends Phaser.Scene {
   private addWeather(w: number, h: number, stage: StagePoints): void {
     const pick = Math.floor(Math.random() * 4);
     if (pick === 0) return;
-    const g = this.add.graphics();
     const key = `weather-${pick}`;
     if (!this.textures.exists(key)) {
-      if (pick === 1) g.fillStyle(0xffb0d0, 1).fillEllipse(3, 3, 6, 4);
-      else if (pick === 2) g.fillStyle(0xc0d8ff, 0.8).fillRect(0, 0, 1, 8);
-      else g.fillStyle(0xffffff, 1).fillCircle(2, 2, 2);
-      g.generateTexture(key, 8, 8);
+      // Drawn on a canvas: generateTexture reads the GPU back and stalls it.
+      const tex = this.textures.createCanvas(key, 8, 8);
+      if (!tex) return;
+      const ctx = tex.context;
+      ctx.beginPath();
+      if (pick === 1) {
+        ctx.fillStyle = '#ffb0d0';
+        ctx.ellipse(3, 3, 3, 2, 0, 0, Math.PI * 2);
+      } else if (pick === 2) {
+        ctx.fillStyle = 'rgba(192,216,255,0.8)';
+        ctx.rect(0, 0, 1, 8);
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.arc(2, 2, 2, 0, Math.PI * 2);
+      }
+      ctx.fill();
+      tex.refresh();
     }
-    g.destroy();
     if (pick === 1) {
       this.add.particles(0, MAP_TOP, key, { x: { min: 0, max: w }, y: { min: -10, max: h }, lifespan: 6000, speedX: { min: 10, max: 30 }, speedY: { min: 8, max: 20 }, quantity: 1, frequency: 400, alpha: { start: 0.9, end: 0.2 }, rotate: { start: 0, end: 180 } }).setDepth(1300);
     } else if (pick === 2) {

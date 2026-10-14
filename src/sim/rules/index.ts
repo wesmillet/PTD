@@ -53,7 +53,13 @@ export function createRules(defs: readonly RuleDef[] | undefined): RuleInstance[
   });
 }
 
-const ctx = (state: LevelState, events: LevelEvent[]): RuleContext => ({ state, events });
+// One context object, refilled per call: hooks run synchronously and never keep it, so nothing is allocated per tick.
+const shared: RuleContext = { state: undefined as unknown as LevelState, events: [] };
+const ctx = (state: LevelState, events: LevelEvent[]): RuleContext => {
+  shared.state = state;
+  shared.events = events;
+  return shared;
+};
 
 export function rulesOnCreate(state: LevelState, events: LevelEvent[]): void {
   for (const r of state.rules) r.onCreate?.(ctx(state, events));

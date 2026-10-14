@@ -71,7 +71,7 @@ cleared; defend levels when you win.
   A selected ball is thrown with the next click on a wild Pokémon; any
   other click drops it.
 - Keys in a level: 1 to 6 pick party slots, Space starts the wave, P
-  pauses, Shift+1/2/4 set the speed, Esc opens the menu. The Save panel
+  pauses, 1, 2 and 4 set the speed, Q to Y pick party slots, Esc opens the menu. The Save panel
   has three slots.
 - After the finale: the Hisui rifts (purple tears), the Sinnoh Conference
   (gold marker east of Sunyshore), the Lottery Corner on Jubilife and the

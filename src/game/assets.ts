@@ -2,11 +2,13 @@
  * Which sprite folders a scene needs, so levels load only their own
  * Pokémon instead of every folder in spriteIndex.json.
  */
+import type Phaser from 'phaser';
 import spriteFolders from '../data/spriteFolders.json';
 import { findPokemonId, getEvolutions, getEncounterArea, getPokemon, type EncounterArea } from '../data/pokedata';
+import { TRAINER_ART, trainerArtId } from '../data/trainers';
 import type { GameState } from '../sim/game';
 import { counterStarter, finalStarter, isScripted, levelTrainers, rosterTable, scriptedSpeciesNames, type AllyDef, type LevelDef } from '../sim/waves';
-import { dexFolder } from './runtime';
+import { assetUrl, bannerTextureKey, dexFolder, mugshotTextureKey, trainerTextureKey } from './runtime';
 
 const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[] }>;
 
@@ -86,4 +88,34 @@ export function levelSpriteFolders(def: LevelDef, game: GameState): string[] {
 
 export function hasSpriteFolder(species: number): boolean {
   return folders[dexFolder(species)] !== undefined;
+}
+
+/** Trainer ids a level shows art for: its trainers and every dialogue speaker. */
+export function levelTrainerIds(def: LevelDef): string[] {
+  const ids = new Set<string>();
+  for (const t of levelTrainers(def)) ids.add(t.id);
+  if (Array.isArray(def.waves)) {
+    for (const w of def.waves) for (const line of [...(w.lines ?? []), ...(w.outro ?? [])]) if (line.speaker) ids.add(line.speaker);
+  }
+  return [...ids];
+}
+
+/**
+ * Queues the Platinum art of these trainers on a scene's loader: the
+ * standing and throwing poses, the VS mugshot and the class banner when
+ * they exist. Ids without art (legendary "event-" trainers, nobles, the
+ * silhouetted anime trainers built at boot) are skipped; textures already
+ * present are not requested again.
+ */
+export function queueTrainerArt(scene: Phaser.Scene, ids: Iterable<string>): void {
+  for (const id of ids) {
+    const art = TRAINER_ART[id];
+    if (!art) continue;
+    const file = trainerArtId(id);
+    const want: [string, string][] = [[trainerTextureKey(id), `assets/trainers/${file}.png`]];
+    if ((art.poses ?? 1) >= 2) want.push([trainerTextureKey(id, true), `assets/trainers/${file}-pose.png`]);
+    if (art.mugshot) want.push([mugshotTextureKey(id), `assets/trainers/mugshots/${file}.png`]);
+    if (art.banner) want.push([bannerTextureKey(id), `assets/trainers/banners/${file}.png`]);
+    for (const [key, path] of want) if (!scene.textures.exists(key)) scene.load.image(key, assetUrl(path));
+  }
 }

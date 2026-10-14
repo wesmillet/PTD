@@ -134,6 +134,28 @@ Platinum encounters trimmed to shipped species; a `legendary` flag from
 PokeAPI; Fairy maps to Normal because the chart stays Gen 4. A test keeps
 folders and data in step both ways.
 
+## Loading and performance
+Boot loads only what every screen needs: the interface sheets, the box
+icons, items, badges, type icons, popups, the town map (and its land
+layer) and the Ace Trainer base for silhouettes. A level loads its own
+map tiles, the sprite folders of its roster, party lines, trainers,
+allies and bosses (`levelSpriteFolders`) and the art of its trainers and
+dialogue speakers (`queueTrainerArt`); the title diorama, the PC, the
+Pokédex, the lottery and the Conference fetch their own portraits and
+sheets on demand; the title unloads the sprite sets it cast when it
+closes (`unloadPokemon`), and a download still in flight when a screen
+closes is dropped the moment it lands. A missing or failed asset logs
+once and the thing it was for is skipped (an animation falls back, an
+icon or portrait is left out); only the map, AnimData and the Idle and
+Walk sheets trigger the retry loop. The sim loop allocates nothing per
+tick (a reused enemy snapshot, pooled target candidates with lane points
+cached per tick, one shared rule context); the scene pools floating
+numbers (at most forty at once), rewrites a text only when its string
+changes and refreshes DOM panels only on a change. Every scene destroys
+its own objects, tweens and timers on shutdown, so twenty scene switches
+leave the heap, the listener count and the texture list where they were.
+Numbers before and after each pass are in `docs/decisions.md`.
+
 ## Core mechanics (match PTD feel, simplified where noted)
 
 ### Map and placement
@@ -559,7 +581,7 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   with phase ticks and the catch-window Poké Ball, Pokédex screen (counts,
   portraits, type icons, areas), result screen with three stars and Next
   level, three save slots in the Save panel, keyboard shortcuts (1 to 6
-  party slots, Shift+1/2/4 speed, P pause, Space start, Esc menu).
+  party slots, 1/2/4 speed, Q to Y party slots, P pause, Space start, Esc menu).
 - Options page: game speed (1x, 2x, 4x) and zoom. Zoom is Fit (default:
   the canvas scales to the window), 1x, 1.5x or 2x (the 960x600 canvas at
   that CSS size, centred, scrolling when bigger than the window); `+` and

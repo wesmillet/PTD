@@ -1,12 +1,10 @@
 import Phaser from 'phaser';
 import config from '../data/config.json';
-import { getLevel, levelIds } from '../data/levels';
 import spriteFolders from '../data/spriteFolders.json';
 import uiGen4 from '../data/ui-gen4.json';
-import { assetUrl, badgeTextureKey, bannerTextureKey, folderIconName, itemTextureKey, itemUrl, mugshotTextureKey, popupTextureKey, trainerTextureKey, typeIconTextureKey, typeIconUrl, urlParam } from '../game/runtime';
+import { assetUrl, badgeTextureKey, folderIconName, itemTextureKey, itemUrl, popupTextureKey, trainerTextureKey, typeIconTextureKey, typeIconUrl, urlParam } from '../game/runtime';
 import { allBadges } from '../sim/game';
-import { levelTrainers, POPUP_KINDS } from '../sim/waves';
-import { TRAINER_ART, trainerArtId } from '../data/trainers';
+import { POPUP_KINDS } from '../sim/waves';
 import { ROSTER } from '../sim/conference';
 import typesJson from '../data/types.json';
 import { PC } from '../sim/pc';
@@ -22,8 +20,9 @@ const ui = uiGen4 as {
 };
 
 /**
- * Loads the small shared assets (portraits, generated textures) and hands
- * off. Pokémon sprite sheets load per level (see LevelScene.preload).
+ * Loads what every screen needs (the interface sheets, box icons, items,
+ * badges, the town map) and hands off. Pokémon sheets, portraits and
+ * trainer art load with the level or screen that shows them.
  */
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -44,14 +43,10 @@ export class BootScene extends Phaser.Scene {
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       label.setText(`Failed to load ${file.src}`).setColor('#ff6b6b');
     });
-    const folders = spriteFolders as Record<string, { shiny: boolean; portraits: string[]; shinyPortraits?: string[]; icon?: boolean; animatedIcon?: boolean }>;
+    // Box icons for every folder (the party strip, box grid and lists need any of them at any time).
+    // Portraits are DOM <img> elements loaded on demand; Pokémon sheets load per level; trainer art loads with its level.
+    const folders = spriteFolders as Record<string, { icon?: boolean; animatedIcon?: boolean }>;
     for (const [dex, info] of Object.entries(folders)) {
-      if (info.portraits.includes('Normal')) {
-        this.load.image(`portrait-${dex}`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/Normal.png`);
-      }
-      if (info.shinyPortraits?.includes('Normal')) {
-        this.load.image(`portrait-${dex}-shiny`, `${import.meta.env.BASE_URL}assets/portraits/${dex}/shiny/Normal.png`);
-      }
       const id = folderIconName(dex);
       if (info.animatedIcon) {
         this.load.image(`icon-${id}-0`, `${import.meta.env.BASE_URL}assets/icons/${id}-f0.png`);
@@ -84,23 +79,10 @@ export class BootScene extends Phaser.Scene {
       this.load.image(`ui-menu-${name}`, assetUrl(icon.on));
       this.load.image(`ui-menu-${name}-off`, assetUrl(icon.off));
     }
-    // Platinum trainer art for the trainers the levels name: standing and
-    // throwing poses, plus the VS mugshot and class banner when they exist.
-    const trainerIds = new Set<string>();
-    for (const levelId of levelIds()) for (const t of levelTrainers(getLevel(levelId))) trainerIds.add(t.id);
-    for (const r of ROSTER) if (!r.silhouette) trainerIds.add(r.id);
-    // Anime trainers without art ride on the Ace Trainer sprite, blacked out in create().
+    // The Ace Trainer sprite is the base of the blacked-out silhouettes (anime trainers without art), built in create().
+    // Every other trainer's art loads with the level or screen that shows it (queueTrainerArt).
     this.load.image(trainerTextureKey('ace-trainer-male'), assetUrl('assets/trainers/ace-trainer-male.png'));
     this.load.image(trainerTextureKey('ace-trainer-male', true), assetUrl('assets/trainers/ace-trainer-male-pose.png'));
-    for (const id of trainerIds) {
-      const art = TRAINER_ART[id];
-      if (!art) continue; // nobles and other non-trainer "trainers" have no art
-      const file = trainerArtId(id);
-      this.load.image(trainerTextureKey(id), assetUrl(`assets/trainers/${file}.png`));
-      if ((art?.poses ?? 1) >= 2) this.load.image(trainerTextureKey(id, true), assetUrl(`assets/trainers/${file}-pose.png`));
-      if (art?.mugshot) this.load.image(mugshotTextureKey(id), assetUrl(`assets/trainers/mugshots/${file}.png`));
-      if (art?.banner) this.load.image(bannerTextureKey(id), assetUrl(`assets/trainers/banners/${file}.png`));
-    }
     this.load.spritesheet('ui-vs', assetUrl('assets/trainers/vs.png'), { frameWidth: 64, frameHeight: 64 });
     // The eight badges, lit and greyed.
     for (const b of allBadges()) {
@@ -113,6 +95,7 @@ export class BootScene extends Phaser.Scene {
     }
     for (const kind of POPUP_KINDS) this.load.image(popupTextureKey(kind), assetUrl(`assets/ui/gen4/popups/${kind}.png`));
     this.load.image('sinnoh-map', assetUrl('assets/ui/gen4/sinnoh-map.png'));
+    this.load.image('sinnoh-map-land', assetUrl('assets/ui/gen4/sinnoh-map-land.png'));
     this.load.spritesheet('map-markers', assetUrl('assets/ui/gen4/map-markers.png'), { frameWidth: 16, frameHeight: 16 });
     this.load.spritesheet('ow-player', assetUrl('assets/trainers/overworld/player_m.png'), { frameWidth: 32, frameHeight: 32 });
   }
@@ -140,14 +123,20 @@ export class BootScene extends Phaser.Scene {
   }
 
   create(): void {
-    // A small star for shiny sparkles.
-    const star = this.add.graphics();
-    star.fillStyle(0xffffff, 1);
-    star.fillPoints([
-      { x: 4, y: 0 }, { x: 5, y: 3 }, { x: 8, y: 4 }, { x: 5, y: 5 }, { x: 4, y: 8 }, { x: 3, y: 5 }, { x: 0, y: 4 }, { x: 3, y: 3 },
-    ], true);
-    star.generateTexture('star', 8, 8);
-    star.destroy();
+    // A small star for shiny sparkles, drawn on a canvas (generateTexture would read the GPU back and stall it).
+    const star = this.textures.createCanvas('star', 8, 8);
+    if (star) {
+      const ctx = star.context;
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      for (const [i, [x, y]] of ([[4, 0], [5, 3], [8, 4], [5, 5], [4, 8], [3, 5], [0, 4], [3, 3]] as [number, number][]).entries()) {
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.fill();
+      star.refresh();
+    }
     this.buildSilhouettes();
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
