@@ -154,5 +154,6 @@ PC, Shop, Save, Credits and Demo buttons in the right column) → PC (`PCScene`,
 `PcSummary` side panel) or Level (`LevelScene`, with the location popup, Pokémon panel,
 replace dialog, evolution prompt, VS intro and trainer dialogue, boss bar
 and summary). Zoom (Options, `+`/`-`) lives in `src/game/zoom.ts`: Fit is
-Phaser's FIT mode, a fixed zoom is NONE mode with that zoom factor and the
-page scrolls (`html.ptd-zoomed` in index.html).
+Phaser's FIT mode capped at the native size (shrink only), a fixed zoom is
+NONE mode with that zoom factor and the page scrolls (`html.ptd-zoomed` in
+index.html).

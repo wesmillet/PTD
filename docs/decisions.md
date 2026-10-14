@@ -527,3 +527,18 @@ portrait the showcase might want.
   placed party member dragged off the strip (a drop that does nothing)
   gets none. Enemies never had one and still have none.
 
+## Phase 9 batch 2, follow-up (page opens too zoomed in)
+
+- Fit used to scale the 960x636 canvas up to the window (1.7x on a
+  1080p screen, 2.3x on the title with its own camera zoom), so the page
+  opened looking blown up. Fit now caps at native size: it only shrinks
+  into a window smaller than the canvas. Existing saves keep their "fit"
+  setting and get the new behaviour; 1.5x and 2x stay for anyone who
+  wants it bigger, and the title's 1.36x camera pan is unchanged.
+- Two things found on the way: Phaser's autoCenter and the page's flex
+  centring both offset the canvas, so it sat right of and below centre
+  (Phaser's centring is off now); and at a fixed zoom bigger than the
+  window Phaser never re-read the canvas position after a scroll, so
+  pointer input drifted by the scroll offset (the canvas bounds are now
+  refreshed on every scroll).
+

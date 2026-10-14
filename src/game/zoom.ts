@@ -1,8 +1,10 @@
 /**
- * Canvas zoom: "fit" scales the game to the window (Phaser's FIT mode); a
- * fixed zoom shows the 960-wide canvas at exactly 1x, 1.5x or 2x CSS pixels
- * (Phaser's NONE mode with its zoom factor), centred, scrolling when it is
- * bigger than the window. Saved with the other settings; `+` and `-` step it.
+ * Canvas zoom: "fit" shows the game at its native size and shrinks it into
+ * a smaller window (Phaser's FIT mode capped at 1x, so a big monitor never
+ * blows the pixels up); a fixed zoom shows the 960-wide canvas at exactly
+ * 1x, 1.5x or 2x CSS pixels (Phaser's NONE mode with its zoom factor),
+ * centred, scrolling when it is bigger than the window. Saved with the
+ * other settings; `+` and `-` step it.
  */
 import Phaser from 'phaser';
 import { runtime } from './runtime';
@@ -25,6 +27,9 @@ export function zoomLabel(z: Zoom): string {
 export function registerZoomGame(g: Phaser.Game, afterChange?: () => void): void {
   game = g;
   onChange = afterChange ?? null;
+  // A fixed zoom bigger than the window scrolls the page; Phaser only re-reads the canvas position on
+  // resize, so pointer input would drift by the scroll offset without this (capture: body scrolls do not bubble).
+  if (typeof window !== 'undefined') window.addEventListener('scroll', () => game?.scale.updateBounds(), { capture: true, passive: true });
   applyZoom(runtime.zoom);
 }
 
@@ -40,11 +45,14 @@ export function applyZoom(z: Zoom): void {
     scale.scaleMode = Phaser.Scale.FIT;
     scale.displaySize.setAspectMode(Phaser.Scale.FIT);
     scale.displaySize.setParent(scale.parentSize);
+    // Never above native size: the page opens at 1x on a big screen and only shrinks on a small one.
+    scale.displaySize.setMax(scale.gameSize.width, scale.gameSize.height);
     scale.setZoom(1);
   } else {
     scale.scaleMode = Phaser.Scale.NONE;
     scale.displaySize.setAspectMode(Phaser.Scale.NONE);
     scale.displaySize.setParent(undefined as unknown as Phaser.Structs.Size);
+    scale.displaySize.setMax();
     scale.setZoom(z);
   }
   scale.refresh();

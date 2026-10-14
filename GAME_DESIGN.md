@@ -586,9 +586,11 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   level, three save slots in the Save panel, keyboard shortcuts (1 to 6
   party slots, 1/2/4 speed, Q to Y party slots, P pause, Space start, Esc menu).
 - Options page: game speed (1x, 2x, 4x) and zoom. Zoom is Fit (default:
-  the canvas scales to the window), 1x, 1.5x or 2x (the 960x600 canvas at
-  that CSS size, centred, scrolling when bigger than the window); `+` and
-  `-` step through it anywhere, and it is saved with the other settings.
+  the canvas at its native size, shrunk to fit a smaller window and never
+  enlarged, so a big monitor does not blow the pixels up), 1x, 1.5x or 2x
+  (the 960x636 canvas at that CSS size, centred, scrolling when bigger
+  than the window); `+` and `-` step through it anywhere, and it is saved
+  with the other settings.
 - Settings still to come: volume, colorblind-friendly type colors.
 
 ## Build plan (work one phase at a time, commit at the end of each)

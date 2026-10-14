@@ -11,18 +11,24 @@ import { Hud } from './ui/hud';
 import { saveGameIfLoaded } from './game/session';
 import { installZoomKeys, registerZoomGame } from './game/zoom';
 
+const WIDTH = 960;
+const HEIGHT = Hud.HEIGHT + 14 * 32 + Hud.BOTTOM;
+
 function start(): void {
   const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
-    width: 960,
-    height: Hud.HEIGHT + 14 * 32 + Hud.BOTTOM,
+    width: WIDTH,
+    height: HEIGHT,
     backgroundColor: '#c0ccdc',
     pixelArt: true,
     loader: { maxRetries: 4 },
     scale: {
       mode: Phaser.Scale.FIT,
-      autoCenter: Phaser.Scale.CENTER_BOTH,
+      // The #game flex box centres the canvas (and scrolls it at a fixed zoom); Phaser centring on top shifted it off-centre.
+      autoCenter: Phaser.Scale.NO_CENTER,
+      // Fit shrinks into a small window but never enlarges past 1x (see game/zoom.ts).
+      max: { width: WIDTH, height: HEIGHT },
     },
     scene: [BootScene, TitleScene, LevelSelectScene, LevelScene, PCScene, ConferenceScene, Phase0Scene],
   });

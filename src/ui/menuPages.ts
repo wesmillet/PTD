@@ -277,7 +277,7 @@ export class MenuPages {
     renderZoom();
     const zoomNote = document.createElement('div');
     zoomNote.className = 'ptd-dim';
-    zoomNote.textContent = 'Fit scales the game to the window; 1x, 1.5x and 2x show it at a fixed size. + and - step through them.';
+    zoomNote.textContent = 'Fit shows the game at its own size and shrinks it to a small window; 1.5x and 2x show it bigger. + and - step through them.';
     root.append(label, row, note, zoomLabelEl, zoomRow, zoomNote);
   }
 }
