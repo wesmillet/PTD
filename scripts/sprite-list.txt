@@ -1,0 +1,288 @@
+# Sprites the story, gyms, Hisui rifts, tournament and events use.
+# Format: DDDD or DDDD:Form (a tracker.json subgroup name). See fetch-sprites.py.
+# gardenia
+0421   # Cherrim
+0420   # Cherubi
+0114   # Tangela
+0455   # Carnivine
+0357   # Tropius
+0182   # Bellossom
+# fantina
+0355   # Duskull
+0356   # Dusclops
+0092   # Gastly
+0093   # Haunter
+0094   # Gengar
+0200   # Misdreavus
+0429   # Mismagius
+0425   # Drifloon
+0426   # Drifblim
+# maylene
+0307   # Meditite
+0308   # Medicham
+0447   # Riolu
+0448   # Lucario
+0453   # Croagunk
+0454   # Toxicroak
+0106   # Hitmonlee
+0107   # Hitmonchan
+# wake
+0194   # Wooper
+0195   # Quagsire
+0418   # Buizel
+0419   # Floatzel
+0223   # Remoraid
+0224   # Octillery
+0183   # Marill
+0184   # Azumarill
+0458   # Mantyke
+0456   # Finneon
+0457   # Lumineon
+# byron
+0081   # Magnemite
+0082   # Magneton
+0410   # Shieldon
+0411   # Bastiodon
+0436   # Bronzor
+0437   # Bronzong
+0227   # Skarmory
+0462   # Magnezone
+# candice
+0215   # Sneasel
+0220   # Swinub
+0221   # Piloswine
+0473   # Mamoswine
+0459   # Snover
+0460   # Abomasnow
+0361   # Snorunt
+0362   # Glalie
+0478   # Froslass
+0471   # Glaceon
+0461   # Weavile
+# volkner
+0025   # Pikachu
+0026   # Raichu
+0172   # Pichu
+0135   # Jolteon
+0239   # Elekid
+0125   # Electabuzz
+0466   # Electivire
+0417   # Pachirisu
+0479   # Rotom
+# galactic
+0229   # Houndoom
+0228   # Houndour
+0430   # Honchkrow
+0198   # Murkrow
+0431   # Glameow
+0432   # Purugly
+0434   # Stunky
+0435   # Skuntank
+0214   # Heracross
+0483   # Dialga
+0484   # Palkia
+0487   # Giratina
+0487:Origin   # Giratina (Origin)
+0480   # Uxie
+0481   # Mesprit
+0482   # Azelf
+0483:Primal   # Dialga (Primal)
+0483:Origin   # Dialga (Origin)
+0484:Origin   # Palkia (Origin)
+# events
+0488   # Cresselia
+0492   # Shaymin
+0492:Sky   # Shaymin (Sky)
+0493   # Arceus
+0485   # Heatran
+0486   # Regigigas
+0377   # Regirock
+0378   # Regice
+0379   # Registeel
+0142   # Aerodactyl
+0150   # Mewtwo
+0150:Shadow   # Mewtwo (Shadow)
+0249   # Lugia
+0249:Shadow   # Lugia (Shadow)
+0381   # Latios
+0380   # Latias
+# hisui
+0058:Hisui   # Growlithe (Hisui)
+0059:Hisui   # Arcanine (Hisui)
+0570:Hisui   # Zorua (Hisui)
+0571:Hisui   # Zoroark (Hisui)
+0215:Hisui   # Sneasel (Hisui)
+0903   # Sneasler
+0211:Hisui   # Qwilfish (Hisui)
+0904   # Overqwil
+0100:Hisui   # Voltorb (Hisui)
+0101:Hisui   # Electrode (Hisui)
+0549:Hisui   # Lilligant (Hisui)
+0548   # Petilil
+0900   # Kleavor
+0899   # Wyrdeer
+0234   # Stantler
+0901   # Ursaluna
+0217   # Ursaring
+0216   # Teddiursa
+0902   # Basculegion
+0628:Hisui   # Braviary (Hisui)
+0627   # Rufflet
+0713:Hisui   # Avalugg (Hisui)
+0712   # Bergmite
+0123   # Scyther
+0193   # Yanma
+0046   # Paras
+0207   # Gligar
+0299   # Nosepass
+0077   # Ponyta
+0078   # Rapidash
+0265   # Wurmple
+0072   # Tentacool
+0157:Hisui   # Typhlosion (Hisui)
+0503:Hisui   # Samurott (Hisui)
+0724:Hisui   # Decidueye (Hisui)
+# tournament
+0469   # Yanmega
+0212   # Scizor
+0416   # Vespiquen
+0452   # Drapion
+0472   # Gliscor
+0450   # Hippowdon
+0464   # Rhyperior
+0136   # Flareon
+0467   # Magmortar
+0122   # Mr_Mime
+0196   # Espeon
+0475   # Gallade
+0442   # Spiritomb
+0468   # Togekiss
+0350   # Milotic
+0445   # Garchomp
+0443   # Gible
+0444   # Gabite
+0149   # Dragonite
+0477   # Dusknoir
+0272   # Ludicolo
+0145   # Zapdos
+0257   # Blaziken
+0244   # Entei
+0143   # Snorlax
+0424   # Ambipom
+0115   # Kangaskhan
+0423   # Gastrodon
+0306   # Aggron
+0199   # Slowking
+0213   # Shuckle
+0463   # Lickilicky
+0192   # Sunflora
+0428   # Lopunny
+0348   # Armaldo
+0334   # Altaria
+0470   # Leafeon
+0376   # Metagross
+0359   # Absol
+0373   # Salamence
+0242   # Blissey
+0113   # Chansey
+0202   # Wobbuffet
+0344   # Claydol
+0219   # Magcargo
+0197   # Umbreon
+0237   # Hitmontop
+0336   # Seviper
+0439   # Mime_Jr_
+0052   # Meowth
+0168   # Ariados
+0427   # Buneary
+0155   # Cyndaquil
+0156   # Quilava
+0131   # Lapras
+0133   # Eevee
+0006   # Charizard
+0448:Mega   # Lucario (Mega)
+0359:Mega   # Absol (Mega)
+0229:Mega   # Houndoom (Mega)
+0065:Mega   # Alakazam (Mega)
+0208:Mega   # Steelix (Mega)
+0362:Mega   # Glalie (Mega)
+0142:Mega   # Aerodactyl (Mega)
+0475:Mega   # Gallade (Mega)
+0428:Mega   # Lopunny (Mega)
+0308:Mega   # Medicham (Mega)
+0334:Mega   # Altaria (Mega)
+0381:Mega   # Latios (Mega)
+0282   # Gardevoir
+0282:Mega   # Gardevoir (Mega)
+0094:Mega   # Gengar (Mega)
+0115:Mega   # Kangaskhan (Mega)
+0227:Mega   # Skarmory (Mega)
+# wilds
+0399   # Bidoof
+0400   # Bibarel
+0396   # Starly
+0397   # Staravia
+0401   # Kricketot
+0402   # Kricketune
+0403   # Shinx
+0406   # Budew
+0415   # Combee
+0179   # Mareep
+0180   # Flaaffy
+0181   # Ampharos
+0438   # Bonsly
+0433   # Chingling
+0441   # Chatot
+0446   # Munchlax
+0449   # Hippopotas
+0451   # Skorupi
+0422   # Shellos
+0412   # Burmy
+0413   # Wormadam
+0414   # Mothim
+0190   # Aipom
+0238   # Smoochum
+0240   # Magby
+0074   # Geodude
+0035   # Clefairy
+0036   # Clefable
+0173   # Cleffa
+0066   # Machop
+0041   # Zubat
+0042   # Golbat
+0169   # Crobat
+0054   # Psyduck
+0055   # Golduck
+0118   # Goldeen
+0119   # Seaking
+0129   # Magikarp
+0130   # Gyarados
+0339   # Barboach
+0340   # Whiscash
+0315   # Roselia
+0161   # Sentret
+0162   # Furret
+# starters and opening routes
+0063   # Abra
+0064   # Kadabra
+0067   # Machoke
+0068   # Machamp
+0075   # Graveler
+0076   # Golem
+0095   # Onix
+0387   # Turtwig
+0388   # Grotle
+0389   # Torterra
+0390   # Chimchar
+0391   # Monferno
+0392   # Infernape
+0393   # Piplup
+0394   # Prinplup
+0395   # Empoleon
+0398   # Staraptor
+0404   # Luxio
+0405   # Luxray
+0407   # Roserade
+0408   # Cranidos
+0409   # Rampardos
+0491   # Darkrai

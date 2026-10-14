@@ -1,0 +1,860 @@
+{
+ "ace-trainer-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Ace Trainer Female",
+  "class": "Ace Trainer Female"
+ },
+ "ace-trainer-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Ace Trainer Male",
+  "class": "Ace Trainer Male"
+ },
+ "ace-trainer-snow-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Ace Trainer Snow Female",
+  "class": "Ace Trainer Snow Female"
+ },
+ "ace-trainer-snow-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Ace Trainer Snow Male",
+  "class": "Ace Trainer Snow Male"
+ },
+ "arcade-star": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "dahlia",
+  "name": "Dahlia",
+  "class": "Arcade Star"
+ },
+ "aroma-lady": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Aroma Lady",
+  "class": "Aroma Lady"
+ },
+ "artist": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "artist",
+  "name": "Artist",
+  "class": "Artist"
+ },
+ "battle-girl": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "battle_girl",
+  "name": "Battle Girl",
+  "class": "Battle Girl"
+ },
+ "beauty": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "beauty",
+  "name": "Beauty",
+  "class": "Beauty"
+ },
+ "belle-and-pa": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Belle And Pa",
+  "class": "Belle And Pa"
+ },
+ "bird-keeper": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Bird Keeper",
+  "class": "Bird Keeper"
+ },
+ "black-belt": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "black_belt",
+  "name": "Black Belt",
+  "class": "Black Belt"
+ },
+ "breeder-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Breeder Female",
+  "class": "Breeder Female"
+ },
+ "breeder-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Breeder Male",
+  "class": "Breeder Male"
+ },
+ "bug-catcher": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "bug_catcher",
+  "name": "Bug Catcher",
+  "class": "Bug Catcher"
+ },
+ "cameraman": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "cameraman",
+  "name": "Cameraman",
+  "class": "Cameraman"
+ },
+ "camper": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "camper",
+  "name": "Camper",
+  "class": "Camper"
+ },
+ "castle-valet": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "darach",
+  "name": "Darach",
+  "class": "Castle Valet"
+ },
+ "champion-cynthia": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": false,
+  "overworld": "cynthia",
+  "name": "Cynthia",
+  "class": "Champion"
+ },
+ "clown": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "clown",
+  "name": "Clown",
+  "class": "Clown"
+ },
+ "collector": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "collector",
+  "name": "Collector",
+  "class": "Collector"
+ },
+ "commander-jupiter": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "jupiter",
+  "name": "Jupiter",
+  "class": "Commander"
+ },
+ "commander-mars": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "mars",
+  "name": "Mars",
+  "class": "Commander"
+ },
+ "commander-saturn": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "saturn",
+  "name": "Saturn",
+  "class": "Commander"
+ },
+ "cowgirl": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "cowgirl",
+  "name": "Cowgirl",
+  "class": "Cowgirl"
+ },
+ "cyclist-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Cyclist Female",
+  "class": "Cyclist Female"
+ },
+ "cyclist-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Cyclist Male",
+  "class": "Cyclist Male"
+ },
+ "double-team": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Double Team",
+  "class": "Double Team"
+ },
+ "dp-player-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Dp Player Female",
+  "class": "Dp Player Female"
+ },
+ "dp-player-female-2": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Dp Player Female 2",
+  "class": "Dp Player Female 2"
+ },
+ "dp-player-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Dp Player Male",
+  "class": "Dp Player Male"
+ },
+ "dp-player-male-2": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Dp Player Male 2",
+  "class": "Dp Player Male 2"
+ },
+ "dragon-tamer": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Dragon Tamer",
+  "class": "Dragon Tamer"
+ },
+ "elite-four-aaron": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": false,
+  "overworld": "aaron",
+  "name": "Aaron",
+  "class": "Elite Four"
+ },
+ "elite-four-bertha": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": false,
+  "overworld": "bertha",
+  "name": "Bertha",
+  "class": "Elite Four"
+ },
+ "elite-four-flint": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": false,
+  "overworld": "flint",
+  "name": "Flint",
+  "class": "Elite Four"
+ },
+ "elite-four-lucian": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": false,
+  "overworld": "lucian",
+  "name": "Lucian",
+  "class": "Elite Four"
+ },
+ "factory-head": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "thorton",
+  "name": "Thorton",
+  "class": "Factory Head"
+ },
+ "fisherman": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "fisherman",
+  "name": "Fisherman",
+  "class": "Fisherman"
+ },
+ "galactic-boss": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "cyrus",
+  "name": "Cyrus",
+  "class": "Galactic Boss"
+ },
+ "galactic-grunt-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "grunt_f",
+  "name": "Galactic Grunt",
+  "class": "Galactic Grunt"
+ },
+ "galactic-grunt-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "grunt_m",
+  "name": "Galactic Grunt",
+  "class": "Galactic Grunt"
+ },
+ "gentleman": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "gentleman",
+  "name": "Gentleman",
+  "class": "Gentleman"
+ },
+ "guitarist": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "guitarist",
+  "name": "Guitarist",
+  "class": "Guitarist"
+ },
+ "hall-matron": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "argenta",
+  "name": "Argenta",
+  "class": "Hall Matron"
+ },
+ "hiker": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "hiker",
+  "name": "Hiker",
+  "class": "Hiker"
+ },
+ "idol": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "idol",
+  "name": "Idol",
+  "class": "Idol"
+ },
+ "interviewers": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Interviewers",
+  "class": "Interviewers"
+ },
+ "jogger": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "jogger",
+  "name": "Jogger",
+  "class": "Jogger"
+ },
+ "lady": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "lady",
+  "name": "Lady",
+  "class": "Lady"
+ },
+ "lass": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "lass",
+  "name": "Lass",
+  "class": "Lass"
+ },
+ "leader-byron": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "byron",
+  "name": "Byron",
+  "class": "Gym Leader"
+ },
+ "leader-candice": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "candice",
+  "name": "Candice",
+  "class": "Gym Leader"
+ },
+ "leader-fantina": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "fantina",
+  "name": "Fantina",
+  "class": "Gym Leader"
+ },
+ "leader-gardenia": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "gardenia",
+  "name": "Gardenia",
+  "class": "Gym Leader"
+ },
+ "leader-maylene": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "maylene",
+  "name": "Maylene",
+  "class": "Gym Leader"
+ },
+ "leader-roark": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "roark",
+  "name": "Roark",
+  "class": "Gym Leader"
+ },
+ "leader-volkner": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "volkner",
+  "name": "Volkner",
+  "class": "Gym Leader"
+ },
+ "leader-wake": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "crasher_wake",
+  "name": "Crasher Wake",
+  "class": "Gym Leader"
+ },
+ "maid": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "maid",
+  "name": "Maid",
+  "class": "Maid"
+ },
+ "ninja-boy": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "ninja_boy",
+  "name": "Ninja Boy",
+  "class": "Ninja Boy"
+ },
+ "parasol-lady": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "parasol_lady",
+  "name": "Parasol Lady",
+  "class": "Parasol Lady"
+ },
+ "pi": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Pi",
+  "class": "Pi"
+ },
+ "picnicker": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "picnicker",
+  "name": "Picnicker",
+  "class": "Picnicker"
+ },
+ "player-female": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": false,
+  "overworld": "player_f",
+  "name": "Dawn",
+  "class": "Pokémon Trainer"
+ },
+ "player-male": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": false,
+  "overworld": "player_m",
+  "name": "Lucas",
+  "class": "Pokémon Trainer"
+ },
+ "poke-kid": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Poke Kid",
+  "class": "Poke Kid"
+ },
+ "pokefan-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Pokefan Female",
+  "class": "Pokefan Female"
+ },
+ "pokefan-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Pokefan Male",
+  "class": "Pokefan Male"
+ },
+ "policeman": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "policeman",
+  "name": "Policeman",
+  "class": "Policeman"
+ },
+ "psychic-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Psychic Female",
+  "class": "Psychic Female"
+ },
+ "psychic-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Psychic Male",
+  "class": "Psychic Male"
+ },
+ "rancher": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "rancher",
+  "name": "Rancher",
+  "class": "Rancher"
+ },
+ "ranger-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Ranger Female",
+  "class": "Ranger Female"
+ },
+ "ranger-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Ranger Male",
+  "class": "Ranger Male"
+ },
+ "reporter": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "reporter",
+  "name": "Reporter",
+  "class": "Reporter"
+ },
+ "rich-boy": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "rich_boy",
+  "name": "Rich Boy",
+  "class": "Rich Boy"
+ },
+ "rival": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "barry",
+  "name": "Barry",
+  "class": "Rival"
+ },
+ "roughneck": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "roughneck",
+  "name": "Roughneck",
+  "class": "Roughneck"
+ },
+ "ruin-maniac": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "ruin_maniac",
+  "name": "Ruin Maniac",
+  "class": "Ruin Maniac"
+ },
+ "sailor": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "sailor",
+  "name": "Sailor",
+  "class": "Sailor"
+ },
+ "school-kid-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "School Kid Female",
+  "class": "School Kid Female"
+ },
+ "school-kid-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "School Kid Male",
+  "class": "School Kid Male"
+ },
+ "scientist": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Scientist",
+  "class": "Scientist"
+ },
+ "sis-and-bro": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Sis And Bro",
+  "class": "Sis And Bro"
+ },
+ "skier-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Skier Female",
+  "class": "Skier Female"
+ },
+ "skier-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Skier Male",
+  "class": "Skier Male"
+ },
+ "socialite": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "socialite",
+  "name": "Socialite",
+  "class": "Socialite"
+ },
+ "swimmer-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Swimmer Female",
+  "class": "Swimmer Female"
+ },
+ "swimmer-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Swimmer Male",
+  "class": "Swimmer Male"
+ },
+ "tower-tycoon": {
+  "poses": 2,
+  "mugshot": true,
+  "banner": true,
+  "overworld": "palmer",
+  "name": "Palmer",
+  "class": "Tower Tycoon"
+ },
+ "trainer-buck": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "buck",
+  "name": "Buck",
+  "class": "Pokémon Trainer"
+ },
+ "trainer-cheryl": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "cheryl",
+  "name": "Cheryl",
+  "class": "Pokémon Trainer"
+ },
+ "trainer-marley": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "marley",
+  "name": "Marley",
+  "class": "Pokémon Trainer"
+ },
+ "trainer-mira": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "mira",
+  "name": "Mira",
+  "class": "Pokémon Trainer"
+ },
+ "trainer-riley": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "riley",
+  "name": "Riley",
+  "class": "Pokémon Trainer"
+ },
+ "tuber-female": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Tuber Female",
+  "class": "Tuber Female"
+ },
+ "tuber-male": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Tuber Male",
+  "class": "Tuber Male"
+ },
+ "twins": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Twins",
+  "class": "Twins"
+ },
+ "veteran": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Veteran",
+  "class": "Veteran"
+ },
+ "waiter": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "waiter",
+  "name": "Waiter",
+  "class": "Waiter"
+ },
+ "waitress": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "waitress",
+  "name": "Waitress",
+  "class": "Waitress"
+ },
+ "worker": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "worker",
+  "name": "Worker",
+  "class": "Worker"
+ },
+ "young-couple": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": null,
+  "name": "Young Couple",
+  "class": "Young Couple"
+ },
+ "youngster": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "youngster",
+  "name": "Youngster",
+  "class": "Youngster"
+ },
+ "rival-barry": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "barry",
+  "name": "Barry",
+  "class": "Rival",
+  "alias_of": "rival"
+ },
+ "youngster-tristan": {
+  "poses": 2,
+  "mugshot": false,
+  "banner": false,
+  "overworld": "youngster",
+  "name": "Youngster",
+  "class": "Youngster",
+  "alias_of": "youngster"
+ }
+}

@@ -14,7 +14,8 @@
         "CHUNSOFT",
         "Discord user 276175146304405514",
         "G〜"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0006",
@@ -31,6 +32,11 @@
       "portrait": [
         "CHUNSOFT",
         "0palite"
+      ],
+      "shinyPortrait": [
+        "Adrian",
+        "SuperFabbioGuy",
+        "Morei"
       ]
     },
     {
@@ -46,7 +52,8 @@
         "CHUNSOFT",
         "Emmuffin",
         "Top_Kec"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0025",
@@ -59,6 +66,72 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Morei",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0026",
+      "name": "Raichu",
+      "sprite": [
+        "CHUNSOFT",
+        "Grimlin",
+        "Top_Kec"
+      ],
+      "shiny": [
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "C_Pariah",
+        "3Monika4",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0035",
+      "name": "Clefairy",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "estelstarlight"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Emboarger",
+        "3Monika4",
+        "bwappi"
+      ]
+    },
+    {
+      "dex": "0036",
+      "name": "Clefable",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "jackolanternjackalope",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei",
+        "ShyStarryRain"
       ]
     },
     {
@@ -74,7 +147,8 @@
       "portrait": [
         "CHUNSOFT",
         "baronessfaron"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0041",
@@ -87,6 +161,10 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "fledermaus"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
         "fledermaus"
       ]
     },
@@ -102,6 +180,51 @@
       "portrait": [
         "CHUNSOFT",
         "JFain"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0046",
+      "name": "Paras",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "jackolanternjackalope",
+        "G〜",
+        "bwappi"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Morei",
+        "G〜",
+        "bwappi"
+      ]
+    },
+    {
+      "dex": "0052",
+      "name": "Meowth",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "PhillipsYoung"
+      ],
+      "shinyPortrait": [
+        "RaoKurai",
+        "Discord user 299261889169588246",
+        "Morei"
       ]
     },
     {
@@ -118,6 +241,10 @@
         "CHUNSOFT",
         "Felis-Licht",
         "Morei"
+      ],
+      "shinyPortrait": [
+        "Morei",
+        "silverfox88"
       ]
     },
     {
@@ -133,6 +260,29 @@
         "CHUNSOFT",
         "JFain",
         "Caitemis"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0058-hisui",
+      "name": "Growlithe (Hisui)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "ShyStarryRain",
+        "baronessfaron"
+      ],
+      "portrait": [
+        "Emmuffin",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin",
+        "baronessfaron"
       ]
     },
     {
@@ -148,6 +298,26 @@
       "portrait": [
         "CHUNSOFT",
         "baronessfaron"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0059-hisui",
+      "name": "Arcanine (Hisui)",
+      "sprite": [
+        "baronessfaron",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Emboarger",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emboarger",
+        "Mond"
       ]
     },
     {
@@ -166,6 +336,11 @@
         "CHUNSOFT",
         "JFain",
         "cosmosully"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Noo",
+        "cosmosully"
       ]
     },
     {
@@ -181,6 +356,11 @@
         "CHUNSOFT",
         "0palite",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei",
+        "Emmuffin"
       ]
     },
     {
@@ -196,6 +376,24 @@
       "portrait": [
         "CHUNSOFT",
         "Gust"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0065-mega",
+      "name": "Alakazam (Mega)",
+      "sprite": [
+        "Michael12",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -213,6 +411,10 @@
         "CHUNSOFT",
         "Felis-Licht",
         "Morei"
+      ],
+      "shinyPortrait": [
+        "Emmuffin",
+        "Morei"
       ]
     },
     {
@@ -227,6 +429,10 @@
       "portrait": [
         "CHUNSOFT",
         "JFain"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "JFain"
       ]
     },
     {
@@ -240,6 +446,30 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Prismatic"
+      ]
+    },
+    {
+      "dex": "0072",
+      "name": "Tentacool",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Caitemis",
+        "brookriver"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei",
+        "G〜",
+        "brookriver"
       ]
     },
     {
@@ -254,6 +484,10 @@
       "portrait": [
         "CHUNSOFT",
         "JustAGunk"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Emmuffin"
       ]
     },
     {
@@ -268,6 +502,10 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "Tainted#3886"
+      ],
+      "shinyPortrait": [
+        "Moo",
         "Tainted#3886"
       ]
     },
@@ -285,6 +523,130 @@
       "portrait": [
         "CHUNSOFT",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0077",
+      "name": "Ponyta",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "deltaflare",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "deltaflare",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0078",
+      "name": "Rapidash",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse",
+        "Noo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "deltaflare",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "deltaflare",
+        "G〜",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0081",
+      "name": "Magnemite",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Fearless-Quit",
+        "Emboarger"
+      ],
+      "shinyPortrait": [
+        "RaoKurai",
+        "Fearless-Quit",
+        "Emboarger"
+      ]
+    },
+    {
+      "dex": "0082",
+      "name": "Magneton",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "SirViolet"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0092",
+      "name": "Gastly",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse",
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "El_Pangoro_Parse"
+      ]
+    },
+    {
+      "dex": "0093",
+      "name": "Haunter",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "PhillipsYoung"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "PhillipsYoung",
+        "Morei"
       ]
     },
     {
@@ -300,6 +662,29 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "PhillipsYoung"
+      ]
+    },
+    {
+      "dex": "0094-mega",
+      "name": "Gengar (Mega)",
+      "sprite": [
+        "Michael12",
+        "Emboarger",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Sugi",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Morei",
+        "Emmuffin"
       ]
     },
     {
@@ -314,7 +699,148 @@
       "portrait": [
         "CHUNSOFT",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "baronessfaron"
       ]
+    },
+    {
+      "dex": "0100-hisui",
+      "name": "Voltorb (Hisui)",
+      "sprite": [
+        "Axcel"
+      ],
+      "shiny": [
+        "Emboarger"
+      ],
+      "portrait": [
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0101-hisui",
+      "name": "Electrode (Hisui)",
+      "sprite": [
+        "electronvolt",
+        "Gelius",
+        "teddg"
+      ],
+      "shiny": [
+        "rhys"
+      ],
+      "portrait": [
+        "Discord user 413387711152390145"
+      ],
+      "shinyPortrait": [
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0106",
+      "name": "Hitmonlee",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Tainted#3886",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0107",
+      "name": "Hitmonchan",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Tacocoa"
+      ]
+    },
+    {
+      "dex": "0113",
+      "name": "Chansey",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Mojo"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0114",
+      "name": "Tangela",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Morei"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0115",
+      "name": "Kangaskhan",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Top_Kec"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Top_Kec"
+      ]
+    },
+    {
+      "dex": "0115-mega",
+      "name": "Kangaskhan (Mega)",
+      "sprite": [
+        "Deeshura"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [],
+      "shinyPortrait": []
     },
     {
       "dex": "0118",
@@ -327,6 +853,11 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Emmuffin",
         "baronessfaron"
       ]
     },
@@ -341,6 +872,61 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0122",
+      "name": "Mr_Mime",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Lovi"
+      ]
+    },
+    {
+      "dex": "0123",
+      "name": "Scyther",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Noo",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0125",
+      "name": "Electabuzz",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Coksi"
+      ],
+      "shinyPortrait": [
+        "Prismatic"
       ]
     },
     {
@@ -355,6 +941,10 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "JemDragons"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
         "JemDragons"
       ]
     },
@@ -372,6 +962,10 @@
         "CHUNSOFT",
         "G〜",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "G〜",
+        "Magu"
       ]
     },
     {
@@ -387,6 +981,13 @@
         "CHUNSOFT",
         "C_Pariah",
         "silverfox88"
+      ],
+      "shinyPortrait": [
+        "RaoKurai",
+        "C_Pariah",
+        "Morei",
+        "silverfox88",
+        "Deeshura"
       ]
     },
     {
@@ -401,6 +1002,96 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0135",
+      "name": "Jolteon",
+      "sprite": [
+        "CHUNSOFT",
+        "dmDash"
+      ],
+      "shiny": [
+        "Lovi",
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "\"motherhenna(Helen)\"",
+        "Morei",
+        "Vynnyal",
+        "baronessfaron",
+        "ShyStarryRain"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei",
+        "baronessfaron",
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0136",
+      "name": "Flareon",
+      "sprite": [
+        "CHUNSOFT",
+        "Ginnie",
+        "JFain"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "ShyStarryRain",
+        "FlowerSnek"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "LegendaryPhoenix",
+        "baronessfaron",
+        "Vynnyal",
+        "ShyStarryRain"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "baronessfaron",
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0142",
+      "name": "Aerodactyl",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Caitemis"
+      ]
+    },
+    {
+      "dex": "0142-mega",
+      "name": "Aerodactyl (Mega)",
+      "sprite": [
+        "Caitemis"
+      ],
+      "shiny": [
+        "G〜"
+      ],
+      "portrait": [
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -416,6 +1107,25 @@
         "CHUNSOFT",
         "NOLASMOR",
         "Emboarger"
+      ],
+      "shinyPortrait": [
+        "El_Pangoro_Parse"
+      ]
+    },
+    {
+      "dex": "0145",
+      "name": "Zapdos",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Tacocoa"
       ]
     },
     {
@@ -434,6 +1144,104 @@
         "\"motherhenna(Helen)\"",
         "Emboarger",
         "AlexGroeger"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Emboarger",
+        "AlexGroeger"
+      ]
+    },
+    {
+      "dex": "0150",
+      "name": "Mewtwo",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse",
+        "JFain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Noo",
+        "Cloudy"
+      ]
+    },
+    {
+      "dex": "0150-shadow",
+      "name": "Mewtwo (Shadow)",
+      "sprite": [
+        "Deeshura"
+      ],
+      "shiny": [],
+      "portrait": [
+        "Deeshura"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0155",
+      "name": "Cyndaquil",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "lokatts"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0156",
+      "name": "Quilava",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "lokatts",
+        "JFain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "C_Pariah"
+      ],
+      "shinyPortrait": [
+        "Reppamon",
+        "C_Pariah",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0157-hisui",
+      "name": "Typhlosion (Hisui)",
+      "sprite": [
+        "Caitemis",
+        "Deeshura"
+      ],
+      "shiny": [
+        "Caitemis",
+        "Deeshura"
+      ],
+      "portrait": [
+        "Emmuffin",
+        "Caitemis",
+        "Deeshura"
+      ],
+      "shinyPortrait": [
+        "Emmuffin",
+        "Caitemis",
+        "Deeshura"
       ]
     },
     {
@@ -453,7 +1261,8 @@
         "JFain",
         "Deleca7755",
         "Emmuffin"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0162",
@@ -468,6 +1277,24 @@
       "portrait": [
         "CHUNSOFT",
         "RelicCipher"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0168",
+      "name": "Ariados",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Prismatic"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "G〜"
       ]
     },
     {
@@ -482,6 +1309,271 @@
       "portrait": [
         "CHUNSOFT",
         "<ElGian>",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0172",
+      "name": "Pichu",
+      "sprite": [
+        "CHUNSOFT",
+        "Spikey-Valentine"
+      ],
+      "shiny": [
+        "Lovi",
+        "Spikey-Valentine"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "C_Pariah"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "C_Pariah"
+      ]
+    },
+    {
+      "dex": "0173",
+      "name": "Cleffa",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Deleca7755",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei",
+        "Deleca7755",
+        "JFain",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0179",
+      "name": "Mareep",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Anonymous",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Felis-Licht"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei",
+        "silverfox88"
+      ]
+    },
+    {
+      "dex": "0180",
+      "name": "Flaaffy",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Anonymous",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Discord user 436940337865293834"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0181",
+      "name": "Ampharos",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous",
+        "Noo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Soulja"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0182",
+      "name": "Bellossom",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "gromchurch"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "gromchurch"
+      ]
+    },
+    {
+      "dex": "0183",
+      "name": "Marill",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "JFain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Fearless-Quit",
+        "Jarleypeño"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0184",
+      "name": "Azumarill",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi",
+        "Noo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin",
+        "ShyStarryRain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0190",
+      "name": "Aipom",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Prismatic",
+        "Noo",
+        "JFain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0192",
+      "name": "Sunflora",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Gust"
+      ]
+    },
+    {
+      "dex": "0193",
+      "name": "Yanma",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Moo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Noo"
+      ]
+    },
+    {
+      "dex": "0194",
+      "name": "Wooper",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis",
+        "Anon",
+        "Uni"
+      ],
+      "shiny": [
+        "Prismatic",
+        "Caitemis",
+        "Uni"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Felis-Licht",
+        "Emmuffin",
+        "ShyStarryRain"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Emboarger",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0195",
+      "name": "Quagsire",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
         "Emmuffin"
       ]
     },
@@ -500,6 +1592,12 @@
         "CHUNSOFT",
         "0palite",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "0palite",
+        "Morei",
+        "baronessfaron"
       ]
     },
     {
@@ -517,6 +1615,113 @@
         "CHUNSOFT",
         "Mojo",
         "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Mojo",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0198",
+      "name": "Murkrow",
+      "sprite": [
+        "CHUNSOFT",
+        "Smalusion",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Scizivire",
+        "Smalusion",
+        "Caitemis"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "baronessfaron",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Morei",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0199",
+      "name": "Slowking",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0200",
+      "name": "Misdreavus",
+      "sprite": [
+        "CHUNSOFT",
+        "Emboarger"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "RoyalRust",
+        "Morei"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0202",
+      "name": "Wobbuffet",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "Noo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Tainted#3886",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei",
+        "Gust"
+      ]
+    },
+    {
+      "dex": "0207",
+      "name": "Gligar",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Prismatic",
+        "JFain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "NeroIntruder"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "NeroIntruder"
       ]
     },
     {
@@ -530,6 +1735,42 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0208-mega",
+      "name": "Steelix (Mega)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Pokejavi."
+      ],
+      "portrait": [
+        "Ichor"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0211-hisui",
+      "name": "Qwilfish (Hisui)",
+      "sprite": [
+        "JFain",
+        "Fresco"
+      ],
+      "shiny": [
+        "Emboarger",
+        "Fresco"
+      ],
+      "portrait": [
+        "Emboarger",
+        "Fresco"
+      ],
+      "shinyPortrait": [
+        "Fresco"
       ]
     },
     {
@@ -544,6 +1785,27 @@
       "portrait": [
         "CHUNSOFT",
         "Emboarger"
+      ],
+      "shinyPortrait": [
+        "Pokejavi."
+      ]
+    },
+    {
+      "dex": "0213",
+      "name": "Shuckle",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous",
+        "Noo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -558,6 +1820,237 @@
       "portrait": [
         "CHUNSOFT",
         "JFain"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "JFain",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0215",
+      "name": "Sneasel",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain",
+        "Grimlin"
+      ],
+      "shiny": [
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Emboarger",
+        "Morei",
+        "cosmosully"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0215-hisui",
+      "name": "Sneasel (Hisui)",
+      "sprite": [
+        "ShyStarryRain"
+      ],
+      "shiny": [
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "Emmuffin",
+        "TawnySoup"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0216",
+      "name": "Teddiursa",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust",
+        "PhillipsYoung"
+      ],
+      "shinyPortrait": [
+        "El_Pangoro_Parse",
+        "Morei",
+        "PhillipsYoung"
+      ]
+    },
+    {
+      "dex": "0217",
+      "name": "Ursaring",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron",
+        "Tainted#3886",
+        "PhillipsYoung"
+      ],
+      "shinyPortrait": [
+        "El_Pangoro_Parse",
+        "Morei",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0219",
+      "name": "Magcargo",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0220",
+      "name": "Swinub",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "Caitemis"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0221",
+      "name": "Piloswine",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0223",
+      "name": "Remoraid",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Avery"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Caitemis"
+      ],
+      "shinyPortrait": [
+        "Avery",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0224",
+      "name": "Octillery",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Top_Kec"
+      ],
+      "shinyPortrait": [
+        "Emmuffin",
+        "Top_Kec"
+      ]
+    },
+    {
+      "dex": "0227",
+      "name": "Skarmory",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Noo"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Noo"
+      ]
+    },
+    {
+      "dex": "0227-mega",
+      "name": "Skarmory (Mega)",
+      "sprite": [
+        "Johanne2"
+      ],
+      "shiny": [],
+      "portrait": [
+        "Sonikku_A"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0228",
+      "name": "Houndour",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Anonymous",
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei",
+        "ShyStarryRain"
       ]
     },
     {
@@ -575,6 +2068,162 @@
         "PhillipsYoung",
         "Discord user 967585139485999154",
         "Morei"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "PhillipsYoung",
+        "Morei",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0229-mega",
+      "name": "Houndoom (Mega)",
+      "sprite": [
+        "Top_Kec"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "Top_Kec"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0234",
+      "name": "Stantler",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0237",
+      "name": "Hitmontop",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Prismatic"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Noo"
+      ],
+      "shinyPortrait": [
+        "Noo"
+      ]
+    },
+    {
+      "dex": "0238",
+      "name": "Smoochum",
+      "sprite": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Lovi",
+        "baronessfaron"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0239",
+      "name": "Elekid",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire",
+        "G〜"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Angels-Snack",
+        "Morei"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "El_Pangoro_Parse",
+        "Morei",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0240",
+      "name": "Magby",
+      "sprite": [
+        "CHUNSOFT",
+        "Emboarger"
+      ],
+      "shiny": [
+        "Lovi",
+        "Emboarger"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "El_Pangoro_Parse"
+      ]
+    },
+    {
+      "dex": "0242",
+      "name": "Blissey",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0244",
+      "name": "Entei",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Top_Kec"
+      ],
+      "shinyPortrait": [
+        "Chi",
+        "G〜",
+        "Top_Kec"
       ]
     },
     {
@@ -589,7 +2238,38 @@
       "portrait": [
         "CHUNSOFT",
         "Ichor"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0249",
+      "name": "Lugia",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Audino"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "G〜"
       ]
+    },
+    {
+      "dex": "0249-shadow",
+      "name": "Lugia (Shadow)",
+      "sprite": [
+        "Mr_L"
+      ],
+      "shiny": [],
+      "portrait": [
+        "CamusZekeSirius",
+        "ShyStarryRain"
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0254",
@@ -605,7 +2285,8 @@
         "CHUNSOFT",
         "0palite",
         "baronessfaron"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0257",
@@ -619,6 +2300,10 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "Noo"
+      ],
+      "shinyPortrait": [
+        "Moo",
         "Noo"
       ]
     },
@@ -636,6 +2321,41 @@
       "portrait": [
         "CHUNSOFT",
         "Emmuffin"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0265",
+      "name": "Wurmple",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Avery"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Novie"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Novie"
+      ]
+    },
+    {
+      "dex": "0272",
+      "name": "Ludicolo",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Morei"
       ]
     },
     {
@@ -651,6 +2371,44 @@
         "CHUNSOFT",
         "Ichor",
         "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Morei",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0282-mega",
+      "name": "Gardevoir (Mega)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "baronessfaron"
+      ],
+      "portrait": [
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0299",
+      "name": "Nosepass",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Moo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "JFain"
       ]
     },
     {
@@ -666,7 +2424,55 @@
         "CHUNSOFT",
         "JemDragons",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
+    },
+    {
+      "dex": "0307",
+      "name": "Meditite",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Anonymous"
+      ]
+    },
+    {
+      "dex": "0308",
+      "name": "Medicham",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0308-mega",
+      "name": "Medicham (Mega)",
+      "sprite": [
+        "JFain"
+      ],
+      "shiny": [],
+      "portrait": [
+        "Emmuffin"
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0315",
@@ -682,6 +2488,10 @@
       "portrait": [
         "CHUNSOFT",
         "JFain",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Morei",
         "G〜"
       ]
     },
@@ -699,6 +2509,69 @@
         "CHUNSOFT",
         "JFain",
         "Top_Kec"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0334",
+      "name": "Altaria",
+      "sprite": [
+        "CHUNSOFT",
+        "TawnySoup"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "gromchurch",
+        "NikolaP",
+        "TawnySoup"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "gromchurch",
+        "Morei",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0334-mega",
+      "name": "Altaria (Mega)",
+      "sprite": [
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Ichor",
+        "Emmuffin",
+        "◥θ┴θ◤"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0336",
+      "name": "Seviper",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "DasK",
+        "Tainted#3886",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Morei",
+        "Emmuffin"
       ]
     },
     {
@@ -713,6 +2586,9 @@
       "portrait": [
         "CHUNSOFT",
         "chikorene"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -729,6 +2605,45 @@
         "Noo",
         "Emmuffin",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0344",
+      "name": "Claydol",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0348",
+      "name": "Armaldo",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Morei",
+        "Noo"
+      ],
+      "shinyPortrait": [
+        "baronessfaron",
+        "Morei"
       ]
     },
     {
@@ -742,6 +2657,73 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Chi",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0355",
+      "name": "Duskull",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0356",
+      "name": "Dusclops",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "G〜"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Tainted#3886",
+        "baronessfaron",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei",
+        "G〜",
+        "Cloudy"
+      ]
+    },
+    {
+      "dex": "0357",
+      "name": "Tropius",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Palika",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Reppamon",
+        "Noo",
         "Emmuffin"
       ]
     },
@@ -762,6 +2744,80 @@
         "CHUNSOFT",
         "Emmuffin",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Emmuffin",
+        "Deeshura"
+      ]
+    },
+    {
+      "dex": "0359-mega",
+      "name": "Absol (Mega)",
+      "sprite": [
+        "Emboarger"
+      ],
+      "shiny": [
+        "Morei",
+        "Deeshura"
+      ],
+      "portrait": [
+        "Caitemis",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "ShyStarryRain",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0361",
+      "name": "Snorunt",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0362",
+      "name": "Glalie",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0362-mega",
+      "name": "Glalie (Mega)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -776,6 +2832,9 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
         "Emmuffin"
       ]
     },
@@ -792,6 +2851,119 @@
       "portrait": [
         "CHUNSOFT",
         "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0377",
+      "name": "Regirock",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Chi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius"
+      ],
+      "shinyPortrait": [
+        "Chi",
+        "CamusZekeSirius"
+      ]
+    },
+    {
+      "dex": "0378",
+      "name": "Regice",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0379",
+      "name": "Registeel",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Audino"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius"
+      ],
+      "shinyPortrait": [
+        "Reppamon",
+        "CamusZekeSirius",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0380",
+      "name": "Latias",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Sharpen",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Reppamon",
+        "Noo",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0381",
+      "name": "Latios",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Reppamon"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0381-mega",
+      "name": "Latios (Mega)",
+      "sprite": [
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Top_Kec"
+      ],
+      "shinyPortrait": [
+        "Top_Kec"
       ]
     },
     {
@@ -805,6 +2977,9 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Chi"
       ]
     },
     {
@@ -820,7 +2995,8 @@
       "portrait": [
         "CHUNSOFT",
         "Emboarger"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0389",
@@ -834,6 +3010,10 @@
       "portrait": [
         "CHUNSOFT",
         "JFain"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei"
       ]
     },
     {
@@ -848,6 +3028,10 @@
       "portrait": [
         "CHUNSOFT",
         "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Emmuffin"
       ]
     },
     {
@@ -861,6 +3045,11 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "baronessfaron",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Lovi",
         "baronessfaron",
         "Emmuffin"
       ]
@@ -878,7 +3067,8 @@
       "portrait": [
         "CHUNSOFT",
         "Emmuffin"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0393",
@@ -891,6 +3081,9 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Lovi"
       ]
     },
     {
@@ -904,6 +3097,11 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "Emboarger",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Lovi",
         "Emboarger",
         "Emmuffin"
       ]
@@ -920,6 +3118,10 @@
       "portrait": [
         "CHUNSOFT",
         "0palite"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Noo"
       ]
     },
     {
@@ -937,7 +3139,8 @@
       "portrait": [
         "CHUNSOFT",
         "CamusZekeSirius"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0397",
@@ -951,6 +3154,10 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "CamusZekeSirius"
+      ],
+      "shinyPortrait": [
+        "Lovi",
         "CamusZekeSirius"
       ]
     },
@@ -972,6 +3179,11 @@
         "CamusZekeSirius",
         "ShyStarryRain",
         "G〜"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "CamusZekeSirius",
+        "Morei"
       ]
     },
     {
@@ -990,6 +3202,9 @@
         "CHUNSOFT",
         "Gust",
         "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -1004,6 +3219,10 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "G〜"
       ]
     },
     {
@@ -1017,6 +3236,9 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Lovi"
       ]
     },
     {
@@ -1031,6 +3253,10 @@
       "portrait": [
         "CHUNSOFT",
         "JFain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
       ]
     },
     {
@@ -1044,6 +3270,9 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Reppamon"
       ]
     },
     {
@@ -1060,6 +3289,10 @@
       "portrait": [
         "CHUNSOFT",
         "C_Pariah"
+      ],
+      "shinyPortrait": [
+        "Reppamon",
+        "C_Pariah"
       ]
     },
     {
@@ -1075,6 +3308,9 @@
       "portrait": [
         "CHUNSOFT",
         "Soulja"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -1092,6 +3328,10 @@
         "CHUNSOFT",
         "Discord user 237814999634935808",
         "Deeshura"
+      ],
+      "shinyPortrait": [
+        "RaoKurai",
+        "Morei"
       ]
     },
     {
@@ -1111,7 +3351,8 @@
         "CHUNSOFT",
         "baronessfaron",
         "G〜"
-      ]
+      ],
+      "shinyPortrait": []
     },
     {
       "dex": "0408",
@@ -1126,6 +3367,11 @@
       "portrait": [
         "CHUNSOFT",
         "JFain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei",
+        "ShyStarryRain"
       ]
     },
     {
@@ -1141,6 +3387,399 @@
         "CHUNSOFT",
         "Noo",
         "NikolaP"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Noo",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0410",
+      "name": "Shieldon",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "A_Lettuce"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "A_Lettuce"
+      ]
+    },
+    {
+      "dex": "0411",
+      "name": "Bastiodon",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0412",
+      "name": "Burmy",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Lovi",
+        "Caitemis"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "snarbs"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "snarbs"
+      ]
+    },
+    {
+      "dex": "0413",
+      "name": "Wormadam",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0414",
+      "name": "Mothim",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Audino"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "FlowerSnek"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "FlowerSnek"
+      ]
+    },
+    {
+      "dex": "0415",
+      "name": "Combee",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Morei"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0416",
+      "name": "Vespiquen",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0417",
+      "name": "Pachirisu",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain",
+        "baronessfaron"
+      ],
+      "shiny": [],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0418",
+      "name": "Buizel",
+      "sprite": [
+        "CHUNSOFT",
+        "Reimu\\_needs\\_$$$"
+      ],
+      "shiny": [
+        "Lovi",
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "C_Pariah"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "C_Pariah"
+      ]
+    },
+    {
+      "dex": "0419",
+      "name": "Floatzel",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei",
+        "Caitemis"
+      ]
+    },
+    {
+      "dex": "0420",
+      "name": "Cherubi",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Discord user 173876028593274880"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0421",
+      "name": "Cherrim",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Emmuffin",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0422",
+      "name": "Shellos",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "chikorene"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "chikorene"
+      ]
+    },
+    {
+      "dex": "0423",
+      "name": "Gastrodon",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0424",
+      "name": "Ambipom",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire",
+        "Noo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "JFain"
+      ]
+    },
+    {
+      "dex": "0425",
+      "name": "Drifloon",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "Deleca7755",
+        "Fearless-Quit"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Deleca7755",
+        "Fearless-Quit"
+      ]
+    },
+    {
+      "dex": "0426",
+      "name": "Drifblim",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "NOLASMOR"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "NOLASMOR"
+      ]
+    },
+    {
+      "dex": "0427",
+      "name": "Buneary",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Lovi",
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "frostibirb",
+        "smbmaster99",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Discord user 589906152708505648",
+        "Morei",
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0428",
+      "name": "Lopunny",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0428-mega",
+      "name": "Lopunny (Mega)",
+      "sprite": [
+        "JFain"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0429",
+      "name": "Mismagius",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "baronessfaron",
+        "Emmuffin"
       ]
     },
     {
@@ -1157,6 +3796,197 @@
         "CHUNSOFT",
         "CamusZekeSirius",
         "baronessfaron"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0431",
+      "name": "Glameow",
+      "sprite": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Lovi",
+        "baronessfaron"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "ShyStarryRain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Noo",
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0432",
+      "name": "Purugly",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0433",
+      "name": "Chingling",
+      "sprite": [
+        "CHUNSOFT",
+        "anomalocaris"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "chime"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "chime"
+      ]
+    },
+    {
+      "dex": "0434",
+      "name": "Stunky",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [],
+      "portrait": [
+        "CHUNSOFT",
+        "C_Pariah",
+        "Jarleypeño"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0435",
+      "name": "Skuntank",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Audino"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "drawsstuff",
+        "Gayschlatt",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Gayschlatt",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0436",
+      "name": "Bronzor",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "chime"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "chime"
+      ]
+    },
+    {
+      "dex": "0437",
+      "name": "Bronzong",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi",
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0438",
+      "name": "Bonsly",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0439",
+      "name": "Mime_Jr_",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emitone",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0441",
+      "name": "Chatot",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust",
+        "Gayschlatt"
+      ],
+      "shinyPortrait": [
+        "Caitemis",
+        "Gayschlatt",
+        "Gust"
       ]
     },
     {
@@ -1170,6 +4000,9 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
         "baronessfaron"
       ]
     },
@@ -1186,6 +4019,28 @@
         "CHUNSOFT",
         "JFain",
         "G〜"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0444",
+      "name": "Gabite",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "dmDash"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "dmDash"
       ]
     },
     {
@@ -1202,6 +4057,27 @@
         "CHUNSOFT",
         "Top_Kec",
         "G〜"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Top_Kec",
+        "◥θ┴θ◤"
+      ]
+    },
+    {
+      "dex": "0446",
+      "name": "Munchlax",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Lovi"
       ]
     },
     {
@@ -1216,6 +4092,11 @@
       "portrait": [
         "CHUNSOFT",
         "Fearless-Quit"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Fearless-Quit",
+        "Emboarger"
       ]
     },
     {
@@ -1236,6 +4117,251 @@
         "MilesFarber",
         "Deeshura",
         "G〜"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "JFain",
+        "Emmuffin",
+        "MilesFarber",
+        "Deeshura",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0448-mega",
+      "name": "Lucario (Mega)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Caitemis"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0449",
+      "name": "Hippopotas",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0450",
+      "name": "Hippowdon",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0451",
+      "name": "Skorupi",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Sunny",
+        "Cloudy"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0452",
+      "name": "Drapion",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0453",
+      "name": "Croagunk",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emboarger",
+        "Noo",
+        "Gust"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0454",
+      "name": "Toxicroak",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Moo"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Moo",
+        "baronessfaron",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0455",
+      "name": "Carnivine",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Emboarger"
+      ]
+    },
+    {
+      "dex": "0456",
+      "name": "Finneon",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Anonymous",
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Discord user 776403448220483615",
+        "JFain",
+        "Morei"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0457",
+      "name": "Lumineon",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Prismatic",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emboarger"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Emboarger"
+      ]
+    },
+    {
+      "dex": "0458",
+      "name": "Mantyke",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Lovi"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Gust"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Gust"
+      ]
+    },
+    {
+      "dex": "0459",
+      "name": "Snover",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Jarleypeño"
+      ],
+      "shinyPortrait": [
+        "Lovi",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0460",
+      "name": "Abomasnow",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Scizivire"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "SingingMudkip"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "SingingMudkip"
       ]
     },
     {
@@ -1252,6 +4378,50 @@
         "JFain",
         "PhillipsYoung",
         "ShyStarryRain"
+      ],
+      "shinyPortrait": [
+        "◥θ┴θ◤",
+        "Morei",
+        "baronessfaron",
+        "ShyStarryRain",
+        "PhillipsYoung"
+      ]
+    },
+    {
+      "dex": "0462",
+      "name": "Magnezone",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Audino"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Magu"
+      ]
+    },
+    {
+      "dex": "0463",
+      "name": "Lickilicky",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Reppamon",
+        "Noo",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
       ]
     },
     {
@@ -1265,6 +4435,11 @@
       ],
       "portrait": [
         "CHUNSOFT",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Reppamon",
+        "Emmuffin",
         "G〜"
       ]
     },
@@ -1281,6 +4456,11 @@
         "CHUNSOFT",
         "Emboarger",
         "JustAGunk"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Emboarger",
+        "JustAGunk"
       ]
     },
     {
@@ -1294,6 +4474,9 @@
       ],
       "portrait": [
         "CHUNSOFT"
+      ],
+      "shinyPortrait": [
+        "G〜"
       ]
     },
     {
@@ -1308,6 +4491,445 @@
       "portrait": [
         "CHUNSOFT",
         "Discord user 436940337865293834"
+      ],
+      "shinyPortrait": [
+        "RaoKurai",
+        "Noo"
+      ]
+    },
+    {
+      "dex": "0469",
+      "name": "Yanmega",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Reppamon"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Top_Kec"
+      ],
+      "shinyPortrait": [
+        "Top_Kec"
+      ]
+    },
+    {
+      "dex": "0470",
+      "name": "Leafeon",
+      "sprite": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Discord user 195280695009083392",
+        "Emboarger",
+        "baronessfaron"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Ichor",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0471",
+      "name": "Glaceon",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Discord user 195280695009083392",
+        "Morei",
+        "baronessfaron"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "PhillipsYoung"
+      ],
+      "shinyPortrait": [
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0472",
+      "name": "Gliscor",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "G〜"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "G〜",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0473",
+      "name": "Mamoswine",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0475",
+      "name": "Gallade",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Noo",
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0475-mega",
+      "name": "Gallade (Mega)",
+      "sprite": [
+        "JFain"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0477",
+      "name": "Dusknoir",
+      "sprite": [
+        "CHUNSOFT",
+        "Caitemis"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Caitemis",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Morei",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0478",
+      "name": "Froslass",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "JFain",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0479",
+      "name": "Rotom",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Audino"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Orange"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Orange"
+      ]
+    },
+    {
+      "dex": "0480",
+      "name": "Uxie",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Tacocoa"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "baronessfaron",
+        "bwappi"
+      ]
+    },
+    {
+      "dex": "0481",
+      "name": "Mesprit",
+      "sprite": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "ShyStarryRain",
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Mojo",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei",
+        "baronessfaron",
+        "bwappi"
+      ]
+    },
+    {
+      "dex": "0482",
+      "name": "Azelf",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "Morei",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0483",
+      "name": "Dialga",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "ShyStarryRain",
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "CamusZekeSirius",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0483-origin",
+      "name": "Dialga (Origin)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CamusZekeSirius",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Caitemis",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0483-primal",
+      "name": "Dialga (Primal)",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius",
+        "G〜"
+      ],
+      "shinyPortrait": []
+    },
+    {
+      "dex": "0484",
+      "name": "Palkia",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius",
+        "TaylorTrap622",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Anonymous",
+        "TaylorTrap622",
+        "Emboarger"
+      ]
+    },
+    {
+      "dex": "0484-origin",
+      "name": "Palkia (Origin)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CamusZekeSirius",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "CamusZekeSirius",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0485",
+      "name": "Heatran",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Anonymous"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0486",
+      "name": "Regigigas",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Morei"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0487",
+      "name": "Giratina",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "G〜",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "El_Pangoro_Parse",
+        "CamusZekeSirius",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0487-origin",
+      "name": "Giratina (Origin)",
+      "sprite": [
+        "CHUNSOFT"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "CamusZekeSirius",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Magu"
+      ]
+    },
+    {
+      "dex": "0488",
+      "name": "Cresselia",
+      "sprite": [
+        "CHUNSOFT",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "ShyStarryRain",
+        "El_Pangoro_Parse"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "baronessfaron",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "El_Pangoro_Parse",
+        "baronessfaron",
+        "Emmuffin"
       ]
     },
     {
@@ -1326,6 +4948,366 @@
         "CHUNSOFT",
         "Wyvernagon",
         "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Prismatic",
+        "Emboarger",
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0492",
+      "name": "Shaymin",
+      "sprite": [
+        "CHUNSOFT",
+        "JFain"
+      ],
+      "shiny": [
+        "Audino",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Mojo"
+      ],
+      "shinyPortrait": [
+        "Tacocoa",
+        "Noo"
+      ]
+    },
+    {
+      "dex": "0492-sky",
+      "name": "Shaymin (Sky)",
+      "sprite": [
+        "CHUNSOFT",
+        "Emmuffin",
+        "XModxGodX"
+      ],
+      "shiny": [
+        "Tacocoa",
+        "Morei",
+        "XModxGodX",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "CHUNSOFT",
+        "Emmuffin",
+        "Soulja"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0493",
+      "name": "Arceus",
+      "sprite": [
+        "JFain",
+        "baronessfaron",
+        "Emboarger"
+      ],
+      "shiny": [
+        "Morei",
+        "Emboarger",
+        "baronessfaron"
+      ],
+      "portrait": [
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0503-hisui",
+      "name": "Samurott (Hisui)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Deeshura"
+      ],
+      "portrait": [
+        "Emmuffin",
+        "Soulja"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0548",
+      "name": "Petilil",
+      "sprite": [
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "mucrush",
+        "Ichor",
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Caitemis",
+        "Ichor",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0549-hisui",
+      "name": "Lilligant (Hisui)",
+      "sprite": [
+        "GustavoMusinTG",
+        "Soulja"
+      ],
+      "shiny": [
+        "baronessfaron"
+      ],
+      "portrait": [
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "baronessfaron"
+      ]
+    },
+    {
+      "dex": "0570-hisui",
+      "name": "Zorua (Hisui)",
+      "sprite": [
+        "Ichor"
+      ],
+      "shiny": [
+        "Morei",
+        "XModxGodX"
+      ],
+      "portrait": [
+        "Emboarger",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Morei"
+      ]
+    },
+    {
+      "dex": "0571-hisui",
+      "name": "Zoroark (Hisui)",
+      "sprite": [
+        "baronessfaron",
+        "Deeshura"
+      ],
+      "shiny": [
+        "Deeshura"
+      ],
+      "portrait": [
+        "Emboarger",
+        "Discord user 632712420778836009",
+        "baronessfaron",
+        "Deeshura"
+      ],
+      "shinyPortrait": [
+        "Morei",
+        "Deeshura"
+      ]
+    },
+    {
+      "dex": "0627",
+      "name": "Rufflet",
+      "sprite": [
+        "baronessfaron",
+        "◥θ┴θ◤"
+      ],
+      "shiny": [
+        "baronessfaron",
+        "Emmuffin"
+      ],
+      "portrait": [
+        "mucrush",
+        "Emmuffin",
+        "Ichor"
+      ],
+      "shinyPortrait": [
+        "Caitemis",
+        "Emmuffin",
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0628-hisui",
+      "name": "Braviary (Hisui)",
+      "sprite": [
+        "Soulja",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Emmuffin",
+        "JFain"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0712",
+      "name": "Bergmite",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "baronessfaron"
+      ],
+      "portrait": [
+        "Noivern",
+        "<ElGian>"
+      ],
+      "shinyPortrait": [
+        "Caitemis",
+        "<ElGian>"
+      ]
+    },
+    {
+      "dex": "0713-hisui",
+      "name": "Avalugg (Hisui)",
+      "sprite": [
+        "baronessfaron",
+        "Emmuffin"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Emmuffin"
+      ],
+      "shinyPortrait": [
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0724-hisui",
+      "name": "Decidueye (Hisui)",
+      "sprite": [
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Reimu\\_needs\\_$$$"
+      ],
+      "shinyPortrait": [
+        "Caitemis"
+      ]
+    },
+    {
+      "dex": "0899",
+      "name": "Wyrdeer",
+      "sprite": [
+        "VOID"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0900",
+      "name": "Kleavor",
+      "sprite": [
+        "JFain",
+        "Soulja"
+      ],
+      "shiny": [
+        "G〜"
+      ],
+      "portrait": [
+        "Noo",
+        "Soulja"
+      ],
+      "shinyPortrait": [
+        "Noo",
+        "Soulja",
+        "Emmuffin"
+      ]
+    },
+    {
+      "dex": "0901",
+      "name": "Ursaluna",
+      "sprite": [
+        "Emmuffin",
+        "baronessfaron"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Emboarger",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Caitemis",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0902",
+      "name": "Basculegion",
+      "sprite": [
+        "Soulja"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Emboarger",
+        "G〜"
+      ]
+    },
+    {
+      "dex": "0903",
+      "name": "Sneasler",
+      "sprite": [
+        "Soulja"
+      ],
+      "shiny": [
+        "Emmuffin"
+      ],
+      "portrait": [
+        "Emmuffin",
+        "baronessfaron"
+      ],
+      "shinyPortrait": [
+        "Emmuffin",
+        "ShyStarryRain"
+      ]
+    },
+    {
+      "dex": "0904",
+      "name": "Overqwil",
+      "sprite": [
+        "JFain"
+      ],
+      "shiny": [
+        "ShyStarryRain"
+      ],
+      "portrait": [
+        "Novie",
+        "G〜"
+      ],
+      "shinyPortrait": [
+        "Novie",
+        "G〜"
       ]
     }
   ]

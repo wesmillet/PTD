@@ -1,0 +1,18 @@
+Pokémon Platinum trainer art, badges and interface graphics.
+Original art by Game Freak / The Pokémon Company / Nintendo, taken from the
+pret/pokeplatinum decompilation project (https://github.com/pret/pokeplatinum),
+which stores the game's graphics as indexed PNGs and NDS tilemaps.
+Converted by scripts/build-platinum.py (background keyed out, town map
+tilemap reassembled). Non-commercial fan project use only.
+
+trainers/<class>.png        battle sprite, standing pose (80x80)
+trainers/<class>-pose.png   battle sprite, throwing pose
+trainers/mugshots/          VS screen mugshots (96x64)
+trainers/banners/           VS screen class banners
+trainers/overworld/         walking sprite sheets (32x32 frames, one column)
+trainers/index.json         names, classes and which files exist per id
+badges/                     the eight Sinnoh badges (64x64) and greyed copies
+ui/gen4/types/              type and move category icons (32x16)
+ui/gen4/popups/             location name banners
+ui/gen4/frames/             message box frames
+ui/gen4/sinnoh-map.png      the Platinum town map (256x192)

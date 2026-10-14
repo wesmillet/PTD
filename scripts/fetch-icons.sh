@@ -40,7 +40,8 @@ for id in "$@"; do
     anim="$WORK/$GEN5/animated/$name.png"
     if [ -f "$anim" ]; then
       cp -f "$anim" "$dest/$name-anim.png"
-      node "$ROOT/scripts/split-apng.mjs" "$anim" "$dest/$name" > /dev/null
+      node "$ROOT/scripts/split-apng.mjs" "$anim" "$dest/$name" > /dev/null 2>&1 \
+        || echo "could not split the APNG for $name (static icon only)"
     fi
   done
   if [ ! -f "$dest/$id.png" ]; then

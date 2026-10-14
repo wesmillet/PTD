@@ -15,19 +15,37 @@ if (!trackerPath || !outPath) {
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const spriteRoot = resolve(root, 'public/assets/sprites');
+// Folders are `0058` (base form) or `0058-hisui` (a tracker.json subgroup,
+// slugified: lower case, underscores to dashes), see scripts/fetch-sprites.py.
 const present = new Set(
-  existsSync(spriteRoot) ? readdirSync(spriteRoot).filter((d) => /^\d{4}$/.test(d)) : [],
+  existsSync(spriteRoot) ? readdirSync(spriteRoot).filter((d) => /^\d{4}(-[a-z0-9-]+)?$/.test(d)) : [],
 );
 
 const tracker = JSON.parse(readFileSync(trackerPath, 'utf8'));
-const index = {};
-for (const dex of [...present].sort()) {
+const slugify = (name) => name.toLowerCase().replace(/[_ ]/g, '-');
+/** The tracker node for a folder: the species entry, or the named subgroup. */
+function trackerNode(folder) {
+  const [dex, form] = folder.split(/-(.+)/);
   const entry = tracker[dex];
-  if (!entry || !entry.name) {
-    console.warn(`tracker.json has no entry for ${dex}`);
+  if (!entry || !form) return { entry, node: entry, dex, form: null };
+  const find = (node) => {
+    for (const sub of Object.values(node.subgroups ?? {})) {
+      if (sub.name && slugify(sub.name) === form) return sub;
+      const deeper = find(sub);
+      if (deeper) return deeper;
+    }
+    return null;
+  };
+  return { entry, node: find(entry), dex, form };
+}
+const index = {};
+for (const folder of [...present].sort()) {
+  const { entry, node, form } = trackerNode(folder);
+  if (!entry || !entry.name || !node) {
+    console.warn(`tracker.json has no entry for ${folder}`);
     continue;
   }
-  index[entry.name.toLowerCase()] = dex;
+  index[slugify(entry.name) + (form ? `-${form}` : '')] = folder;
 }
 
 writeFileSync(outPath, JSON.stringify(index, null, 2) + '\n');
@@ -36,15 +54,21 @@ console.log(`wrote ${outPath} with ${Object.keys(index).length} entries`);
 // Which optional assets each folder has, so the loader can skip missing ones.
 const foldersPath = resolve(dirname(outPath), 'spriteFolders.json');
 const folders = {};
-for (const dex of [...present].sort()) {
-  const shiny = existsSync(resolve(spriteRoot, dex, 'shiny', 'AnimData.xml'));
-  const portraitDir = resolve(root, 'public/assets/portraits', dex);
+for (const folder of [...present].sort()) {
+  const { dex, form, node } = trackerNode(folder);
+  const shiny = existsSync(resolve(spriteRoot, folder, 'shiny', 'AnimData.xml'));
+  const portraitDir = resolve(root, 'public/assets/portraits', folder);
   const portraits = existsSync(portraitDir) ? readdirSync(portraitDir).filter((f) => f.endsWith('.png')).map((f) => f.replace('.png', '')).sort() : [];
+  const shinyPortraitDir = resolve(portraitDir, 'shiny');
+  const shinyPortraits = existsSync(shinyPortraitDir) ? readdirSync(shinyPortraitDir).filter((f) => f.endsWith('.png')).map((f) => f.replace('.png', '')).sort() : [];
   const iconDir = resolve(root, 'public/assets/icons');
-  const id = String(Number(dex));
+  // Icons are named by unpadded dex number plus the form slug: 58-hisui.png.
+  const id = String(Number(dex)) + (form ? `-${form}` : '');
   const icon = existsSync(resolve(iconDir, `${id}.png`));
   const animatedIcon = existsSync(resolve(iconDir, `${id}-f0.png`)) && existsSync(resolve(iconDir, `${id}-f1.png`));
-  folders[dex] = { shiny, portraits, icon, animatedIcon };
+  folders[folder] = form
+    ? { shiny, portraits, shinyPortraits, icon, animatedIcon, species: Number(dex), form, formName: node?.name ?? form }
+    : { shiny, portraits, shinyPortraits, icon, animatedIcon };
 }
 writeFileSync(foldersPath, JSON.stringify(folders, null, 2) + '\n');
 console.log(`wrote ${foldersPath}`);
@@ -72,14 +96,15 @@ const readCredits = (file) => {
   return names;
 };
 const credits = { source: 'PMDCollab SpriteCollab (https://github.com/PMDCollab/SpriteCollab)', pokemon: [] };
-for (const dex of [...present].sort()) {
-  const entry = tracker[dex];
+for (const folder of [...present].sort()) {
+  const { entry, node, form } = trackerNode(folder);
   credits.pokemon.push({
-    dex,
-    name: entry?.name ?? dex,
-    sprite: readCredits(resolve(spriteRoot, dex, 'credits.txt')),
-    shiny: readCredits(resolve(spriteRoot, dex, 'shiny', 'credits.txt')),
-    portrait: readCredits(resolve(root, 'public/assets/portraits', dex, 'credits.txt')),
+    dex: folder,
+    name: (entry?.name ?? folder) + (form ? ` (${node?.name ?? form})` : ''),
+    sprite: readCredits(resolve(spriteRoot, folder, 'credits.txt')),
+    shiny: readCredits(resolve(spriteRoot, folder, 'shiny', 'credits.txt')),
+    portrait: readCredits(resolve(root, 'public/assets/portraits', folder, 'credits.txt')),
+    shinyPortrait: readCredits(resolve(root, 'public/assets/portraits', folder, 'shiny', 'credits.txt')),
   });
 }
 const creditsPath = resolve(dirname(outPath), 'credits.json');
