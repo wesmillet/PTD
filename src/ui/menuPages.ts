@@ -10,6 +10,8 @@ import { BALL_IDS, BALLS } from '../sim/catch';
 import { allBadges, dexCounts, hasBadge, type GameState } from '../sim/game';
 import type { Monster } from '../sim/monster';
 import { allBoxed } from '../sim/pc';
+import { runtime } from '../game/runtime';
+import { setZoom, ZOOMS, zoomLabel } from '../game/zoom';
 import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame, typeBadge, uiUrl } from './domOverlay';
 
 export interface MenuPageHooks {
@@ -233,7 +235,31 @@ export class MenuPages {
     render();
     const note = document.createElement('div');
     note.className = 'ptd-dim';
-    note.textContent = 'Higher speeds run more simulation steps per frame; the outcome is the same. Sound and accessibility options come with the polish phase.';
-    root.append(label, row, note);
+    note.textContent = 'Higher speeds run more simulation steps per frame; the outcome is the same.';
+    const zoomLabelEl = document.createElement('div');
+    zoomLabelEl.className = 'ptd-label';
+    zoomLabelEl.textContent = 'Zoom';
+    const zoomRow = document.createElement('div');
+    zoomRow.className = 'ptd-actions';
+    zoomRow.id = 'ptd-zoom-row';
+    const renderZoom = () => {
+      zoomRow.innerHTML = '';
+      for (const z of ZOOMS) {
+        const b = document.createElement('button');
+        b.textContent = zoomLabel(z);
+        b.dataset.zoom = String(z);
+        b.style.opacity = z === runtime.zoom ? '1' : '0.6';
+        b.addEventListener('click', () => {
+          setZoom(z);
+          renderZoom();
+        });
+        zoomRow.appendChild(b);
+      }
+    };
+    renderZoom();
+    const zoomNote = document.createElement('div');
+    zoomNote.className = 'ptd-dim';
+    zoomNote.textContent = 'Fit scales the game to the window; 1x, 1.5x and 2x show it at a fixed size. + and - step through them.';
+    root.append(label, row, note, zoomLabelEl, zoomRow, zoomNote);
   }
 }

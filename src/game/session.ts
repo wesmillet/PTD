@@ -42,6 +42,11 @@ export function getGame(): GameState {
   return game;
 }
 
+/** Saves only when a game has been loaded (settings changed from the title screen stay in memory). */
+export function saveGameIfLoaded(): void {
+  if (loaded) saveGame();
+}
+
 /** Persists the current game and settings. */
 export function saveGame(): void {
   writeSave(game);

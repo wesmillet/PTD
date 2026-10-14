@@ -34,8 +34,13 @@ export interface SavedBox {
   slots: (SavedMonster | null)[];
 }
 
+export type SavedZoom = 'fit' | 1 | 1.5 | 2;
+export const SAVED_ZOOMS: readonly SavedZoom[] = ['fit', 1, 1.5, 2];
+
 export interface SavedSettings {
   gameSpeed: number;
+  /** Canvas zoom (absent in older saves: fit). */
+  zoom?: SavedZoom;
   speed: SpeedConfig;
 }
 
@@ -91,7 +96,7 @@ export function serializeGame(game: GameState, settings: SavedSettings, now = Da
     money: game.money,
     pokedex: JSON.parse(JSON.stringify(game.pokedex)) as Record<string, DexEntry>,
     badges: [...game.badges],
-    settings: { gameSpeed: settings.gameSpeed, speed: { ...settings.speed } },
+    settings: { gameSpeed: settings.gameSpeed, ...(settings.zoom !== undefined ? { zoom: settings.zoom } : {}), speed: { ...settings.speed } },
   };
 }
 
@@ -222,6 +227,7 @@ export function validateSave(raw: unknown): SaveData {
       speed[key] = v;
     }
   }
+  if (settings.zoom !== undefined && !(SAVED_ZOOMS as readonly unknown[]).includes(settings.zoom)) throw new SaveError('bad zoom');
   return {
     version: SAVE_VERSION,
     savedAt: s.savedAt,
@@ -233,7 +239,7 @@ export function validateSave(raw: unknown): SaveData {
     money: s.money as number,
     pokedex,
     badges,
-    settings: { gameSpeed: GAME_SPEEDS.includes(settings.gameSpeed) ? settings.gameSpeed : 1, speed },
+    settings: { gameSpeed: GAME_SPEEDS.includes(settings.gameSpeed) ? settings.gameSpeed : 1, ...(settings.zoom !== undefined ? { zoom: settings.zoom as SavedZoom } : {}), speed },
   };
 }
 

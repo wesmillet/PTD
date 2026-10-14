@@ -83,6 +83,9 @@ describe('corrupt saves are rejected', () => {
     expect(bad((d) => ((d.items as Record<string, unknown>).potions = 'lots'))).toThrow(/item/);
     expect(bad((d) => (d.settings = { gameSpeed: 'fast', speed: {} }))).toThrow(/settings/);
     expect(bad((d) => ((d.settings as Record<string, unknown>).speed = { speedBase: -1 }))).toThrow(/speed/);
+    expect(bad((d) => ((d.settings as Record<string, unknown>).zoom = 3))).toThrow(/zoom/);
+    expect(validateSave(JSON.parse(JSON.stringify({ ...data, settings: { ...data.settings, zoom: 1.5 } }))).settings.zoom).toBe(1.5);
+    expect(validateSave(JSON.parse(JSON.stringify(data))).settings.zoom).toBeUndefined();
     expect(bad((d) => (d.pokedex = { '387': { seen: 'yes' } }))).toThrow(/pokedex/);
     expect(() => validateSave(null)).toThrow(SaveError);
     expect(() => validateSave('nope')).toThrow(SaveError);

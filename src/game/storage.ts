@@ -2,13 +2,14 @@
  * localStorage persistence of the game state and settings.
  */
 import { runtime, runtimeConfig } from './runtime';
+import { applyZoom } from './zoom';
 import type { GameState } from '../sim/game';
 import { decodeSaveCode, encodeSaveCode, restoreGame, SaveError, serializeGame, validateSave, type SaveData } from '../sim/save';
 
 export const SAVE_KEY = 'ptd.save.v1';
 
 function currentSettings() {
-  return { gameSpeed: runtime.gameSpeed, speed: { ...runtimeConfig.speed } };
+  return { gameSpeed: runtime.gameSpeed, zoom: runtime.zoom, speed: { ...runtimeConfig.speed } };
 }
 
 export function buildSave(game: GameState): SaveData {
@@ -62,6 +63,7 @@ export function clearSave(): void {
 export function applySettings(data: SaveData): void {
   runtime.gameSpeed = data.settings.gameSpeed;
   Object.assign(runtimeConfig.speed, data.settings.speed);
+  applyZoom(data.settings.zoom ?? 'fit');
 }
 
 export function saveCodeFor(game: GameState): string {

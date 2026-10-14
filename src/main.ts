@@ -7,9 +7,11 @@ import { PCScene } from './scenes/PCScene';
 import { Phase0Scene } from './scenes/Phase0Scene';
 import { TitleScene } from './scenes/TitleScene';
 import { Hud } from './ui/hud';
+import { saveGameIfLoaded } from './game/session';
+import { installZoomKeys, registerZoomGame } from './game/zoom';
 
 function start(): void {
-  new Phaser.Game({
+  const game = new Phaser.Game({
     type: Phaser.AUTO,
     parent: 'game',
     width: 960,
@@ -23,6 +25,8 @@ function start(): void {
     },
     scene: [BootScene, TitleScene, LevelSelectScene, LevelScene, PCScene, Phase0Scene],
   });
+  registerZoomGame(game, () => saveGameIfLoaded());
+  installZoomKeys();
 }
 
 // Make sure the pixel font is available before any canvas text is created.

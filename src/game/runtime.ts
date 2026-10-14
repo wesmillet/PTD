@@ -15,6 +15,8 @@ if (typeof window !== 'undefined' && new URLSearchParams(window.location.search)
 /** Game speed multiplier: extra fixed steps per frame (1x, 2x, 4x; see config.gameSpeeds). */
 export const runtime = {
   gameSpeed: 1,
+  /** Canvas zoom: 'fit' or a fixed factor (see game/zoom.ts). */
+  zoom: 'fit' as 'fit' | 1 | 1.5 | 2,
   /** Level the debug panel sets for the player's Turtwig (party member 0). */
   partyLevelOverride: undefined as number | undefined,
 };
