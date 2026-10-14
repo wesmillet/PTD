@@ -122,3 +122,7 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
 - The debug panel and the map editor keep their monospace developer styling
   (they are tools, not game UI, and the editor belongs to the maps session);
   the save-code text areas use Power Clear like the rest.
+- A failed sprite download (seen live right after a redeploy) now reloads
+  the level on its own after 2, 4 and 8 s before showing the manual Retry
+  screen; the sprite loader forgets a folder whose AnimData failed so the
+  reload requests it again.

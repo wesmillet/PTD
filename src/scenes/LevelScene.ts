@@ -91,7 +91,12 @@ interface TowerView {
 export interface LevelSceneData {
   levelId?: string;
   seed?: number;
+  /** Automatic reload attempts so far after a failed asset download. */
+  retry?: number;
 }
+
+/** Delays before each automatic reload after a download failure (a redeploy or a dropped connection). */
+const RELOAD_DELAYS_MS = [2000, 4000, 8000];
 
 /**
  * Renders a LevelState and animates the events `step` returns. Owns no game
@@ -139,6 +144,9 @@ export class LevelScene extends Phaser.Scene {
 
   init(data: LevelSceneData): void {
     this.levelId = data.levelId ?? urlParam('level') ?? 'route-201';
+    this.retry = data.retry ?? 0;
+    this.loadFailed = false;
+    this.failedFiles = [];
     const urlSeed = Number(urlParam('seed'));
     this.seed = data.seed ?? (Number.isFinite(urlSeed) && urlSeed > 0 ? urlSeed : (Date.now() % 1_000_000) + 1);
     this.enemyViews.clear();
@@ -154,6 +162,8 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private loadFailed = false;
+  private failedFiles: string[] = [];
+  private retry = 0;
   private loadedFolders: string[] = [];
 
   preload(): void {
@@ -171,12 +181,18 @@ export class LevelScene extends Phaser.Scene {
     });
     this.load.on('loaderror', (file: Phaser.Loader.File) => {
       this.loadFailed = true;
+      this.failedFiles.push(file.src);
       label.setText(`Could not load ${file.src}`).setColor('#ff7b7b');
     });
     MapRenderer.queueAssets(this);
     this.loadedFolders = levelSpriteFolders(def, game);
     for (const dex of this.loadedFolders) queuePokemon(this, dex, ALL_ACTIONS, { optional: OPTIONAL_ACTIONS });
+    // Debug hook for the automated load checks.
+    (window as unknown as { __ptdLoad?: unknown }).__ptdLoad = { retry: this.retry, failed: () => this.failedFiles, phase: () => this.loadPhase };
+    this.loadPhase = 'preload';
   }
+
+  private loadPhase = 'init';
 
   create(): void {
     const def = getLevel(this.levelId);
@@ -185,10 +201,21 @@ export class LevelScene extends Phaser.Scene {
       this.scene.start('LevelSelect');
       return;
     }
+    this.loadPhase = this.loadFailed ? 'failed' : 'create';
     if (this.loadFailed) {
       const { width, height } = this.scale;
+      const delay = RELOAD_DELAYS_MS[this.retry];
+      if (delay !== undefined) {
+        // A download failed (often a redeploy in progress or a dropped connection): reload on our own first.
+        const note = this.add.text(width / 2, height / 2 + 40, `${this.failedFiles.length} file(s) did not download. Retrying in ${Math.round(delay / 1000)} s…`, TEXT_DIM).setOrigin(0.5);
+        this.time.delayedCall(delay, () => {
+          note.destroy();
+          this.scene.restart({ levelId: this.levelId, seed: this.seed, retry: this.retry + 1 });
+        });
+        return;
+      }
       this.add.text(width / 2, height / 2 + 40, 'Some sprites did not download. Check your connection and retry.', TEXT_DIM).setOrigin(0.5);
-      new Button(this, width / 2 - 80, height / 2 + 84, 'Retry', () => this.scene.restart({ levelId: this.levelId, seed: this.seed }), 140, 32);
+      new Button(this, width / 2 - 80, height / 2 + 84, 'Retry', () => this.scene.restart({ levelId: this.levelId, seed: this.seed, retry: 0 }), 140, 32);
       new Button(this, width / 2 + 80, height / 2 + 84, 'Level select', () => this.scene.start('LevelSelect'), 140, 32);
       return;
     }
@@ -808,7 +835,8 @@ export class LevelScene extends Phaser.Scene {
   // ----------------------------------------------------------------- loop
 
   override update(_time: number, delta: number): void {
-    if (this.ended) return;
+    // No state yet: the loader failed and the retry screen (or the automatic reload timer) is showing.
+    if (this.ended || !this.state) return;
     this.mapRenderer?.update(delta);
     if (!this.paused) {
       // Events are handled per step so a dialog opened mid-frame stops the rest of the frame.

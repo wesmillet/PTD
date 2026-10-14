@@ -170,7 +170,16 @@ export function queuePokemon(
 
   const key = animDataKey(dex);
   scene.load.text(key, `${SPRITE_ROOT}/${dex}/AnimData.xml`);
+  // If the download fails, forget the pending entry so a later preload (the
+  // scene's automatic reload) requests the file again instead of skipping it.
+  const onError = (file: Phaser.Loader.File) => {
+    if (file.key !== key) return;
+    pendingActions.delete(dex);
+    scene.load.off('loaderror', onError);
+  };
+  scene.load.on('loaderror', onError);
   scene.load.once(`filecomplete-text-${key}`, (_key: string, _type: string, xml: string) => {
+    scene.load.off('loaderror', onError);
     const set: LoadedSet = { dex, animData: parseAnimData(xml), actions: new Set() };
     loadedSets.set(dex, set);
     const wanted = pendingActions.get(dex) ?? { actions: new Set(actions), optional, shadows };
