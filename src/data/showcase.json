@@ -57,24 +57,24 @@
     },
     {
       "species": 282,
-      "level": 40,
+      "level": 34,
       "shiny": true,
       "moves": [
+        273,
         345,
         347,
-        94,
-        286
+        94
       ]
     },
     {
       "species": 376,
-      "level": 45,
+      "level": 22,
       "shiny": true,
       "moves": [
-        94,
-        334,
-        97,
-        359
+        36,
+        393,
+        93,
+        232
       ]
     },
     {
@@ -134,7 +134,7 @@
     },
     {
       "species": 6,
-      "level": 53,
+      "level": 49,
       "shiny": false,
       "moves": [
         163,
@@ -145,13 +145,13 @@
     },
     {
       "species": 9,
-      "level": 43,
+      "level": 31,
       "shiny": false,
       "moves": [
+        44,
+        229,
         182,
-        352,
-        401,
-        130
+        352
       ]
     },
     {
@@ -178,13 +178,13 @@
     },
     {
       "species": 149,
-      "level": 58,
+      "level": 46,
       "shiny": false,
       "moves": [
-        407,
-        219,
-        349,
-        17
+        21,
+        97,
+        401,
+        407
       ]
     },
     {
@@ -233,13 +233,13 @@
     },
     {
       "species": 248,
-      "level": 57,
+      "level": 36,
       "shiny": false,
       "moves": [
-        371,
-        242,
-        89,
-        444
+        184,
+        37,
+        399,
+        371
       ]
     },
     {
@@ -266,7 +266,7 @@
     },
     {
       "species": 257,
-      "level": 55,
+      "level": 51,
       "shiny": false,
       "moves": [
         98,
@@ -277,24 +277,24 @@
     },
     {
       "species": 254,
-      "level": 40,
+      "level": 27,
       "shiny": false,
       "moves": [
+        98,
+        404,
         228,
-        103,
-        348,
-        97
+        103
       ]
     },
     {
       "species": 260,
-      "level": 41,
+      "level": 29,
       "shiny": false,
       "moves": [
+        117,
+        341,
         193,
-        426,
-        36,
-        330
+        426
       ]
     },
     {
@@ -310,24 +310,24 @@
     },
     {
       "species": 306,
-      "level": 42,
+      "level": 22,
       "shiny": false,
       "moves": [
-        36,
-        442,
-        182,
-        319
+        29,
+        232,
+        334,
+        46
       ]
     },
     {
       "species": 373,
-      "level": 53,
+      "level": 31,
       "shiny": false,
       "moves": [
-        428,
-        184,
-        19,
-        242
+        29,
+        116,
+        52,
+        182
       ]
     },
     {
@@ -343,13 +343,13 @@
     },
     {
       "species": 330,
-      "level": 53,
+      "level": 41,
       "shiny": false,
       "moves": [
+        328,
+        48,
         225,
-        103,
-        337,
-        201
+        103
       ]
     },
     {
@@ -482,6 +482,730 @@
         328,
         163,
         337
+      ]
+    }
+  ],
+  "legends": [
+    {
+      "species": 144,
+      "level": 63,
+      "shiny": true,
+      "moves": [
+        97,
+        58,
+        115,
+        355
+      ]
+    },
+    {
+      "species": 146,
+      "level": 61,
+      "shiny": true,
+      "moves": [
+        53,
+        219,
+        403,
+        355
+      ]
+    },
+    {
+      "species": 151,
+      "level": 64,
+      "shiny": true,
+      "moves": [
+        94,
+        112,
+        246,
+        133
+      ]
+    },
+    {
+      "species": 243,
+      "level": 70,
+      "shiny": true,
+      "moves": [
+        242,
+        422,
+        435,
+        326
+      ]
+    },
+    {
+      "species": 245,
+      "level": 52,
+      "shiny": true,
+      "moves": [
+        62,
+        54,
+        243,
+        423
+      ]
+    },
+    {
+      "species": 250,
+      "level": 53,
+      "shiny": true,
+      "moves": [
+        126,
+        241,
+        129,
+        363
+      ]
+    },
+    {
+      "species": 251,
+      "level": 58,
+      "shiny": true,
+      "moves": [
+        246,
+        226,
+        363,
+        377
+      ]
+    },
+    {
+      "species": 382,
+      "level": 70,
+      "shiny": true,
+      "moves": [
+        56,
+        156,
+        329,
+        38
+      ]
+    },
+    {
+      "species": 383,
+      "level": 63,
+      "shiny": true,
+      "moves": [
+        89,
+        126,
+        156,
+        90
+      ]
+    },
+    {
+      "species": 384,
+      "level": 51,
+      "shiny": true,
+      "moves": [
+        349,
+        242,
+        19,
+        156
+      ]
+    },
+    {
+      "species": 385,
+      "level": 64,
+      "shiny": true,
+      "moves": [
+        356,
+        361,
+        248,
+        322
+      ]
+    },
+    {
+      "species": 386,
+      "level": 59,
+      "shiny": true,
+      "moves": [
+        228,
+        94,
+        289,
+        375
+      ]
+    },
+    {
+      "species": 489,
+      "level": 51,
+      "shiny": true,
+      "moves": [
+        61,
+        151,
+        250,
+        352
+      ]
+    },
+    {
+      "species": 490,
+      "level": 56,
+      "shiny": true,
+      "moves": [
+        151,
+        250,
+        352,
+        392
+      ]
+    },
+    {
+      "species": 494,
+      "level": 66,
+      "shiny": true,
+      "moves": [
+        428,
+        517,
+        179,
+        545
+      ]
+    },
+    {
+      "species": 638,
+      "level": 60,
+      "shiny": true,
+      "moves": [
+        368,
+        36,
+        533,
+        14
+      ]
+    },
+    {
+      "species": 639,
+      "level": 57,
+      "shiny": true,
+      "moves": [
+        157,
+        36,
+        533,
+        14
+      ]
+    },
+    {
+      "species": 640,
+      "level": 68,
+      "shiny": true,
+      "moves": [
+        235,
+        533,
+        14,
+        348
+      ]
+    },
+    {
+      "species": 641,
+      "level": 66,
+      "shiny": true,
+      "moves": [
+        253,
+        359,
+        240,
+        542
+      ]
+    },
+    {
+      "species": 642,
+      "level": 62,
+      "shiny": true,
+      "moves": [
+        435,
+        253,
+        359,
+        240
+      ]
+    },
+    {
+      "species": 643,
+      "level": 64,
+      "shiny": true,
+      "moves": [
+        53,
+        558,
+        304,
+        126
+      ]
+    },
+    {
+      "species": 644,
+      "level": 59,
+      "shiny": true,
+      "moves": [
+        337,
+        85,
+        559,
+        304
+      ]
+    },
+    {
+      "species": 645,
+      "level": 57,
+      "shiny": true,
+      "moves": [
+        414,
+        326,
+        444,
+        359
+      ]
+    },
+    {
+      "species": 646,
+      "level": 57,
+      "shiny": true,
+      "moves": [
+        58,
+        304,
+        184,
+        59
+      ]
+    },
+    {
+      "species": 647,
+      "level": 65,
+      "shiny": true,
+      "moves": [
+        36,
+        533,
+        14,
+        56
+      ]
+    },
+    {
+      "species": 648,
+      "level": 70,
+      "shiny": true,
+      "moves": [
+        369,
+        547,
+        94,
+        304
+      ]
+    },
+    {
+      "species": 649,
+      "level": 55,
+      "shiny": true,
+      "moves": [
+        488,
+        319,
+        404,
+        393
+      ]
+    },
+    {
+      "species": 716,
+      "level": 60,
+      "shiny": true,
+      "moves": [
+        275,
+        36,
+        601,
+        585
+      ]
+    },
+    {
+      "species": 717,
+      "level": 69,
+      "shiny": true,
+      "moves": [
+        613,
+        566,
+        492,
+        407
+      ]
+    },
+    {
+      "species": 718,
+      "level": 56,
+      "shiny": true,
+      "moves": [
+        242,
+        406,
+        616,
+        137
+      ]
+    },
+    {
+      "species": 719,
+      "level": 58,
+      "shiny": true,
+      "moves": [
+        397,
+        113,
+        157,
+        285
+      ]
+    },
+    {
+      "species": 720,
+      "level": 55,
+      "shiny": true,
+      "moves": [
+        428,
+        433,
+        472,
+        247
+      ]
+    },
+    {
+      "species": 721,
+      "level": 61,
+      "shiny": true,
+      "moves": [
+        503,
+        36,
+        54,
+        114
+      ]
+    },
+    {
+      "species": 772,
+      "level": 51,
+      "shiny": true,
+      "moves": [
+        161,
+        404,
+        442,
+        36
+      ]
+    },
+    {
+      "species": 773,
+      "level": 62,
+      "shiny": true,
+      "moves": [
+        242,
+        36,
+        38,
+        575
+      ]
+    },
+    {
+      "species": 785,
+      "level": 56,
+      "shiny": true,
+      "moves": [
+        103,
+        435,
+        212,
+        717
+      ]
+    },
+    {
+      "species": 786,
+      "level": 70,
+      "shiny": true,
+      "moves": [
+        717,
+        585,
+        321,
+        285
+      ]
+    },
+    {
+      "species": 787,
+      "level": 56,
+      "shiny": true,
+      "moves": [
+        532,
+        428,
+        212,
+        717
+      ]
+    },
+    {
+      "species": 788,
+      "level": 64,
+      "shiny": true,
+      "moves": [
+        330,
+        212,
+        717,
+        585
+      ]
+    },
+    {
+      "species": 789,
+      "level": 63,
+      "shiny": true,
+      "moves": [
+        100,
+        150
+      ]
+    },
+    {
+      "species": 790,
+      "level": 56,
+      "shiny": true,
+      "moves": [
+        322,
+        100
+      ]
+    },
+    {
+      "species": 791,
+      "level": 57,
+      "shiny": true,
+      "moves": [
+        234,
+        242,
+        368,
+        528
+      ]
+    },
+    {
+      "species": 792,
+      "level": 63,
+      "shiny": true,
+      "moves": [
+        539,
+        94,
+        585,
+        566
+      ]
+    },
+    {
+      "species": 800,
+      "level": 69,
+      "shiny": true,
+      "moves": [
+        500,
+        350,
+        334,
+        408
+      ]
+    },
+    {
+      "species": 801,
+      "level": 50,
+      "shiny": true,
+      "moves": [
+        60,
+        62,
+        199,
+        508
+      ]
+    },
+    {
+      "species": 802,
+      "level": 58,
+      "shiny": true,
+      "moves": [
+        395,
+        372,
+        389,
+        409
+      ]
+    },
+    {
+      "species": 807,
+      "level": 57,
+      "shiny": true,
+      "moves": [
+        521,
+        268,
+        9,
+        468
+      ]
+    },
+    {
+      "species": 808,
+      "level": 54,
+      "shiny": true,
+      "moves": [
+        29,
+        86,
+        151,
+        430
+      ]
+    },
+    {
+      "species": 809,
+      "level": 66,
+      "shiny": true,
+      "moves": [
+        430,
+        5,
+        182,
+        435
+      ]
+    },
+    {
+      "species": 888,
+      "level": 60,
+      "shiny": true,
+      "moves": [
+        14,
+        442,
+        568,
+        242
+      ]
+    },
+    {
+      "species": 889,
+      "level": 70,
+      "shiny": true,
+      "moves": [
+        442,
+        368,
+        242,
+        585
+      ]
+    },
+    {
+      "species": 890,
+      "level": 65,
+      "shiny": true,
+      "moves": [
+        406,
+        53,
+        744,
+        322
+      ]
+    },
+    {
+      "species": 891,
+      "level": 50,
+      "shiny": true,
+      "moves": [
+        442,
+        223,
+        68,
+        370
+      ]
+    },
+    {
+      "species": 892,
+      "level": 53,
+      "shiny": true,
+      "moves": [
+        223,
+        68,
+        370,
+        264
+      ]
+    },
+    {
+      "species": 894,
+      "level": 61,
+      "shiny": true,
+      "moves": [
+        85,
+        393,
+        37,
+        199
+      ]
+    },
+    {
+      "species": 895,
+      "level": 54,
+      "shiny": true,
+      "moves": [
+        337,
+        359,
+        349,
+        37
+      ]
+    },
+    {
+      "species": 897,
+      "level": 61,
+      "shiny": true,
+      "moves": [
+        36,
+        97,
+        37,
+        50
+      ]
+    },
+    {
+      "species": 898,
+      "level": 52,
+      "shiny": true,
+      "moves": [
+        270,
+        580,
+        678,
+        412
+      ]
+    },
+    {
+      "species": 905,
+      "level": 64,
+      "shiny": true,
+      "moves": [
+        326,
+        253,
+        276,
+        361
+      ]
+    },
+    {
+      "species": 150,
+      "level": 51,
+      "shiny": true,
+      "moves": [
+        244,
+        357,
+        54,
+        427
+      ]
+    },
+    {
+      "species": 249,
+      "level": 57,
+      "shiny": true,
+      "moves": [
+        240,
+        129,
+        363,
+        246
+      ]
+    },
+    {
+      "species": 483,
+      "level": 70,
+      "shiny": true,
+      "moves": [
+        459,
+        377,
+        414,
+        163
+      ]
+    },
+    {
+      "species": 484,
+      "level": 68,
+      "shiny": true,
+      "moves": [
+        337,
+        460,
+        377,
+        414
+      ]
+    },
+    {
+      "species": 487,
+      "level": 58,
+      "shiny": true,
+      "moves": [
+        246,
+        337,
+        467,
+        377
+      ]
+    },
+    {
+      "species": 493,
+      "level": 56,
+      "shiny": true,
+      "moves": [
+        414,
+        304,
+        245,
+        287
+      ]
+    },
+    {
+      "species": 10006,
+      "level": 54,
+      "shiny": true,
+      "moves": [
+        73,
+        98,
+        230,
+        363
       ]
     }
   ]

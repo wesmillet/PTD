@@ -427,7 +427,12 @@ every level is unlocked from the start (badges and progress still save as
 normal), and a new game's PC starts with the showcase collection in
 `src/data/showcase.json` (built by `scripts/build-showcase.mjs`: 44 Gen 1
 to 4 Pokémon at levels 20 to 60, 12 of them shiny filling Box 1, movesets
-from their Platinum learnsets). The starter is still chosen normally.
+from their learnsets), followed by the "Legends" boxes: every legendary
+and mythical with a sprite folder (the last section of
+`scripts/sprite-list.txt`, plus Mewtwo, Lugia, Ho-Oh, Rayquaza, Dialga,
+Palkia, Giratina, Arceus and Shaymin Sky), all shiny at levels 50 to 70,
+one per species, in the first empty boxes renamed "Legends", "Legends 2",
+... The starter is still chosen normally.
 
 ## Challenge levels and shiny hunting
 Unchanged from the sections below.

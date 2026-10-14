@@ -1,7 +1,10 @@
 // Writes src/data/showcase.json: the curated PC collection a new save gets
 // in demo mode (config.json "demoMode"). Levels 20 to 60, shinies first so
 // they fill Box 1, movesets as the Platinum learnset would give at that
-// level. Deterministic (seeded) so the file only changes when the list does.
+// level; then the "Legends" boxes: every legendary and mythical in the
+// last section of scripts/sprite-list.txt plus the Sinnoh and Johto
+// headliners, all shiny at levels 50 to 70. Deterministic (seeded) so the
+// file only changes when the lists do.
 // Usage: node scripts/build-showcase.mjs
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -14,6 +17,7 @@ const learnsets = read('learnsets.json');
 const evolutions = read('evolutions.json');
 const byName = new Map(Object.entries(pokemon).map(([id, p]) => [p.name, Number(id)]));
 
+const LEGENDS_EXTRA = ['mewtwo', 'lugia', 'ho-oh', 'rayquaza', 'dialga', 'palkia', 'giratina', 'arceus', 'shaymin-sky'];
 const LIST = `Charizard, Blastoise, Venusaur, Pikachu, Gengar*, Dragonite, Gyarados*, Lapras, Snorlax, Arcanine, Ninetales*, Scizor*, Heracross, Tyranitar, Umbreon*, Espeon, Houndoom, Blaziken, Sceptile, Swampert, Gardevoir*, Absol, Aggron, Salamence, Metagross*, Milotic, Flygon, Torterra, Infernape, Empoleon, Luxray*, Staraptor, Lucario*, Garchomp*, Togekiss, Weavile, Honchkrow, Spiritomb, Rhyperior, Electivire, Magmortar, Gible, Riolu*, Eevee*`;
 
 // mulberry32, same generator as src/sim/rng.ts.
@@ -67,5 +71,26 @@ for (const e of entries) {
 }
 // Shinies first so they fill Box 1 in order; the rest keep the list's order.
 out.sort((a, b) => Number(b.shiny) - Number(a.shiny));
-writeFileSync(resolve(root, 'src/data/showcase.json'), JSON.stringify({ pokemon: out }, null, 2) + '\n');
-console.log(`wrote src/data/showcase.json: ${out.length} Pokémon, ${out.filter((p) => p.shiny).length} shiny, levels ${Math.min(...out.map((p) => p.level))}-${Math.max(...out.map((p) => p.level))}`);
+
+// The Legends boxes: the sprite list's legendaries section (dex order) plus the named extras, one per species.
+const spriteList = readFileSync(resolve(root, 'scripts/sprite-list.txt'), 'utf8');
+const section = spriteList.split('# legendaries and mythicals of every generation')[1]?.split('\n#')[0] ?? '';
+const legendIds = [];
+for (const m of section.matchAll(/^(\d{4})/gm)) legendIds.push(Number(m[1]));
+for (const name of LEGENDS_EXTRA) {
+  const id = byName.get(name);
+  if (!id) throw new Error(`unknown legend ${name}`);
+  legendIds.push(id);
+}
+const legends = [];
+const seen = new Set();
+for (const id of legendIds) {
+  if (seen.has(id)) continue;
+  seen.add(id);
+  if (!pokemon[String(id)]) throw new Error(`legend ${id} has no data`);
+  const floor = Math.max(50, minLevel(id));
+  const level = Math.min(70, between(floor, 70));
+  legends.push({ species: id, level, shiny: true, moves: movesAt(id, level) });
+}
+writeFileSync(resolve(root, 'src/data/showcase.json'), JSON.stringify({ pokemon: out, legends }, null, 2) + '\n');
+console.log(`wrote src/data/showcase.json: ${out.length} Pokémon, ${out.filter((p) => p.shiny).length} shiny, levels ${Math.min(...out.map((p) => p.level))}-${Math.max(...out.map((p) => p.level))}; ${legends.length} legends`);

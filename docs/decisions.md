@@ -419,3 +419,13 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   form's base species (Growlithe for 0058-hisui) may ship no entry.
 - PokeAPI's `is_legendary` / `is_mythical` become a `legendary` flag for
   the lottery pool, the showcase and the title cast.
+
+## Phase 9 batch 2, item 3 (Legends box)
+
+- Sixty-eight legends do not fit one box of thirty, so the showcase fills
+  the first empty boxes after the ordinary collection and names them
+  "Legends", "Legends 2", "Legends 3".
+- The list is read from the sprite list's legendaries section (dex
+  order) plus the nine named extras; Shaymin Sky counts as its own species
+  (form id), Type: Null, Cosmog and Kubfu are included as listed.
+- Levels respect a species' evolution floor (Solgaleo never below 53).
