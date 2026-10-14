@@ -3,7 +3,11 @@ import config from '../data/config.json';
 import levelsJson from '../data/levels.json';
 import spriteFolders from '../data/spriteFolders.json';
 import uiGen4 from '../data/ui-gen4.json';
-import { assetUrl, badgeTextureKey, folderIconName, itemTextureKey, itemUrl, trainerTextureKey, urlParam } from '../game/runtime';
+import { assetUrl, badgeTextureKey, bannerTextureKey, folderIconName, itemTextureKey, itemUrl, mugshotTextureKey, popupTextureKey, trainerTextureKey, typeIconTextureKey, typeIconUrl, urlParam } from '../game/runtime';
+import { allBadges } from '../sim/game';
+import { POPUP_KINDS } from '../sim/waves';
+import { TRAINER_ART, trainerArtId } from '../data/trainers';
+import typesJson from '../data/types.json';
 import { PC } from '../sim/pc';
 import { frameKey, TEXT_BIG } from '../ui/styles';
 
@@ -79,14 +83,32 @@ export class BootScene extends Phaser.Scene {
       this.load.image(`ui-menu-${name}`, assetUrl(icon.on));
       this.load.image(`ui-menu-${name}-off`, assetUrl(icon.off));
     }
-    // Trainer portraits and badges named by the levels.
-    for (const def of Object.values(levelsJson as Record<string, { trainer?: { id: string }; badge?: { id: string } }>)) {
-      if (def.trainer) this.load.image(trainerTextureKey(def.trainer.id), assetUrl(`assets/trainers/${def.trainer.id}.png`));
-      if (def.badge) {
-        this.load.image(badgeTextureKey(def.badge.id), assetUrl(`assets/badges/${def.badge.id}.png`));
-        this.load.image(badgeTextureKey(def.badge.id, false), assetUrl(`assets/badges/${def.badge.id}-off.png`));
-      }
+    // Platinum trainer art for the trainers the levels name: standing and
+    // throwing poses, plus the VS mugshot and class banner when they exist.
+    for (const def of Object.values(levelsJson as Record<string, { trainer?: { id: string } }>)) {
+      if (!def.trainer) continue;
+      const id = def.trainer.id;
+      const art = TRAINER_ART[id];
+      const file = trainerArtId(id);
+      this.load.image(trainerTextureKey(id), assetUrl(`assets/trainers/${file}.png`));
+      if ((art?.poses ?? 1) >= 2) this.load.image(trainerTextureKey(id, true), assetUrl(`assets/trainers/${file}-pose.png`));
+      if (art?.mugshot) this.load.image(mugshotTextureKey(id), assetUrl(`assets/trainers/mugshots/${file}.png`));
+      if (art?.banner) this.load.image(bannerTextureKey(id), assetUrl(`assets/trainers/banners/${file}.png`));
     }
+    this.load.spritesheet('ui-vs', assetUrl('assets/trainers/vs.png'), { frameWidth: 64, frameHeight: 64 });
+    // The eight badges, lit and greyed.
+    for (const b of allBadges()) {
+      this.load.image(badgeTextureKey(b.id), assetUrl(`assets/badges/${b.id}.png`));
+      this.load.image(badgeTextureKey(b.id, false), assetUrl(`assets/badges/${b.id}-off.png`));
+    }
+    // Type and move-category icons, location popups, the town map and its markers, the player's walking sheet.
+    for (const name of [...Object.values((typesJson as { names: Record<string, string> }).names), 'physical', 'special', 'status']) {
+      this.load.image(typeIconTextureKey(name), typeIconUrl(name));
+    }
+    for (const kind of POPUP_KINDS) this.load.image(popupTextureKey(kind), assetUrl(`assets/ui/gen4/popups/${kind}.png`));
+    this.load.image('sinnoh-map', assetUrl('assets/ui/gen4/sinnoh-map.png'));
+    this.load.spritesheet('map-markers', assetUrl('assets/ui/gen4/map-markers.png'), { frameWidth: 16, frameHeight: 16 });
+    this.load.spritesheet('ow-player', assetUrl('assets/trainers/overworld/player_m.png'), { frameWidth: 32, frameHeight: 32 });
   }
 
   /**

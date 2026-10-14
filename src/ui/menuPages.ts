@@ -12,7 +12,7 @@ import type { Monster } from '../sim/monster';
 import { allBoxed } from '../sim/pc';
 import { runtime } from '../game/runtime';
 import { setZoom, ZOOMS, zoomLabel } from '../game/zoom';
-import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame, typeBadge, uiUrl } from './domOverlay';
+import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame, typeIcon, uiUrl } from './domOverlay';
 
 export interface MenuPageHooks {
   game: GameState;
@@ -121,7 +121,7 @@ export class MenuPages {
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
       meta.textContent = `HP ${mon.hp}/${mon.stats.hp}${this.hooks.isPlaced(mon) ? '  ·  on the field' : ''}${mon.status.ailment !== 'none' ? `  ·  ${capitalize(mon.status.ailment)}` : ''}`;
-      li.append(icon, name, typeBadge(typeName(mon.types[0] ?? 1)), meta);
+      li.append(icon, name, typeIcon(typeName(mon.types[0] ?? 1)), meta);
       li.addEventListener('click', () => {
         this.close();
         this.hooks.openPokemon(mon);

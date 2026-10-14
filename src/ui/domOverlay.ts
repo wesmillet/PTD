@@ -5,6 +5,7 @@
 import uiGen4 from '../data/ui-gen4.json';
 import { expForLevel } from '../data/pokedata';
 import type { Monster } from '../sim/monster';
+import { typeIconUrl } from '../game/runtime';
 
 interface Rect {
   x: number;
@@ -159,13 +160,23 @@ export function iconImage(url: string | undefined, shiny = false): HTMLElement |
   return wrap;
 }
 
-/** A type badge coloured by the CSS variable for that type. */
+/** A type badge coloured by the CSS variable for that type (text fallback; panels use typeIcon). */
 export function typeBadge(name: string): HTMLSpanElement {
   const span = document.createElement('span');
   span.className = 'ptd-type';
   span.textContent = name;
   span.style.background = `var(--type-${name}, #444)`;
   return span;
+}
+
+/** The Platinum type icon (32x16) for a type name, or a move category (physical, special, status). */
+export function typeIcon(name: string): HTMLImageElement {
+  const img = document.createElement('img');
+  img.className = 'ptd-type-icon';
+  img.alt = name;
+  img.title = capitalize(name);
+  img.src = typeIconUrl(name);
+  return img;
 }
 
 /**

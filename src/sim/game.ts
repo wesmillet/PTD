@@ -2,6 +2,7 @@
  * Pure game-wide state: starter, party, PC boxes, level completion, items,
  * money, badges. No Phaser imports.
  */
+import badgesJson from '../data/badges.json';
 import config from '../data/config.json';
 import { getLevel, levelIds } from '../data/levels';
 import type { Monster } from './monster';
@@ -138,14 +139,26 @@ export function hasBadge(game: GameState, badgeId: string): boolean {
   return game.badges.includes(badgeId);
 }
 
-/** Every badge the levels define, in level order. */
-export function allBadges(): { id: string; name: string; levelId: string }[] {
-  const out: { id: string; name: string; levelId: string }[] = [];
+export interface BadgeInfo {
+  id: string;
+  name: string;
+  leader: string;
+  gym: string;
+  /** The level that awards it, once one does. */
+  levelId?: string;
+}
+
+/** The eight Sinnoh badges (src/data/badges.json), each with the level that awards it when one exists. */
+export function allBadges(): BadgeInfo[] {
+  const awardedBy = new Map<string, string>();
   for (const id of levelIds()) {
     const badge = getLevel(id).badge;
-    if (badge) out.push({ ...badge, levelId: id });
+    if (badge) awardedBy.set(badge.id, id);
   }
-  return out;
+  return (badgesJson.badges as Omit<BadgeInfo, 'levelId'>[]).map((b) => {
+    const levelId = awardedBy.get(b.id);
+    return levelId ? { ...b, levelId } : { ...b };
+  });
 }
 
 export function isLevelCompleted(game: GameState, levelId: string): boolean {

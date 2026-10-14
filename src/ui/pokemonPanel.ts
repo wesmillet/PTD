@@ -11,7 +11,7 @@ import type { Monster } from '../sim/monster';
 import { resolveMove } from '../sim/moves';
 import { evolutionOptions } from '../sim/evolution';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, hpBox, iconImage, isolateFromGame, typeBadge, updateHpBox } from './domOverlay';
+import { capitalize, ensureOverlayStyles, hpBox, iconImage, isolateFromGame, typeIcon, updateHpBox } from './domOverlay';
 
 export interface PokemonPanelHooks {
   portraitUrl: (species: number, shiny: boolean) => string | undefined;
@@ -176,7 +176,7 @@ export class PokemonPanel {
     this.title.textContent = `${capitalize(mon.name)}${mon.shiny ? ' ★' : ''}`;
     this.level.textContent = `Lv ${mon.level}`;
     this.types.innerHTML = '';
-    for (const t of mon.types) this.types.appendChild(typeBadge(typeName(t)));
+    for (const t of mon.types) this.types.appendChild(typeIcon(typeName(t)));
     if (this.hpBoxEl) updateHpBox(this.hpBoxEl, mon);
     const next = mon.level >= 100 ? 0 : expForLevel(mon.growth, mon.level + 1) - mon.exp;
     const rate = towerAttacksPerSec(getPokemon(mon.species).base.spe, runtimeConfig.speed);
@@ -210,7 +210,7 @@ export class PokemonPanel {
       const data = getMove(slot.id);
       const li = document.createElement('li');
       li.className = `ptd-move${index === mon.activeMove ? ' active' : ''}`;
-      li.style.gridTemplateColumns = '1fr auto auto';
+      li.style.gridTemplateColumns = '1fr auto auto auto';
       const name = document.createElement('span');
       name.className = 'ptd-name';
       name.textContent = `${index === mon.activeMove ? '▶ ' : ''}${capitalize(data.name)}`;
@@ -218,8 +218,8 @@ export class PokemonPanel {
       pp.textContent = `PP ${slot.pp}/${slot.maxPp}`;
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
-      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${capitalize(data.category)}  Range ${spec.range}  ${capitalize(spec.targeting)}`;
-      li.append(name, typeBadge(typeName(data.type)), pp, meta);
+      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  Range ${spec.range}  ${capitalize(spec.targeting)}`;
+      li.append(name, typeIcon(typeName(data.type)), typeIcon(data.category), pp, meta);
       li.addEventListener('click', () => {
         this.hooks.setActiveMove(mon, index);
         this.refresh();

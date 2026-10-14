@@ -39,6 +39,12 @@ export const GENERAL_CREDITS: { title: string; lines: string[] }[] = [
     ],
   },
   {
+    title: 'Trainers, badges and town map (Pokémon Platinum)',
+    lines: [
+      'Trainer battle sprites and poses, VS mugshots and class banners, overworld walking sprites, the eight Sinnoh badges, type and move-category icons, location popups and the town map come from the pret/pokeplatinum decompilation project, https://github.com/pret/pokeplatinum, converted by scripts/build-platinum.py (see public/assets/trainers/CREDITS.txt). Original art by Game Freak / The Pokémon Company / Nintendo.',
+    ],
+  },
+  {
     title: 'Font',
     lines: [
       'Power Clear and Power Clear Bold, the DS-era Pokémon text fonts distributed with Pokémon Essentials (https://github.com/Maruno17/pokemon-essentials, Fonts folder), by the Pokémon Essentials contributors. Creative Commons Attribution-NonCommercial-ShareAlike 4.0; non-commercial use only.',

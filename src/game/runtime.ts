@@ -121,9 +121,34 @@ export function itemTextureKey(sprite: string): string {
   return `item-${sprite}`;
 }
 
-/** Texture key of a trainer portrait placeholder (assets/trainers/<id>.png). */
-export function trainerTextureKey(id: string): string {
-  return `trainer-${id}`;
+/** Texture key of a trainer's Platinum battle sprite (assets/trainers/<id>.png); `pose` gives the throwing pose. */
+export function trainerTextureKey(id: string, pose = false): string {
+  return pose ? `trainer-${id}-pose` : `trainer-${id}`;
+}
+
+/** Texture key of a trainer's VS mugshot (assets/trainers/mugshots/<id>.png). */
+export function mugshotTextureKey(id: string): string {
+  return `mugshot-${id}`;
+}
+
+/** Texture key of a trainer's VS class banner (assets/trainers/banners/<id>.png). */
+export function bannerTextureKey(id: string): string {
+  return `banner-${id}`;
+}
+
+/** Texture key of a location popup banner (assets/ui/gen4/popups/<kind>.png). */
+export function popupTextureKey(kind: string): string {
+  return `popup-${kind}`;
+}
+
+/** Texture key of a type or move-category icon (assets/ui/gen4/types/<name>.png, 32x16). */
+export function typeIconTextureKey(name: string): string {
+  return `type-${name}`;
+}
+
+/** URL of a type or move-category icon for DOM panels. */
+export function typeIconUrl(name: string): string {
+  return `${import.meta.env.BASE_URL}assets/ui/gen4/types/${name}.png`;
 }
 
 /** Texture key of a badge icon; `lit` false gives the greyed version. */

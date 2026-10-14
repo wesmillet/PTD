@@ -13,7 +13,7 @@ import { makeMoveSlot, type Monster } from '../sim/monster';
 import { learnableAt } from '../sim/moves';
 import { capitalizeName } from '../sim/names';
 import type { BoxFilter, SortKey } from '../sim/pc';
-import { capitalize, ensureOverlayStyles, hpBox, iconImage, isolateFromGame, typeBadge } from './domOverlay';
+import { capitalize, ensureOverlayStyles, hpBox, iconImage, isolateFromGame, typeIcon } from './domOverlay';
 import { EvolutionDialog } from './evolutionDialog';
 import { LearnDialog } from './learnDialog';
 
@@ -179,7 +179,7 @@ export class PcSummary {
     line.textContent = `Lv ${mon.level}  ·  ${where === 'party' ? 'in the party' : 'in a box'}`;
     const types = document.createElement('div');
     types.style.marginTop = '4px';
-    for (const t of mon.types) types.appendChild(typeBadge(typeName(t)));
+    for (const t of mon.types) types.appendChild(typeIcon(typeName(t)));
     text.append(name, line, types);
     if (icon) head.appendChild(icon);
     head.append(portrait, text);
@@ -216,8 +216,9 @@ export class PcSummary {
       mname.textContent = capitalize(data.name);
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
-      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${data.category}  PP ${slot.pp}/${slot.maxPp}`;
-      li.append(mname, typeBadge(typeName(data.type)), meta);
+      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  PP ${slot.pp}/${slot.maxPp}`;
+      li.style.gridTemplateColumns = '1fr auto auto';
+      li.append(mname, typeIcon(typeName(data.type)), typeIcon(data.category), meta);
       moves.appendChild(li);
     }
     body.appendChild(moves);

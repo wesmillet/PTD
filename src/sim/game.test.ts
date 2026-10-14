@@ -90,7 +90,10 @@ describe('level unlock chain', () => {
 
   it('awards a badge for winning a gym level, once', () => {
     const game = createGameState();
-    expect(allBadges()).toEqual([{ id: 'coal', name: 'Coal Badge', levelId: 'oreburgh-mine-1f' }]);
+    const badges = allBadges();
+    expect(badges.map((b) => b.id)).toEqual(['coal', 'forest', 'cobble', 'fen', 'relic', 'mine', 'icicle', 'beacon']);
+    expect(badges[0]).toMatchObject({ id: 'coal', name: 'Coal Badge', levelId: 'oreburgh-mine-1f' });
+    expect(badges[1]?.levelId).toBeUndefined();
     recordLevelResult(game, 'oreburgh-mine-1f', 'lost', 7);
     expect(game.badges).toEqual([]);
     recordLevelResult(game, 'oreburgh-mine-1f', 'won', 8);

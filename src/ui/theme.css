@@ -140,6 +140,7 @@ body { background-image: repeating-linear-gradient(135deg, rgba(255, 255, 255, 0
 .ptd-panel .ptd-move.active { border-color: var(--ptd-accent); background: #fff0e8; }
 .ptd-panel .ptd-move .ptd-name { font: 700 var(--ptd-size)/var(--ptd-line) var(--ptd-font-pixel); }
 .ptd-panel .ptd-move .ptd-meta { grid-column: 1 / -1; color: var(--ptd-text-dim); }
+.ptd-type-icon { width: 32px; height: 16px; image-rendering: pixelated; vertical-align: middle; flex: none; margin-right: 2px; }
 .ptd-type { display: inline-block; font: 700 var(--ptd-size)/1 var(--ptd-font-pixel); padding: 2px 6px; border-radius: 4px; background: #444; color: #fff;
   text-transform: uppercase; text-shadow: var(--ptd-shadow-dark); justify-self: end; }
 .ptd-panel .ptd-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; align-items: center; }

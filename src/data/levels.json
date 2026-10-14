@@ -5,15 +5,29 @@
     "time": "day",
     "objective": "free",
     "map": "route-201",
+    "mapPos": [
+      66,
+      160
+    ],
+    "popup": "route",
     "enemiesFirstWave": 3,
     "enemiesPerWave": 1,
     "spawnInterval": 1.5,
     "placements": 6,
     "requires": null,
     "roster": [
-      { "species": "starly", "rarity": 45 },
-      { "species": "bidoof", "rarity": 45 },
-      { "species": "kricketot", "rarity": 10 }
+      {
+        "species": "starly",
+        "rarity": 45
+      },
+      {
+        "species": "bidoof",
+        "rarity": 45
+      },
+      {
+        "species": "kricketot",
+        "rarity": 10
+      }
     ]
   },
   "lake-verity": {
@@ -22,15 +36,41 @@
     "time": "day",
     "objective": "free",
     "map": "lake-verity",
+    "mapPos": [
+      44,
+      148
+    ],
+    "popup": "lake",
     "enemiesFirstWave": 3,
     "enemiesPerWave": 1,
     "spawnInterval": 1.5,
     "placements": 6,
     "requires": "route-201",
     "roster": [
-      { "species": "psyduck", "rarity": 40, "levels": [3, 5] },
-      { "species": "magikarp", "rarity": 30, "levels": [3, 6] },
-      { "species": "goldeen", "rarity": 30, "levels": [4, 6] }
+      {
+        "species": "psyduck",
+        "rarity": 40,
+        "levels": [
+          3,
+          5
+        ]
+      },
+      {
+        "species": "magikarp",
+        "rarity": 30,
+        "levels": [
+          3,
+          6
+        ]
+      },
+      {
+        "species": "goldeen",
+        "rarity": 30,
+        "levels": [
+          4,
+          6
+        ]
+      }
     ]
   },
   "route-202": {
@@ -39,15 +79,33 @@
     "time": "day",
     "objective": "free",
     "map": "route-202",
+    "mapPos": [
+      76,
+      140
+    ],
+    "popup": "route",
     "enemiesFirstWave": 3,
     "enemiesPerWave": 1,
     "spawnInterval": 1.5,
     "placements": 6,
     "requires": "lake-verity",
     "roster": [
-      { "species": "shinx", "rarity": 45 },
-      { "species": "kricketot", "rarity": 45 },
-      { "species": "sentret", "rarity": 10, "levels": [3, 4] }
+      {
+        "species": "shinx",
+        "rarity": 45
+      },
+      {
+        "species": "kricketot",
+        "rarity": 45
+      },
+      {
+        "species": "sentret",
+        "rarity": 10,
+        "levels": [
+          3,
+          4
+        ]
+      }
     ],
     "trainer": {
       "id": "youngster-tristan",
@@ -55,8 +113,14 @@
       "intro": "Hey! Let's battle! My Pokémon are tougher than they look!",
       "wave": 6,
       "party": [
-        { "species": "starly", "level": 7 },
-        { "species": "bidoof", "level": 7 }
+        {
+          "species": "starly",
+          "level": 7
+        },
+        {
+          "species": "bidoof",
+          "level": 7
+        }
       ]
     }
   },
@@ -66,6 +130,11 @@
     "time": "day",
     "objective": "defend",
     "map": "route-203",
+    "mapPos": [
+      92,
+      128
+    ],
+    "popup": "route",
     "waves": 8,
     "lives": 10,
     "enemiesFirstWave": 3,
@@ -74,17 +143,40 @@
     "placements": 6,
     "requires": "route-202",
     "roster": [
-      { "species": "abra", "rarity": 34 },
-      { "species": "zubat", "rarity": 33, "levels": [4, 6] },
-      { "species": "budew", "rarity": 33, "levels": [4, 6] }
+      {
+        "species": "abra",
+        "rarity": 34
+      },
+      {
+        "species": "zubat",
+        "rarity": 33,
+        "levels": [
+          4,
+          6
+        ]
+      },
+      {
+        "species": "budew",
+        "rarity": 33,
+        "levels": [
+          4,
+          6
+        ]
+      }
     ],
     "trainer": {
       "id": "rival-barry",
       "name": "Rival Barry",
       "intro": "There you are! I'm gonna win this time, so get ready! I'll fine you a million if you're slow!",
       "party": [
-        { "species": "starly", "level": 9 },
-        { "species": "counter-starter", "level": 11 }
+        {
+          "species": "starly",
+          "level": 9
+        },
+        {
+          "species": "counter-starter",
+          "level": 11
+        }
       ]
     }
   },
@@ -94,6 +186,11 @@
     "time": "day",
     "objective": "defend",
     "map": "oreburgh-gate",
+    "mapPos": [
+      98,
+      130
+    ],
+    "popup": "cave",
     "waves": 8,
     "lives": 10,
     "enemiesFirstWave": 3,
@@ -102,10 +199,34 @@
     "placements": 6,
     "requires": "route-203",
     "roster": [
-      { "species": "geodude", "rarity": 42 },
-      { "species": "barboach", "rarity": 42, "levels": [5, 8] },
-      { "species": "golduck", "rarity": 8, "levels": [7, 8] },
-      { "species": "zubat", "rarity": 8, "levels": [5, 8] }
+      {
+        "species": "geodude",
+        "rarity": 42
+      },
+      {
+        "species": "barboach",
+        "rarity": 42,
+        "levels": [
+          5,
+          8
+        ]
+      },
+      {
+        "species": "golduck",
+        "rarity": 8,
+        "levels": [
+          7,
+          8
+        ]
+      },
+      {
+        "species": "zubat",
+        "rarity": 8,
+        "levels": [
+          5,
+          8
+        ]
+      }
     ]
   },
   "oreburgh-mine-1f": {
@@ -114,6 +235,11 @@
     "time": "day",
     "objective": "defend",
     "map": "oreburgh-mine-1f",
+    "mapPos": [
+      104,
+      128
+    ],
+    "popup": "cave",
     "waves": 8,
     "lives": 10,
     "enemiesFirstWave": 3,
@@ -122,28 +248,56 @@
     "placements": 6,
     "requires": "oreburgh-gate",
     "roster": [
-      { "species": "onix", "rarity": 45 },
-      { "species": "machop", "rarity": 45, "levels": [5, 8] },
-      { "species": "geodude", "rarity": 10 }
+      {
+        "species": "onix",
+        "rarity": 45
+      },
+      {
+        "species": "machop",
+        "rarity": 45,
+        "levels": [
+          5,
+          8
+        ]
+      },
+      {
+        "species": "geodude",
+        "rarity": 10
+      }
     ],
     "trainer": {
       "id": "leader-roark",
       "name": "Leader Roark",
       "intro": "I'm Roark, the Gym Leader! Let me show you what Rock types are made of!",
       "party": [
-        { "species": "geodude", "level": 12 },
-        { "species": "onix", "level": 12 },
+        {
+          "species": "geodude",
+          "level": 12
+        },
+        {
+          "species": "onix",
+          "level": 12
+        },
         {
           "species": "cranidos",
           "level": 14,
           "boss": true,
           "moves": [
-            { "move": "headbutt", "every": 5 },
-            { "move": "zen-headbutt", "every": 12 }
+            {
+              "move": "headbutt",
+              "every": 5
+            },
+            {
+              "move": "zen-headbutt",
+              "every": 12
+            }
           ]
         }
       ]
     },
-    "badge": { "id": "coal", "name": "Coal Badge" }
+    "badge": {
+      "id": "coal",
+      "name": "Coal Badge"
+    }
   }
 }

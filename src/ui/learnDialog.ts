@@ -4,7 +4,7 @@
  */
 import { getMove, typeName } from '../data/pokedata';
 import type { Monster } from '../sim/monster';
-import { capitalize, ensureOverlayStyles, isolateFromGame, portraitImage } from './domOverlay';
+import { capitalize, ensureOverlayStyles, isolateFromGame, portraitImage, typeIcon } from './domOverlay';
 
 export class LearnDialog {
   private root: HTMLDivElement | null = null;
@@ -43,14 +43,12 @@ export class LearnDialog {
       const name = document.createElement('span');
       name.className = 'ptd-name';
       name.textContent = `${label}${capitalize(data.name)}`;
-      const type = document.createElement('span');
-      type.className = 'ptd-type';
-      type.textContent = typeName(data.type);
-      type.style.background = `var(--type-${typeName(data.type)}, #444)`;
+      const type = typeIcon(typeName(data.type));
       const meta = document.createElement('span');
       meta.className = 'ptd-meta';
-      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  ${data.category}  PP ${data.pp ?? '—'}`;
-      li.append(name, type, meta);
+      meta.textContent = `Pow ${data.power ?? '—'}  Acc ${data.accuracy ?? '—'}  PP ${data.pp ?? '—'}`;
+      li.style.gridTemplateColumns = '1fr auto auto';
+      li.append(name, type, typeIcon(data.category), meta);
       if (onClick) li.addEventListener('click', onClick);
       else li.style.cursor = 'default';
       return li;

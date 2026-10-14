@@ -1,0 +1,12 @@
+{
+  "badges": [
+    { "id": "coal", "name": "Coal Badge", "leader": "Roark", "gym": "Oreburgh City" },
+    { "id": "forest", "name": "Forest Badge", "leader": "Gardenia", "gym": "Eterna City" },
+    { "id": "cobble", "name": "Cobble Badge", "leader": "Maylene", "gym": "Veilstone City" },
+    { "id": "fen", "name": "Fen Badge", "leader": "Crasher Wake", "gym": "Pastoria City" },
+    { "id": "relic", "name": "Relic Badge", "leader": "Fantina", "gym": "Hearthome City" },
+    { "id": "mine", "name": "Mine Badge", "leader": "Byron", "gym": "Canalave City" },
+    { "id": "icicle", "name": "Icicle Badge", "leader": "Candice", "gym": "Snowpoint City" },
+    { "id": "beacon", "name": "Beacon Badge", "leader": "Volkner", "gym": "Sunyshore City" }
+  ]
+}

@@ -1,6 +1,6 @@
 /** One-time starter choice. DOM modal. */
 import { getPokemon, typeName } from '../data/pokedata';
-import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame } from './domOverlay';
+import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame, typeIcon } from './domOverlay';
 
 export function showStarterDialog(
   starters: readonly number[],
@@ -29,11 +29,7 @@ export function showStarterDialog(
     const name = document.createElement('span');
     name.className = 'ptd-name';
     name.textContent = capitalize(data.name);
-    const type = document.createElement('span');
-    type.className = 'ptd-type';
-    const t = typeName(data.types[0] ?? 1);
-    type.textContent = t;
-    type.style.background = `var(--type-${t}, #444)`;
+    const type = typeIcon(typeName(data.types[0] ?? 1));
     li.append(img, name, type);
     li.addEventListener('click', () => {
       root.remove();

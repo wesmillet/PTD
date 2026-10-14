@@ -38,6 +38,19 @@ export interface TrainerDef {
   wave?: number;
 }
 
+export const POPUP_KINDS = ['route', 'city', 'town', 'cave', 'forest', 'lake', 'water', 'indoors', 'park'] as const;
+export type PopupKind = (typeof POPUP_KINDS)[number];
+
+/** The location banner for a level: its `popup`, else guessed from the area (lakes, caves and mines, forests, routes). */
+export function levelPopup(def: Pick<LevelDef, 'area' | 'popup'>): PopupKind {
+  if (def.popup) return def.popup;
+  const area = def.area;
+  if (/lake/.test(area)) return 'lake';
+  if (/mine|gate|cave|cavern|tunnel|ruins/.test(area)) return 'cave';
+  if (/forest/.test(area)) return 'forest';
+  return 'route';
+}
+
 export interface BadgeDef {
   id: string;
   name: string;
@@ -49,6 +62,10 @@ export interface LevelDef {
   time: TimeOfDay;
   objective: Objective;
   map: string;
+  /** Marker position on the Platinum town map (256x192 map pixels). */
+  mapPos?: [number, number];
+  /** Location popup banner kind (ui/gen4/popups/<kind>.png); defaults by area, see levelPopup. */
+  popup?: PopupKind;
   /** Defend only: number of waves to clear. */
   waves?: number;
   /** Defend only: starting lives. */
