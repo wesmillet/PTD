@@ -264,6 +264,10 @@ since the gyms are interiors in the games and Hisui has no map render):
 | `stadium-grass`, `stadium-rock`, `stadium-water`, `stadium-ice` | the Conference's field roulette |
 | `hisui-fieldlands`, `hisui-mirelands`, `hisui-coastlands`, `hisui-icelands` | the four Hisui rifts |
 | `title` | the title screen diorama |
+| `lake-verity-island` | the Surf secret level (the traced lake, island placeable, `path-water` lane to it, `island` spot property) |
+| `lake-valor`, `lake-acuity` | the other two lakes |
+| `valley-windworks`, `eterna-forest`, `old-chateau`, `iron-island`, `galactic-hq`, `great-marsh` | story set pieces |
+| `ss-libra`, `flower-paradise`, `fullmoon-island`, `newmoon-island` | mystery events |
 
 Every map registers itself: `src/data/maps.ts` globs `src/data/maps/*.json`,
 so a new file is a new map with no code change.

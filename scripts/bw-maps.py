@@ -168,8 +168,13 @@ class Map:
                 self.terrain[y][x] = tid
 
     def reach(self, p):
+        """Distance from a cell to the nearest enemy lane (the path or any
+        extra lane)."""
         best = 1e9
-        for (ax, ay), (bx, by) in zip(self.path, self.path[1:]):
+        segs = list(zip(self.path, self.path[1:]))
+        for _, pts in getattr(self, 'extra_paths', []):
+            segs += list(zip(pts, pts[1:]))
+        for (ax, ay), (bx, by) in segs:
             vx, vy = bx - ax, by - ay
             ln = vx * vx + vy * vy
             t = 0 if ln == 0 else max(0, min(1, ((p[0] - ax) * vx + (p[1] - ay) * vy) / ln))
@@ -295,11 +300,12 @@ class Map:
         return placed
 
 
-def from_trace(name, seed, path, overrides=None, skip_trees=()):
+def from_trace(name, seed, path, overrides=None, skip_trees=(), trace=None):
     """Build a map from the traced Platinum layout (scripts/gen4-traces):
     T forest, ~ water, = road, g tall grass, # rock, . grass. The enemy path
-    is laid along the real road and clears whatever it crosses."""
-    grid = TRACES.resample(name)
+    is laid along the real road and clears whatever it crosses. `trace` names
+    the trace when the map name differs (secret versions of a place)."""
+    grid = TRACES.resample(trace or name)
     if overrides:
         grid = [''.join(overrides.get((x, y), ch) for x, ch in enumerate(row)) for y, row in enumerate(grid)]
     m = Map(name, 30, 14, seed=seed)
@@ -778,6 +784,248 @@ MAPS = {'route-201': route_201, 'lake-verity': lake_verity, 'route-202': route_2
         'stadium-water': lambda: stadium('water'), 'stadium-ice': lambda: stadium('ice'),
         'hisui-fieldlands': hisui_fieldlands, 'hisui-mirelands': hisui_mirelands,
         'hisui-coastlands': hisui_coastlands, 'hisui-icelands': hisui_icelands, 'title': title}
+
+
+# --------------------------------------------------------------------------
+# Story set pieces and secret levels (hand-built where no trace exists).
+
+# Lake Verity, the island (Surf secret level): the traced lake with the
+# island made placeable and a swimming lane from the south shore to it.
+def lake_verity_island():
+    island = {(x, y): '.' for x in range(13, 17) for y in range(6, 8)}
+    m = from_trace('lake-verity-island', 302, [(0, 11), (3, 11), (3, 0), (26, 0), (26, 11), (23, 11), (23, 13)], overrides=island, trace='lake-verity')
+    swim = [(23, 12), (23, 9), (15, 9), (15, 7)]
+    m.extra_paths = [('path-water', swim)]
+    lane(m, swim, road=False)
+    spots = [(14, 6), (16, 6), (14, 7), (16, 7)]
+    m.add_spots(spots)
+    m.spot_props = {p: {'island': True} for p in spots}
+    m.stamp('bw-rock-small', 13, 6)
+    m.stamp('bw-flowers-white', 13, 7)
+    m.points = [('cave', 'stage', 15, 7)]
+    return finish_trace(m, n_spots=8)
+
+
+# Lake Valor: the great lake with its island, drained by Saturn's bomb in the
+# story (the level code drains and refills it); same bones as Verity.
+def lake_valor():
+    m = blank('lake-valor', 303, [(0, 12), (4, 12), (4, 2), (25, 2), (25, 12), (29, 12)])
+    lake = rect(6, 3, 23, 10) - {(6, 3), (7, 3), (6, 4), (22, 3), (23, 3), (23, 4), (6, 9), (6, 10), (7, 10), (22, 10), (23, 10), (23, 9)} | rect(9, 2, 20, 2) | rect(9, 11, 20, 11)
+    island = rect(13, 6, 16, 7)
+    water(m, lake - island)
+    m.stamp('bw-rock', 14, 6)
+    m.stamp('bw-rock-small', 16, 7, must=False)
+    border_forest(m)
+    m.forest(0, 4, 2, 9)
+    m.forest(27, 4, 29, 9)
+    for x, y in ((5, 2), (24, 2), (5, 11), (24, 11), (7, 1), (22, 1)):
+        m.stamp('bw-reeds', x, y, must=False)
+    m.tall_grass(6, 12, 22, 12)
+    pick_spots(m, 10)
+    m.scatter(['bw-flowers-white', 'bw-sprig'], 6, (0, 0, 29, 13))
+    return m
+
+
+# Lake Acuity: the frozen lake below Snowpoint. Snow all round, ice at the
+# edge of the water, the island in the middle.
+def lake_acuity():
+    m = blank('lake-acuity', 304, [(0, 11), (3, 11), (3, 1), (26, 1), (26, 11), (29, 11)], road='pebbles')
+    m.floor('bw-snow', 0, 0, 29, 13)
+    lake = rect(7, 3, 22, 10) - {(7, 3), (22, 3), (7, 10), (22, 10)}
+    island = rect(13, 6, 16, 7)
+    water(m, lake - island)
+    m.terrain_cells('ice', (rect(5, 2, 24, 11) - lake - m.path_cells))
+    m.stamp('bw-snow-rock', 14, 5, must=False)
+    border_forest(m, kind='pine-snow')
+    m.stamp('bw-snow-rock-big', 0, 2, must=False)
+    m.stamp('bw-snow-rock-big', 26, 2, must=False)
+    m.scatter(['bw-grey-rock-small', 'bw-ice-block'], 5, (0, 0, 29, 13))
+    pick_spots(m, 10)
+    return m
+
+
+# Valley Windworks: the river valley below the plant. The river runs down the
+# map with a shallow ford, tall grass on both banks, fences of logs.
+def valley_windworks():
+    m = blank('valley-windworks', 401, [(0, 3), (9, 3), (9, 8), (19, 8), (19, 4), (29, 4)])
+    river = rect(13, 0, 15, 13)
+    water(m, river - rect(13, 8, 15, 8))
+    m.terrain_cells('shallow-water', rect(13, 8, 15, 8) - m.path_cells)
+    border_forest(m, bottom=False)
+    m.forest(0, 10, 10, 14)
+    m.tall_grass(1, 5, 7, 7)
+    m.tall_grass(21, 9, 28, 11)
+    m.tall_grass(17, 0, 24, 1)
+    for x, y in ((4, 1), (23, 6), (10, 11)):
+        m.stamp('bw-log', x, y, must=False)
+    m.stamp('bw-sign', 1, 2, must=False)
+    pick_spots(m, 10)
+    m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-sprig'], 8, (0, 0, 29, 13))
+    return m
+
+
+# Eterna Forest: deep woods, the path winding through narrow clearings; moss
+# (tall grass) and fallen logs.
+def eterna_forest():
+    m = blank('eterna-forest', 402, [(0, 2), (6, 2), (6, 9), (13, 9), (13, 3), (21, 3), (21, 11), (29, 11)], road='dirt-path-dark')
+    border_forest(m)
+    m.forest(8, 4, 11, 7)
+    m.forest(15, 5, 19, 8)
+    m.forest(23, 0, 29, 8)
+    m.forest(0, 4, 4, 8)
+    m.forest(8, 11, 19, 14)
+    m.tall_grass(1, 10, 4, 12)
+    m.tall_grass(23, 9, 27, 10)
+    m.stamp('bw-log', 10, 1, must=False)
+    m.stamp('bw-logpile', 16, 0, must=False)
+    pick_spots(m, 10)
+    m.scatter(['bw-sprig', 'bw-sprig-2', 'bw-sprig-3', 'bw-flowers-white'], 10, (0, 0, 29, 13))
+    return m
+
+
+# Old Chateau grounds at night: overgrown garden, lanterns, dead-looking
+# pines, a cobbled drive.
+def old_chateau():
+    m = blank('old-chateau', 403, [(0, 7), (5, 7), (5, 3), (12, 3), (12, 10), (18, 10), (18, 3), (25, 3), (25, 13)], road=None)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'bw-cobble-0'
+    border_forest(m, kind='pine-dirt')
+    m.forest(7, 6, 10, 8, kind='pine-dirt')
+    m.forest(20, 6, 23, 8, kind='pine-dirt')
+    for x, y in ((3, 2), (14, 1), (26, 8), (9, 11), (21, 11)):
+        m.stamp('bw-lantern', x, y, must=False)
+    m.tall_grass(1, 9, 4, 12)
+    m.tall_grass(13, 5, 17, 8)
+    m.stamp('bw-logpile', 27, 0, must=False)
+    m.stamp('bw-barrel', 1, 1, must=False)
+    pick_spots(m, 10)
+    m.scatter(['bw-sprig-2', 'bw-sprig-3'], 8, (0, 0, 29, 13))
+    return m
+
+
+# Iron Island: a rock island. Brown cliffs step up to the mine mouth, a
+# beach along the bottom, two lanes for the grunts.
+def iron_island():
+    m = blank('iron-island', 404, [(0, 9), (6, 9), (6, 5), (14, 5), (14, 9), (22, 9), (22, 5), (29, 5)], road='pebbles')
+    m.extra_paths = [('path-2', [(0, 11), (10, 11), (10, 7), (18, 7), (18, 11), (29, 11)])]
+    lane(m, m.extra_paths[0][1])
+    m.floor('bw-darkrock', 0, 0, 29, 13)
+    m.terrain_cells('beach-sand', rect(0, 12, 29, 12) - m.path_cells - m.lane_cells)
+    water(m, rect(0, 13, 29, 13))
+    m.plateau(0, 0, 29, 3, cliff='rock', interior=False)
+    m.stamp('bw-cave-mouth', 12, 4, must=False)
+    m.stamp('bw-rock-big', 25, 4, must=False)
+    for x, y in ((3, 6), (26, 7), (16, 1)):
+        m.stamp('bw-rock', x, y, must=False)
+    m.scatter(['bw-rock-small'], 8, (0, 3, 29, 11))
+    pick_spots(m, 10)
+    return m
+
+
+# Galactic HQ: the Veilstone rooftop. Steel plates, containers, machines, the
+# spirit extractor at the top, two lanes of grunts.
+def galactic_hq():
+    m = blank('galactic-hq', 405, [(0, 10), (8, 10), (8, 4), (16, 4), (16, 10), (24, 10), (24, 2), (29, 2)], road=None)
+    m.floor('bw-steel', 0, 0, 29, 13)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'bw-cobble-0'
+    m.floor('bw-darkrock', 0, 0, 29, 0)
+    for x in (2, 11, 20):
+        m.stamp('bw-container', x, 6, must=False)
+    for x, y in ((12, 1), (19, 1), (27, 6)):
+        m.stamp('bw-machine', x, y, must=False)
+    for x, y in ((4, 2), (27, 12), (1, 12), (13, 12)):
+        m.stamp('bw-barrel', x, y, must=False)
+    m.stamp('bw-streetlamp', 5, 11, must=False)
+    m.stamp('bw-streetlamp', 22, 11, must=False)
+    pick_spots(m, 10)
+    m.points = [('machine', 'stage', 15, 1)]
+    return m
+
+
+# The S.S. Libra: Cipher's ship at Sunyshore harbour. A steel deck on the
+# water, two lanes (deck and hold), cargo and lamps.
+def ss_libra():
+    m = blank('ss-libra', 406, [(0, 4), (7, 4), (7, 8), (22, 8), (22, 4), (29, 4)], road=None)
+    m.extra_paths = [('path-2', [(0, 10), (29, 10)])]
+    lane(m, m.extra_paths[0][1], road=False)
+    water(m, rect(0, 0, 29, 1) | rect(0, 12, 29, 13))
+    m.floor('bw-steel', 0, 2, 29, 11)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'bw-orangetile-' + str((x % 2) + (y % 2) * 2)
+    for (x, y) in m.lane_cells:
+        m.ground[y][x] = 'bw-cobble-0'
+    for x in (3, 12, 24):
+        m.stamp('bw-container', x, 5, must=False)
+    for x, y in ((9, 2), (18, 2), (27, 2)):
+        m.stamp('bw-barrel', x, y, must=False)
+    for x, y in ((1, 2), (15, 2), (28, 6)):
+        m.stamp('bw-streetlamp', x, y, must=False)
+    pick_spots(m, 10)
+    return m
+
+
+# Flower Paradise: the Seabreak Path from the Route 224 beach into a sea of
+# flowers, Shaymin at the far end.
+def flower_paradise():
+    m = blank('flower-paradise', 407, [(0, 10), (4, 10), (4, 6), (29, 6)], road='sand')
+    m.terrain_cells('beach-sand', rect(0, 11, 6, 13) - m.path_cells)
+    water(m, rect(0, 13, 29, 13) | rect(7, 12, 29, 12))
+    border_forest(m, top=True, bottom=False, left=False, right=False)
+    for y in (2, 4, 8, 10):
+        for x in range(6, 28, 3):
+            m.stamp(['bw-flower-bush-red', 'bw-flower-bush-mix', 'bw-flower-patch-pink'][(x // 3 + y) % 3], x, y, must=False)
+    pick_spots(m, 10)
+    m.scatter(['bw-flowers-white', 'bw-flowers-white-2'], 14, (5, 0, 29, 11))
+    m.points = [('shaymin', 'stage', 28, 6)]
+    return m
+
+
+# Fullmoon and Newmoon Islands: a small wooded island each; Fullmoon's shore
+# is sand and flowers, Newmoon's is rock and dark pines.
+def moon_island(name, dark):
+    m = blank(name, 408 if dark else 409, [(0, 7), (4, 7), (4, 3), (12, 3), (12, 10), (20, 10), (20, 5), (29, 5)], road='dirt-path-dark' if dark else 'bw-path')
+    sea = rect(0, 0, 29, 0) | rect(0, 13, 29, 13) | rect(0, 1, 1, 12) | rect(28, 1, 29, 12)
+    water(m, sea - m.path_cells)
+    kind = 'pine-dirt' if dark else 'conifer'
+    m.forest(6, 5, 10, 8, kind)
+    m.forest(14, 5, 18, 8, kind)
+    m.forest(22, 7, 26, 11, kind)
+    if dark:
+        m.floor('bw-darkrock', 2, 1, 27, 12)
+        for x, y in ((3, 1), (24, 1), (8, 11)):
+            m.stamp('bw-rock', x, y, must=False)
+    else:
+        m.terrain_cells('beach-sand', (rect(2, 1, 27, 1) | rect(2, 12, 27, 12)) - m.path_cells)
+        m.scatter(['bw-flowers-white', 'bw-flowers-white-2', 'bw-flower-patch-pink'], 8, (2, 1, 27, 12))
+    m.tall_grass(22, 1, 26, 3)
+    m.tall_grass(6, 10, 10, 12)
+    pick_spots(m, 10)
+    return m
+
+
+# Great Marsh: the Safari Zone. Pools and reeds everywhere, boardwalk-less
+# mud paths, tall grass in patches.
+def great_marsh():
+    m = blank('great-marsh', 410, [(0, 2), (6, 2), (6, 11), (14, 11), (14, 2), (22, 2), (22, 11), (29, 11)], road='soil')
+    water(m, rect(8, 4, 12, 7) | rect(16, 5, 20, 9) | rect(1, 5, 4, 8) | rect(24, 3, 28, 6), tid='shallow-water')
+    for x, y in ((7, 3), (13, 8), (15, 4), (21, 10), (0, 9), (23, 7), (27, 7)):
+        m.stamp('bw-reeds', x, y, must=False)
+    m.tall_grass(1, 10, 5, 12)
+    m.tall_grass(9, 9, 12, 10)
+    m.tall_grass(24, 8, 28, 10)
+    m.tall_grass(8, 0, 12, 1)
+    m.forest(16, -1, 20, 1)
+    m.stamp('bw-log', 2, 3, must=False)
+    pick_spots(m, 10)
+    return m
+
+
+MAPS.update({'lake-verity-island': lake_verity_island, 'lake-valor': lake_valor, 'lake-acuity': lake_acuity,
+             'valley-windworks': valley_windworks, 'eterna-forest': eterna_forest, 'old-chateau': old_chateau,
+             'iron-island': iron_island, 'galactic-hq': galactic_hq, 'ss-libra': ss_libra,
+             'flower-paradise': flower_paradise, 'fullmoon-island': lambda: moon_island('fullmoon-island', False),
+             'newmoon-island': lambda: moon_island('newmoon-island', True), 'great-marsh': great_marsh})
 
 
 # --------------------------------------------------------------------------

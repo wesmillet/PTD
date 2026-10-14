@@ -190,8 +190,8 @@
   "bw-outdoor": {
    "image": "assets/tilesets/bw-outdoor.png",
    "columns": 8,
-   "rows": 51,
-   "tilecount": 408,
+   "rows": 53,
+   "tilecount": 424,
    "tilewidth": 32,
    "tileheight": 32,
    "tiles": {
@@ -410,7 +410,22 @@
     "bw-tree-99": 403,
     "bw-tree-100": 404,
     "bw-tree-101": 405,
-    "bw-tree-102": 406
+    "bw-tree-102": 406,
+    "bw-tree-103": 407,
+    "bw-tree-104": 408,
+    "bw-tree-105": 409,
+    "bw-tree-106": 410,
+    "bw-tree-107": 411,
+    "bw-tree-108": 412,
+    "bw-tree-109": 413,
+    "bw-tree-110": 414,
+    "bw-tree-111": 415,
+    "bw-tree-112": 416,
+    "bw-tree-113": 417,
+    "bw-tree-114": 418,
+    "bw-tree-115": 419,
+    "bw-tree-116": 420,
+    "bw-tree-117": 421
    }
   }
  },

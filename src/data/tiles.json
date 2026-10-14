@@ -4259,6 +4259,171 @@
    "col": 6,
    "row": 12,
    "solid": true
+  },
+  {
+   "id": "bw-tree-103",
+   "name": "BW forest 103",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 7,
+   "row": 12,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-104",
+   "name": "BW forest 104",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 0,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-105",
+   "name": "BW forest 105",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 1,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-106",
+   "name": "BW forest 106",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 2,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-107",
+   "name": "BW forest 107",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 3,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-108",
+   "name": "BW forest 108",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 4,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-109",
+   "name": "BW forest 109",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 5,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-110",
+   "name": "BW forest 110",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 6,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-111",
+   "name": "BW forest 111",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 7,
+   "row": 13,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-112",
+   "name": "BW forest 112",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 0,
+   "row": 14,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-113",
+   "name": "BW forest 113",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 1,
+   "row": 14,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-114",
+   "name": "BW forest 114",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 2,
+   "row": 14,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-115",
+   "name": "BW forest 115",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 3,
+   "row": 14,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-116",
+   "name": "BW forest 116",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 4,
+   "row": 14,
+   "solid": true
+  },
+  {
+   "id": "bw-tree-117",
+   "name": "BW forest 117",
+   "group": "BW forest",
+   "layer": "decoration",
+   "tileset": "bw-outdoor",
+   "source": "generated-bw",
+   "col": 5,
+   "row": 14,
+   "solid": true
   }
  ],
  "terrains": [
