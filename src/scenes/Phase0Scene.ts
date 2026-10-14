@@ -1,4 +1,6 @@
 import Phaser from 'phaser';
+import { getGame } from '../game/session';
+import { addOptionsButton, optionsPages } from '../ui/optionsButton';
 import spriteIndex from '../data/spriteIndex.json';
 import { ALL_DIRECTIONS, DIRECTION_NAMES, Direction, directionFromVector } from '../assets/direction';
 import { createPmdSprite, playAnim, queuePokemon, registerAnims, syncShadow } from '../assets/pmdLoader';
@@ -36,9 +38,10 @@ export class Phase0Scene extends Phaser.Scene {
   create(): void {
     for (const dex of Object.values(spriteIndex)) registerAnims(this, dex);
     const { width } = this.scale;
-    this.title = this.add.text(16, 12, '', TEXT_STYLE);
+    addOptionsButton(this, optionsPages(getGame()));
+    this.title = this.add.text(52, 12, '', TEXT_STYLE);
     this.add.text(
-      16,
+      52,
       32,
       'Space: swap Idle/Walk rows   +/-: scale   1-5: Pokémon   (rows: top Idle, bottom Walk; columns: 8 facings)',
       { ...TEXT_STYLE, color: '#8f8fa8' },

@@ -153,7 +153,13 @@ player sprite as the cursor, the bag and badge case in the left column, the
 PC, Shop, Save, Credits and Demo buttons in the right column) → PC (`PCScene`, full screen: party column, box grid,
 `PcSummary` side panel) or Level (`LevelScene`, with the location popup, Pokémon panel,
 replace dialog, evolution prompt, VS intro and trainer dialogue, boss bar
-and summary). Zoom (Options, `+`/`-`) lives in `src/game/zoom.ts`: Fit is
-Phaser's FIT mode capped at the native size (shrink only), a fixed zoom is
-NONE mode with that zoom factor and the page scrolls (`html.ptd-zoomed` in
-index.html).
+and summary). Zoom (Options, `+`/`-`/`0`) lives in `src/game/zoom.ts` with
+its rules in `zoomRules.ts`: Fit is Phaser's FIT mode capped at the native
+size (shrink only), a fixed zoom is NONE mode with that zoom factor and the
+page scrolls (`html.ptd-zoomed` in index.html). The setting is its own
+localStorage key (`ptd.settings.zoom`); a zoom bigger than the window is
+never stored and falls back to Fit on boot and resize; changes show the
+`.ptd-toast` line fixed to the window. `src/ui/optionsButton.ts` is the
+gear every screen keeps at the canvas's top-left (`optionsPages` builds
+the Options pages for screens without a start menu), and `StartMenu`
+anchors its column to `visibleCanvasRect()` when the canvas overflows.

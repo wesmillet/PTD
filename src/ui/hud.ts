@@ -108,7 +108,6 @@ export class Hud {
     // Both bars are Platinum text-box frames spanning the width.
     framePanel(scene, width / 2, Hud.HEIGHT / 2, width, Hud.HEIGHT, 'blue').setDepth(1000);
     framePanel(scene, width / 2, this.bottomY + Hud.BOTTOM / 2, width, Hud.BOTTOM, 'blue').setDepth(1000);
-    scene.add.text(20, 6, state.def.name, TEXT_BIG).setDepth(1001);
     this.wave = scene.add.text(20, 40, '', TEXT).setDepth(1001);
     this.lives = scene.add.text(230, 40, '', TEXT).setDepth(1001);
     this.money = scene.add.text(20, 72, '', { ...TEXT, color: '#c87818' }).setDepth(1001);
@@ -138,7 +137,12 @@ export class Hud {
     this.startButton = place(new Button(scene, 0, by, 'Start wave (99s)', callbacks.onStartWave, 120));
     this.speedButton = place(new Button(scene, 0, by, '1x', callbacks.onToggleSpeed, 64));
     if (state.def.objective === 'free') this.leaveButton = place(new Button(scene, 0, by, 'Leave route', callbacks.onLeave, 120));
-    place(new Button(scene, 0, by, 'Menu', callbacks.onMenu, 90));
+    // Menu (the pause menu with Options) in the top-left corner: the one corner on screen at every zoom.
+    const menu = new Button(scene, 0, by, 'Menu', callbacks.onMenu, 90).setDepth(1001);
+    menu.setX(12 + menu.frameWidth / 2);
+    const name = scene.add.text(12 + menu.frameWidth + 10, 6, state.def.name, TEXT_BIG).setDepth(1001);
+    const room = bx - name.x;
+    if (name.width > room) name.setScale(Math.max(0.6, room / name.width));
     scene.add.text(14, this.bottomY + 36, 'Party', TEXT_DIM).setOrigin(0, 0.5).setDepth(1001);
     this.rebuildSlots(state);
 

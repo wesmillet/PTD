@@ -39,7 +39,7 @@ export const SAVED_ZOOMS: readonly SavedZoom[] = ['fit', 1, 1.5, 2];
 
 export interface SavedSettings {
   gameSpeed: number;
-  /** Canvas zoom (absent in older saves: fit). */
+  /** Canvas zoom: written by saves before it moved to its own localStorage key; read once for migration. */
   zoom?: SavedZoom;
   speed: SpeedConfig;
 }

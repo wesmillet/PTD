@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { visibleCanvasRect } from '../game/zoom';
 import { framePanel } from './button';
 import { COLORS, TEXT } from './styles';
 
@@ -38,6 +39,10 @@ export function startMenuEntries(playerName: string): StartMenuEntry[] {
 export class StartMenu {
   private readonly scene: Phaser.Scene;
   private readonly container: Phaser.GameObjects.Container;
+  /** The rows and cursor, moved as one when the menu must open at the visible top-left. */
+  private readonly column: Phaser.GameObjects.Container;
+  /** The column's default top edge, for anchoring. */
+  private readonly top: number;
   private readonly cursor: Phaser.GameObjects.Graphics;
   private readonly rows: { y: number; hit: Phaser.GameObjects.Rectangle; entry: StartMenuEntry }[] = [];
   private index = 0;
@@ -69,8 +74,11 @@ export class StartMenu {
       if (!this.locked) this.close();
     });
     this.container.add(shade);
+    this.column = scene.add.container(0, 0);
+    this.container.add(this.column);
     const x = width - StartMenu.WIDTH / 2 - 12;
     const top = Math.max(12, (height - entries.length * StartMenu.ROW_H) / 2 - 40);
+    this.top = top;
     entries.forEach((entry, i) => {
       const y = top + i * StartMenu.ROW_H + StartMenu.ROW_H / 2;
       const panel = framePanel(scene, x, y, StartMenu.WIDTH, StartMenu.ROW_H - 4, 'blue');
@@ -86,13 +94,13 @@ export class StartMenu {
         this.setIndex(i);
         this.select();
       });
-      this.container.add(panel);
-      if (icon) this.container.add(icon);
-      this.container.add([label, hit]);
+      this.column.add(panel);
+      if (icon) this.column.add(icon);
+      this.column.add([label, hit]);
       this.rows.push({ y, hit, entry });
     });
     this.cursor = scene.add.graphics();
-    this.container.add(this.cursor);
+    this.column.add(this.cursor);
     this.setIndex(0);
   }
 
@@ -104,6 +112,7 @@ export class StartMenu {
     this.open = true;
     this.locked = false;
     this.openedAt = performance.now();
+    this.anchor();
     this.container.setVisible(true);
     this.scene.input.keyboard?.on('keydown', this.keyHandler);
     this.setIndex(this.index);
@@ -125,6 +134,22 @@ export class StartMenu {
   destroy(): void {
     this.scene.input.keyboard?.off('keydown', this.keyHandler);
     this.container.destroy();
+  }
+
+  /**
+   * The column sits on the right of the canvas, unless the canvas is bigger
+   * than the window (a fixed zoom): then it opens at the visible top-left, where
+   * the player can see it and reach Options.
+   */
+  private anchor(): void {
+    const { width, height } = this.scene.scale;
+    const vis = visibleCanvasRect();
+    if (vis.width >= width - 1 && vis.height >= height - 1) {
+      this.column.setPosition(0, 0);
+      return;
+    }
+    const left = width - StartMenu.WIDTH - 12;
+    this.column.setPosition(vis.x + 12 - left, vis.y + 12 - this.top);
   }
 
   private move(delta: number): void {

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { addOptionsButton, optionsPages } from '../ui/optionsButton';
 import config from '../data/config.json';
 import { getLevel } from '../data/levels';
 import { badgeTextureKey, iconUrl, itemTextureKey } from '../game/runtime';
@@ -134,8 +135,9 @@ export class LevelSelectScene extends Phaser.Scene {
     }
     this.add.rectangle(this.mapX, this.mapY, MAP_W * MAP_SCALE, MAP_H * MAP_SCALE).setOrigin(0).setStrokeStyle(2, COLORS.borderOuter);
 
-    this.drawBadges(8, 10);
-    this.drawBag(8, 214, height - 10);
+    addOptionsButton(this, optionsPages(game));
+    this.drawBadges(8, 50);
+    this.drawBag(8, 252, height - 10);
     this.drawMenu(this.mapX, this.mapY + MAP_H * MAP_SCALE + (height - this.mapY - MAP_H * MAP_SCALE) / 2);
     this.drawRightColumn(width - 8);
     this.drawMarkers(game);

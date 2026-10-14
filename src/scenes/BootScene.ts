@@ -9,6 +9,7 @@ import { ROSTER } from '../sim/conference';
 import typesJson from '../data/types.json';
 import { PC } from '../sim/pc';
 import { frameKey, TEXT_BIG } from '../ui/styles';
+import { flushZoomToast } from '../game/zoom';
 
 const ui = uiGen4 as {
   frames: Record<string, { file: string }>;
@@ -138,6 +139,7 @@ export class BootScene extends Phaser.Scene {
       star.refresh();
     }
     this.buildSilhouettes();
+    flushZoomToast();
     const scene = urlParam('scene');
     if (scene === 'demo') this.scene.start('Phase0');
     else if (scene === 'select') this.scene.start('LevelSelect');

@@ -58,7 +58,9 @@ cleared; defend levels when you win.
   Pokémon (Route 202's Tristan, Route 203's Barry, Roark in the mine)
   bounce the ball off; Roark's Cranidos is a boss with its own HP bar.
 - Speed toggle: 1x, 2x, 4x (extra fixed steps per frame, same results).
-  Options also has Zoom (Fit never enlarges past 1x, 1.5x, 2x; `+` and `-` step it).
+  Options also has Zoom (Fit never enlarges past 1x, 1.5x, 2x; `+` and `-` step it,
+  `0` is Fit, `?zoom=fit` in the URL resets it, and a zoom bigger than the window
+  always falls back to Fit).
 - A Pokémon's attack rate follows its species' base Speed (Shuckle 0.6/s
   up to 1.9/s); the Pokémon panel and PC summary show it.
 - Gym leaders and other mugshot trainers get a VS intro; the trainer's

@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { addOptionsButton, optionsPages } from '../ui/optionsButton';
 import { iconInfo, iconTextureKey, iconUrl, portraitUrl } from '../game/runtime';
 import { getGame, saveGame } from '../game/session';
 import { MAX_PARTY } from '../sim/game';
@@ -104,9 +105,10 @@ export class PCScene extends Phaser.Scene {
 
     // Party column: the left edge, top to bottom.
     framePanel(this, PARTY_W / 2, height / 2, PARTY_W + 8, height + 8, 'blue');
-    this.add.text(PARTY_W / 2, 18, 'Party', TEXT_BIG).setOrigin(0.5);
-    this.add.text(PARTY_W / 2, 44, `${game.party.length} / ${MAX_PARTY}`, TEXT_DIM).setOrigin(0.5);
-    const partyTop = 70;
+    addOptionsButton(this, optionsPages(game));
+    this.add.text(PARTY_W / 2, 56, 'Party', TEXT_BIG).setOrigin(0.5);
+    this.add.text(PARTY_W / 2, 82, `${game.party.length} / ${MAX_PARTY}`, TEXT_DIM).setOrigin(0.5);
+    const partyTop = 106;
     const partyStep = Math.floor((height - partyTop - 50) / MAX_PARTY);
     for (let i = 0; i < MAX_PARTY; i++) {
       const y = partyTop + i * partyStep + partyStep / 2;

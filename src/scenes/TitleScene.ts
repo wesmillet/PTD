@@ -11,7 +11,8 @@ import { Button, framePanel } from '../ui/button';
 import { CreditsScreen } from '../ui/creditsScreen';
 import { Diorama, type StagePoints } from '../ui/diorama';
 import { ensureLoaded, isLoaded } from '../assets/pmdLoader';
-import { MenuPages } from '../ui/menuPages';
+import type { MenuPages } from '../ui/menuPages';
+import { addOptionsButton, optionsPages } from '../ui/optionsButton';
 import { COLORS, TEXT_DIM, TEXT_SMALL_DIM, TEXT_TITLE } from '../ui/styles';
 
 const VERSION = '0.8';
@@ -225,17 +226,7 @@ export class TitleScene extends Phaser.Scene {
     });
     this.uiAdd(this.add.text(width - 16, height - 24, 'Non-commercial fan project. Pokémon is a trademark of Nintendo, Creatures Inc. and GAME FREAK.', { ...TEXT_SMALL_DIM, color: '#f8f8f8', wordWrap: { width: 640 }, align: 'right' }).setOrigin(1, 1).setDepth(3000));
     this.credits = new CreditsScreen(() => undefined);
-    this.pages = new MenuPages({
-      game,
-      party: () => game.party,
-      isPlaced: () => false,
-      openPokemon: () => undefined,
-      getSpeed: () => runtime.gameSpeed,
-      setSpeed: (speed) => {
-        runtime.gameSpeed = speed;
-        saveGameIfLoaded();
-      },
-      onClose: () => undefined,
-    });
+    this.pages = optionsPages(game);
+    this.uiAdd(addOptionsButton(this, this.pages));
   }
 }

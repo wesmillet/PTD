@@ -13,7 +13,7 @@ import { allBadges, dexCounts, hasBadge, type GameState } from '../sim/game';
 import type { Monster } from '../sim/monster';
 import { allBoxed } from '../sim/pc';
 import { runtime } from '../game/runtime';
-import { setZoom, ZOOMS, zoomLabel } from '../game/zoom';
+import { setZoom, zoomFits, ZOOMS, zoomLabel } from '../game/zoom';
 import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame, typeIcon, uiUrl } from './domOverlay';
 
 export interface MenuPageHooks {
@@ -29,6 +29,8 @@ export interface MenuPageHooks {
 
 export class MenuPages {
   private root: HTMLDivElement | null = null;
+  /** Listeners a page added outside its element, removed when it closes. */
+  private cleanup: (() => void)[] = [];
   private readonly keyHandler = (e: KeyboardEvent) => {
     if (e.key === 'Escape' || e.key === 'x') {
       e.stopPropagation();
@@ -69,6 +71,8 @@ export class MenuPages {
     if (!this.root) return;
     this.root.remove();
     this.root = null;
+    for (const fn of this.cleanup) fn();
+    this.cleanup = [];
     window.removeEventListener('keydown', this.keyHandler, true);
     if (notify) this.hooks.onClose();
   }
@@ -266,7 +270,9 @@ export class MenuPages {
         const b = document.createElement('button');
         b.textContent = zoomLabel(z);
         b.dataset.zoom = String(z);
-        b.style.opacity = z === runtime.zoom ? '1' : '0.6';
+        const fits = zoomFits(z);
+        b.style.opacity = z === runtime.zoom ? '1' : fits ? '0.6' : '0.35';
+        b.title = fits ? '' : 'Bigger than the window: the page scrolls, and it is not kept for the next visit';
         b.addEventListener('click', () => {
           setZoom(z);
           renderZoom();
@@ -275,9 +281,12 @@ export class MenuPages {
       }
     };
     renderZoom();
+    // The keys (+ - 0) and a window resize change the zoom while the page is open.
+    window.addEventListener('ptd-zoom', renderZoom);
+    this.cleanup.push(() => window.removeEventListener('ptd-zoom', renderZoom));
     const zoomNote = document.createElement('div');
     zoomNote.className = 'ptd-dim';
-    zoomNote.textContent = 'Fit shows the game at its own size and shrinks it to a small window; 1.5x and 2x show it bigger. + and - step through them.';
+    zoomNote.textContent = 'Fit shows the game at its own size and shrinks it to a small window; 1.5x and 2x show it bigger and scroll when they do not fit. + and - step through them, 0 is Fit.';
     root.append(label, row, note, zoomLabelEl, zoomRow, zoomNote);
   }
 }

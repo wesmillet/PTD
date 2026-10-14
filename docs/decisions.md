@@ -542,3 +542,32 @@ portrait the showcase might want.
   pointer input drifted by the scroll offset (the canvas bounds are now
   refreshed on every scroll).
 
+## Phase 9 batch 2, follow-up (zoom can never trap the player)
+
+- The zoom is its own localStorage key (`ptd.settings.zoom`), not part of
+  the save: a save code or a slot switch never changes it, a fresh browser
+  starts at Fit, and the zoom an old save carried is read once and moved
+  to the key (only while the key is still empty).
+- A zoom bigger than the window is never stored: choosing it by key or in
+  Options applies it (the page scrolls, the toast says how to get back)
+  but the last fitting zoom stays on disk, so a reload fits. On boot and
+  on every resize a zoom that does not fit falls back to Fit and stores
+  Fit. `?zoom=fit` stores Fit before anything else runs.
+- `+` and `-` stop at the ends instead of wrapping (minus at Fit was the
+  shortest way into 2x), `0` and numpad 0 reset to Fit. The toast is a
+  DOM line fixed to the window rather than canvas text, so it shows at
+  every zoom and scroll position.
+- Every screen keeps an Options gear at the canvas's top-left, the corner
+  that stays visible when the page scrolls (`safe center` aligns the
+  overflow to the start). The level's Menu button moved there (the level
+  name follows it and shrinks when a long name would run into the
+  buttons); the title keeps its Options entry too. The gear reuses one
+  set of Options pages (`optionsPages`), so the title no longer builds
+  its own. The start menu's column anchors to the visible top-left when
+  the canvas is bigger than the window; the DOM pages are fixed to the
+  window centre, which is always on screen.
+- The demo scene's own `+`/`-` sprite-scale keys also step the zoom; it
+  is a developer screen, left as is.
+- "A brand new save always starts at Fit" is read as "nothing in a save
+  sets the zoom": New game does not reset a zoom the player chose.
+

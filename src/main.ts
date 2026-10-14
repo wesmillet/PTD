@@ -8,7 +8,6 @@ import { ConferenceScene } from './scenes/ConferenceScene';
 import { Phase0Scene } from './scenes/Phase0Scene';
 import { TitleScene } from './scenes/TitleScene';
 import { Hud } from './ui/hud';
-import { saveGameIfLoaded } from './game/session';
 import { installZoomKeys, registerZoomGame } from './game/zoom';
 
 const WIDTH = 960;
@@ -32,7 +31,7 @@ function start(): void {
     },
     scene: [BootScene, TitleScene, LevelSelectScene, LevelScene, PCScene, ConferenceScene, Phase0Scene],
   });
-  registerZoomGame(game, () => saveGameIfLoaded());
+  registerZoomGame(game);
   installZoomKeys();
 }
 

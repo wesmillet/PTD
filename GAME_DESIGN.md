@@ -584,13 +584,24 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   with phase ticks and the catch-window Poké Ball, Pokédex screen (counts,
   portraits, type icons, areas), result screen with three stars and Next
   level, three save slots in the Save panel, keyboard shortcuts (1 to 6
-  party slots, 1/2/4 speed, Q to Y party slots, P pause, Space start, Esc menu).
+  party slots, 1/2/4 speed, Q to Y party slots, P pause, Space start, Esc menu,
+  + - 0 zoom).
 - Options page: game speed (1x, 2x, 4x) and zoom. Zoom is Fit (default:
   the canvas at its native size, shrunk to fit a smaller window and never
   enlarged, so a big monitor does not blow the pixels up), 1x, 1.5x or 2x
   (the 960x636 canvas at that CSS size, centred, scrolling when bigger
-  than the window); `+` and `-` step through it anywhere, and it is saved
-  with the other settings.
+  than the window). It can never trap the player: it lives under its own
+  localStorage key (`ptd.settings.zoom`, never in a save slot or code, so
+  importing a code or switching slots leaves it alone; a zoom an old save
+  carried is read once and moved there), a zoom bigger than the window is
+  never stored and falls back to Fit on boot and on resize (Fit is then
+  stored), `?zoom=fit` forces Fit, `+` and `-` step without wrapping, `0`
+  is Fit, every change (and a boot at anything but Fit) shows a two-second
+  toast naming the zoom and the keys, every screen keeps an Options gear
+  in the canvas's top-left corner (the corner that stays on screen when
+  the page scrolls; the level's Menu button sits there), and the start
+  menu opens at the visible top-left when the canvas is bigger than the
+  window.
 - Settings still to come: volume, colorblind-friendly type colors.
 
 ## Build plan (work one phase at a time, commit at the end of each)

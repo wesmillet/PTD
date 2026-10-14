@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { addOptionsButton, optionsPages } from '../ui/optionsButton';
 import { getGame, loadDebugPartyIfRequested, saveGame } from '../game/session';
 import { applyConferenceResult, buyFromVendor, drawBracket, healParty, nextOpponent, roundLevel, spinFloor, type ConferenceRun } from '../sim/conference';
 import { hasFlag } from '../sim/game';
@@ -27,6 +28,7 @@ export class ConferenceScene extends Phaser.Scene {
     this.add.text(width / 2, height - 20, 'Lily of the Valley Island', TEXT_DIM).setOrigin(0.5);
     loadDebugPartyIfRequested();
     const game = getGame();
+    addOptionsButton(this, optionsPages(game));
     this.screen = new ConferenceScreen({
       game,
       playerName: PLAYER_NAME,

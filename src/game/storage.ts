@@ -2,7 +2,7 @@
  * localStorage persistence of the game state and settings.
  */
 import { runtime, runtimeConfig } from './runtime';
-import { applyZoom } from './zoom';
+import { migrateZoomFromSave } from './zoom';
 import type { GameState } from '../sim/game';
 import { decodeSaveCode, encodeSaveCode, restoreGame, SaveError, serializeGame, validateSave, type SaveData } from '../sim/save';
 
@@ -77,7 +77,8 @@ export function listSlots(): SlotInfo[] {
 }
 
 function currentSettings() {
-  return { gameSpeed: runtime.gameSpeed, zoom: runtime.zoom, speed: { ...runtimeConfig.speed } };
+  // The zoom is not here: it lives under its own key (game/zoom.ts), so codes and slots never carry it.
+  return { gameSpeed: runtime.gameSpeed, speed: { ...runtimeConfig.speed } };
 }
 
 export function buildSave(game: GameState): SaveData {
@@ -127,11 +128,11 @@ export function clearSave(): void {
   }
 }
 
-/** Applies saved settings to the runtime. */
+/** Applies saved settings to the runtime (a zoom an old save carries migrates to its own key once). */
 export function applySettings(data: SaveData): void {
   runtime.gameSpeed = data.settings.gameSpeed;
   Object.assign(runtimeConfig.speed, data.settings.speed);
-  applyZoom(data.settings.zoom ?? 'fit');
+  migrateZoomFromSave(data.settings.zoom);
 }
 
 export function saveCodeFor(game: GameState): string {
