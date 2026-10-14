@@ -70,7 +70,7 @@ import { findPokemonId, getMove } from '../data/pokedata';
 import { counterStarter, levelPopup, type DialogueLine, type LevelDef } from '../sim/waves';
 import { resolveRound, type ConferenceRun } from '../sim/conference';
 import type { Monster } from '../sim/monster';
-import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
+import { COLORS, TEXT, TEXT_BIG, TEXT_DIM, TEXT_SMALL, TEXT_SMALL_DIM } from '../ui/styles';
 import { STATUS_BADGE } from '../ui/domOverlay';
 import { showSummary } from '../ui/summary';
 
@@ -358,7 +358,7 @@ export class LevelScene extends Phaser.Scene {
         if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen && !this.dialogue?.isOpen) this.paused = false;
       },
     });
-    this.add.text(this.scale.width / 2, Hud.HEIGHT - 86, `seed ${this.seed}`, TEXT_DIM).setOrigin(0.5, 0).setDepth(1001);
+    this.add.text(this.scale.width / 2, this.scale.height - 4, `seed ${this.seed}`, TEXT_SMALL_DIM).setOrigin(0.5, 1).setDepth(1001);
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => this.onPointerDown(pointer));
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => this.onPointerMove(pointer));
@@ -502,8 +502,8 @@ export class LevelScene extends Phaser.Scene {
     const last = map.path[map.path.length - 1]!;
     const a = this.tilePixel(first[0], first[1]);
     const b = this.tilePixel(last[0], last[1]);
-    this.add.text(a.px, a.py - 22, 'IN', TEXT_DIM).setOrigin(0.5).setDepth(1);
-    this.add.text(b.px, b.py - 22, 'OUT', TEXT_DIM).setOrigin(0.5).setDepth(1);
+    this.add.text(a.px, a.py - 22, 'IN', TEXT_SMALL_DIM).setOrigin(0.5).setDepth(1);
+    this.add.text(b.px, b.py - 22, 'OUT', TEXT_SMALL_DIM).setOrigin(0.5).setDepth(1);
   }
 
   // ------------------------------------------------------------- map editor
@@ -1630,7 +1630,7 @@ export class LevelScene extends Phaser.Scene {
   }
 
   private floatText(pos: { px: number; py: number }, text: string, color: string): void {
-    const t = this.add.text(pos.px, pos.py - 20, text, { ...TEXT, color, stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5).setDepth(3000);
+    const t = this.add.text(pos.px, pos.py - 20, text, { ...TEXT_SMALL, color, stroke: '#000000', strokeThickness: 3 }).setOrigin(0.5).setDepth(3000);
     this.tweens.add({ targets: t, y: pos.py - 48, alpha: 0, duration: 900, ease: 'Quad.easeOut', onComplete: () => t.destroy() });
   }
 

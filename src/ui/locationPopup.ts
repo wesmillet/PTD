@@ -12,7 +12,8 @@ export function showLocationPopup(scene: Phaser.Scene, kind: string, name: strin
   const scale = 2;
   const banner = scene.add.image(0, 0, key).setOrigin(0).setScale(scale);
   const w = banner.width * scale;
-  const label = scene.add.text(w / 2, 20, name, TEXT_BIG).setOrigin(0.5, 0);
+  const h = banner.height * scale;
+  const label = scene.add.text(w / 2, h / 2, name, { ...TEXT_BIG, wordWrap: { width: w - 24 }, align: 'center' }).setOrigin(0.5);
   const c = scene.add.container(-w - 8, top, [banner, label]).setDepth(2400);
   scene.tweens.add({ targets: c, x: 8, duration: 220, ease: 'Cubic.easeOut' });
   scene.time.delayedCall(2200, () => {

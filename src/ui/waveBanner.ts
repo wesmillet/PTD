@@ -16,12 +16,13 @@ export class WaveBanner {
     this.current?.destroy();
     const scene = this.scene;
     const { width } = scene.scale;
-    const w = Math.min(width - 40, Math.max(260, 40 + Math.max(title.length * 15, (detail?.length ?? 0) * 8)));
-    const h = detail ? 64 : 44;
+    const text = scene.add.text(0, detail ? -15 : 0, title, TEXT_BIG).setOrigin(0.5);
+    const sub = detail ? scene.add.text(0, 16, detail, { ...TEXT_DIM, color: '#3878e0', wordWrap: { width: width - 80 }, align: 'center' }).setOrigin(0.5) : undefined;
+    const w = Math.min(width - 40, Math.max(260, 40 + Math.max(text.width, sub?.width ?? 0)));
+    const h = detail ? 76 : 48;
     const frame = framePanel(scene, 0, 0, w, h, 'blue');
-    const text = scene.add.text(0, detail ? -11 : 0, title, TEXT_BIG).setOrigin(0.5);
     const items: Phaser.GameObjects.GameObject[] = [frame, text];
-    if (detail) items.push(scene.add.text(0, 15, detail, { ...TEXT_DIM, color: '#3878e0' }).setOrigin(0.5));
+    if (sub) items.push(sub);
     const c = scene.add.container(-w, this.top + h / 2 + 6, items).setDepth(2300);
     this.current = c;
     scene.tweens.add({ targets: c, x: width / 2, duration: 260, ease: 'Cubic.easeOut' });

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import uiGen4 from '../data/ui-gen4.json';
-import { COLORS, frameKey, TEXT } from './styles';
+import { COLORS, FONT_BOLD, frameKey, TEXT } from './styles';
 
 interface FrameInsets {
   left: number;
@@ -27,13 +27,24 @@ export function framePanel(scene: Phaser.Scene, x: number, y: number, width: num
   return scene.add.nineslice(x, y, key, undefined, Math.max(width, i.left + i.right + 2), Math.max(height, i.top + i.bottom + 2), i.left, i.right, i.top, i.bottom);
 }
 
-/** A text button on the blue Platinum frame, with an optional menu icon on the left (see docs/ui.md). */
+/**
+ * A text button on the blue Platinum frame, with an optional menu icon on
+ * the left (see docs/ui.md). The label is 26 px bold; the frame grows to
+ * fit it when the given width is too narrow, so callers only give a minimum.
+ */
 export class Button extends Phaser.GameObjects.Container {
+  /** Default frame height for a 26 px label. */
+  static readonly HEIGHT = 38;
+  /** Horizontal padding each side of the label. */
+  static readonly PAD = 14;
   private readonly bg: Phaser.GameObjects.NineSlice | Phaser.GameObjects.Rectangle;
   private readonly label: Phaser.GameObjects.Text;
   private icon?: Phaser.GameObjects.Image;
   private enabled = true;
   private hover = false;
+  /** Final frame width: the given minimum or the label plus padding. */
+  readonly bw: number;
+  readonly bh: number;
 
   constructor(
     scene: Phaser.Scene,
@@ -41,16 +52,18 @@ export class Button extends Phaser.GameObjects.Container {
     y: number,
     text: string,
     onClick: () => void,
-    private readonly bw = 120,
-    private readonly bh = 30,
+    minWidth = 120,
+    height = Button.HEIGHT,
     iconKey?: string,
   ) {
     super(scene, x, y);
-    this.bg = framePanel(scene, 0, 0, bw, bh, 'blue');
-    this.label = scene.add.text(0, 0, text, { ...TEXT, fontStyle: 'bold' }).setOrigin(0.5);
+    this.label = scene.add.text(0, 0, text, { ...TEXT, fontFamily: FONT_BOLD }).setOrigin(0.5);
+    this.bw = Math.max(minWidth, Math.ceil(this.label.width) + Button.PAD * 2 + (iconKey ? 28 : 0));
+    this.bh = Math.max(height, Button.HEIGHT);
+    this.bg = framePanel(scene, 0, 0, this.bw, this.bh, 'blue');
     this.add([this.bg, this.label]);
     if (iconKey) this.setIcon(iconKey);
-    this.setSize(bw, bh);
+    this.setSize(this.bw, this.bh);
     this.setInteractive({ useHandCursor: true });
     this.on('pointerover', () => {
       this.hover = true;
@@ -74,8 +87,13 @@ export class Button extends Phaser.GameObjects.Container {
     if (!this.scene.textures.exists(key)) return this;
     this.icon = this.scene.add.image(-this.bw / 2 + 22, 0, key);
     this.add(this.icon);
-    this.label.setX(10);
+    this.label.setX(14);
     return this;
+  }
+
+  /** Width of the frame as drawn. */
+  get frameWidth(): number {
+    return this.bw;
   }
 
   private draw(): void {

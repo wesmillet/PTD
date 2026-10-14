@@ -422,7 +422,13 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   Pokémon Essentials, CC BY-NC-SA 4.0, `public/assets/fonts/`) everywhere,
   DOM and canvas: body text and numbers in Power Clear, titles and headings
   in the Bold. The font sits on a 13 px grid, so only 13 px and 26 px are
-  used, with no smoothing; text is dark grey (#484848) with a light shadow
+  used, with no smoothing: 26 px for everything read during play (HUD,
+  dialogue box, banners, Pokémon panel, PC summary, pause and options
+  pages, level select frames, buttons) and 13 px only for dense lists
+  (box grid tooltips, the Pokédex list, credits, damage numbers). The
+  dialogue box holds two lines at 26 px and splits longer pages. The HUD
+  top bar is 110 px (name and buttons, wave and lives, money and hint),
+  the bottom bar 78 px. Text is dark grey (#484848) with a light shadow
   one pixel down and right on light panels, white with a dark shadow on
   dark backgrounds. `$` renders as the Pokédollar sign.
 - Theme: Pokémon Platinum. Light panels with dark text inside the

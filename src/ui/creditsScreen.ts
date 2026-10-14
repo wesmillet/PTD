@@ -67,7 +67,7 @@ export class CreditsScreen {
     ensureOverlayStyles();
     this.close();
     const root = document.createElement('div');
-    root.className = 'ptd-panel ptd-modal';
+    root.className = 'ptd-panel ptd-modal ptd-dense';
     root.id = 'ptd-credits';
     root.style.width = 'min(720px, calc(100vw - 24px))';
     root.style.maxHeight = 'calc(100vh - 24px)';

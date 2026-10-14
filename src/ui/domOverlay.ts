@@ -83,7 +83,7 @@ export function hpBox(mon: Monster, variant: 'player' | 'player-exp' | 'enemy' =
       bar.style.width = `${meta.hpFill.width * s}px`;
       bar.style.height = `${meta.hpFill.height * s}px`;
       numbers.style.right = `${(meta.width - meta.hpFill.x - meta.hpFill.width) * s + 2}px`;
-      numbers.style.top = `${(meta.hpFill.y + 6) * s}px`;
+      numbers.style.bottom = '6px';
       badge.style.left = `${(meta.hpFill.x - 30) * s}px`;
       badge.style.top = `${(meta.hpFill.y + 5) * s}px`;
     }

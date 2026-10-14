@@ -2,8 +2,11 @@
  * Canvas-side mirror of theme.css (Phaser text cannot read CSS variables).
  * Power Clear (DS-era Pokémon font, Pokémon Essentials) renders on a 13 px
  * grid: 13 px is the DS size, 26 px its 2x. Only those two sizes are used
- * so glyphs stay on whole pixels. Text is dark grey with a light shadow one
- * pixel down and right on light panels, white with a dark shadow elsewhere.
+ * so glyphs stay on whole pixels. Everything read during play is 26 px
+ * (TEXT, TEXT_DIM, TEXT_LIGHT); the 13 px styles (TEXT_SMALL and friends)
+ * stay for dense lists only: box grid tooltips, the Pokédex list, credits,
+ * damage numbers. Text is dark grey with a light shadow one pixel down and
+ * right on light panels, white with a dark shadow elsewhere.
  */
 export const FONT = '"Power Clear", monospace';
 export const FONT_BOLD = '"Power Clear Bold", "Power Clear", monospace';
@@ -13,12 +16,16 @@ export const SIZE_LARGE = 26;
 const SHADOW_LIGHT = { offsetX: 1, offsetY: 1, color: '#d0d0c8', blur: 0, stroke: false, fill: true } as const;
 const SHADOW_DARK = { offsetX: 1, offsetY: 1, color: '#283028', blur: 0, stroke: false, fill: true } as const;
 
-export const TEXT = { fontFamily: FONT, fontSize: '13px', color: '#484848', shadow: SHADOW_LIGHT, resolution: 1 } as const;
-export const TEXT_DIM = { fontFamily: FONT, fontSize: '13px', color: '#707878', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+export const TEXT = { fontFamily: FONT, fontSize: '26px', color: '#484848', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+export const TEXT_DIM = { fontFamily: FONT, fontSize: '26px', color: '#707878', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+/** 13 px body text for dense lists and tiny labels only. */
+export const TEXT_SMALL = { fontFamily: FONT, fontSize: '13px', color: '#484848', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+export const TEXT_SMALL_DIM = { fontFamily: FONT, fontSize: '13px', color: '#707878', shadow: SHADOW_LIGHT, resolution: 1 } as const;
+export const TEXT_SMALL_LIGHT = { fontFamily: FONT, fontSize: '13px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
 export const TEXT_BIG = { fontFamily: FONT_BOLD, fontSize: '26px', color: '#484848', shadow: SHADOW_LIGHT, resolution: 1 } as const;
 export const TEXT_TITLE = { fontFamily: FONT_BOLD, fontSize: '26px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
 /** Light text with a dark shadow, for labels over the map or dark boxes. */
-export const TEXT_LIGHT = { fontFamily: FONT, fontSize: '13px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
+export const TEXT_LIGHT = { fontFamily: FONT, fontSize: '26px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
 export const TEXT_LIGHT_BIG = { fontFamily: FONT_BOLD, fontSize: '26px', color: '#f8f8f8', shadow: SHADOW_DARK, resolution: 1 } as const;
 
 export const COLORS = {

@@ -57,8 +57,8 @@ export class StartMenu {
     e.preventDefault();
   };
 
-  static readonly ROW_H = 40;
-  static readonly WIDTH = 176;
+  static readonly ROW_H = 44;
+  static readonly WIDTH = 236;
 
   constructor(scene: Phaser.Scene, entries: StartMenuEntry[], private readonly hooks: StartMenuHooks) {
     this.scene = scene;
@@ -75,7 +75,7 @@ export class StartMenu {
       const y = top + i * StartMenu.ROW_H + StartMenu.ROW_H / 2;
       const panel = framePanel(scene, x, y, StartMenu.WIDTH, StartMenu.ROW_H - 4, 'blue');
       const icon = scene.textures.exists(entry.icon) ? scene.add.image(x - StartMenu.WIDTH / 2 + 30, y, entry.icon) : undefined;
-      const label = scene.add.text(x - StartMenu.WIDTH / 2 + 50, y, entry.label, TEXT).setOrigin(0, 0.5);
+      const label = scene.add.text(x - StartMenu.WIDTH / 2 + 54, y, entry.label, TEXT).setOrigin(0, 0.5);
       const hit = scene.add.rectangle(x, y, StartMenu.WIDTH, StartMenu.ROW_H, 0xffffff, 0.001).setInteractive({ useHandCursor: true });
       hit.on('pointerover', () => {
         if (!this.locked) this.setIndex(i);

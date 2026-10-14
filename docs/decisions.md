@@ -290,3 +290,29 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   unknown ones blacked out and named "???".
 - The wave banner merges the wave's start events (trainer, lane, rule
   texts) into one frame; rule toasts mid-wave stay toasts.
+
+## Phase 9 item 1 (bigger text)
+
+- 26 px is the default canvas style (`TEXT`, `TEXT_DIM`, `TEXT_LIGHT`)
+  and the DOM `--ptd-size`; the 13 px styles live on as `TEXT_SMALL*`
+  and the `.ptd-dense` class for the Pokédex list, credits, box grid
+  tooltips, damage numbers and the seed label.
+- The HUD top bar grew to 110 px (three rows) and the bottom bar to
+  78 px, so the canvas is 960x636; Fit zoom scales it as before.
+- The HUD hints were shortened to one short sentence each so they fit
+  between the money and the rule button at 26 px.
+- `Button` grows to fit its label; callers give a minimum width. The
+  summary, HUD and level select lay their buttons out from the measured
+  widths.
+- A noble's stagger meter is a gold bar under the boss HP bar instead of
+  text, since "stagger 45 %" no longer fits beside the HP numbers.
+- The placed-Pokémon dot on a party slot is gone; the blue outline
+  already marks a placed slot.
+- The level select's PC / Shop / Save / Credits / Demo buttons moved into
+  a strip under the town map; the right column keeps the party count and
+  the key hint, the left column the badges and bag.
+- The dialogue box splits any page that wraps past two lines into
+  two-line pages at word boundaries (`DialogueBox.splitPage`), keeping
+  the portrait on every part and the icons and riddle choices on the last.
+- The title's Continue button is always labelled "Continue" and greyed
+  without a save (the old "(no save)" suffix no longer fits the frame).

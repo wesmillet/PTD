@@ -28,6 +28,9 @@ import { claimDailyTicket } from '../sim/lottery';
 import { showStarterDialog } from '../ui/starterDialog';
 import { COLORS, TEXT, TEXT_DIM, TEXT_LIGHT } from '../ui/styles';
 
+/** Height of the two-line hover frames over markers (26 px name and detail). */
+const HOVER_H = 72;
+
 /** The Platinum town map is 256x192; it is shown at 3x. */
 const MAP_W = 256;
 const MAP_H = 192;
@@ -80,7 +83,8 @@ export class LevelSelectScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.cameras.main.setBackgroundColor(COLORS.bg);
     this.mapX = Math.round((width - MAP_W * MAP_SCALE) / 2);
-    this.mapY = Math.round((height - MAP_H * MAP_SCALE) / 2);
+    // The map sits at the top; the strip under it holds the PC, Shop, Save, Credits and Demo buttons.
+    this.mapY = 6;
     this.markers = [];
     this.walking = false;
 
@@ -91,9 +95,10 @@ export class LevelSelectScene extends Phaser.Scene {
     }
     this.add.rectangle(this.mapX, this.mapY, MAP_W * MAP_SCALE, MAP_H * MAP_SCALE).setOrigin(0).setStrokeStyle(2, COLORS.borderOuter);
 
-    this.drawBadges(8, 16);
-    this.drawBag(8, 200, height - 12);
-    this.drawMenu(width - 8, 30);
+    this.drawBadges(8, 10);
+    this.drawBag(8, 214, height - 10);
+    this.drawMenu(this.mapX, this.mapY + MAP_H * MAP_SCALE + (height - this.mapY - MAP_H * MAP_SCALE) / 2);
+    this.drawRightColumn(width - 8);
     this.drawMarkers(game);
     this.drawConferenceMarker(game);
     this.drawLotteryMarker(game);
@@ -203,10 +208,10 @@ export class LevelSelectScene extends Phaser.Scene {
     const tickets = () => game.tickets ?? 0;
     const label = () => {
       this.hideHover();
-      const name = this.add.text(0, -8, 'Jubilife TV: Lottery Corner', TEXT).setOrigin(0.5);
-      const info = this.add.text(0, 8, `${tickets()} ticket${tickets() === 1 ? '' : 's'} · a shiny for a cleared challenge`, TEXT_DIM).setOrigin(0.5);
-      const w = Math.max(name.width, info.width) + 28;
-      this.hover = this.add.container(Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4), y - 62, [framePanel(this, 0, 0, w, 44, 'blue'), name, info]).setDepth(50);
+      const name = this.add.text(0, -15, 'Jubilife TV: Lottery Corner', TEXT).setOrigin(0.5);
+      const info = this.add.text(0, 15, `${tickets()} ticket${tickets() === 1 ? '' : 's'} · a shiny for a challenge`, TEXT_DIM).setOrigin(0.5);
+      const w = Math.max(name.width, info.width) + 44;
+      this.hover = this.add.container(Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4), y - 72, [framePanel(this, 0, 0, w, HOVER_H, 'blue'), name, info]).setDepth(50);
     };
     image.on('pointerover', label);
     image.on('pointerout', () => this.hideHover());
@@ -224,10 +229,10 @@ export class LevelSelectScene extends Phaser.Scene {
     image.setDepth(10).setInteractive({ useHandCursor: open });
     const label = () => {
       this.hideHover();
-      const name = this.add.text(0, -8, 'Sinnoh Conference', TEXT).setOrigin(0.5);
-      const info = this.add.text(0, 8, open ? 'Lily of the Valley: sixteen trainers, four rounds' : 'Locked: clear the Distortion World', TEXT_DIM).setOrigin(0.5);
-      const w = Math.max(name.width, info.width) + 28;
-      this.hover = this.add.container(Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4), y - 62, [framePanel(this, 0, 0, w, 44, 'blue'), name, info]).setDepth(50);
+      const name = this.add.text(0, -15, 'Sinnoh Conference', TEXT).setOrigin(0.5);
+      const info = this.add.text(0, 15, open ? 'Sixteen trainers, four rounds' : 'Locked: clear the Distortion World', TEXT_DIM).setOrigin(0.5);
+      const w = Math.max(name.width, info.width) + 44;
+      this.hover = this.add.container(Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4), y - 72, [framePanel(this, 0, 0, w, HOVER_H, 'blue'), name, info]).setDepth(50);
     };
     image.on('pointerover', label);
     image.on('pointerout', () => this.hideHover());
@@ -248,10 +253,10 @@ export class LevelSelectScene extends Phaser.Scene {
     const kind = def.objective === 'free' ? 'free roam' : `defend, ${waveCount(def)} waves`;
     const extra = def.trainer ? (def.badge ? ' · gym' : ' · trainer') : '';
     const line2 = unlocked ? `${kind}${extra}${isLevelCompleted(game, id) ? ' · cleared' : ''}` : `Locked: ${unlockBlockers(game, id).slice(0, 2).join(', ') || 'not yet'}`;
-    const name = this.add.text(0, -8, def.name, TEXT).setOrigin(0.5);
-    const info = this.add.text(0, 8, line2, TEXT_DIM).setOrigin(0.5);
-    const w = Math.max(name.width, info.width) + 28;
-    const h = 44;
+    const name = this.add.text(0, -15, def.name, TEXT).setOrigin(0.5);
+    const info = this.add.text(0, 15, line2, TEXT_DIM).setOrigin(0.5);
+    const w = Math.max(name.width, info.width) + 44;
+    const h = HOVER_H;
     const frame = framePanel(this, 0, 0, w, h, 'blue');
     const above = y - 40 - h / 2 > this.mapY;
     const cx = Phaser.Math.Clamp(x, this.mapX + w / 2 + 4, this.mapX + MAP_W * MAP_SCALE - w / 2 - 4);
@@ -344,7 +349,7 @@ export class LevelSelectScene extends Phaser.Scene {
       img.on('pointerover', () => {
         this.hideHover();
         const label = this.add.text(0, 0, earned ? b.name : `${b.name}: ${b.leader}, ${b.gym}`, TEXT).setOrigin(0, 0.5);
-        this.hover = this.add.container(x + 22, y, [framePanel(this, label.width / 2 + 10, 0, label.width + 20, 28, 'blue'), label]).setDepth(60);
+        this.hover = this.add.container(x + 22, y, [framePanel(this, label.width / 2 + 10, 0, label.width + 20, 40, 'blue'), label]).setDepth(60);
       });
       img.on('pointerout', () => this.hideHover());
     });
@@ -377,18 +382,30 @@ export class LevelSelectScene extends Phaser.Scene {
     this.add.text(left + 40, bottom, `$${game.money}`, { ...TEXT, color: '#c87818' }).setOrigin(0.5, 1);
   }
 
-  /** PC, Shop, Save, Credits and the sprite demo down the right column. */
-  private drawMenu(right: number, top: number): void {
-    const x = right - 44;
-    new Button(this, x, top, 'PC', () => this.guard(() => this.scene.start('PC')), 88, 30, 'ui-menu-party');
-    new Button(this, x, top + 38, 'Shop', () => this.guard(() => this.shop?.show()), 88, 30, 'ui-menu-bag');
-    new Button(this, x, top + 76, 'Save', () => this.savePanel?.show(), 88, 30, 'ui-menu-save');
-    new Button(this, x, top + 114, 'Credits', () => this.credits?.show(), 88, 30, 'ui-menu-card');
-    new Button(this, x, top + 152, 'Demo', () => this.scene.start('Phase0'), 88, 30, 'ui-menu-options');
+  /** PC, Shop, Save, Credits and the sprite demo in a row under the map. */
+  private drawMenu(left: number, y: number): void {
+    const entries: [string, () => void, string][] = [
+      ['PC', () => this.guard(() => this.scene.start('PC')), 'ui-menu-party'],
+      ['Shop', () => this.guard(() => this.shop?.show()), 'ui-menu-bag'],
+      ['Save', () => this.savePanel?.show(), 'ui-menu-save'],
+      ['Credits', () => this.credits?.show(), 'ui-menu-card'],
+      ['Demo', () => this.scene.start('Phase0'), 'ui-menu-options'],
+    ];
+    let x = left;
+    for (const [label, action, icon] of entries) {
+      const b = new Button(this, 0, y, label, action, 96, Button.HEIGHT, icon);
+      b.setX(x + b.frameWidth / 2);
+      x += b.frameWidth + 8;
+    }
+  }
+
+  /** The right column: the party count and the controls hint. */
+  private drawRightColumn(right: number): void {
     const game = getGame();
-    const party = game.party.length ? `Party ${game.party.length}/6` : 'No Pokémon yet';
-    this.add.text(x, top + 190, party, TEXT_DIM).setOrigin(0.5, 0);
-    this.add.text(x, this.scale.height - 12, 'Click a marker\n← → Enter', { ...TEXT_LIGHT, align: 'center' }).setOrigin(0.5, 1);
+    const x = (right + this.mapX + MAP_W * MAP_SCALE) / 2;
+    const party = game.party.length ? `Party\n${game.party.length}/6` : 'No\nparty';
+    this.add.text(x, 12, party, { ...TEXT_DIM, align: 'center' }).setOrigin(0.5, 0);
+    this.add.text(x, this.scale.height - 10, 'Click a\nmarker\n← → ⏎', { ...TEXT_LIGHT, align: 'center' }).setOrigin(0.5, 1);
   }
 
   private guard(open: () => void): void {

@@ -61,10 +61,18 @@ ready-cut from `scripts/build-platinum.py` (pret/pokeplatinum; credits in
   and on the canvas. `--ptd-font-body` / `FONT` is the regular (body text
   and numbers), `--ptd-font-pixel` / `FONT_BOLD` the bold (titles,
   headings, buttons).
-- Sizes: the font's grid is 13 px, so only `--ptd-size` 13 px and
-  `--ptd-size-big` 26 px are used (`SIZE_SMALL` / `SIZE_LARGE` in
-  styles.ts). No smoothing (`-webkit-font-smoothing: none; font-smooth:
-  never`), Phaser text at resolution 1.
+- Sizes: the font's grid is 13 px, so only 13 px and 26 px are used
+  (`SIZE_SMALL` / `SIZE_LARGE` in styles.ts). Everything read during play
+  is 26 px: `--ptd-size` (DOM panels: Pokémon panel, PC summary, pause
+  and options pages, shop, save panel) and `TEXT` / `TEXT_DIM` /
+  `TEXT_LIGHT` on the canvas (HUD, dialogue box, banners, level select
+  frames, buttons). Dense lists keep 13 px: the `.ptd-dense` class (the
+  Pokédex list, credits) and `TEXT_SMALL` / `TEXT_SMALL_DIM` /
+  `TEXT_SMALL_LIGHT` (box grid tooltips, damage numbers, the seed
+  label). `Button` labels are 26 px bold and the frame grows to fit the
+  label (`frameWidth`); callers pass a minimum width. No smoothing
+  (`-webkit-font-smoothing: none; font-smooth: never`), Phaser text at
+  resolution 1.
 - Colours: `--ptd-text` #484848 with `--ptd-shadow-light` (1px 1px #d0d0c8)
   on light panels; white with `--ptd-shadow-dark` (#283028) on dark
   backgrounds (`TEXT_LIGHT`, `TEXT_TITLE`).

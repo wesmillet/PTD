@@ -19,7 +19,7 @@ import {
 } from '../sim/pc';
 import { Button, framePanel } from '../ui/button';
 import { PcSummary } from '../ui/pcSummary';
-import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from '../ui/styles';
+import { COLORS, TEXT, TEXT_BIG, TEXT_DIM, TEXT_SMALL, TEXT_SMALL_DIM } from '../ui/styles';
 
 /**
  * Layout for the full 960x600 canvas, edge to edge like the DS PC screen:
@@ -148,7 +148,7 @@ export class PCScene extends Phaser.Scene {
     const footY = this.boxY + this.wallH + 36;
     new Button(this, this.boxX + 70, footY, 'Wallpaper', () => this.nextWallpaper(), 130, 28);
     this.countText = this.add.text(this.boxX + this.wallW, footY, '', TEXT).setOrigin(1, 0.5);
-    this.add.text(this.boxX + this.wallW / 2, height - 14, 'Drag between slots and the party; hold over an arrow to turn the page', TEXT_DIM).setOrigin(0.5);
+    this.add.text(this.boxX + this.wallW / 2, height - 14, 'Drag between slots and the party; hold over an arrow to turn the page', TEXT_SMALL_DIM).setOrigin(0.5);
 
     // Cursor image follows the pointer over the canvas.
     if (this.textures.exists('pc-cursor')) {
@@ -353,7 +353,7 @@ export class PCScene extends Phaser.Scene {
   private showToast(text: string): void {
     this.toast?.destroy();
     this.toast = this.add
-      .text(this.boxX + this.wallW / 2, this.scale.height - 40, text, { ...TEXT, backgroundColor: '#f8f8f8ee', padding: { x: 8, y: 4 } })
+      .text(this.boxX + this.wallW / 2, this.scale.height - 40, text, { ...TEXT_SMALL, backgroundColor: '#f8f8f8ee', padding: { x: 8, y: 4 } })
       .setOrigin(0.5)
       .setDepth(4500);
     this.time.delayedCall(1800, () => this.toast?.destroy());

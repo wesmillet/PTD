@@ -11,7 +11,7 @@ import { Button, framePanel } from '../ui/button';
 import { CreditsScreen } from '../ui/creditsScreen';
 import { Diorama, type StagePoints } from '../ui/diorama';
 import { MenuPages } from '../ui/menuPages';
-import { COLORS, TEXT_DIM, TEXT_TITLE } from '../ui/styles';
+import { COLORS, TEXT_DIM, TEXT_SMALL_DIM, TEXT_TITLE } from '../ui/styles';
 
 const VERSION = '0.8';
 /** The diorama map is 960x448; the canvas is 960x600, so the camera zooms in to fill it and pans across. */
@@ -172,8 +172,8 @@ export class TitleScene extends Phaser.Scene {
     const game = getGame();
     const title = this.uiAdd(this.add.text(width / 2, 30, 'Sinnoh Tower Defense', { ...TEXT_TITLE, shadow: { offsetX: 2, offsetY: 2, color: '#283028', blur: 0, stroke: false, fill: true } }).setOrigin(0.5).setDepth(3000));
     title.setStroke('#283028', 3);
-    this.uiAdd(this.add.text(width / 2, 56, 'A Pokémon Tower Defense fan game', { ...TEXT_DIM, color: '#f8f8f8' }).setOrigin(0.5).setDepth(3000));
-    this.uiAdd(this.add.text(width - 10, height - 8, `v${VERSION}`, { ...TEXT_DIM, color: '#f8f8f8' }).setOrigin(1, 1).setDepth(3000));
+    this.uiAdd(this.add.text(width / 2, 66, 'A Pokémon Tower Defense fan game', { ...TEXT_DIM, color: '#f8f8f8' }).setOrigin(0.5).setDepth(3000));
+    this.uiAdd(this.add.text(width - 10, height - 8, `v${VERSION}`, { ...TEXT_SMALL_DIM, color: '#f8f8f8' }).setOrigin(1, 1).setDepth(3000));
     // Badge case at the top right, lit for the badges this save has earned.
     const badges = allBadges();
     let bx = width - 24 - (badges.length - 1) * 28;
@@ -199,16 +199,16 @@ export class TitleScene extends Phaser.Scene {
           this.scene.start('LevelSelect');
         },
       },
-      { label: saved ? 'Continue' : 'Continue (no save)', icon: 'ui-menu-party', action: () => this.scene.start('LevelSelect'), enabled: saved || game.party.length > 0 },
+      { label: 'Continue', icon: 'ui-menu-party', action: () => this.scene.start('LevelSelect'), enabled: saved || game.party.length > 0 },
       { label: 'PC', icon: 'ui-menu-bag', action: () => this.scene.start('PC'), enabled: saved || game.party.length > 0 },
       { label: 'Options', icon: 'ui-menu-options', action: () => this.pages?.options() },
       { label: 'Credits', icon: 'ui-menu-card', action: () => this.credits?.show() },
     ];
     entries.forEach((e, i) => {
-      const b = this.uiAdd(new Button(this, px, py - panelH / 2 + 30 + i * 42, e.label, e.action, 200, 34, e.icon).setDepth(3000));
+      const b = this.uiAdd(new Button(this, px, py - panelH / 2 + 30 + i * 42, e.label, e.action, 200, 38, e.icon).setDepth(3000));
       if (e.enabled === false) b.setEnabled(false);
     });
-    this.uiAdd(this.add.text(width - 16, height - 24, 'Non-commercial fan project. Pokémon is a trademark of Nintendo, Creatures Inc. and GAME FREAK.', { ...TEXT_DIM, color: '#f8f8f8', wordWrap: { width: 640 }, align: 'right' }).setOrigin(1, 1).setDepth(3000));
+    this.uiAdd(this.add.text(width - 16, height - 24, 'Non-commercial fan project. Pokémon is a trademark of Nintendo, Creatures Inc. and GAME FREAK.', { ...TEXT_SMALL_DIM, color: '#f8f8f8', wordWrap: { width: 640 }, align: 'right' }).setOrigin(1, 1).setDepth(3000));
     this.credits = new CreditsScreen(() => undefined);
     this.pages = new MenuPages({
       game,

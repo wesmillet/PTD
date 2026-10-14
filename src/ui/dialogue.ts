@@ -28,6 +28,10 @@ export interface DialogueOptions {
  * the next one advances; the last one closes and calls `onDone`.
  */
 export class DialogueBox {
+  /** Box height: two lines of 26 px text with the frame's padding. */
+  static readonly HEIGHT = 100;
+  /** Lines a page may hold; longer pages are split at word boundaries. */
+  static readonly LINES = 2;
   private readonly scene: Phaser.Scene;
   private readonly container: Phaser.GameObjects.Container;
   private readonly textObj: Phaser.GameObjects.Text;
@@ -57,7 +61,7 @@ export class DialogueBox {
     this.scene = scene;
     const { width, height } = scene.scale;
     this.msPerLetter = 1000 / (options.speed ?? 40);
-    const h = 96;
+    const h = DialogueBox.HEIGHT;
     const bottom = options.bottom ?? height - 60;
     this.container = scene.add.container(0, 0).setDepth(2450).setVisible(false);
     this.shade = scene.add.rectangle(0, 0, width, height, 0x000000, 0.001).setOrigin(0).setInteractive();
@@ -66,11 +70,11 @@ export class DialogueBox {
     this.container.add(framePanel(scene, width / 2, bottom - h / 2, width - 16, h, options.frame ?? 'blue'));
     this.portrait = scene.add.image(44, bottom - h / 2, '').setVisible(false);
     this.container.add(this.portrait);
-    this.textObj = scene.add.text(24, bottom - h + 14, '', { ...TEXT_BIG, wordWrap: { width: width - 80 }, lineSpacing: 2 });
+    this.textObj = scene.add.text(24, bottom - h + 16, '', { ...TEXT_BIG, wordWrap: { width: width - 80 }, lineSpacing: 4 });
     this.container.add(this.textObj);
-    this.iconRow = scene.add.container(0, bottom - 24);
+    this.iconRow = scene.add.container(0, bottom - 22);
     this.container.add(this.iconRow);
-    this.choiceRow = scene.add.container(0, bottom - h - 8);
+    this.choiceRow = scene.add.container(0, bottom - h - 10);
     this.container.add(this.choiceRow);
     this.arrow = scene.add.text(width - 40, bottom - 22, '▼', { ...TEXT_BIG, fontSize: `${SIZE_LARGE}px` }).setOrigin(0.5).setVisible(false);
     this.container.add(this.arrow);
@@ -86,12 +90,38 @@ export class DialogueBox {
       onDone();
       return;
     }
-    this.pages = pages;
+    this.pages = pages.flatMap((p) => this.splitPage(p));
     this.page = 0;
     this.onDone = onDone;
     this.container.setVisible(true);
     this.scene.input.keyboard?.on('keydown', this.keyHandler);
     this.startPage();
+  }
+
+  /** Wrap width for a page: narrower beside a portrait. */
+  private wrapWidth(p: DialoguePage): number {
+    const { width } = this.scene.scale;
+    return p.portrait && this.scene.textures.exists(p.portrait) ? width - 150 : width - 80;
+  }
+
+  /**
+   * Splits a page whose text wraps past LINES lines into pages of LINES
+   * lines each (at word boundaries); icons and choices stay on the last one.
+   */
+  private splitPage(p: DialoguePage): DialoguePage[] {
+    this.textObj.setWordWrapWidth(this.wrapWidth(p));
+    const lines = this.textObj.getWrappedText(p.text);
+    if (lines.length <= DialogueBox.LINES) return [p];
+    const out: DialoguePage[] = [];
+    for (let i = 0; i < lines.length; i += DialogueBox.LINES) {
+      const text = lines
+        .slice(i, i + DialogueBox.LINES)
+        .map((l) => l.trim())
+        .join(' ');
+      const last = i + DialogueBox.LINES >= lines.length;
+      out.push(last ? { ...p, text } : { text, ...(p.portrait ? { portrait: p.portrait } : {}) });
+    }
+    return out;
   }
 
   private startPage(): void {
@@ -163,15 +193,17 @@ export class DialogueBox {
       this.arrow.setVisible(false);
       this.choicesOpen = true;
       const { width } = this.scene.scale;
-      const w = Math.min(260, (width - 32) / p.choices.length - 8);
-      p.choices.forEach((label, i) => {
+      const labels = p.choices.map((label, i) => this.scene.add.text(0, 0, `${i + 1}. ${label}`, TEXT).setOrigin(0.5));
+      const w = Math.min(Math.max(...labels.map((l) => l.width)) + 28, (width - 32) / p.choices.length - 8);
+      const h = 40;
+      p.choices.forEach((_label, i) => {
         const x = 16 + w / 2 + i * (w + 8);
-        const frame = framePanel(this.scene, x, 0, w, 36, 'blue').setInteractive(new Phaser.Geom.Rectangle(-w / 2, -18, w, 36), Phaser.Geom.Rectangle.Contains);
+        const frame = framePanel(this.scene, x, 0, w, h, 'blue').setInteractive(new Phaser.Geom.Rectangle(-w / 2, -h / 2, w, h), Phaser.Geom.Rectangle.Contains);
         frame.on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
           event.stopPropagation();
           this.choose(i);
         });
-        const text = this.scene.add.text(x, 0, `${i + 1}. ${label}`, TEXT).setOrigin(0.5);
+        const text = labels[i]!.setPosition(x, 0);
         this.choiceRow.add([frame, text]);
       });
       return;

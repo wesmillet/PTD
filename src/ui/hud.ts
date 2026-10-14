@@ -58,14 +58,19 @@ export interface BossStatus {
 }
 
 /**
- * Top bar: level name, wave, lives, money, speed, Start / Leave, boss bar.
- * Bottom bar (below the map): party slots and the ball bar.
+ * Top bar (three rows of 26 px text): the level name with the buttons,
+ * then wave and lives with the rule status, then money with the hint;
+ * the boss bar sits over the middle. Bottom bar (below the map): party
+ * slots and the ball bar.
  */
 export class Hud {
   /** Height of the top bar; the map starts here. */
-  static readonly HEIGHT = 92;
+  static readonly HEIGHT = 110;
   /** Height of the bottom bar under the map. */
-  static readonly BOTTOM = 60;
+  static readonly BOTTOM = 78;
+  /** Party slot pitch and frame size in the bottom bar. */
+  private static readonly SLOT_STEP = 62;
+  private static readonly SLOT_W = 56;
   private readonly bottomY: number;
   private readonly scene: Phaser.Scene;
   private readonly callbacks: HudCallbacks;
@@ -103,17 +108,17 @@ export class Hud {
     // Both bars are Platinum text-box frames spanning the width.
     framePanel(scene, width / 2, Hud.HEIGHT / 2, width, Hud.HEIGHT, 'blue').setDepth(1000);
     framePanel(scene, width / 2, this.bottomY + Hud.BOTTOM / 2, width, Hud.BOTTOM, 'blue').setDepth(1000);
-    scene.add.text(20, 8, state.def.name, TEXT_BIG).setDepth(1001);
-    this.wave = scene.add.text(20, 42, '', TEXT).setDepth(1001);
-    this.lives = scene.add.text(20, 62, '', TEXT).setDepth(1001);
-    this.money = scene.add.text(250, 42, '', { ...TEXT, color: '#c87818' }).setDepth(1001);
-    this.hint = scene.add.text(width / 2, 70, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
-    this.ruleText = scene.add.text(width - 16, 56, '', { ...TEXT, color: '#3878e0' }).setOrigin(1, 0.5).setDepth(1001);
+    scene.add.text(20, 6, state.def.name, TEXT_BIG).setDepth(1001);
+    this.wave = scene.add.text(20, 40, '', TEXT).setDepth(1001);
+    this.lives = scene.add.text(230, 40, '', TEXT).setDepth(1001);
+    this.money = scene.add.text(20, 72, '', { ...TEXT, color: '#c87818' }).setDepth(1001);
+    this.hint = scene.add.text(width / 2 + 40, 85, '', TEXT_DIM).setOrigin(0.5).setDepth(1001);
+    this.ruleText = scene.add.text(width - 16, 53, '', { ...TEXT, color: '#3878e0' }).setOrigin(1, 0.5).setDepth(1001);
     // Boss bar: the battle GUI enemy HP box at 2x with the name font, Lv number and HP fill drawn over it.
     this.bossGfx = scene.add.graphics().setDepth(1003);
     const box = HPBOX['enemy'];
-    const boxX = width / 2 - (box ? (box.width * BOSS_BOX_SCALE) / 2 : 128);
-    const boxY = 20;
+    const boxX = width / 2 + 40 - (box ? (box.width * BOSS_BOX_SCALE) / 2 : 128);
+    const boxY = 38;
     if (box && scene.textures.exists('ui-hpbox-enemy')) {
       this.bossBox = scene.add.image(boxX, boxY, 'ui-hpbox-enemy').setOrigin(0).setScale(BOSS_BOX_SCALE).setDepth(1002).setVisible(false);
     }
@@ -121,33 +126,40 @@ export class Hud {
     if (box?.lv) {
       this.bossLevel = scene.add.text(boxX + (box.lv.x + 13) * BOSS_BOX_SCALE, boxY + box.lv.y * BOSS_BOX_SCALE - 1, '', TEXT_LIGHT).setDepth(1004).setVisible(false);
     }
-    this.bossHp = scene.add.text(boxX + (box ? box.width * BOSS_BOX_SCALE : 256) - 20, boxY + 60, '', TEXT_LIGHT).setOrigin(1, 0.5).setDepth(1004).setVisible(false);
-    this.startButton = new Button(scene, width - 80, 22, 'Start wave', callbacks.onStartWave, 130, 30).setDepth(1001);
-    this.speedButton = new Button(scene, width - 185, 22, '1x', callbacks.onToggleSpeed, 60, 30).setDepth(1001);
-    if (state.def.objective === 'free') {
-      this.leaveButton = new Button(scene, width - 300, 22, 'Leave route', callbacks.onLeave, 130, 30).setDepth(1001);
-    }
-    new Button(scene, width - (state.def.objective === 'free' ? 415 : 300), 22, 'Menu', callbacks.onMenu, 80, 30).setDepth(1001);
-    scene.add.text(16, this.bottomY + 24, 'Party', TEXT_DIM).setOrigin(0, 0.5).setDepth(1001);
+    this.bossHp = scene.add.text(boxX + (box ? box.width * BOSS_BOX_SCALE : 256) - 20, boxY + 56, '', TEXT_LIGHT).setOrigin(1, 0.5).setDepth(1004).setVisible(false);
+    // Buttons on the first row, right to left, each as wide as its label needs.
+    const by = 24;
+    let bx = width - 12;
+    const place = (b: Button) => {
+      b.setX(bx - b.frameWidth / 2);
+      bx -= b.frameWidth + 8;
+      return b.setDepth(1001);
+    };
+    this.startButton = place(new Button(scene, 0, by, 'Start wave (99s)', callbacks.onStartWave, 120));
+    this.speedButton = place(new Button(scene, 0, by, '1x', callbacks.onToggleSpeed, 64));
+    if (state.def.objective === 'free') this.leaveButton = place(new Button(scene, 0, by, 'Leave route', callbacks.onLeave, 120));
+    place(new Button(scene, 0, by, 'Menu', callbacks.onMenu, 90));
+    scene.add.text(14, this.bottomY + 36, 'Party', TEXT_DIM).setOrigin(0, 0.5).setDepth(1001);
     this.rebuildSlots(state);
 
     // Ball bar, right side of the bottom bar, with the Gen 5 item sprites.
     const obtainable = state.ballsOnly ?? BALL_IDS.filter((id) => BALLS[id]?.obtainable !== false);
-    const startX = width - 16 - obtainable.length * 46 + 22;
-    scene.add.text(startX - 30, this.bottomY + 30, 'Balls', TEXT_DIM).setOrigin(1, 0.5).setDepth(1001);
+    const pitch = 52;
+    const startX = width - 14 - obtainable.length * pitch + pitch / 2;
+    scene.add.text(startX - pitch / 2 - 10, this.bottomY + 36, 'Balls', TEXT_DIM).setOrigin(1, 0.5).setDepth(1001);
     obtainable.forEach((id, i) => {
-      const x = startX + i * 46;
-      const y = this.bottomY + 30;
-      const frame = scene.add.rectangle(x, y, 42, 46, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
+      const x = startX + i * pitch;
+      const y = this.bottomY + 38;
+      const frame = scene.add.rectangle(x, y, pitch - 4, Hud.BOTTOM - 14, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
       frame.on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
         event.stopPropagation();
         callbacks.onBall(id);
       });
       const key = itemTextureKey(BALLS[id]?.sprite ?? 'poke-ball');
       const icon = scene.textures.exists(key)
-        ? scene.add.image(x, y - 7, key).setDepth(1002)
-        : scene.add.circle(x, y - 8, 9, 0xe03030).setStrokeStyle(2, 0x202020).setDepth(1002);
-      const count = scene.add.text(x, y + 13, '', TEXT).setOrigin(0.5).setDepth(1003);
+        ? scene.add.image(x, y - 14, key).setDepth(1002)
+        : scene.add.circle(x, y - 14, 9, 0xe03030).setStrokeStyle(2, 0x202020).setDepth(1002);
+      const count = scene.add.text(x, y + 16, '', TEXT).setOrigin(0.5).setDepth(1003);
       this.balls.push({ id, frame, icon, count });
     });
     this.update(state, 1);
@@ -174,10 +186,10 @@ export class Hud {
     }
     this.slots = [];
     state.party.forEach((entry, i) => {
-      const x = 86 + i * 54;
-      const y = this.bottomY + 24;
+      const x = 120 + i * Hud.SLOT_STEP;
+      const y = this.bottomY + 32;
       const species = entry.mon.species;
-      const frame = this.scene.add.rectangle(x, y + 6, 46, 46, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
+      const frame = this.scene.add.rectangle(x, y + 6, Hud.SLOT_W, Hud.BOTTOM - 14, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
       frame.on('pointerdown', (p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
         event.stopPropagation();
         this.callbacks.onPartySlotDown(i, p);
@@ -187,17 +199,19 @@ export class Hud {
       const shiny = entry.mon.shiny;
       const iconKey = iconTextureKey(species, this.iconFrame, shiny);
       const portraitKey = portraitTextureKey(species, shiny);
+      // Top to bottom inside the frame: HP bar, icon, level.
       const image = this.scene.textures.exists(iconKey)
-        ? this.scene.add.image(x, y + 4, iconKey).setDepth(1002)
+        ? this.scene.add.image(x, y - 2, iconKey).setDepth(1002)
         : this.scene.textures.exists(portraitKey)
-          ? this.scene.add.image(x, y + 6, portraitKey).setDepth(1002)
+          ? this.scene.add.image(x, y - 2, portraitKey).setScale(0.8).setDepth(1002)
           : undefined;
-      const level = this.scene.add.text(x + 22, y - 17, '', TEXT).setOrigin(1, 0).setDepth(1003);
-      const placed = this.scene.add.text(x - 22, y - 17, '', { ...TEXT, color: '#3878e0' }).setOrigin(0, 0).setDepth(1003);
+      const level = this.scene.add.text(x, y + 24, '', TEXT).setOrigin(0.5).setDepth(1003);
+      // A placed Pokémon shows as the blue frame outline (see update); the text stays for a possible marker.
+      const placed = this.scene.add.text(x - Hud.SLOT_W / 2 + 4, y - 14, '', { ...TEXT, color: '#3878e0' }).setOrigin(0, 0.5).setDepth(1003).setVisible(false);
       const hp = this.scene.add.graphics().setDepth(1003);
       const slot: Slot = { species, shiny, frame, level, hp, placed, animated: !shiny && info.animatedIcon && this.scene.textures.exists(iconKey) };
       if (image) slot.image = image;
-      if (shiny) slot.star = this.scene.add.image(x + 16, y - 10, 'star').setDepth(1003).setTint(0xf8d030);
+      if (shiny) slot.star = this.scene.add.image(x + Hud.SLOT_W / 2 - 8, y - 20, 'star').setDepth(1003).setTint(0xf8d030);
       this.slots.push(slot);
     });
   }
@@ -227,7 +241,8 @@ export class Hud {
     if (this.ruleButtonId !== withButton.id) {
       this.ruleButton?.destroy();
       this.ruleButtonId = withButton.id;
-      this.ruleButton = new Button(this.scene, this.scene.scale.width - 80, 78, withButton.button ?? withButton.label, () => this.callbacks.onRule?.(withButton.id), 130, 26).setDepth(1001);
+      const b = new Button(this.scene, 0, 86, withButton.button ?? withButton.label, () => this.callbacks.onRule?.(withButton.id), 120);
+      this.ruleButton = b.setX(this.scene.scale.width - 12 - b.frameWidth / 2).setDepth(1001);
     }
   }
 
@@ -256,6 +271,12 @@ export class Hud {
         if (at >= 1 || at <= 0) continue;
         this.bossGfx.fillStyle(0xf8f8f8, 1).fillRect(Math.round(bx + bw * at) - 1, by - 1, 2, f.height * s + 2);
       }
+      // A noble's stagger meter: a gold bar under the HP bar.
+      if (boss.stagger !== undefined) {
+        const sy = by + f.height * s + 3;
+        this.bossGfx.fillStyle(0x283028, 1).fillRect(bx - 1, sy - 1, bw + 2, 6);
+        this.bossGfx.fillStyle(boss.staggered ? 0xf8f8f8 : 0xf8c020, 1).fillRect(bx, sy, Math.round(bw * Math.max(0, Math.min(1, boss.stagger))), 4);
+      }
       if (boss.catchable) {
         const key = this.scene.textures.exists('item-poke-ball') ? 'item-poke-ball' : undefined;
         if (!this.bossBall && key) this.bossBall = this.scene.add.image(bx + bw + 14, by + (f.height * s) / 2, key).setDepth(1004);
@@ -267,13 +288,13 @@ export class Hud {
       const width = this.scene.scale.width;
       const w = Math.min(520, width - 300);
       const x = width / 2 - w / 2;
-      this.bossGfx.fillStyle(COLORS.borderOuter, 1).fillRect(x - 1, 61, w + 2, 14);
-      this.bossGfx.fillStyle(0x000000, 1).fillRect(x, 62, w, 12);
-      this.bossGfx.fillStyle(colour, 1).fillRect(x, 62, Math.round(w * frac), 12);
+      this.bossGfx.fillStyle(COLORS.borderOuter, 1).fillRect(x - 1, 79, w + 2, 14);
+      this.bossGfx.fillStyle(0x000000, 1).fillRect(x, 80, w, 12);
+      this.bossGfx.fillStyle(colour, 1).fillRect(x, 80, Math.round(w * frac), 12);
     }
     this.bossName.setText(boss.staggered ? `${boss.name}  STAGGERED` : boss.name);
     this.bossLevel?.setText(String(boss.level ?? ''));
-    this.bossHp.setText(boss.stagger !== undefined && !boss.staggered ? `${boss.hp} / ${boss.maxHp}   stagger ${Math.round(boss.stagger * 100)}%` : `${boss.hp} / ${boss.maxHp}`);
+    this.bossHp.setText(`${boss.hp} / ${boss.maxHp}`);
   }
 
   update(state: LevelState, gameSpeed: number, selectedPartyIndex: number | null = null, selectedBall: string | null = null): void {
@@ -289,15 +310,15 @@ export class Hud {
     this.money.setText(`$${getGame().money}${state.kos > 0 ? `  +$${state.kos * config.money.perKo}` : ''}`);
     const canStart = state.phase === 'build' && state.towers.length > 0;
     this.startButton.setEnabled(canStart);
-    const nextIn = def.objective === 'free' && state.phase === 'build' && state.towers.length > 0 ? ` (auto in ${Math.ceil(state.buildTimer)}s)` : '';
+    const nextIn = def.objective === 'free' && state.phase === 'build' && state.towers.length > 0 ? ` (${Math.ceil(state.buildTimer)}s)` : '';
     this.startButton.setText(state.phase === 'build' ? `Start wave${nextIn}` : 'Wave running');
     const bossShown = this.bossShown;
     if (this.paused) {
       this.hint.setText('Paused');
     } else if (selectedBall) {
-      this.hint.setText(`${BALLS[selectedBall]?.name ?? selectedBall}: click a wild Pokémon to throw (Esc cancels)`);
+      this.hint.setText(`${BALLS[selectedBall]?.name ?? selectedBall}: click a wild Pokémon`);
     } else if (state.phase === 'build') {
-      this.hint.setText(state.towers.length === 0 ? 'Drag a party Pokémon onto a worn patch beside the path' : 'Drag Pokémon to move them. Tap one for its panel. Start when ready.');
+      this.hint.setText(state.towers.length === 0 ? 'Drag a Pokémon onto a worn patch' : 'Drag to move, tap for the panel');
     } else if (state.phase === 'wave') {
       this.hint.setText(`${state.enemies.length} on the path, ${state.pending.length} to come`);
     } else {
@@ -319,9 +340,10 @@ export class Hud {
       const frac = entry.mon.stats.hp > 0 ? entry.mon.hp / entry.mon.stats.hp : 0;
       slot.hp.clear();
       // Battle-GUI bar: dark outline, black body, coloured fill.
-      slot.hp.fillStyle(COLORS.borderOuter, 1).fillRect(slot.frame.x - 21, slot.frame.y + 17, 42, 5);
-      slot.hp.fillStyle(0x000000, 1).fillRect(slot.frame.x - 20, slot.frame.y + 18, 40, 3);
-      slot.hp.fillStyle(frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical, 1).fillRect(slot.frame.x - 20, slot.frame.y + 18, Math.round(40 * frac), 3);
+      const hy = slot.frame.y - Hud.BOTTOM / 2 + 10;
+      slot.hp.fillStyle(COLORS.borderOuter, 1).fillRect(slot.frame.x - 23, hy, 46, 5);
+      slot.hp.fillStyle(0x000000, 1).fillRect(slot.frame.x - 22, hy + 1, 44, 3);
+      slot.hp.fillStyle(frac > 0.5 ? COLORS.hpFront : frac > 0.2 ? COLORS.hpLow : COLORS.hpCritical, 1).fillRect(slot.frame.x - 22, hy + 1, Math.round(44 * frac), 3);
     });
     for (const b of this.balls) {
       const n = state.items.balls[b.id] ?? 0;

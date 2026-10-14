@@ -84,7 +84,7 @@ export class MenuPages {
     line.textContent = `Seen ${counts.seen}   Caught ${counts.caught}   Shiny ${counts.shiny}`;
     root.appendChild(line);
     const list = document.createElement('ul');
-    list.className = 'ptd-moves';
+    list.className = 'ptd-moves ptd-dense';
     const ids = new Set<number>(allWildSpecies());
     for (const id of Object.keys(game.pokedex).map(Number)) if (game.pokedex[String(id)]?.seen) ids.add(id);
     for (const id of [...ids].sort((a, b) => a - b)) {
