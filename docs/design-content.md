@@ -292,6 +292,8 @@ The maps session (this chat) builds every new map; the main session builds the c
 8. **Events and lottery:** Shaymin, Cresselia, Darkrai, S.S. Libra, Shadow Mewtwo; the Lottery Corner with the reroll.
 9. **Secret HM levels, Max Raids, Regis, Arceus.**
 
+**Maps already in the repo** (commit 58bd92e): the seven gym arenas (`eterna-gym` to `sunyshore-gym`), `spear-pillar`, `distortion-world`, the four stadium floors, the four Hisui rifts and the `title` diorama with its stage points. Still to build: Valley Windworks, Eterna Forest, Old Chateau, Lake Valor, Iron Island, Galactic HQ, the lake islands, Flower Paradise, the two moon islands and the S.S. Libra.
+
 - [ ] Approve or change the level and tournament designs
 - [ ] Decide whether badge perks apply to demo saves
 - [ ] Pick anime trainer art for Ash, Paul and Tobias
