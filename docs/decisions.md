@@ -217,3 +217,17 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   Platinum frame at the bottom left; Options opens the same page as in
   levels (speed and zoom).
 - Stand-ins: Rowan is the Gentleman sheet, Looker the Policeman sheet.
+
+## Phase 8 item 4 (finale)
+
+- Barry's second ally is `counter-starter-final`: the final form of the
+  starter that beats the player's (Infernape for a Turtwig run), as in
+  Platinum where Barry's starter counters yours.
+- The grunt waves alternate lanes per spawn (`lane: "both"`) so both
+  stairways are busy at once; Mars takes the main stairway and Jupiter the
+  other in the tag battle.
+- Giratina's Shadow Force is a boss phase that opens with a three-second
+  vanish (untargetable, no throws) at 100 %, 60 % and 30 %; the third phase
+  also flips gravity every ten seconds. Dragon Claw is its timed move.
+- Cutscene `show` names put PMD sprites on the map's `altar` point (or the
+  path's end) for the length of the line.

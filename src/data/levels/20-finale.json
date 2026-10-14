@@ -1,0 +1,720 @@
+{
+  "spear-pillar": {
+    "name": "Spear Pillar",
+    "area": "mt-coronet/spear-pillar",
+    "time": "day",
+    "objective": "defend",
+    "map": "spear-pillar",
+    "mapPos": [
+      136,
+      100
+    ],
+    "popup": "cave",
+    "lives": 10,
+    "enemiesFirstWave": 3,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 55,
+    "levels": [
+      40,
+      47
+    ],
+    "maxWildLevel": 100,
+    "requires": "sunyshore-gym",
+    "unlock": {
+      "badges": [
+        "beacon"
+      ]
+    },
+    "lanes": [
+      "path",
+      "path-2"
+    ],
+    "rules": [],
+    "waves": [
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "golbat",
+              "level": 40
+            },
+            {
+              "species": "bronzor",
+              "level": 40
+            },
+            {
+              "species": "stunky",
+              "level": 40
+            }
+          ],
+          "intro": "Team Galactic owns this summit now! Get them!",
+          "lane": "both"
+        },
+        "banner": "Grunts from both stairways",
+        "lines": [
+          {
+            "text": "Spear Pillar. Cyrus stands at the altar with the Red Chain; grunts pour up both stairways."
+          }
+        ]
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "bronzor",
+              "level": 41
+            },
+            {
+              "species": "stunky",
+              "level": 41
+            },
+            {
+              "species": "glameow",
+              "level": 41
+            }
+          ],
+          "lane": "both"
+        },
+        "banner": "Grunts from both stairways"
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-male",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "stunky",
+              "level": 42
+            },
+            {
+              "species": "glameow",
+              "level": 42
+            },
+            {
+              "species": "croagunk",
+              "level": 42
+            },
+            {
+              "species": "golbat",
+              "level": 42
+            }
+          ],
+          "lane": "both"
+        },
+        "banner": "Grunts from both stairways"
+      },
+      {
+        "trainer": {
+          "id": "galactic-grunt-female",
+          "name": "Galactic Grunt",
+          "party": [
+            {
+              "species": "glameow",
+              "level": 43
+            },
+            {
+              "species": "croagunk",
+              "level": 43
+            },
+            {
+              "species": "golbat",
+              "level": 43
+            },
+            {
+              "species": "bronzor",
+              "level": 43
+            }
+          ],
+          "lane": "both"
+        },
+        "banner": "Grunts from both stairways"
+      },
+      {
+        "trainers": [
+          {
+            "id": "commander-mars",
+            "name": "Commander Mars",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              }
+            ],
+            "intro": "You again?! Jupiter, we take them together.",
+            "lane": "path"
+          },
+          {
+            "id": "commander-jupiter",
+            "name": "Commander Jupiter",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              }
+            ],
+            "lane": "path-2"
+          }
+        ],
+        "banner": "Tag battle: Mars and Jupiter",
+        "lines": [
+          {
+            "speaker": "rival-barry",
+            "text": "Hey! Sorry I'm late! You're not fighting two commanders alone. Staraptor, go!"
+          }
+        ],
+        "allies": [
+          {
+            "species": "staraptor",
+            "level": 47,
+            "name": "Barry's Staraptor",
+            "spot": "nearest-altar",
+            "moves": [
+              "aerial-ace",
+              "close-combat"
+            ]
+          },
+          {
+            "species": "counter-starter-final",
+            "level": 48,
+            "name": "Barry's starter",
+            "spot": "nearest-altar"
+          }
+        ]
+      },
+      {
+        "trainers": [
+          {
+            "id": "commander-mars",
+            "name": "Commander Mars",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              }
+            ],
+            "lane": "path"
+          },
+          {
+            "id": "commander-jupiter",
+            "name": "Commander Jupiter",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              }
+            ],
+            "lane": "path-2"
+          }
+        ],
+        "banner": "Tag battle: Mars and Jupiter"
+      },
+      {
+        "trainers": [
+          {
+            "id": "commander-mars",
+            "name": "Commander Mars",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              }
+            ],
+            "lane": "path"
+          },
+          {
+            "id": "commander-jupiter",
+            "name": "Commander Jupiter",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              }
+            ],
+            "lane": "path-2"
+          }
+        ],
+        "banner": "Tag battle: Mars and Jupiter"
+      },
+      {
+        "trainers": [
+          {
+            "id": "commander-mars",
+            "name": "Commander Mars",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              },
+              {
+                "species": "purugly",
+                "level": 46,
+                "boss": true,
+                "moves": [
+                  {
+                    "move": "body-slam",
+                    "every": 6
+                  }
+                ]
+              }
+            ],
+            "lane": "path"
+          },
+          {
+            "id": "commander-jupiter",
+            "name": "Commander Jupiter",
+            "party": [
+              {
+                "species": "bronzor",
+                "level": 44
+              },
+              {
+                "species": "golbat",
+                "level": 44
+              },
+              {
+                "species": "skuntank",
+                "level": 46,
+                "boss": true,
+                "moves": [
+                  {
+                    "move": "night-slash",
+                    "every": 6
+                  }
+                ]
+              }
+            ],
+            "lane": "path-2"
+          }
+        ],
+        "banner": "Tag battle: Mars and Jupiter"
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Galactic Boss Cyrus",
+          "party": [
+            {
+              "species": "houndoom",
+              "level": 45
+            },
+            {
+              "species": "honchkrow",
+              "level": 47
+            }
+          ],
+          "intro": "I am Cyrus. This world is incomplete; emotion is its flaw. With the Red Chain, Dialga and Palkia will shape a new one. You will not stop me.",
+          "lane": "path"
+        },
+        "banner": "Cyrus"
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Galactic Boss Cyrus",
+          "party": [
+            {
+              "species": "honchkrow",
+              "level": 47
+            },
+            {
+              "species": "gyarados",
+              "level": 46
+            }
+          ],
+          "lane": "path"
+        },
+        "banner": "Cyrus"
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Galactic Boss Cyrus",
+          "party": [
+            {
+              "species": "gyarados",
+              "level": 46
+            },
+            {
+              "species": "crobat",
+              "level": 46
+            }
+          ],
+          "lane": "path"
+        },
+        "banner": "Cyrus"
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Galactic Boss Cyrus",
+          "party": [
+            {
+              "species": "weavile",
+              "level": 47,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "night-slash",
+                  "every": 5
+                },
+                {
+                  "move": "ice-shard",
+                  "every": 9
+                }
+              ]
+            }
+          ],
+          "lane": "path"
+        },
+        "banner": "Cyrus's Weavile",
+        "outro": [
+          {
+            "speaker": "galactic-boss",
+            "text": "It does not matter. The chain is complete! Dialga! Palkia! Come forth!",
+            "show": [
+              "dialga",
+              "palkia"
+            ]
+          },
+          {
+            "text": "The sky tears. Dialga and Palkia appear at the altar, and the summit distorts around them.",
+            "show": [
+              "dialga",
+              "palkia"
+            ]
+          },
+          {
+            "text": "A shadow pours out of the rift. Giratina seizes Cyrus and drags him into the portal!",
+            "show": [
+              "giratina-origin"
+            ]
+          },
+          {
+            "speaker": "champion-cynthia",
+            "text": "The Distortion World... Cyrus went in. I'm going after him. Follow me when you are ready."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 6000,
+      "items": {
+        "adamant-orb": 1,
+        "lustrous-orb": 1
+      },
+      "flags": [
+        "spear-pillar-cleared"
+      ]
+    }
+  },
+  "distortion-world": {
+    "name": "Distortion World",
+    "area": "distortion-world",
+    "time": "night",
+    "objective": "defend",
+    "map": "distortion-world",
+    "mapPos": [
+      140,
+      110
+    ],
+    "popup": "cave",
+    "lives": 10,
+    "enemiesFirstWave": 4,
+    "enemiesPerWave": 1,
+    "spawnInterval": 1.5,
+    "placements": 6,
+    "levelCap": 60,
+    "levels": [
+      44,
+      49
+    ],
+    "maxWildLevel": 100,
+    "requires": "spear-pillar",
+    "unlock": {
+      "flags": [
+        "spear-pillar-cleared"
+      ]
+    },
+    "rules": [
+      {
+        "id": "gravity-shift",
+        "every": 2
+      }
+    ],
+    "waves": [
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "haunter",
+          "duskull",
+          "dusclops"
+        ],
+        "count": 4,
+        "levels": [
+          44,
+          49
+        ],
+        "lines": [
+          {
+            "speaker": "champion-cynthia",
+            "text": "This is the Distortion World, Giratina's realm. Gravity does not hold still here. Garchomp will guard the centre while I look for Cyrus."
+          }
+        ],
+        "allies": [
+          {
+            "species": "garchomp",
+            "level": 60,
+            "name": "Cynthia's Garchomp",
+            "spot": [
+              14,
+              4
+            ],
+            "waves": [
+              1,
+              3
+            ],
+            "moves": [
+              "dragon-claw",
+              "earthquake"
+            ]
+          }
+        ]
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "haunter",
+          "duskull",
+          "dusclops"
+        ],
+        "count": 5,
+        "levels": [
+          44,
+          49
+        ]
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "haunter",
+          "duskull",
+          "dusclops"
+        ],
+        "count": 6,
+        "levels": [
+          44,
+          49
+        ],
+        "outro": [
+          {
+            "speaker": "champion-cynthia",
+            "text": "I've found Cyrus's trail. Garchomp, with me! You can hold this on your own now."
+          }
+        ]
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "haunter",
+          "duskull",
+          "dusclops"
+        ],
+        "count": 7,
+        "levels": [
+          44,
+          49
+        ]
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "haunter",
+          "duskull",
+          "dusclops"
+        ],
+        "count": 8,
+        "levels": [
+          44,
+          49
+        ]
+      },
+      {
+        "wild": [
+          "golbat",
+          "crobat",
+          "bronzong",
+          "haunter",
+          "duskull",
+          "dusclops"
+        ],
+        "count": 9,
+        "levels": [
+          44,
+          49
+        ]
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Galactic Boss Cyrus",
+          "party": [
+            {
+              "species": "houndoom",
+              "level": 45
+            },
+            {
+              "species": "honchkrow",
+              "level": 47
+            }
+          ],
+          "intro": "You followed me even here? Then watch the world end."
+        },
+        "banner": "Cyrus again"
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Galactic Boss Cyrus",
+          "party": [
+            {
+              "species": "honchkrow",
+              "level": 47
+            },
+            {
+              "species": "gyarados",
+              "level": 46
+            }
+          ]
+        },
+        "banner": "Cyrus again"
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Galactic Boss Cyrus",
+          "party": [
+            {
+              "species": "weavile",
+              "level": 48,
+              "boss": true,
+              "moves": [
+                {
+                  "move": "night-slash",
+                  "every": 5
+                }
+              ]
+            }
+          ]
+        },
+        "banner": "Cyrus again"
+      },
+      {
+        "trainer": {
+          "id": "galactic-boss",
+          "name": "Giratina",
+          "party": [
+            {
+              "species": "giratina-origin",
+              "level": 70,
+              "boss": true,
+              "catchableUnder": 0.1,
+              "moves": [
+                {
+                  "move": "dragon-claw",
+                  "every": 7
+                }
+              ],
+              "phases": [
+                {
+                  "at": 1,
+                  "vanish": 3
+                },
+                {
+                  "at": 0.6,
+                  "vanish": 3,
+                  "burnNearest": 2,
+                  "moves": [
+                    {
+                      "move": "will-o-wisp",
+                      "every": 12
+                    }
+                  ]
+                },
+                {
+                  "at": 0.3,
+                  "vanish": 3,
+                  "reverseEvery": 10
+                }
+              ]
+            }
+          ],
+          "intro": "Giratina, the Renegade, rises from the void. Its Origin Forme fills the sky."
+        },
+        "banner": "Giratina, Origin Forme",
+        "outro": [
+          {
+            "speaker": "galactic-boss",
+            "text": "So this is the god of this world... and it rejects me too. Leave me. I will find my own way out."
+          },
+          {
+            "speaker": "champion-cynthia",
+            "text": "The Griseous Orb. Giratina keeps its Origin Forme while it holds this. Take it, and come back to Sinnoh with me."
+          }
+        ]
+      }
+    ],
+    "reward": {
+      "money": 8000,
+      "items": {
+        "griseous-orb": 1
+      },
+      "flags": [
+        "distortion-world-cleared"
+      ]
+    }
+  }
+}

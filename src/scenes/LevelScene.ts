@@ -1077,11 +1077,33 @@ export class LevelScene extends Phaser.Scene {
     else talk();
   }
 
+  /** Sprites a cutscene line shows on the altar (or the path's end) while it is up. */
+  private cutsceneSprites: Phaser.GameObjects.Sprite[] = [];
+
+  private showCutsceneSprites(names: string[]): void {
+    for (const s of this.cutsceneSprites) s.destroy();
+    this.cutsceneSprites = [];
+    const stage = this.state.map.points?.altar ?? this.state.map.path[this.state.map.path.length - 1]!;
+    const { px, py } = this.tilePixel(stage[0], stage[1]);
+    names.forEach((name, i) => {
+      const species = findPokemonId(name);
+      if (species === undefined) return;
+      const dex = spriteFolder(species, false);
+      if (!isLoaded(dex)) return;
+      const x = px + (i - (names.length - 1) / 2) * 56;
+      const sprite = createPmdSprite(this, dex, x, py + SPRITE_Y_OFFSET, 'Idle', Direction.Down).setDepth(2000).setScale(1.5).setAlpha(0);
+      syncShadow(sprite);
+      this.tweens.add({ targets: sprite, alpha: 1, duration: 400 });
+      this.cutsceneSprites.push(sprite);
+    });
+  }
+
   /** Shows scripted dialogue lines in the bottom box; the sim pauses until the last one is dismissed. */
   private showLines(lines: DialogueLine[]): void {
     if (!this.dialogue) return;
     this.paused = true;
     this.selectedBall = null;
+    if (lines[0]?.show) this.showCutsceneSprites(lines[0].show);
     const pages = lines.map((line) => ({
       text: line.text,
       ...(line.speaker ? { portrait: trainerTextureKey(line.speaker) } : {}),
@@ -1096,6 +1118,8 @@ export class LevelScene extends Phaser.Scene {
         : {}),
     }));
     this.dialogue.show(pages, () => {
+      for (const s of this.cutsceneSprites) s.destroy();
+      this.cutsceneSprites = [];
       if (!this.learnDialog?.isOpen && !this.evolutionDialog?.isOpen && !this.startMenu?.isOpen && !this.vsIntro?.isOpen) this.paused = false;
     });
   }

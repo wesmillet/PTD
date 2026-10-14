@@ -35,6 +35,16 @@ which maps the maps session still needs to build. Updated per commit.
   flyover, rift. One scene re-casts every 90 s; sprites load in the
   background with a two-second skip.
 
+- **Team Galactic finale** (`src/data/levels/20-finale.json`): Spear Pillar
+  (twelve waves: grunts up both stairways, the Mars and Jupiter tag battle
+  with Barry's Staraptor and starter as free towers from wave 5, Cyrus's
+  team with Weavile as the boss, the Dialga/Palkia/Giratina cutscene with
+  the sprites on the altar; the orbs and 6,000 as the reward) and the
+  Distortion World (gravity shifts every other wave, Cynthia's Garchomp on
+  the central spot for waves 1 to 3, Cyrus again, Giratina Origin as a
+  three-phase boss with Shadow Force, Will-O-Wisp and gravity every 10 s,
+  catchable under 10 %; night cave for Dusk Balls; the Griseous Orb).
+
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
@@ -46,6 +56,8 @@ which maps the maps session still needs to build. Updated per commit.
 - Title scene stand-ins: Professor Rowan uses the `gentleman` overworld
   sheet and Looker the `policeman` one (no Rowan or Looker sheets exist).
   The chase runs the route polyline forward and back (the map has no loop).
+- Dialga and Palkia appear in the cutscene only (the Origin secret level
+  is item 9 territory). Cyrus's dialogue is a short paraphrase.
 - The Snowpoint hail pulse fires at every wave start (the design ties it to
   Abomasnow; the rule has no way to know who is on the field yet).
 
