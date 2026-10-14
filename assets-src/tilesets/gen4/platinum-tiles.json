@@ -30,6 +30,16 @@
    "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
    "description": "Platinum texture set 017, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
   },
+  "pt-ruins": {
+   "file": "assets-src/tilesets/gen4/pt-ruins.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 055, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
+  "pt-vroad": {
+   "file": "assets-src/tilesets/gen4/pt-vroad.png",
+   "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
+   "description": "Platinum texture set 070, decoded by scripts/nsbtx.py and tiled by scripts/build-platinum-tiles.py"
+  },
   "pt-coronet": {
    "file": "assets-src/tilesets/gen4/pt-coronet.png",
    "artist": "Game Freak (Pok\u00e9mon Platinum map textures, via pret/pokeplatinum)",
@@ -922,6 +932,256 @@
    "source": "pt-stark",
    "col": 4,
    "row": 7,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-floor",
+   "source": "pt-ruins",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-ruins-floor-b",
+   "source": "pt-ruins",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-ruins-steps",
+   "source": "pt-ruins",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-ruins-bridge",
+   "source": "pt-ruins",
+   "col": 0,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-ruins-water",
+   "source": "pt-ruins",
+   "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-ruins-wall",
+   "source": "pt-ruins",
+   "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-wall-s",
+   "source": "pt-ruins",
+   "col": 4,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-wall-e",
+   "source": "pt-ruins",
+   "col": 5,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-wall-w",
+   "source": "pt-ruins",
+   "col": 6,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-wall-c",
+   "source": "pt-ruins",
+   "col": 7,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-door",
+   "source": "pt-ruins",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-rocks",
+   "source": "pt-ruins",
+   "col": 0,
+   "row": 7,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-ruins-stairs",
+   "source": "pt-ruins",
+   "col": 4,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-vroad-floor",
+   "source": "pt-vroad",
+   "col": 0,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-vroad-floor-b",
+   "source": "pt-vroad",
+   "col": 1,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-vroad-steps",
+   "source": "pt-vroad",
+   "col": 0,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-vroad-bridge",
+   "source": "pt-vroad",
+   "col": 0,
+   "row": 3,
+   "w": 4,
+   "h": 4,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-vroad-water",
+   "source": "pt-vroad",
+   "col": 2,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "ground",
+   "solid": false
+  },
+  {
+   "id": "pt-vroad-wall",
+   "source": "pt-vroad",
+   "col": 3,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-vroad-wall-s",
+   "source": "pt-vroad",
+   "col": 4,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-vroad-wall-e",
+   "source": "pt-vroad",
+   "col": 5,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-vroad-wall-w",
+   "source": "pt-vroad",
+   "col": 6,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-vroad-door",
+   "source": "pt-vroad",
+   "col": 2,
+   "row": 1,
+   "w": 2,
+   "h": 2,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-vroad-rocks",
+   "source": "pt-vroad",
+   "col": 7,
+   "row": 0,
+   "w": 1,
+   "h": 1,
+   "kind": "deco",
+   "solid": true
+  },
+  {
+   "id": "pt-vroad-boulder",
+   "source": "pt-vroad",
+   "col": 4,
+   "row": 1,
    "w": 2,
    "h": 2,
    "kind": "deco",

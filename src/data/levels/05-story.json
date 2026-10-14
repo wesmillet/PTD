@@ -1981,7 +1981,7 @@
     "area": "victory-road",
     "time": "day",
     "objective": "defend",
-    "map": "mt-coronet",
+    "map": "victory-road",
     "mapPos": [
       236,
       96

@@ -685,6 +685,101 @@ def temporal_spire():
     return m
 
 
+# A walled cave room on one of the Platinum cave texture sets: floor,
+# a lighter floor under the path, wall bands top and bottom, rocks.
+def cave_room(name, seed, path, src, floor='floor', path_floor='floor-b', extra=None):
+    m = blank(name, seed, path, road=None)
+    m.theme = 'cave'
+    m.floor(f'pt-{src}-{floor}', 0, 0, 29, 13)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = f'pt-{src}-{path_floor}-0'
+    for x in range(0, 30):
+        m.stamp(f'pt-{src}-wall-s', x, 0, must=False)
+        m.stamp(f'pt-{src}-wall', x, 13, must=False)
+    if extra:
+        extra(m)
+    pick_spots(m, 10)
+    return m
+
+
+# Victory Road: the olive cave before the League, an underground river
+# with a plank bridge, Strength boulders and rubble.
+def victory_road():
+    def deco(m):
+        m.floor('pt-vroad-water', 10, 10, 16, 12)
+        m.wall(10, 10, 16, 12)
+        m.floor('pt-vroad-bridge', 12, 10, 13, 12)
+        m.floor('pt-vroad-water', 22, 1, 29, 2)
+        m.wall(22, 1, 29, 2)
+        for x, y in ((3, 2), (18, 5), (25, 10), (8, 11)):
+            m.stamp('pt-vroad-boulder', x, y, must=False)
+        m.stamp('pt-vroad-door', 27, 11, must=False)
+        m.scatter(['pt-vroad-rocks'], 8, (0, 1, 29, 12))
+    return cave_room('victory-road', 416, [(0, 4), (7, 4), (7, 8), (13, 8), (13, 3), (20, 3), (20, 8), (29, 8)], 'vroad', extra=deco)
+
+
+# Turnback Cave: the ruins set in the dark, pillar rooms joined by doors;
+# the path winds past the stair hole where Giratina waits.
+def turnback_cave():
+    def deco(m):
+        for x, y in ((4, 2), (24, 2), (4, 10), (24, 10)):
+            m.stamp('pt-ruins-door', x, y, must=False)
+        m.stamp('pt-ruins-stairs', 13, 5, must=False)
+        for x, y in ((9, 1), (19, 1), (9, 11), (19, 11)):
+            m.stamp('pt-spear-pillar-broken', x, y, must=False)
+        m.scatter(['pt-ruins-rocks'], 6, (0, 1, 29, 12))
+    def deco2(m):
+        m.extra_paths = [('path-2', [(0, 12), (29, 12)])]
+        cells = lane(m, m.extra_paths[0][1], road=False)
+        for (x, y) in cells:
+            m.ground[y][x] = 'pt-ruins-floor-b-0'
+        deco(m)
+    return cave_room('turnback-cave', 417, [(0, 7), (6, 7), (6, 3), (11, 3), (11, 9), (18, 9), (18, 3), (23, 3), (23, 7), (29, 7)], 'ruins', floor='floor', path_floor='floor-b', extra=deco2)
+
+
+# The Regi chambers: three small ruins rooms, each dressed for its Regi.
+def regi_chamber(name, seed, kind):
+    def deco(m):
+        if kind == 'rock':
+            for x, y in ((3, 2), (24, 2), (12, 10), (20, 10)):
+                m.stamp('pt-mine-boulder', x, y, must=False)
+            m.scatter(['pt-mine-rocks'], 8, (0, 1, 29, 12))
+        elif kind == 'ice':
+            m.floor('pt-temple-ice-a', 3, 2, 9, 5)
+            m.floor('pt-temple-ice-b', 18, 8, 25, 11)
+            m.stamp('bw-ice-block', 12, 2, must=False)
+            m.stamp('bw-ice-rock', 26, 2, must=False)
+        else:
+            for x, y in ((3, 2), (24, 2), (12, 10)):
+                m.stamp('pt-mine-panel', x, y, must=False)
+            m.stamp('pt-mine-lift', 24, 10, must=False)
+            m.scatter(['pt-mine-rocks'], 4, (0, 1, 29, 12))
+        m.stamp('pt-ruins-door', 14, 0, must=False)
+    path = [(0, 9), (6, 9), (6, 4), (14, 4), (14, 9), (22, 9), (22, 4), (29, 4)]
+    return cave_room(name, seed, path, 'ruins', floor='floor-b' if kind == 'ice' else 'floor', path_floor='floor' if kind == 'ice' else 'floor-b', extra=deco)
+
+
+# Hall of Origin: one straight stair of white stone up into the sky, grey
+# pillars on both sides and cloud below; Arceus at the top.
+def hall_of_origin():
+    m = blank('hall-of-origin', 418, [(10, 13), (10, 11), (19, 11), (19, 7), (10, 7), (10, 3), (15, 3), (15, 1)], road=None)
+    m.floor('bw-void', 0, 0, 29, 13)
+    m.floor('pt-spear-grey', 8, 0, 21, 13)
+    for (x, y) in m.path_cells:
+        m.ground[y][x] = 'pt-spear-grey-steps-' + str(x % 2)
+    m.floor('pt-spear-altar', 14, 0, 15, 1)
+    for y in (0, 4, 8):
+        m.stamp('pt-spear-pillar', 8, y, must=False)
+        m.stamp('pt-spear-pillar', 20, y, must=False)
+    for x, y in ((5, 2), (22, 2), (4, 9), (23, 9), (1, 5), (26, 5), (3, 12), (25, 12)):
+        m.stamp('pt-spear-cloud', x, y, must=False)
+    m.wall(0, 0, 7, 13)
+    m.wall(22, 0, 29, 13)
+    pick_spots(m, 10)
+    m.points = [('altar', 'stage', 15, 0)]
+    return m
+
+
 # Distortion World on Platinum's own textures: platforms of pink cracked
 # rock on black nothing, blue-lit rock where the path runs, sideways
 # waterfalls of pale "water", the blue trees, boulders and dark plants.
@@ -1197,7 +1292,11 @@ def great_marsh():
     return m
 
 
-MAPS.update({'temporal-spire': temporal_spire, 'snowpoint-temple': snowpoint_temple, 'mt-coronet': mt_coronet, 'stark-mountain': stark_mountain,
+MAPS.update({'victory-road': victory_road, 'turnback-cave': turnback_cave, 'hall-of-origin': hall_of_origin,
+             'regirock-chamber': lambda: regi_chamber('regirock-chamber', 419, 'rock'),
+             'regice-chamber': lambda: regi_chamber('regice-chamber', 420, 'ice'),
+             'registeel-chamber': lambda: regi_chamber('registeel-chamber', 421, 'steel'),
+             'temporal-spire': temporal_spire, 'snowpoint-temple': snowpoint_temple, 'mt-coronet': mt_coronet, 'stark-mountain': stark_mountain,
              'oreburgh-gate': lambda: oreburgh_cave('oreburgh-gate', 414, [(0, 2), (9, 2), (9, 8), (19, 8), (19, 3), (29, 3)], False),
              'oreburgh-mine-1f': lambda: oreburgh_cave('oreburgh-mine-1f', 415, [(0, 10), (7, 10), (7, 3), (15, 3), (15, 9), (23, 9), (23, 4), (29, 4)], True),
              'lake-verity-island': lake_verity_island, 'lake-valor': lake_valor, 'lake-acuity': lake_acuity,

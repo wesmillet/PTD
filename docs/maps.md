@@ -268,6 +268,9 @@ since the gyms are interiors in the games and Hisui has no map render):
 | `lake-valor`, `lake-acuity` | the other two lakes |
 | `valley-windworks`, `eterna-forest`, `old-chateau`, `iron-island`, `galactic-hq`, `great-marsh` | story set pieces |
 | `ss-libra`, `flower-paradise`, `fullmoon-island`, `newmoon-island` | mystery events |
+| `spear-pillar`, `distortion-world`, `temporal-spire`, `hall-of-origin` | on Platinum's Spear Pillar and Distortion World textures |
+| `galactic-hq`, `snowpoint-temple`, `mt-coronet`, `stark-mountain`, `victory-road`, `turnback-cave`, `oreburgh-gate`, `oreburgh-mine-1f` | on Platinum's own interior and cave textures |
+| `regirock-chamber`, `regice-chamber`, `registeel-chamber` | the Regi rooms on the ruins textures |
 
 Every map registers itself: `src/data/maps.ts` globs `src/data/maps/*.json`,
 so a new file is a new map with no code change.
@@ -322,9 +325,10 @@ pillar sprites.
 
 Which texture set a place uses comes from `include/data/map_headers.h`
 (`areaDataArchiveID`) and `res/field/area_data/area_data_NNN.json`
-(`mapTextureSet`). Built so far: Spear Pillar (set 059), the Distortion
-World (073), Galactic HQ (057), Snowpoint Temple (064), Mt. Coronet (068),
-the Oreburgh caves (054) and Stark Mountain (017). Gym interiors stay as
+(`mapTextureSet`). Built so far: Spear Pillar, the Temporal Spire and the Hall of Origin (set
+059), the Distortion World (073), Galactic HQ (057), Snowpoint Temple (064),
+Mt. Coronet (068), the Oreburgh caves (054), Stark Mountain (017), Victory
+Road (070) and the ruins set (055) for Turnback Cave and the Regi chambers. Gym interiors stay as
 BW outdoor yards on purpose.
 
 To add a place: find its set, run `python3 -I scripts/nsbtx.py <set.nsbtx>

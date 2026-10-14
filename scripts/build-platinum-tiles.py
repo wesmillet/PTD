@@ -133,6 +133,35 @@ LOCATIONS = {
         ('hanger', 2, 'rocks', 'deco', True),
         ('tree3_01', 1, 'palm', 'deco', True),
     ]),
+    'ruins': (55, [
+        ('dun_floor', 2, 'floor', 'ground', False),          # grey-green stone
+        ('dun_floor2', 2, 'floor-b', 'ground', False),       # tan stone
+        ('dun_step', 2, 'steps', 'ground', False),
+        ('dun_hashi', 2, 'bridge', 'ground', False),
+        ('dun_sea', 2, 'water', 'ground', False),
+        ('dun_wall_n', 2, 'wall', 'deco', True),
+        ('dun_wall_s', 2, 'wall-s', 'deco', True),
+        ('dun_wall_e', 2, 'wall-e', 'deco', True),
+        ('dun_wall_w', 2, 'wall-w', 'deco', True),
+        ('dun_wall_c', 2, 'wall-c', 'deco', True),
+        ('dun_dhole', 2, 'door', 'deco', True),
+        ('dun_hanger', 2, 'rocks', 'deco', True),
+        ('dun_level', 2, 'stairs', 'deco', True),
+    ]),
+    'vroad': (70, [
+        ('dun_floor', 2, 'floor', 'ground', False),          # olive cave floor
+        ('dun_floor2', 2, 'floor-b', 'ground', False),
+        ('dun_step', 2, 'steps', 'ground', False),
+        ('dun_hashi', 2, 'bridge', 'ground', False),
+        ('dun_sea', 2, 'water', 'ground', False),
+        ('dun_wall_n', 2, 'wall', 'deco', True),
+        ('dun_wall_s', 2, 'wall-s', 'deco', True),
+        ('dun_wall_e', 2, 'wall-e', 'deco', True),
+        ('dun_wall_w', 2, 'wall-w', 'deco', True),
+        ('dun_dhole', 2, 'door', 'deco', True),
+        ('dun_hanger', 2, 'rocks', 'deco', True),
+        ('dun_srock', 2, 'boulder', 'deco', True),
+    ]),
     'coronet': (68, [
         ('dun_floor', 2, 'floor', 'ground', False),
         ('dun_floor2', 2, 'floor-b', 'ground', False),
