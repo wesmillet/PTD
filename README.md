@@ -51,8 +51,8 @@ cleared; defend levels when you win.
 - Place a Pokémon by clicking its party slot and then a blue tile; drag a
   placed Pokémon to move it (also mid-wave); tap it for its panel.
 - Click a ball in the ball bar, then a wild Pokémon, to throw it.
-- Between levels: Party / PC (swap, sort, Rare Candy), Shop, Pokédex, Save
-  (save code export and import, New Game) and Credits.
+- Between levels: Party / PC (swap, sort, Rare Candy), Shop, Save (save code
+  export and import, New Game) and Credits.
 - The game saves itself after every level and change. URL flags:
   `?level=<id>` opens a level, `&seed=<n>` replays the same waves,
   `&shiny=1` makes every spawn shiny, `?party=debug` loads the test party.
@@ -74,7 +74,10 @@ node scripts/build-pokedata.ts    # writes src/data/*.json
 ```
 
 The CSVs are never committed. Typed accessors live in `src/data/pokedata.ts`.
-`node scripts/level-species.mjs` lists every species the current levels need
+Box icons (Gen 5, from github.com/PokeAPI/sprites) are fetched the same way:
+`scripts/fetch-icons.sh <id>...` with plain species ids. Pass
+`node scripts/level-species.mjs` output to `scripts/fetch-sprites.sh`;
+`scripts/level-species.mjs` lists every species the current levels need
 (with evolution lines); pass its output to `scripts/fetch-sprites.sh`, which
 also regenerates `spriteIndex.json`, `spriteFolders.json` and `credits.json`.
 

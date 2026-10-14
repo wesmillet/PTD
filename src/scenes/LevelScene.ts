@@ -645,6 +645,7 @@ export class LevelScene extends Phaser.Scene {
     this.syncViews();
     this.drawOverlay();
     this.hud.setPaused(this.paused);
+    this.hud.tick(delta);
     this.hud.update(this.state, runtime.gameSpeed, this.selectedPartyIndex, this.selectedBall);
     this.panel?.refresh();
   }

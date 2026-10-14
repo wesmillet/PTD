@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import type { LevelSummary } from '../sim/level';
+import { iconTextureKey } from '../game/runtime';
 import { Button } from './button';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
 
@@ -37,8 +38,9 @@ export function showSummary(scene: Phaser.Scene, summary: LevelSummary & { money
   );
   let y = py - panelH / 2 + 90;
   const portrait = (species: number, x: number, cy: number) => {
-    const key = `portrait-${String(species).padStart(4, '0')}`;
-    if (scene.textures.exists(key)) container.add(scene.add.image(x, cy, key).setScale(0.6));
+    const icon = iconTextureKey(species, 0);
+    const key = scene.textures.exists(icon) ? icon : `portrait-${String(species).padStart(4, '0')}`;
+    if (scene.textures.exists(key)) container.add(scene.add.image(x, cy, key).setScale(key === icon ? 1 : 0.6));
   };
   for (const p of summary.party) {
     const name = p.name.charAt(0).toUpperCase() + p.name.slice(1);

@@ -59,6 +59,14 @@ The fetch script copies Normal, Happy, Sad, Angry and Surprised into
 for dialogue. Shiny sprites for the base form live at
 `sprite/<dexnum>/0000/0001/` and are copied to `public/assets/sprites/<dexnum>/shiny/`.
 
+Small Pokémon icons (party strip, Party / PC lists, starter choice, level
+summary) are the Gen 5 Black/White box icons from github.com/PokeAPI/sprites
+(`sprites/pokemon/versions/generation-v/icons/`, with the `animated/`
+two-frame versions so they bob; `generation-viii/icons/` is the fallback for
+forms without a Gen 5 icon, such as Hisuian forms). `scripts/fetch-icons.sh`
+sparse-checks-out only the shipped species into `public/assets/icons/`. The
+SpriteCollab portraits stay for the large Pokémon panel.
+
 Pokémon stats, moves, types, learnsets, and evolution data: bundle a static JSON
 dump (PokeAPI data, Gen 4 ruleset) into `src/data/`. Do not call PokeAPI at
 runtime.
@@ -187,9 +195,8 @@ range, from a seeded RNG so a level replays identically for the same seed.
   placed Pokémon to full HP between waves, from its panel) and Rare Candy
   (one level, not past 100, from the Party screen; triggers move learning
   and evolution). Evolution stones, TMs and vitamins come later.
-- Pokédex tracks seen (on spawn), caught, and shiny caught per species. The
-  Pokédex screen shows the portrait for caught species and a silhouette for
-  seen-only ones.
+- The save tracks seen (on spawn), caught, and shiny caught per species for
+  later features; there is no Pokédex screen.
 
 ### Save data
 - Saved to localStorage after every level and every party, PC, shop or

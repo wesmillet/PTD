@@ -40,7 +40,8 @@ palette: `src/ui/theme.css` defines it as CSS variables and
 - `.ptd-moves` list of `.ptd-move` rows (`.active` for the selected one),
   each with `.ptd-name`, a `typeBadge(name)` (`.ptd-type`) and `.ptd-meta`.
 - `.ptd-actions` button row; `button.ptd-close` top-right close.
-- `.ptd-status` chips; `.ptd-grid` + `.ptd-card` for the Pokédex.
+- `.ptd-icon` 32 px box icon (`iconImage(url)`), used wherever a Pokémon
+  appears small; `.ptd-status` chips; `.ptd-grid` + `.ptd-card` for grids.
 
 ## Components (canvas)
 - `Button` (`src/ui/button.ts`): rounded frame with the double border.
@@ -51,5 +52,5 @@ palette: `src/ui/theme.css` defines it as CSS variables and
 
 ## Screens
 Title (`TitleScene`) → Level select (`LevelSelectScene`, with Party / PC,
-Shop, Pokédex, Save, Credits overlays) → Level (`LevelScene`, with the
+Shop, Save, Credits overlays) → Level (`LevelScene`, with the
 Pokémon panel, replace dialog, evolution prompt and summary).

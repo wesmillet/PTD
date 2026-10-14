@@ -7,7 +7,7 @@ import { evolutionOptions } from '../sim/evolution';
 import { moveToBox, moveToParty, sortMonsters, MAX_PARTY, type GameState, type SortKey } from '../sim/game';
 import type { Monster } from '../sim/monster';
 import { capitalizeName } from '../sim/names';
-import { capitalize, ensureOverlayStyles, isolateFromGame } from './domOverlay';
+import { capitalize, ensureOverlayStyles, iconImage, isolateFromGame } from './domOverlay';
 import { replaceMove, useRareCandy } from '../sim/items';
 import { evolveMonster } from '../sim/evolution';
 import { learnableAt } from '../sim/moves';
@@ -17,6 +17,7 @@ import { EvolutionDialog } from './evolutionDialog';
 
 export interface PartyScreenHooks {
   portraitUrl: (species: number) => string | undefined;
+  iconUrl: (species: number) => string | undefined;
   onChange: () => void;
   onClose: () => void;
 }
@@ -116,13 +117,7 @@ export class PartyScreen {
       const li = document.createElement('li');
       li.className = `ptd-move${mon === this.selected ? ' active' : ''}`;
       li.style.gridTemplateColumns = 'auto 1fr auto';
-      const img = document.createElement('img');
-      img.className = 'ptd-portrait';
-      img.style.width = '40px';
-      img.style.height = '40px';
-      img.alt = '';
-      const url = this.hooks.portraitUrl(mon.species);
-      if (url) img.src = url;
+      const img = iconImage(this.hooks.iconUrl(mon.species)) ?? document.createElement('span');
       const name = document.createElement('span');
       name.className = 'ptd-name';
       name.textContent = `${capitalize(mon.name)}${mon.shiny ? ' ★' : ''}  Lv ${mon.level}`;

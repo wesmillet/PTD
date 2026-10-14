@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BALL_IDS, BALLS } from '../sim/catch';
 import type { LevelState } from '../sim/level';
 import { getGame } from '../game/session';
+import { iconInfo, iconTextureKey } from '../game/runtime';
 import config from '../data/config.json';
 import { Button } from './button';
 import { COLORS, TEXT, TEXT_BIG, TEXT_DIM } from './styles';
@@ -18,6 +19,7 @@ interface Slot {
   species: number;
   frame: Phaser.GameObjects.Rectangle;
   image?: Phaser.GameObjects.Image;
+  animated: boolean;
   level: Phaser.GameObjects.Text;
   hp: Phaser.GameObjects.Graphics;
   placed: Phaser.GameObjects.Text;
@@ -61,6 +63,10 @@ export class Hud {
   private slots: Slot[] = [];
   private readonly balls: BallButton[] = [];
   private paused = false;
+  private iconFrame: 0 | 1 = 0;
+  private iconTimer = 0;
+  /** Box icons alternate frames at the Gen 5 rate (170 ms). */
+  private static readonly ICON_FRAME_MS = 170;
 
   constructor(scene: Phaser.Scene, state: LevelState, callbacks: HudCallbacks) {
     this.scene = scene;
@@ -123,20 +129,39 @@ export class Hud {
     state.party.forEach((entry, i) => {
       const x = 86 + i * 54;
       const y = this.bottomY + 24;
-      const dex = String(entry.mon.species).padStart(4, '0');
+      const species = entry.mon.species;
       const frame = this.scene.add.rectangle(x, y + 6, 46, 46, COLORS.panel2).setStrokeStyle(2, COLORS.borderOuter).setDepth(1001).setInteractive({ useHandCursor: true });
       frame.on('pointerdown', (_p: Phaser.Input.Pointer, _x: number, _y: number, event: Phaser.Types.Input.EventData) => {
         event.stopPropagation();
         this.callbacks.onPartySlot(i);
       });
-      const image = this.scene.textures.exists(`portrait-${dex}`) ? this.scene.add.image(x, y + 6, `portrait-${dex}`).setDepth(1002) : undefined;
+      // Gen 5 box icon (PokeAPI sprites); falls back to the SpriteCollab portrait.
+      const info = iconInfo(species);
+      const iconKey = iconTextureKey(species, this.iconFrame);
+      const portraitKey = `portrait-${String(species).padStart(4, '0')}`;
+      const image = this.scene.textures.exists(iconKey)
+        ? this.scene.add.image(x, y + 4, iconKey).setDepth(1002)
+        : this.scene.textures.exists(portraitKey)
+          ? this.scene.add.image(x, y + 6, portraitKey).setDepth(1002)
+          : undefined;
       const level = this.scene.add.text(x + 22, y - 17, '', { ...TEXT_DIM, fontSize: '10px', color: '#f4ecd8' }).setOrigin(1, 0).setDepth(1003);
       const placed = this.scene.add.text(x - 22, y - 17, '', { ...TEXT_DIM, fontSize: '10px', color: '#9ad0ff' }).setOrigin(0, 0).setDepth(1003);
       const hp = this.scene.add.graphics().setDepth(1003);
-      const slot: Slot = { species: entry.mon.species, frame, level, hp, placed };
+      const slot: Slot = { species, frame, level, hp, placed, animated: info.animatedIcon && this.scene.textures.exists(iconKey) };
       if (image) slot.image = image;
       this.slots.push(slot);
     });
+  }
+
+  /** Call once per frame with the frame delta so party icons bob. */
+  tick(deltaMs: number): void {
+    this.iconTimer += deltaMs;
+    if (this.iconTimer < Hud.ICON_FRAME_MS) return;
+    this.iconTimer -= Hud.ICON_FRAME_MS;
+    this.iconFrame = this.iconFrame === 0 ? 1 : 0;
+    for (const slot of this.slots) {
+      if (slot.animated && slot.image) slot.image.setTexture(iconTextureKey(slot.species, this.iconFrame));
+    }
   }
 
   update(state: LevelState, gameSpeed: number, selectedPartyIndex: number | null = null, selectedBall: string | null = null): void {

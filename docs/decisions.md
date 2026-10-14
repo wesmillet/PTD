@@ -26,12 +26,11 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   format and tilesets).
 - The starter is chosen once before Route 201; Pokémon Tower Defense gave
   the three Sinnoh starters at level 5 the same way.
-- The credits screen lists "RawAsset" verbatim as asked; I could not tell
-  what it refers to, so its line is just the name (edit
-  `GENERAL_CREDITS` in `src/ui/creditsScreen.ts`).
-- The Gen 5 tileset credit (Kyle-Dove, in `assets-src/tilesets/gen5/
-  CREDITS.txt`) is not on the credits screen yet because the tileset is not
-  shipped in the build; the maps branch should add it when tiles ship.
+- The "RawAsset" credits entry was removed on the maps branch (it was not
+  used); the Gen 5 tileset credits (Kyle-Dove, UltimoSpriter) took its place.
+- The Gen 5 tileset credits (`assets-src/tilesets/gen5/CREDITS.txt`, also
+  in `src/data/tiles.json`) are shown on the credits screen since the maps
+  branch ships the packed tiles.
 - SpriteCollab credit ids are resolved to names with the repository's
   `credit_names.txt`, kept in `assets-src/spritecollab/` so the index can be
   rebuilt without a checkout.
@@ -40,3 +39,10 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   only portraits. The all-at-once load was ~730 requests and failed on
   GitHub Pages. Anything missing at runtime (a surprise evolution) loads on
   demand, and a failed level load shows a Retry button.
+- The Pokédex page was removed on request; the seen/caught/shiny record
+  stays in the save for later features.
+- Box icons come from PokeAPI/sprites Gen 5 icons: the two-frame APNG is
+  used directly in DOM screens (browsers animate it) and split into two PNG
+  frames for the canvas party strip, which alternates them every 170 ms like
+  Black/White. Portraits stay for the large Pokémon panel and the evolution
+  prompt.

@@ -7,7 +7,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0042": {
     "shiny": true,
@@ -17,7 +19,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0054": {
     "shiny": true,
@@ -27,7 +31,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0055": {
     "shiny": true,
@@ -37,7 +43,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0063": {
     "shiny": true,
@@ -47,7 +55,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0064": {
     "shiny": true,
@@ -57,7 +67,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0065": {
     "shiny": true,
@@ -67,14 +79,18 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0074": {
     "shiny": true,
     "portraits": [
       "Happy",
       "Normal"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0075": {
     "shiny": true,
@@ -82,21 +98,27 @@
       "Angry",
       "Normal",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0076": {
     "shiny": true,
     "portraits": [
       "Normal",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0095": {
     "shiny": true,
     "portraits": [
       "Normal",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0169": {
     "shiny": true,
@@ -106,13 +128,17 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0208": {
     "shiny": true,
     "portraits": [
       "Normal"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0387": {
     "shiny": true,
@@ -122,7 +148,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0388": {
     "shiny": true,
@@ -132,7 +160,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0389": {
     "shiny": true,
@@ -142,7 +172,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0390": {
     "shiny": true,
@@ -152,7 +184,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0391": {
     "shiny": true,
@@ -162,7 +196,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0392": {
     "shiny": true,
@@ -172,7 +208,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0393": {
     "shiny": true,
@@ -182,7 +220,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0394": {
     "shiny": true,
@@ -192,7 +232,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0395": {
     "shiny": true,
@@ -202,7 +244,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0396": {
     "shiny": true,
@@ -212,7 +256,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0397": {
     "shiny": true,
@@ -222,7 +268,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0398": {
     "shiny": true,
@@ -232,7 +280,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0399": {
     "shiny": true,
@@ -242,19 +292,25 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0400": {
     "shiny": true,
     "portraits": [
       "Normal"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0401": {
     "shiny": true,
     "portraits": [
       "Normal"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0402": {
     "shiny": true,
@@ -264,7 +320,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0403": {
     "shiny": true,
@@ -274,7 +332,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0404": {
     "shiny": true,
@@ -284,7 +344,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0405": {
     "shiny": true,
@@ -294,7 +356,9 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   },
   "0491": {
     "shiny": true,
@@ -304,6 +368,8 @@
       "Normal",
       "Sad",
       "Surprised"
-    ]
+    ],
+    "icon": true,
+    "animatedIcon": true
   }
 }

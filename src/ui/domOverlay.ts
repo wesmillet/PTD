@@ -16,6 +16,16 @@ export function portraitImage(url: string | undefined, small = true): HTMLImageE
   return img;
 }
 
+/** A 32x32 box icon (animated APNG where available); null when the species has none. */
+export function iconImage(url: string | undefined): HTMLImageElement | null {
+  if (!url) return null;
+  const img = document.createElement('img');
+  img.className = 'ptd-icon';
+  img.alt = '';
+  img.src = url;
+  return img;
+}
+
 /** A type badge coloured by the CSS variable for that type. */
 export function typeBadge(name: string): HTMLSpanElement {
   const span = document.createElement('span');
