@@ -15,6 +15,8 @@ export interface DebugPanelHooks {
   setPartyLevel: (level: number) => void;
   setTimeOfDay: (time: TimeOfDay) => void;
   reroll: () => void;
+  /** Opens the in-game map editor (maps branch); see docs/maps.md. */
+  openMapEditor?: () => void;
 }
 
 interface SliderDef {
@@ -148,6 +150,14 @@ export class DebugPanel {
         this.refresh();
       }),
     );
+    if (this.hooks.openMapEditor) {
+      buttons.appendChild(
+        this.button('Map editor', () => {
+          this.hooks.openMapEditor?.();
+          this.toggle();
+        }),
+      );
+    }
     this.root.appendChild(buttons);
     const note = document.createElement('div');
     note.style.cssText = 'color:#9a9ab0;margin-top:8px';
