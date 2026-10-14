@@ -27,6 +27,14 @@ which maps the maps session still needs to build. Updated per commit.
   rockfall rule and its Coal Badge reward (Stealth Rock, Rock Smash). Badge
   perks: placements = 2 + badges outside demo mode.
 
+- **Title screen** (`src/scenes/TitleScene.ts`, `src/ui/diorama.ts`): the
+  `title` map behind the menu with a 60 s pan at 1.36x zoom, real-clock tint
+  (dawn, dusk, night with route glow), one weather effect per load (none,
+  petals, rain, snow on the ledge) and the cast scenes on the stage points:
+  spar, chase (with role flips), fishing trip, picnic, Galactic business,
+  flyover, rift. One scene re-casts every 90 s; sprites load in the
+  background with a two-second skip.
+
 ## Stubbed or simplified
 
 - Dialogue riddles are plain option rows in the text box (keys 1 to 4).
@@ -35,6 +43,9 @@ which maps the maps session still needs to build. Updated per commit.
   the right answer lights two lanterns.
 - Gym trainer names are made up (the Platinum gyms' trainers are not in the
   repo's data); their classes and Pokémon follow the design table.
+- Title scene stand-ins: Professor Rowan uses the `gentleman` overworld
+  sheet and Looker the `policeman` one (no Rowan or Looker sheets exist).
+  The chase runs the route polyline forward and back (the map has no loop).
 - The Snowpoint hail pulse fires at every wave start (the design ties it to
   Abomasnow; the rule has no way to know who is on the field yet).
 

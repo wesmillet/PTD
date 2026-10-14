@@ -207,3 +207,13 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   saves; demo saves keep the level's six.
 - Pastoria sends every even wave down the water lane (`path-water`), the
   high-tide waves, so the water spots matter.
+
+## Phase 8 item 3 (title screen)
+
+- The title uses two cameras: the main one zooms to 1.36x and pans the
+  diorama, a second camera renders the menu, title and badges unscaled.
+- The menu replaces the old Continue / New Game / Credits column with the
+  design's five entries (New game, Continue, PC, Options, Credits) in a
+  Platinum frame at the bottom left; Options opens the same page as in
+  levels (speed and zoom).
+- Stand-ins: Rowan is the Gentleman sheet, Looker the Policeman sheet.

@@ -407,7 +407,12 @@ Unlocked after each gym. Each has a fixed rule set and gives a reward:
   The 17 type colours are CSS variables; Pixelify Sans (OFL, bundled) for
   general text, a system sans-serif for long text. Variables, components
   and the sheet cutter are documented in `docs/ui.md`.
-- Title screen: game name, Continue, New Game, Credits.
+- Title screen: the living Sinnoh diorama (the `title` map with a slow
+  pan, real-clock tint, one weather effect per load and the cast scenes of
+  `docs/design-content.md`: spar, chase, fishing trip, picnic, Galactic
+  business, flyover, rift, re-cast every 90 s) behind a Platinum menu frame
+  (New game, Continue, PC, Options, Credits), the title in Power Clear Bold
+  and the badge case at the top right. The menu never waits on the scenes.
 - Level select on the Platinum town map at 3x (768x576, centred, nearest
   filtering): every level is a marker at its `mapPos` (town-map pixels; a
   dot for routes, lakes and caves, the square for towns), red when open,
