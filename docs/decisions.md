@@ -369,3 +369,15 @@ closest to Pokémon Tower Defense when the spec was ambiguous.
   their own exist; the rooms are its two stairways.
 - Dialga and Palkia Origin share one `event-origin` trainer entry with
   `lane: both`, so one comes down each stairway.
+
+## Phase 9 item 4 (shiny icons and stand-in maps)
+
+- Shiny form icons already came from the shiny portraits; the gap was
+  folders with shiny sheets but no shiny portrait (14). Those get a
+  32x32 icon cut from the first down-facing frame of the shiny Idle
+  sheet (`scripts/make-shiny-icons.py`), recorded as `shinyIcon` by the
+  sprite index and loaded at boot; the runtime prefers the portrait cut
+  when both exist.
+- The Temporal Spire already sits on its own map (the maps session
+  switched it); the stand-in table keeps Shadow Mewtwo, Victory Road,
+  Turnback Cave, the Hall of Origin and the Regi chambers.

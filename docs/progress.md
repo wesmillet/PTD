@@ -183,6 +183,5 @@ maps and no levels. Team Rocket's balloon and Hunter J have no art.
 | `turnback-cave` | `spear-pillar` (at night) | Turnback Cave (rooms that shuffle) |
 | `hall-of-origin` | `spear-pillar` | The Hall of Origin (a stair of light) |
 | `regirock-chamber`, `regice-chamber`, `registeel-chamber` | `oreburgh-mine-1f`, `lake-acuity`, `iron-island` | Sealed chambers, if wanted |
-| `temporal-spire` | `spear-pillar` | The Temporal Spire (a spiral up the spire, PMD-style) |
 | `shadow-mewtwo` | `stadium-grass` (at night) | The stadium at night with empty stands, if a night variant is wanted |
 | Galactic Eterna Building, Solaceon Ruins | none (levels not built) | The rooftop garden; the ruins |

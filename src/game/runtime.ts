@@ -75,6 +75,7 @@ export function iconInfo(species: number): IconInfo {
  */
 export function iconUrl(species: number, animated = true, shiny = false): string | undefined {
   if (shiny && hasShinyPortrait(species)) return portraitUrl(species, 'Normal', true);
+  if (shiny && hasShinyIcon(species)) return `${import.meta.env.BASE_URL}assets/icons/${folderIconName(dexFolder(species))}-shiny.png`;
   const info = iconInfo(species);
   if (!info.icon) return undefined;
   const base = `${import.meta.env.BASE_URL}assets/icons/${folderIconName(dexFolder(species))}`;
@@ -87,13 +88,19 @@ export function iconUrl(species: number, animated = true, shiny = false): string
  * ("icon-<dex>-shiny", one frame); otherwise the normal icon.
  */
 export function iconTextureKey(species: number, frame: 0 | 1, shiny = false): string {
-  if (shiny && hasShinyPortrait(species)) return shinyIconTextureKey(species);
+  if (shiny && (hasShinyPortrait(species) || hasShinyIcon(species))) return shinyIconTextureKey(species);
   const info = iconInfo(species);
   const stem = folderIconName(dexFolder(species));
   return info.animatedIcon ? `icon-${stem}-${frame}` : `icon-${stem}`;
 }
 
-/** Texture key of the shiny box icon BootScene builds from the shiny Normal portrait. */
+/** Whether a folder ships a shiny icon file (cut from the shiny Idle sheet by scripts/make-shiny-icons.py). */
+export function hasShinyIcon(species: number): boolean {
+  const info = (spriteFolders as Record<string, { shinyIcon?: boolean }>)[dexFolder(species)];
+  return info?.shinyIcon ?? false;
+}
+
+/** Texture key of the shiny box icon: cut from the shiny Normal portrait at boot, or the shipped shiny icon file. */
 export function shinyIconTextureKey(species: number): string {
   return `icon-${folderIconName(dexFolder(species))}-shiny`;
 }

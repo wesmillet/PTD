@@ -298,7 +298,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0059-hisui": {
     "shiny": true,
@@ -371,7 +372,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0065-mega": {
     "shiny": true,
@@ -797,6 +799,7 @@
     "shinyPortraits": [],
     "icon": true,
     "animatedIcon": false,
+    "shinyIcon": true,
     "species": 115,
     "form": "mega",
     "formName": "Mega"
@@ -1203,7 +1206,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0162": {
     "shiny": true,
@@ -1216,7 +1220,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0168": {
     "shiny": true,
@@ -1637,7 +1642,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0208-mega": {
     "shiny": true,
@@ -2751,7 +2757,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0362": {
     "shiny": true,
@@ -3070,7 +3077,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0389": {
     "shiny": true,
@@ -3140,7 +3148,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0393": {
     "shiny": true,
@@ -3210,7 +3219,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0397": {
     "shiny": true,
@@ -3397,7 +3407,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0408": {
     "shiny": true,
@@ -3830,7 +3841,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0431": {
     "shiny": true,
@@ -4240,7 +4252,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0454": {
     "shiny": true,
@@ -5274,7 +5287,8 @@
     ],
     "shinyPortraits": [],
     "icon": true,
-    "animatedIcon": true
+    "animatedIcon": true,
+    "shinyIcon": true
   },
   "0644": {
     "shiny": true,
